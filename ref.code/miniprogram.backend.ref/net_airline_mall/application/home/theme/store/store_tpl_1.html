@@ -1,0 +1,215 @@
+{include file='public/head'}
+<link rel="stylesheet" type="text/css" href="__STATIC__/plugins/swiper/swiper.min.css">
+<link rel="stylesheet" type="text/css" href="__THEME__/css/store.css">
+<link rel="stylesheet" type="text/css" href="__THEME__/css/preview.css">
+{include file='public/top_nav'}
+{include file='public/store_search_bar'}
+{include file='public/shop_header'}
+
+<div class="shop-list-main">
+    <div class="pc-wrapper">
+        {include file='public/shop_nav'}
+
+        <div class="content" style="min-height: 891px; background-image: none; background-color: transparent; background-position: 100% 50%; background-repeat: repeat;">
+            {if isset($store.carcousel.img)}
+            <div class="item">
+                <div class="view">
+                    <div class="swiper-container" id="shop_banner" data-effect="{$store.slide_type}">
+                        <div class="swiper-wrapper">
+                            {foreach $store.carcousel.img as $index=>$img}
+                            <div class="swiper-slide">
+                                <a href="{$store['carcousel']['url'][$index]}"><img src="{$img}"></a>
+                            </div>
+                            {/foreach}
+                        </div>
+                        <div class="swiper-pagination shop_banner_pagination"></div>
+                    </div>
+                </div>
+            </div>
+            {/if}
+            {if count($data.coupon)}
+            <div class="item w1200">
+                <div class="view">
+                    <div class="floor" data-type="range">
+                        <div class="mt">
+                            <div class="con"><h2>领券更实惠</h2>
+                                <p>SALE COUPON</p></div>
+                        </div>
+                        <div class="w1200">
+                            <ul class="coupon">
+                                {foreach $data.coupon as $cid => $vo}
+                                <li onclick="receiveCoupon('{$vo.coupon_id}')">
+                                    <div class="store-coupon">
+                                        <a class="">
+                                            <span class="coupon-money"><em>{$vo.money}</em>元</span>
+                                            <span class="coupon-condition">满{$vo.min_goods_amount}元使用</span>
+                                            <span class="coupon-guide">立即领取</span>
+                                        </a>
+                                    </div>
+                                </li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/if}
+            <div class="item w1200" data-mode="floor" data-purebox="goods" data-diff="0">
+                <div class="view">
+                    <div class="floor" data-type="range">
+                        <div class="mt">
+                            <div class="con"><h2>热卖精品</h2>
+                                <p>HOT GOODS</p></div>
+                        </div>
+                        <div class="mc w1200">
+                            {if count($data.goods.hot)}
+                            <ul class="row3">
+                                {volist name="data.goods.hot" id="vo"}
+                                <li>
+                                    <div class="img"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}"><img src="{$vo.original_img}"></a></div>
+                                    <div class="info">
+                                        <div class="name"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}">{$vo.goods_name}</a></div>
+                                        <div class="price"><em>¥</em>{$vo.shop_price}</div>
+                                        <div class="btn_hover"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}">立即购买</a></div>
+                                    </div>
+                                </li>
+                                {/volist}
+                            </ul>
+                            {else /}
+                            <div class="user-order-list user-order-list-special">
+                                <div class="no_records" style="padding-left:30%"><i class="no_icon"></i>
+                                    <div class="no_info"><h3>本店正在努力上传商品哦~</h3></div>
+                                </div>
+                            </div>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {if isset($data.adv.top.img)}
+            <div class="item w1200" data-mode="advImg4" data-purebox="adv" data-li="1" data-diff="0" style="display: block;">
+                <div class="view">
+                    <div class="advertising">
+                        <ul class="row{:count($data.adv.top.img)}" data-type="range">
+                            {foreach $data.adv.top.img as $idx => $vo}
+                            <li style="height:337px;"><a href="{$data.adv['top']['url'][$idx]}"><img src="{$vo}"></a></li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {/if}
+            <div class="item w1200" data-mode="floor" data-purebox="goods" data-diff="1" style="display: block;">
+
+                <div class="view">
+                    <div class="floor" data-type="range">
+                        <div class="mt">
+                            <div class="con"><h2>人气销量榜单</h2>
+                                <p>SALE TOP</p></div>
+                        </div>
+                        <div class="mc w1200">
+                            {if count($data.goods.sale)}
+                            <ul class="row4">
+                                {foreach $data.goods.sale as $vo}
+                                <li>
+                                    <div class="img"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}"><img src="{$vo.original_img}"></a></div>
+                                    <div class="info">
+                                        <div class="name"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}">{$vo.goods_name}</a></div>
+                                        <div class="price"><em>¥</em>{$vo.shop_price}</div>
+                                        <div class="btn_hover"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}">立即购买</a></div>
+                                    </div>
+                                </li>
+                                {/foreach}
+                            </ul>
+                            {else /}
+                            <div class="user-order-list user-order-list-special">
+                                <div class="no_records" style="padding-left:30%"><i class="no_icon"></i>
+                                    <div class="no_info"><h3>本店正在努力上传商品哦~</h3></div>
+                                </div>
+                            </div>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {if isset($data.adv.bottom.img)}
+            <div class="item w1200" data-purebox="adv">
+                <div class="view" style="display: block;position:relative">
+                    <div class="swiper-container adv_swiper" data-effect="{$adv.bottom.effect |default='slide'}">
+                        <div class="swiper-wrapper">
+                            {foreach $data.adv.bottom.img as $idx => $vo}
+                            <div class="swiper-slide"><a href="{$data.adv['bottom']['url'][$idx]}"><img src="{$vo}"></a></div>
+                            {/foreach}
+                        </div>
+                        <div class="swiper-pagination paginator"></div>
+                    </div>
+                </div>
+            </div>
+            {/if}
+            <div class="item w1200" data-mode="floor" data-purebox="goods" data-diff="2" style="display: block;">
+
+                <div class="view">
+                    <div class="floor" data-type="range">
+                        <div class="mc w1200">
+                            <ul class="row5">
+                                {foreach $data.goods.new as $vo}
+                                <li>
+                                    <div class="img"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}"><img src="{$vo.original_img}"></a></div>
+                                    <div class="info">
+                                        <div class="name"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}">{$vo.goods_name}</a></div>
+                                        <div class="price"><em>¥</em>{$vo.shop_price}</div>
+                                        <div class="btn_hover"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}">立即购买</a></div>
+                                    </div>
+                                </li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{include file='public/right_bar'}
+<script type="text/javascript" src="__STATIC__/plugins/swiper/swiper.min.js"></script>
+<script>
+    var length = $("#shop_banner .swiper-slide").length;
+
+    if (length > 1) {
+        new Swiper('#shop_banner', {
+            autoplay: {
+                delay: 5000
+            },
+            pagination: {
+                el: '.shop_banner_pagination',
+                type: 'progressbar'
+            },
+            effect: $("#shop_banner").data("effect"),
+            loop: true,
+            speed: 500,
+        });
+    }
+
+    var adv = $('.adv_swiper');
+    var adv_length = adv.find('.swiper-slide').length;
+    var swi;
+    if (adv_length > 1) {
+        swi = new Swiper('.adv_swiper', {
+            autoplay: true,
+            slidesPerView: 'auto',
+            autoHeight: true,
+            speed: 500,
+            grabCursor: true,
+            pagination: {
+                el: '.paginator',
+            },
+            effect: adv.data("effect"),
+            loop: true,
+        });
+        swi.params.autoplay.delay = 5000;
+    }
+</script>
+{include file='public/footer'}

@@ -1,0 +1,186 @@
+{include file="public/header"}
+<div id="app" v-cloak>
+    <div class="tabmenu">
+        <ul class="tab">
+            <li><a href="/seller/goods/attr_type.html">商品类型</a></li>
+            <li class="active"><a href="javascript:">属性分组</a></li>
+            <li><a href="/seller/goods/attr_cate.html">属性分类</a></li>
+        </ul>
+    </div>
+
+    <div class="btn-info">
+        <a class="sc-btn sc-blue-btn" href="/seller/goods/attr_group_add.html"><i class="icon-edit"></i>新建商品分组</a>
+    </div>
+
+    <div class="search-info">
+        <div class="search-form">
+            <div class="search-key">
+                <input type="text" class="text" v-model="keywords" placeholder="关键字" @keydown.enter="getData(true)">
+                <input type="button" class="submit" id="search-btn" value=" 搜索 " @click="getData(true)">
+            </div>
+        </div>
+    </div>
+
+    <div class="list-div" id="listDiv">
+
+        <table class="ecsc-default-table">
+            <thead>
+            <tr>
+                <th width="6%"><a @click="orderby('group_id');" class="orange">编号</a><img v-show="field=='group_id'" class="sort-desc-img" :src="'/public/static/images/sort_'+sort+'.gif'"/></th>
+                <th width="20%"><a @click="orderby('name');" class="orange">商品分组名称</a><img v-show="field=='name'" class="sort-desc-img" :src="'/public/static/images/sort_'+sort+'.gif'"/></th>
+                <th width="20%">属性分类</th>
+                <th width="12%">属性数</th>
+                <th width="15%">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="bd-line" v-for="(vo,index) in list">
+                <td>{{vo.id}}</td>
+                <td class="center">
+                    <div @click="edit('name', index)" :title="vo.goods_name" title="点击修改内容" class="edit-div">{{vo.name}}</div>
+                </td>
+                <td>{{type_cat[vo.cate_id]}}</td>
+                <td>{{vo.attr_count}}</td>
+                <td class="ecsc-table-handle tr">
+                    <span><a :href="'/seller/goods/attr_list.html?group_id='+vo.group_id" title="属性列表" class="btn-orange"><i class="icon sc_icon_see"></i><p>查看</p></a></span>
+                    <span><a :href="'/seller/goods/attr_group_add.html?id='+vo.group_id" title="编辑" class="btn-green"><i class="icon icon-edit"></i><p>编辑</p></a></span>
+                    <span><a @click="del(index)" title="删除" class="btn-red"><i class="icon icon-trash"></i><p>删除</p></a></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            field: 'group_id',
+            sort: 'desc',
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            keywords: '',
+            beforeRequest: false,
+            type_cat: {},
+            cate_id: getUrlParam('cate_id')
+        },
+        methods: {
+            getData: function (search) {
+                if (search) {
+                    vm.page = 1;
+                }
+                var param = {
+                    page: vm.page,
+                    pageSize: vm.pageSize,
+                    field: vm.field,
+                    sort: vm.sort,
+                    cate_id: vm.cate_id
+                };
+                if (vm.keywords) {
+                    delete param.cate_id;
+                    vm.cate_id = 0;
+                    param.keywords = vm.keywords;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/attr_group',
+                    data: param,
+                    success: function (data) {
+                        vm.count = data.count;
+                        vm.page = data.page;
+                        vm.list = data.list;
+                        vm.type_cat = data.type_cat;
+                        if (data.page == 1) vm.pagerender();
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            orderby: function (field) {
+                this.field = field;
+                this.sort = this.sort == 'desc' ? 'asc' : 'desc';
+                this.getData();
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            edit: function (field, index) {
+                var obj = event.currentTarget;
+                var param = {
+                    id: vm.list[index]['group_id'],
+                    field: field
+                };
+                clickEdit(obj, param, vm.modify);
+            },
+            modify: function (param, callback) {
+                if (vm.beforeRequest) {
+                    return;
+                }
+                vm.beforeRequest = true;
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/goods/attr_group_add.html?operate=modify",
+                    data: param,
+                    success: function (data) {
+                        vm.beforeRequest = false;
+                        callback(data);
+                    },
+                    error: function (xhr, type) {
+                        vm.beforeRequest = false;
+                        callback(xhr.responseJSON);
+                    }
+                });
+            },
+            del: function (index) {
+                if (alert) {
+                    if (!window.confirm('确定要删除吗？')) {
+                        return;
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/goods/attr_group_add.html?operate=del",
+                    data: {id: vm.list[index].group_id},
+                    success: function (data) {
+                        vm.list.splice(index, 1);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        }
+    });
+
+    $(function () {
+        vm.getData();
+    });
+</script>
+{include file="public/footer"}

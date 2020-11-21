@@ -1,0 +1,81 @@
+{include file='public/head'}
+
+<style>
+    body {
+        background-color: #fff;
+    }
+
+    .content {
+        text-align: center
+    }
+
+    .banner_top {
+        position: relative;
+    }
+
+    .banner_top > img {
+        max-width: 100%;
+    }
+
+    @media (min-width: 100px) {
+        .content .banner_top .pic-warp {
+            top: 14.5rem;
+            left: 65%;
+            width: 100px;
+        }
+    }
+
+    @media (min-width: 1300px) and (max-width: 1400px) {
+        .content .banner_top .pic-warp {
+            top: 325px;
+            left: 65%;
+        }
+    }
+
+    @media (min-width: 1600px) and (max-width: 2000px) {
+        .content .banner_top .pic-warp {
+            top: 470px;
+            left: 65%;
+        }
+    }
+
+    .banner_top .pic-warp {
+        position: absolute;
+        width: 120px;
+    }
+
+    .banner_top .pic-warp span {
+        display: inline-block;
+        margin-top: 5px;
+        font-size: 14px;
+        color: #379f18;
+        font-weight: bold;
+    }
+
+    .banner_top .pic-warp img {
+        width: 100%;
+    }
+
+    .footer {
+        background-color: #fff;
+        text-align: center;
+        margin: 30px 0;
+    }
+</style>
+<div class="content">
+    <div class="banner_top">
+        <img src="{$pic}" alt="益农商城">
+        <div class="pic-warp">
+            <img src="{:url('/api/common/qrcode',['no_logo'=>1])}?str={:url('index/qrcode_jump','',true,true)}" alt="益农商城">
+            <span>扫描二维码下载</span>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    技术支持：郑州网航科技有限公司
+</div>
+<script type="text/javascript" src="__STATIC__/js/jquery.purebox.js"></script>
+<script type="text/javascript" src="__STATIC__/js/jquery.validation.min.js"></script>
+<script type="text/javascript" src="__THEME__/js/mall-common.js"></script>
+</body>
+</html>

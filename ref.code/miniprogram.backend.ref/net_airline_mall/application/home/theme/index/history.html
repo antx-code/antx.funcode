@@ -1,0 +1,314 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<style>.w1200{width: 1390px;}</style>
+<div class="w w1200">
+    <div class="crumbs-nav">
+        <div class="crumbs-nav-main clearfix">
+            <span><a href="../member">首页</a></span><span class="arrow">&gt;</span> <span class="finish">浏览历史</span></div>
+    </div>
+</div>
+<div class="container">
+    <div class="w w1390">
+        <div class="filter">
+            <div class="filter-wrap">
+                <div class="filter-sort">
+                    <a href="/home/index/history?sort=goods_id&&order={if $order=='ASC'}DESC{else /}ASC{/if}&&ship={$ship}&&self={$self}&&have={$have}"
+                       class="sort-item {if $sort=='goods_id'}curr{/if}">综合
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}&&ship={$ship}&&self={$self}&&have={$have}"></i>
+                    </a>
+                    <a href="/home/index/history?sort=total_sale_num&&order={if $order=='ASC'}DESC{else /}ASC{/if}&&ship={$ship}&&self={$self}&&have={$have}"
+                       class="sort-item {if $sort=='total_sale_num'}curr{/if}">销量
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}&&ship={$ship}&&self={$self}&&have={$have}"></i>
+                    </a>
+                    <a href="/home/index/history?sort=last_update&&order={if $order=='ASC'}DESC{else /}ASC{/if}&&ship={$ship}&&self={$self}&&have={$have}"
+                       class="sort-item {if $sort=='last_update'}curr{/if}">新品
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}&&ship={$ship}&&self={$self}&&have={$have}"></i>
+                    </a>
+                    <a href="/home/index/history?sort=comment_num&&order={if $order=='ASC'}DESC{else /}ASC{/if}&&ship={$ship}&&self={$self}&&have={$have}"
+                       class="sort-item {if $sort=='comment_num'}curr{/if}">评论数
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}&&ship={$ship}&&self={$self}&&have={$have}"></i>
+                    </a>
+                    <a href="/home/index/history?sort=shop_price&&order={if $order=='ASC'}DESC{else /}ASC{/if}&&ship={$ship}&&self={$self}&&have={$have}"
+                       class="sort-item {if $sort=='shop_price'}curr{/if}">价格
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}"></i>
+                    </a>
+                </div>
+                <div class="filter-range">
+                    <div class="fcheckbox">
+                        <div class="checkbox_items">
+                            <div class="checkbox_item {if $ship==1}checkbox-checked{/if}">
+                                <input type="checkbox" name="fk-type" class="ui-checkbox" value="" id="store-checkbox-011"
+                                       {if $ship>0}checked='checked'{/if}>
+                                <label class="ui-label" for="store-checkbox-011">包邮</label>
+                                <i id="input-i1" rev="/home/index/history?sort={$sort}&&order={$order}&&ship=1&&self={$self}&&have={$have}"></i>
+                                <i id="input-i2" rev="/home/index/history?sort={$sort}&&order={$order}&&ship=0&&self={$self}&&have={$have}"></i>
+                            </div>
+                            <div class="checkbox_item">
+                                <input type="checkbox" name="fk-type" class="ui-checkbox" value="" id="store-checkbox-012"
+                                       {if $self==0}checked='checked'{/if}>
+                                <label class="ui-label" for="store-checkbox-012">自营商品</label>
+                                <i id="input-i1" rev="/home/index/history?sort={$sort}&&order={$order}&&ship={$ship}&&self=0&&have={$have}"></i>
+                                <i id="input-i2" rev="/home/index/history?sort={$sort}&&order={$order}&&ship={$ship}&&self=1&&have={$have}"></i>
+                            </div>
+                            <div class="checkbox_item">
+                                <input type="checkbox" name="fk-type" class="ui-checkbox" value="" id="store-checkbox-013"
+                                       {if $have>0}checked='checked'{/if}>
+                                <label class="ui-label" for="store-checkbox-013">仅显示有货</label>
+                                <i id="input-i1" rev="/home/index/history?sort={$sort}&&order={$order}&&ship={$ship}&&self={$self}&&have=1"></i>
+                                <i id="input-i2" rev="/home/index/history?sort={$sort}&&order={$order}&&ship={$ship}&&self={$self}&&have=0"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="g-view w">
+            <div class="goods-list" shoptype="gMain">
+                <div class="gl-warp gl-warp-large">
+                    <div class="goods-list-warp">
+                        <ul shoptype="items">
+                            {volist name="list" id="vo"}
+                            <li class="gl-item">
+                                <div class="gl-i-wrap">
+                                    <div class="p-img">
+                                        <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank">
+                                            <img src="{$vo.original_img}">
+                                        </a>
+                                    </div>
+                                    <div class="sider">
+                                        <a href="javascript:void(0);" class="sider-prev prevStop">
+                                            <i class="iconfont icon-left"></i>
+                                        </a>
+                                        <ul>
+                                            {volist name="vo.goods_gallery" id="vo2"}
+                                            <li>
+                                                <img src="{$vo2.img_original}" width="26" height="26">
+                                            </li>
+                                            {/volist}
+                                        </ul>
+                                        <a href="javascript:void(0);" class="sider-next nextStop">
+                                            <i class="iconfont icon-right"></i>
+                                        </a>
+                                    </div>
+                                    <div class="p-lie">
+                                        <div class="p-price">
+                                            <em>¥</em>{$vo.shop_price}
+                                        </div>
+                                        <div class="p-num">已售<em>{$vo.total_sale_num+$vo.virtual_sale_num}</em>件</div>
+                                    </div>
+                                    <div class="p-name">
+                                        <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" title="{$vo.goods_name}"
+                                           target="_blank">{$vo.goods_name}</a>
+                                    </div>
+
+                                    <div class="p-store">
+                                        {if $vo.store_name!=''}
+                                        <a href="javascript:;" title="{$vo.store_name}" class="store">{$vo.store_name}</a>
+                                        {else /}
+                                        <a href="javascript:;" title="{$siteInfo.shop_name}" class="store">{$siteInfo.shop_name}</a>
+                                        {/if}
+                                        <a href="javascript:;" id="{$vo.store_id}"
+                                           ru_id="0" class="p-kefu p-c-violet"><i class="iconfont icon-kefu"></i>
+                                        </a>
+                                    </div>
+
+                                    <div class="p-activity">
+                                        {if $vo.store_name == ''}
+                                        <span class="tag tac-sr">
+                                            <i class="i-left"></i>
+                                            自营
+                                            <i class="i-right"></i>
+                                        </span>
+                                        {/if}
+                                    </div>
+                                    <div class="p-operate">
+                                        {if $vo.product_id>0}
+                                        <a href="javascript:void(0);" id="compareLink" title="没有设置属性类型无法对比" class="not_compareLink">
+                                            <input id="{$vo.goods_id}" type="checkbox" name="duibi" class="ui-checkbox">
+                                            <label class="ui-label">对比</label>
+                                        </a>
+                                        {else /}
+                                        <a href="javascript:void(0);" id="compareLink">
+                                            <input id="{$vo.goods_id}" type="checkbox" name="duibi" class="ui-checkbox"
+                                                   onclick="Compare.add(this, '{$vo.goods_id}','{$vo.goods_name}','1', '{$vo.original_img}',
+                                                   '<em>¥</em>{$vo.shop_price}', '<em>¥</em>{$vo.market_price}')">
+                                            <label class="ui-label" for="{$vo.goods_id}">对比</label>
+                                        </a>
+                                        {/if}
+                                        <a href="javascript:collect({$vo.goods_id});" class="choose-btn-coll"><i class="iconfont icon-zan-alt"></i>收藏</a>
+                                        <a href="javascript:void(0);"
+                                           onclick="javascript:goodsListaddToCart('{$vo.goods_id}',0,event,this,'flyItem');"
+                                           rev="{$vo.original_img}"
+                                           data-dialog="addCart_dialog"
+                                           data-divid="addCartLog" class="addcart">
+                                            <i class="iconfont icon-carts"></i>
+                                            加入购物车
+                                        </a>
+                                    </div>
+                                    <div class="history_close">
+                                        <a href="javascript:delHistory({$vo.click_id})"><img src="/public/static/theme/images/p-del.png"></a>
+                                    </div>
+                                </div>
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+                    <div id="flyItem" class="fly_item"><img src="" width="40" height="40"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <!--推广产品-->
+            <div class="goods-spread hide">
+                <a href="javascript:void(0);" class="g-stop" shoptype="gstop"><i class="iconfont icon-right"></i></a>
+                <div class="gs-warp">
+                    <div class="gs-tit">推广商品</div>
+                    <ul class="gs-list">
+                        {volist name="adgoodsList" id="vo"}
+                        <li class="opacity_img">
+                            <div class="">
+                                <div class="p-img">
+                                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank">
+                                        <img src="{$vo.original_img}" width="190" height="190">
+                                    </a>
+                                </div>
+                                <div class="p-price">
+                                    <em>¥</em>{$vo.shop_price}
+                                </div>
+                                <div class="p-name">
+                                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" title="{$vo.goods_name}"
+                                       target="_blank">{$vo.goods_name}
+                                    </a>
+                                </div>
+                                <div class="p-num">已售<em>{$vo.total_sale_num+$vo.virtual_sale_num}</em>件</div>
+                            </div>
+                        </li>
+                        {/volist}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix" id="pages_ajax"></div>
+    </div>
+
+</div>
+
+<div class="duibi_box" id="slideTxtBox">
+    <div class="parWarp">
+        <div class="parTit">对比栏</div>
+        <div class="parBd">
+            <div class="slideBox5" id="duibilan">
+                <div id="diff-items" class="diff-items clearfix">
+                    <dl class="hasItem" id="compare_goods1">
+                        <dt><h1>1</h1></dt>
+                        <dd><span class="ts">您还可以继续添加</span></dd>
+                    </dl>
+                    <dl class="hasItem" id="compare_goods2">
+                        <dt><h1>2</h1></dt>
+                        <dd><span class="ts">您还可以继续添加</span></dd>
+                    </dl>
+                    <dl class="hasItem" id="compare_goods3">
+                        <dt><h1>3</h1></dt>
+                        <dd><span class="ts">您还可以继续添加</span></dd>
+                    </dl>
+                    <dl class="hasItem" id="compare_goods4">
+                        <dt><h1>4</h1></dt>
+                        <dd><span class="ts">您还可以继续添加</span></dd>
+                    </dl>
+                </div>
+                <div class="diff-operate">
+                    <a id="compare_button" class="compare-active"></a>
+                    <a id="qingkong" class="del-items">清空对比栏</a>
+                    <a href="javascript:;" class="hide-me" shoptype="db_hide">隐藏</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file='public/right_bar'}
+{include file='public/footer'}
+
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__STATIC__/js/common.js"></script>
+<script type="text/javascript" src="__THEME__/js/magiczoomplus.min.js"></script>
+<script type="text/javascript" src="__THEME__/js/parabola.js"></script>
+<script type="text/javascript" src="__THEME__/js/compare.js"></script>
+<script type="text/javascript" src="__THEME__/js/jd_choose.js"></script>
+<script>
+    var total = '{$total}';
+    $(function(){
+        $(".gl-i-wrap").slide({mainCell:".sider ul",effect:"left",pnLoop:false,autoPlay:false,autoPage:true,prevCell:".sider-prev",nextCell:".sider-next",vis:5});
+        Compare.init();
+
+        if(total > 0){
+            pageinitGet();
+            $(".goods-spread").removeClass('hide');
+        }else{
+            $(".no_records").removeClass('hide');
+            $(".goods-spread").hide();
+        }
+
+    });
+    //删除历史记录
+    function delHistory(click_id){
+        pbDialog('您要删除该浏览历史商品吗！',"",0,'','',"",true,function delete_history(){
+            $.post('/home/member/dodelete', {
+                pageparm: JSON.stringify({'click_id':click_id}),
+                table: 'goods_click'
+            }, function (ret) {
+                if (ret.status == 1) {
+                    location.reload();
+                } else {
+                    layer.msg(ret.msg, {icon: 2});
+                }
+            }, 'json');
+        });
+    }
+    /* *
+     * 添加商品到购物车
+     */
+    function goodsListaddToCart(goods_id, parentId, event, obj, divId, store_id, end_time, store_mobile) {
+        var client_x = 0, client_y = 0, img_url = 0;
+        if (typeof (obj) != "undefined" && event) {
+            img_url = obj.rev;
+            client_x = event.clientX;
+            client_y = event.clientY;
+        }
+
+        $.post('/home/cart/addCart', {
+            goods_id: goods_id,
+            num: 1,
+            attr_keys: '',
+        }, function (ret) {
+            if(ret.status == 1){
+                flyCart(client_x, client_y, img_url, ret.cart_num, ret, 'flyItem');
+            }else{
+                pbDialog(ret.msg, "", 0, 500, 80, 50);
+            }
+            console.log(JSON.stringify(ret));
+        }, 'json');
+    }
+
+    function pageinitGet(elem = "pages_ajax", theme="#EF4F4F") {
+        layui.use('laypage', function () {
+            var laypage = layui.laypage;
+            laypage.render({
+                elem: elem, //注意，这里的 test1 是 ID，不用加 # 号
+                count: total, //数据总数，从服务端得到
+                limit: 20,
+                limits: [10, 20, 30, 40, 50, 100],
+                groups: 5,
+                theme: theme,
+                curr: {$page},
+                layout: ['prev', 'page', 'next', 'limit'],
+                jump: function (obj, first) {
+                    if(!first){
+                        //"/home/index/history?sort={$sort}&&order={$order}&&ship={$ship}&&self={$self}&&have=0"
+                        window.location.href = "/home/index/history?sort={$sort}&&order={$order}&&ship={$ship}&&self={$self}&&have={$have}&&page="+obj.curr+'&&rows='+obj.limit;
+                    }
+                }
+            });
+        });
+    }
+</script>

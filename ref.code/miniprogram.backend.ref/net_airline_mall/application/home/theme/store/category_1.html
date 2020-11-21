@@ -1,0 +1,142 @@
+{include file='public/head'}
+<link rel="stylesheet" type="text/css" href="__THEME__/css/store.css">
+<link rel="stylesheet" type="text/css" href="__THEME__/css/preview.css">
+{include file='public/top_nav'}
+{include file='public/store_search_bar'}
+{include file='public/shop_header'}
+{include file='public/shop_nav'}
+
+<div class="seller-list-main">
+    <div class="w w1200">
+        <div class="selector">
+            <div class="s-line">
+                <div class="s-l-wrap">
+                    <div class="s-l-tit"><span>搜索：</span></div>
+                    <div class="s-l-value">
+                        <form method="GET" action="{:url('store/category',['id'=>$store.store_id,'cid'=>$Think.param.cid])}" class="shop-search" name="listform" onsubmit="return checkSearch()">
+                            <input type="text" id="sp-keyword" name="keyword" value="{$Request.param.keyword}" placeholder="商品名称关键字" autocomplete="off">
+                            <button id="btnShopSearch" type="submit">搜索</button>
+                            <input type="hidden" value="5" id="merchant_id" name="merchant_id">
+                            <input type="hidden" value="44" id="cat_id" name="cat_id">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix mt15">
+            <div class="shop-list-side">
+                <div class="side-box">
+                    <h2>店铺分类</h2>
+                    <div class="side-menu">
+                        {foreach $cat as $vo}
+                        <dl class="j-slideToggle-wp active">
+                            <dt class="menu-level-1"><a href="{:url('store/category',['id'=>$store.store_id,'cid'=>$vo.cat_id])}">{$vo.cat_name}</a><i class="iconfont icon-xia j-slideToggle-handle"></i></dt>
+                            {foreach $vo.children as $vo2}
+                            <dd class="j-slideToggle-con" style="display: block;">
+                                <p><a href="{:url('store/category',['id'=>$store.store_id,'cid'=>$vo2.cat_id])}">{$vo2.cat_name}</a></p>
+                            </dd>
+                            {/foreach}
+                        </dl>
+                        {/foreach}
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-list-view">
+                <div class="filter">
+                    <div class="filter-wrap">
+                        <div class="filter-sort">
+                            <a data-sort="sort_order" class="">默认<i class="iconfont icon-arrow-up"></i></a>
+                            <a data-sort="total_sale_num" class="">销量<i class="iconfont icon-arrow-up"></i></a>
+                            <a data-sort="shop_price" class="">价格<i class="iconfont icon-arrow-up"></i></a>
+                            <a data-sort="last_update" class="">新品<i class="iconfont icon-arrow-up"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="g-view w">
+                    <div class="goods-list" shoptype="gMain">
+                        <ul class="gl-warp gl-warp-large">
+                            {foreach $goodsList as $goods}
+                            <li class="gl-item">
+                                <div class="gl-i-wrap">
+                                    <div class="p-img"><a target="_blank" href="{:url('goods/detail',['id'=>$goods.goods_id])}"><img class="item_hd_745" alt="{$goods.goods_name}" src="{$goods.original_img}"></a></div>
+                                    <div class="sider">
+                                        <ul>
+                                            {foreach $goods.gallery as $idx => $img}
+                                            <li class="{if $idx==1}curr{/if}" data="hd_745"><a href="javascript:void(0);"><img src="{$img.img_original}" alt="{$goods.goods_name}" width="26" height="26" title="{$goods.goods_name}"></a></li>
+                                            {/foreach}
+                                        </ul>
+                                    </div>
+                                    <div class="p-lie">
+                                        <div class="p-price">
+                                            <em>¥</em>{$goods.shop_price}
+                                        </div>
+                                        <div class="p-num">已售<em>{$goods.total_sale_num+$goods.virtual_sale_num}</em>件</div>
+                                    </div>
+                                    <div class="p-name"><a target="_blank" title="{$goods.goods_name}" href="{:url('goods/detail',['id'=>$goods.goods_id])}">{$goods.goods_name}</a></div>
+                                </div>
+                            </li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="center">
+                        {$paginor|raw}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{include file='public/right_bar'}
+<script>
+
+    function slideToggle() {
+        var wp = $(".j-slideToggle-wp");
+        wp.each(function (i, el) {
+            var $this = $(el);
+            var handle = $this.find(".j-slideToggle-handle");
+            var con = $this.find(".j-slideToggle-con");
+            handle.click(function () {
+                con.slideToggle();
+                $this.toggleClass("active");
+            });
+        });
+    }
+
+    function checkSearch() {
+        if ($('#sp-keyword').val().length < 1) {
+            layer.msg('请输入搜索关键字', {time: 1500});
+            return false;
+        }
+        return true;
+    }
+
+    var param = JSON.parse('{:json_encode($param)}');
+    $(function () {
+        var sort_a = $('*[data-sort="{$param.sort}"]').addClass('curr');
+        if (param.order == 'DESC') {
+            sort_a.find('i').removeClass('icon-arrow-up').addClass('icon-arrow-down');
+        }
+        slideToggle();
+        $('.filter-sort a').on('click', function () {
+            if (param.sort = this.dataset.sort) {
+                param.order = param.order == 'ASC' ? 'DESC' : 'ASC';
+            } else {
+                param.sort = this.dataset.sort;
+                param.order = 'DESC';
+            }
+            if (document.getElementById('sp-keyword').value) {
+                param.keyword = document.getElementById('sp-keyword').value;
+            }
+            param = Object.keys(param).map(function (key) {
+                return encodeURIComponent(key) + "=" + encodeURIComponent(param[key]);
+            }).join("&");
+            location.href = location.pathname + '?' + param;
+        });
+    });
+</script>
+{include file='public/footer'}

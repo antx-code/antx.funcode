@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>商品详情</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .goods_desc img{max-width: 100% !important;}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="con">
+        <div class="con_main goods">
+            <div class="swipe van-swipe">
+                <div class="goods_photo d_jump">
+                    <div id='slider' class='swipe'>
+                        <div class='swiper-wrapper'>
+                            <template v-for="(vo,index) in info.gallery">
+                                <div class="swiper-slide aui-text-center"><img :src="vo"/></div>
+                            </template>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="cont-box">
+                <div class="dis-box price-box">
+                    <div class="left box-flex">
+                        <h4 class="color-white">
+                            <div class="f-weight">¥{{info.market_goods.sec_price}}</div>
+                            <div class="tag-price dis-box">
+                                <div class="left-tag dis-box">
+                                    <div class="left-icon"><i class="iconfont icon-lightning f-01"></i></div>
+                                    <div class="box-flex tag-right-cont f-01">秒杀</div>
+                                </div>
+                                <div class="box-flex">
+                                    <label class="p-l05 f-01">市场价
+                                        <del>{{info.shop_price}}</del>
+                                    </label>
+                                </div>
+                            </div>
+                        </h4>
+                    </div>
+                    <div class="right">
+                        <div class="time-title f-02 text-center m-top06">距结束还剩:</div>
+                        <div class="f-02 color-white time m-top02">
+                            <div>
+                                <div endtime="1564538400" callback="function(){}" endtext="活动结束">
+                                    <p><span>{{c_h}}</span><i>:</i><span>{{c_m}}</span><i>:</i><span>{{c_s}}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="title bg-color-write f-06 color-3 padding-all">
+                    <span class="m-r05 f-03 van-tag" style="background-color: rgb(255, 68, 68);">自营</span>
+                    <span class="f-05 color-3 f-weight">{{info.goods_name}}</span>
+                    <div class="color-red f-03 m-top04"></div>
+                    <div class="dis-box color-9 f-03 m-top08">
+                        <div class="box-flex">销量 {{info.market_goods.sold_num}}</div>
+                        <div class="box-flex text-center">库存 {{info.market_goods.sec_num}}</div>
+                        <div class="box-flex"><p class="text-right">限购{{info.market_goods.sec_limit}}</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="ect-group dis-box m-top08">
+                <div class="left-cell">数量：</div>
+                <div class="box-flex right-cell">
+                    <div class="div-num dis-box  fr">
+                        <a class="num-less" href="javascript:void(0)" @click="numberreduceInit()"></a>
+                        <input type="number" name="price_times" class="box-flex price_times" v-model="number">
+                        <a class="num-plus" href="javascript:void(0)" @click="numberplusInit()"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="m-top08 van-tabs van-tabs--line">
+                <div class="van-tabs__wrap van-hairline--top-bottom">
+                    <div class="van-tabs__nav van-tabs__nav--line">
+                        <div class="van-tabs__line"
+                             style="width: 94px; transform: translateX(47px); transition-duration: 0.2s;"></div>
+                        <div class="van-tab van-tab--active"><span class="van-ellipsis">商品详情</span></div>
+                        <div class="van-tab"><span class="van-ellipsis">规格参数</span></div>
+                    </div>
+                </div>
+                <div class="van-tabs__content">
+                    <div class="van-tab__pane" style="">
+                        <div class="goods_desc" v-html="info.goods_desc" style="padding: 10px 5px;"></div>
+                    </div>
+                    <div class="van-tab__pane" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="van-goods-action">
+                <div class="van-hairline van-goods-action-mini-btn"><i
+                        class="van-icon van-icon-chat van-goods-action-mini-btn__icon"></i>客服
+                </div>
+                <div class="van-hairline van-goods-action-mini-btn" :class="{'curr':info.iscollect==1}"
+                     @click="collectupdate()">
+                    <i class="van-icon van-icon-like-o van-goods-action-mini-btn__icon" v-if="info.iscollect==0"></i>
+                    <i class="van-icon van-icon-like van-goods-action-mini-btn__icon" v-if="info.iscollect==1"></i>
+                    收藏
+                </div>
+                <button class="van-button van-button--danger van-button--large van-button--square van-goods-action-big-btn" @click="confirmOrder()">
+                    <span class="van-button__text">立即抢购</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var countdown = null;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            id: 50465,
+            number: 1,
+            c_h: '00',//时
+            c_m: '00',//分
+            c_s: '00',//秒
+            info: [],
+
+            buyNow: 'from_gpgoods_detail',
+            promtype: 'seckill_goods',
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('HH:mm');
+            }
+        },
+        methods: {
+            numberplusInit: function () {
+                vm.number++;
+            },
+            numberreduceInit: function () {
+                if (vm.number == 1) {
+                    return false;
+                } else {
+                    vm.number--;
+                }
+            },
+            confirmOrder: function () {
+                api.openWin({
+                    name: 'confirmorder_win',
+                    url: 'widget://html/confirmorder_win.html',
+                    pageParam: {
+                        goods_id: vm.id,
+                        number: vm.number,
+                        buyNow: vm.buyNow,
+                        promtype: vm.promtype,
+                    }
+                });
+            },
+            collectupdate: function () {
+                if (!$api.getStorage('token')) {
+                    wxapp.alert('fail', '未登录');
+                    setTimeout(function () {
+                        longinwin();
+                    });
+                    return false;
+                }
+                wxapp.ajax(config.collectupdate, {
+                    act: 'add',
+                    goods_id: vm.info.goods_id,
+                }).then(function (ret) {
+                    wxapp.alert('success', ret.msg);
+                    vm.init();
+                })
+            },
+            cutdowntime: function (index) {
+                var end_time = vm.info.market_goods.end_time;
+                var curr_time = parseInt(Date.parse(new Date()) / 1000);
+                var diff_time = parseInt(end_time - curr_time);// 倒计时时间差
+                vm.c_h = wxapp.fillzero(Math.floor(diff_time / 3600));
+                vm.c_m = wxapp.fillzero(Math.floor((diff_time / 60 % 60)));
+                vm.c_s = wxapp.fillzero(Math.floor((diff_time % 60)));
+                if (diff_time <= 0) {
+                    vm.c_h = '00';
+                    vm.c_m = '00';
+                    vm.c_s = '00';
+                }
+            },
+            init: function () {
+                wxapp.ajax(config.skdetail, {id: vm.id}).then(function (ret) {
+                    if (ret) {
+                        vm.info = ret.data;
+                    }
+                    countdown = setInterval(function () {
+                        vm.cutdowntime();
+                    }, 1000);
+                });
+            },
+        }
+    });
+    window.onload = function () {
+        vm.id = api.pageParam.id ? api.pageParam.id : 0;
+        vm.init();
+    };
+</script>

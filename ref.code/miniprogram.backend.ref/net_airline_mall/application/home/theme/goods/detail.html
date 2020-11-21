@@ -1,0 +1,651 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+
+<div class="full-main-n">
+    <div class="w w1200 relative">
+        <div class="crumbs-nav">
+            <div class="crumbs-nav-main clearfix">
+                {foreach $goods.breadCrumb as $vo}
+                <div class="crumbs-nav-item">
+                    <div class="menu-drop">
+                        <div class="trigger {if count($vo.children)==0}bottom{/if}">
+                            <a href="{:url('category/index',['id'=>$vo.cat_id])}"><span>{$vo.cat_name}</span></a>
+                            <i class="iconfont icon-down"></i>
+                        </div>
+                        {if count($vo.children)}
+                        <div class="menu-drop-main">
+                            <ul>
+                                {foreach $vo.children as $child}
+                                <li><a href="{:url('category/index',['id'=>$child.cat_id])}">{$child.cat_name}</a></li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                        {/if}
+                    </div>
+                    <i class="iconfont icon-right"></i></div>
+                {/foreach}
+                <span class="cn-goodsName">{$goods.goods_name}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="w w1200">
+        <div class="product-info mt20">
+            <div class="preview">
+                <div class="gallery_wrap">
+                    <ul>
+                        <li shoptype="img">
+                            <a href="{$goods.gallery[0]??''}" class="MagicZoomPlus" id="Zoomer" rel="hint-text: ; selectors-effect: false; selectors-class: img-hover; selectors-change: mouseover; zoom-distance: 10;zoom-width: 400; zoom-height: 474;">
+                                <img src="{$goods.gallery[0]??''}" id="J_prodImg" alt="{$goods.goods_name}">
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="spec-list">
+                    <a href="javascript:void(0);" class="spec-prev"><i class="iconfont icon-left"></i></a>
+                    <div class="spec-items">
+                        <ul>
+                            {volist name="$goods.gallery" id="img"}
+                            <li data-type="img">
+                                <a href="{$img}" rel="zoom-id: Zoomer" rev="{$img}" data-type="img">
+                                    <img src="{$img}" alt="{$goods.goods_name}" width="58" height="58">
+                                </a>
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+                    <a href="javascript:void(0);" class="spec-next"><i class="iconfont icon-right"></i></a>
+                </div>
+                <div class="short-share">
+                    <div class="left-btn">
+                        <a href="javascript:void(0);" class="collection choose-btn-coll {if ($goods.is_collect>0)}selected{/if}" data-dialog="goods_collect_dialog" data-divid="goods_collect" data-goodsid="{$goods.goods_id}" data-type="goods">
+                            <i class="iconfont choose-btn-icon icon-collection{if ($goods.is_collect>0)}-alt{/if}" id="collection_iconfont"></i>
+                            <em style="border-right: none">收藏 (<span id="collect_count">{$goods.collect_count}</span>)</em>
+                        </a>
+<!--                        <div id="bdshare" class="bdshare_t bds_tools get-codes-bdshare"><a class="share bds_more" href="#none"><i class="iconfont icon-share"></i><em>分享</em></a></div>-->
+<!--                        <a class="report fr" href="javascript:" shoptype="report"><em>举报</em></a>-->
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-wrap product-wrap-min">
+                <form action="{:url('cart/confirmOrder')}" method="post" name="ECS_FORMBUY" id="ECS_FORMBUY">
+                    <div class="name">{$goods.goods_name}</div>
+                    {if $goods.goods_brief}
+                    <div class="newp">{$goods.goods_brief}</div>
+                    {/if}
+                    <div class="summary">
+                        <div class="summary-price-wrap">
+                            <div class="s-p-w-wrap">
+                                <div class="summary-item si-shop-price">
+                                    <div class="si-tit">商 城 价</div>
+                                    <div class="si-warp">
+                                        <strong class="shop-price" id="ECS_SHOPPRICE" shoptype="SHOP_PRICE"><em>¥</em><span>{$goods.shop_price}</span></strong>
+                                        {if $goods.is_best}
+                                        <span class="price-notify">商家推荐</span>
+                                        {elseif $goods.is_new /}
+                                        <span class="price-notify">新品上市</span>
+                                        {elseif $goods.is_hot /}
+                                        <span class="price-notify">热卖</span>
+                                        {/if}
+                                    </div>
+                                </div>
+                                <div class="summary-item si-market-price">
+                                    <div class="si-tit">市 场 价</div>
+                                    <div class="si-warp">
+                                        <div class="m-price" id="ECS_MARKETPRICE"><em>¥</em><span>{$goods.market_price}</span></div>
+                                    </div>
+                                </div>
+                                <div class="si-info">
+                                    <div class="si-cumulative">累计评价<em>{$goods.comment_num}</em></div>
+                                    <div class="si-cumulative">累计销量<em>{$goods.total_sale_num+$goods.virtual_sale_num}</em></div>
+                                </div>
+                                <div class="si-phone-code">
+                                    <div class="qrcode-wrap">
+                                        <div class="qrcode_tit">手机购买<i class="iconfont icon-qr-code"></i></div>
+                                        <div class="qrcode_pop">
+                                            <div class="mobile-qrcode"><img src="{:url('api/common/qrcode','no_logo=1','',true).'?str='.$goods.wapUrl}" alt="商品二维码" title="" width="175"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {if $store.freeCoupons}
+                                <div class="summary-item si-coupon">
+                                    <div class="si-tit">领 券</div>
+                                    <div class="si-warp">
+                                        {foreach $store.freeCoupons as $cid=>$coupon}
+                                        <a class="J-open-tb" href="#none" data-goodsid="{$goods.goods_id}">
+                                            <div class="quan-item" title="{$coupon.name}"><i class="i-left"></i>满{$coupon.min_goods_amount}减{$coupon.money}<i class="i-right"></i></div>
+                                        </a>
+                                        {/foreach}
+                                    </div>
+                                </div>
+                                {/if}
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                        <div class="summary-basic-info">
+                            <div class="summary-item is-service">
+                                <div class="si-tit">服务</div>
+                                <div class="si-warp">
+                                    <div class="fl">
+                                        {if isset($store.store_id)}
+                                        由 <a href="{:url('store/index',['id'=>$store.store_id])}" class="link-red" target="_blank">{$store.store_name}</a> 发货并提供售后服务。
+                                        {else}
+                                        <a href="javascript:" class="link-red" target="_blank">{$siteInfo.shop_name}自营</a> 发货并提供售后服务。
+                                        {/if}
+                                    </div>
+                                </div>
+                            </div>
+                            {if $goods.brand_id}
+                            <!--商品品牌-->
+                            <div class="summary-item is-brand">
+                                <div class="si-tit">商品品牌</div>
+                                <div class="si-warp"><a href="{:url('search/list',['brand_id'=>$goods.brand_id])}" target="_blank">{$goods.brand.brand_name}</a></div>
+                            </div>
+                            {/if}
+                            {if $goods.give_integral>0}
+                            <!--购买本商品赠送积分-->
+                            <div class="summary-item is-integral">
+                                <div class="si-tit">赠送积分</div>
+                                <div class="si-warp">赠送 <span class="integral">{$goods.give_integral}</span></div>
+                            </div>
+                            {/if}
+                            {if $goods.integral>0}
+                            <!--购买本商品可使用积分抵扣多少钱-->
+                            <div class="summary-item is-integral">
+                                <div class="si-tit">积分兑换</div>
+                                <div class="si-warp">最多可以抵扣 <span class="integral">{$goods.integral}</span></div>
+                            </div>
+                            {/if}
+
+                            {if isset($goods.product.filterSpec)}
+                            <!--规格价-->
+                            {if $goods.product.filterSpec}
+                            {foreach $goods.product.filterSpec as $specName=>$specArr}
+                            <div class="summary-item is-attr goods_info_attr" id="is-attr">
+                                <div class="si-tit">{$specName}</div>
+                                <div class="si-warp">
+                                    <ul>
+                                        {foreach $specArr as $index=>$item}
+                                        <li class="item {if $index==0}selected {/if}" data-id="{$item.attr_id}" data-name="{$item.attr_value}">
+                                            <b></b>
+                                            <a href="javascript:void(0);" class="noimg">
+                                                <i>{$item.attr_value}</i>
+                                            </a>
+                                        </li>
+                                        {/foreach}
+                                    </ul>
+                                </div>
+                            </div>
+                            {/foreach}
+                            <input type="hidden" name="attr_key" id="attr_key" value="">
+                            {/if}
+                            {/if}
+                            <div class="summary-item is-number">
+                                <div class="si-tit">数量</div>
+                                <div class="si-warp">
+                                    <div class="amount-warp">
+                                        <input class="text buy-num" shoptype="quantity" value="1" id="goods_number" name="number" defaultnumber="1">
+                                        <div class="a-btn">
+                                            <a href="javascript:void(0);" class="btn-add" shoptype="btnAdd"><i class="iconfont icon-up"></i></a>
+                                            <a href="javascript:void(0);" class="btn-reduce btn-disabled" shoptype="btnReduce"><i class="iconfont icon-down"></i></a>
+                                            <input type="hidden" name="perNumber" id="perNumber" shoptype="perNumber" value="{$goods.goods_number}">
+                                            <input type="hidden" name="perMinNumber" id="perMinNumber" shoptype="perMinNumber" value="1">
+                                        </div>
+                                    </div>
+                                    <span>库存&nbsp;<em id="goods_attr_num" shoptype="goods_attr_num">{$goods.goods_number}</em>&nbsp;个</span>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="choose-btns ml60 clearfix">
+                            <a href="javascript:checkLogin()" data-type="0" class="btn-buynow" shoptype="btn-buynow">立即购买</a>
+                            <a href="javascript:addToCartShowDiv('{$goods.goods_id}')" class="btn-append" shoptype="btn-append"><i class="iconfont icon-carts"></i>加入购物车</a>
+                        </div>
+
+                        {if $goods.goods_tag}
+                        <div class="summary-basic-info">
+                            <div class="summary-item is-service">
+                                <div class="si-tit">服务承诺</div>
+                                <div class="si-warp">
+                                    {foreach $goods.goods_tag as $item=>$tag}
+                                    <span class="tary">{$tag}</span>
+                                    {/foreach}
+                                </div>
+                            </div>
+                        </div>
+                        {/if}
+                    </div>
+                    <input type="hidden" value="{$store.store_id | default=0}" id="store_id" name="store_id">
+                    <input type="hidden" value="{$goods.goods_id}" id="goods_id" name="goods_id">
+                    <input type="hidden" value="from_goods_detail" name="buyNow">
+                </form>
+            </div>
+
+            <div class="clear"></div>
+        </div>
+
+        <div class="goods-main-layout">
+            <div class="g-m-left">
+                <div class="g-main g-store-info" shoptype="gm-tabs">
+                    <div class="mt">
+                        {if isset($store.store_name)}
+                        <h3>{$store.store_name}</h3>
+                        {else}
+                        <h3>{$shop_config['shop_name']}</h3>
+                        {/if}
+                        {if $goods.store_id>0}
+                        <a onclick="openIm(this)" data-url="{:url('index/im',['uid'=>'seller-'.$store.kf])}" class="s-a-kefu"><i class="icon i-kefu"></i></a>
+                        {else /}
+                        <a onclick="void(0)" data-url="{:url('index/im',['uid'=>'admin-'.$store.kf])}" class="s-a-kefu"><i class="icon i-kefu"></i></a>
+                        {/if}
+                    </div>
+                    <div class="mc">
+                        <div class="mc-warp">
+                            <div class="g-s-brand">
+                                {if isset($goods.brand.brand_id)}
+                                <a href="{:url('category/catgoodslist',['brand_id'=>$goods.brand_id])}" target="_blank"><img src="{$goods.brand.brand_logo}"></a>
+                                {elseif isset($store.store_id)}
+                                <a href="{:url('store/index',['id'=>$store.store_id])}" target="_blank"><img src="{$store.logo}"></a>
+                                {else}
+                                <a href="javascript:"><img src="{$siteInfo.shop_logo}"></a>
+                                {/if}
+                            </div>
+                        </div>
+                        {if $goods.store_id >0}
+                        <div class="mc-warp b-t-gary">
+                            <div class="s-search">
+                                <form action="{:url('store/category',['id'=>$goods.store_id])}" method="get">
+                                    <p class="sp-form-item1"><input type="text" name="keyword" class="text" id="sp-keyword" value="" placeholder="关键字"></p>
+                                    <p class="sp-form-item3"><input type="submit" value="店内搜索" class="search-btn" id="btnShopSearch"></p>
+                                    <input type="hidden" name="store_id" value="{$goods.store_id}">
+                                </form>
+                            </div>
+                        </div>
+                        {/if}
+                    </div>
+                </div>
+                {if count($store['storeCat'])}
+                <div class="g-main g-store-cate">
+                    <div class="mt">
+                        <h3>店内分类</h3>
+                    </div>
+                    <div class="mc">
+                        <div class="g-s-cate-warp">
+                            {foreach $store.storeCat as $cat1=>$storeTop}
+                            <dl {if isset($storeTop.children)} shoptype="cateOpen" {else/} class="hover" {/if}>
+                            <dt><i class="icon"></i><a href="{:url('store/category',['id'=>$goods.store_id,'cid'=>$storeTop['cat_id']])}" target="_blank">{$storeTop['cat_name']}</a></dt>
+                            {if isset($storeTop['children'])}
+                            {volist name="$storeTop['children']" id="vo"}
+                            <dd>
+                                <a href="{:url('store/category',['id'=>$goods.store_id,'cid'=>$key])}" class="a-item" target="_blank">&gt; {$vo['cat_name']}</a>
+                            </dd>
+                            {/volist}
+                            {/if}
+                            </dl>
+                            {/foreach}
+                        </div>
+                    </div>
+                </div>
+                {/if}
+
+                {if isset($goods['related_cat'])}
+                <div class="g-main">
+                    <div class="mt">
+                        <h3>相关分类</h3>
+                    </div>
+                    <div class="mc">
+                        <div class="mc-warp">
+                            <div class="items">
+                                {foreach $goods['related_cat'] as $key=>$item}
+                                <div class="item"><a href="{:url('category/index',['id'=>$item['cat_id']])}" target="_blank">{$item['cat_name']}</a></div>
+                                {/foreach}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/if}
+
+                {if isset($goods['related_brand'])}
+                <div class="g-main">
+                    <div class="mt">
+                        <h3>同类其他品牌</h3>
+                    </div>
+                    <div class="mc">
+                        <div class="mc-warp">
+                            <div class="items">
+                                {foreach $goods['related_brand'] as $key=>$val}
+                                <div class="item"><a href="{:url('brand/list',['id'=>$key])}" target="_blank">{$val}</a></div>
+                                {/foreach}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/if}
+
+                {if isset($goods['history_goods'])}
+                <div class="g-main g-history">
+                    <div class="mt">
+                        <h3>最近浏览</h3>
+                        <a onclick="clear_history()" class="clear_history ftx-05 fr mt10 mr10" href="javascript:void(0);">清空</a>
+                    </div>
+                    <div class="mc">
+                        <div class="mc-warp" id="history_list" shoptype="history_mian">
+                            <ul>
+                                {foreach $goods['history_goods'] as $key=>$item}
+                                <li>
+                                    <div class="p-img"><a href="{:url('goods/detail',['id'=>$item.goods_id])}" target="_blank" title="{$item.goods_name}"><img src="{$item.original_img}" width="170" height="170"></a></div>
+                                    <div class="p-name"><a href="{:url('goods/detail',['id'=>$item.goods_id])}" target="_blank" title="{$item.goods_name}">{$item.goods_name}</a></div>
+                                    <div class="p-lie">
+                                        <div class="p-price">
+                                            <em>¥</em>{$item.shop_price}
+                                        </div>
+                                    </div>
+                                </li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {/if}
+
+                {if isset($goods['relatedGoods']) && count($goods['relatedGoods'])}
+                <div class="g-main g-recommend">
+                    <div class="mt">
+                        <h3>用户还喜欢</h3>
+                    </div>
+                    <div class="mc">
+                        <div class="mc-warp">
+                            <ul>
+                                {foreach $goods['relatedGoods'] as $key=>$item}
+                                <li>
+                                    <div class="p-img"><a href="{:url('goods/detail',['id'>$item.goods_id])}" target="_blank"><img src="{$item.original_img}" width="170" height="170"></a></div>
+                                    <div class="p-name"><a href="{:url('goods/detail',['id'>$item.goods_id])}" target="_blank" title="{$item.goods_name}">{$item.goods_name}</a></div>
+                                    <div class="p-price">
+                                        <em>¥</em>{$item.shop_price}
+                                    </div>
+                                </li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {/if}
+            </div>
+
+            <div class="g-m-detail">
+                <div class="gm-tabbox" shoptype="gm-tabs">
+                    <ul class="gm-tab">
+                        <li class="curr" shoptype="gm-tab-item">商品详情</li>
+                        <li shoptype="gm-tab-item">商品属性</li>
+                        <li shoptype="gm-tab-item">用户评论（<em class="ReviewsCount">{$goods.comment.allmen}</em>）</li>
+                    </ul>
+                    <div class="extra">
+                        <div class="item">
+                            <div class="inner">
+                                <a href="javascript:void(0)" class="btn sc-redBg-btn" id="btn-anchor" shoptype="tb-tab-anchor">加入购物车</a>
+                                <div class="tb-popsku" style="display: none;">
+                                    <span class="arrow-top"></span>
+                                    <div class="tb-popsku-content">
+                                        <div class="tb-list">
+                                            <div class="tb-label">价格：</div>
+                                            <div class="tb-value"><strong class="shop-price" shoptype="SHOP_PRICE"><em>¥</em><span>{$goods.shop_price}</span></strong></div>
+                                        </div>
+                                        <div class="tb-list">
+                                            <div class="tb-label">数量：</div>
+                                            <div class="tb-value">
+                                                <div class="amount-warp">
+                                                    <input class="text buy-num" shoptype="quantity" value="1" name="number" defaultnumber="1">
+                                                    <div class="a-btn">
+                                                        <a href="javascript:void(0);" class="btn-add" shoptype="btnAdd"><i class="iconfont icon-up"></i></a>
+                                                        <a href="javascript:void(0);" class="btn-reduce btn-disabled" shoptype="btnReduce"><i class="iconfont icon-down"></i></a>
+                                                    </div>
+                                                    <input name="confirm_type" id="confirm_type" type="hidden" value="3">
+                                                </div>
+                                                <span class="lh30 ml10">库存&nbsp;<em shoptype="goods_attr_num">{$goods.goods_number}</em>&nbsp;个</span>
+                                            </div>
+                                        </div>
+                                        <div class="tb-list">
+                                            <div class="tb-label">&nbsp;</div>
+                                            <div class="tb-value">
+                                                <a href="javascript:addToCartShowDiv('{$goods.goods_id}')" class="cz-btn cz-btn-true" shoptype="btn-append">确定</a>
+                                                <a href="javascript:void(0);" class="cz-btn cz-btn-false" shoptype="tb-cancel">取消</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gm-tab-qp-bort" shoptype="qp-bort"></div>
+                </div>
+
+                <div class="gm-floors" shoptype="gm-floors">
+                    <div class="gm-f-item gm-f-details" shoptype="gm-item">
+                        <div class="gm-title">
+                            <h3>商品详情</h3>
+                        </div>
+                        <div class="goods-para-list">
+                            <dl class="goods-para">
+                                <dd class="column"><span>商品名称：{$goods.goods_name}</span></dd>
+                                <dd class="column"><span>商品编号：{$goods.goods_sn}</span></dd>
+                                {if isset($store.store_id)}
+                                <dd class="column"><span>店铺：<a href="{:url('store/index',['id'=>$store.store_id])}" title="{$store.store_name}" target="_blank">{$store.store_name}</a></span></dd>
+                                {/if}
+                                <dd class="column"><span>重量：{$goods.goods_weight}{$goods.weight_unit}</span></dd>
+                                <dd class="column"><span>上架时间：{$goods.add_time |date='Y-m-d H:i:s'}</span></dd>
+                            </dl>
+                        </div>
+                        {$goods.goods_desc|raw}
+                    </div>
+
+                    <div class="gm-f-item gm-f-details" shoptype="gm-item">
+                        <div class="gm-title">
+                            <h3>商品属性</h3>
+                        </div>
+                        <div class="goods-para-list">
+                            {foreach $goods.attr.other as $item}
+                            <div class="goods-attr-box along-attr">
+                                <h3>&nbsp;</h3>
+                                <dl class="goods-attr font-gray">
+                                    <dt>{$item.name}</dt>
+                                    <dd>{$item.element}</dd>
+                                </dl>
+                            </div>
+                            {/foreach}
+
+                            {foreach $goods.attr.group as $group}
+                            <div class="goods-attr-box">
+                                <h3>{$group.group_name}</h3>
+                                {foreach $group.data as $item}
+                                <dl class="goods-attr font-gray">
+                                    <dt>{$item.name}</dt>
+                                    <dd>{$item.element}</dd>
+                                </dl>
+                                {/foreach}
+                            </div>
+                            {/foreach}
+                        </div>
+                    </div>
+
+                    <div class="gm-f-item gm-f-comment" shoptype="gm-item">
+                        <div class="gm-title">
+                            <h3>评论晒单</h3>
+                            <!--TODO 增加广告位-->
+                            <ul class="gm-f-tab" shoptype="gmf-tab" data-id="{$goods.goods_id}">
+                                <li class="curr" rev="all"><a href="javascript:;">全部<em>({$goods.comment.allmen})</em></a></li>
+                                <li rev="good"><a href="javascript:;">好评<em>({$goods.comment.goodmen})</em></a></li>
+                                <li rev="middle"><a href="javascript:;">中评<em>({$goods.comment.middlemen})</em></a></li>
+                                <li rev="bad" class="last"><a href="javascript:;">差评<em>({$goods.comment.badmen})</em></a></li>
+                            </ul>
+                        </div>
+                        <div class="gm-warp">
+                            <div class="praise-rate-warp">
+                                <div class="rate">
+                                    <strong>{$goods.comment.goodReview}</strong>
+                                    <span class="rate-span">
+                                        <span class="tit">好评率</span>
+                                        <span class="bf">%</span>
+                                    </span>
+                                </div>
+                                <div class="actor-new">
+                                    {if count($goods.goods_tag)}
+                                    <dl>
+                                        <dd shoptype="comment_tag" data-type="1"><span class="red">全部</span></dd>
+                                        <!--TODO 添加印象点赞数量-->
+                                        {foreach $goods.goods_tag as $index=>$tag}
+                                        <dd shoptype="comment_tag"><span>{$tag}</span></dd>
+                                        {/foreach}
+                                    </dl>
+                                    {else}
+                                    <div class="actor-new">
+                                        <div class="not_impression">此商品还没有设置买家印象，陪我一起等下嘛</div>
+                                    </div>
+                                    {/if}
+                                </div>
+                            </div>
+                            <div class="com-list-main">
+                                <div id="ECS_COMMENT">
+                                    {include file='ajax/comment'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="clear"></div>
+        </div>
+    </div>
+
+    <div class="">
+        <div class="ecsc-cart-popup" id="addtocartdialog">
+            <div class="loading-mask"></div>
+            <div class="loading">
+                <div class="center_pop_txt">
+                    <div class="title">
+                        <h3>提示</h3>
+                        <a onclick="$('#addtocartdialog').hide();" title="关闭" class="loading-x">X</a>
+                    </div>
+                    <div class="center_pop_p">
+                        <div class="ts">宝贝已成功添加到购物车！</div>
+                        <div class="desc">
+                            <span>购物车共有</span>
+                            <strong>(<span></span>)</strong>
+                            <span>件宝贝,总金额为：</span>
+                            <em class="saleP">￥<span></span></em>
+                        </div>
+                    </div>
+                </div>
+                <div class="btns">
+                    <a href="{:url('cart/index')}" class="ecsc-btn-mini ecsc-btn-orange">去付款</a>
+                    <a href="javascript:$('#addtocartdialog').hide();" class="ecsc-btn-mini">继续购物</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{include file='public/right_bar'}
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__THEME__/js/magiczoomplus.min.js"></script>
+<script>
+    var spec_price = JSON.parse('{:json_encode(isset($goods.product.spec)?$goods.product.spec:[])}');
+    var attr_key = '';
+
+    function niceResponse(res) {
+        if (res.err_no == 1) {
+            var back_url = res.url;
+            $.notLogin("get_ajax_content.php?act=get_login_dialog", back_url);
+            return false;
+        } else if (res.err_no == 0) {
+            $(".reply-nice" + res.id).html(res.useful);
+            $(".comment_nice").addClass("selected");
+        }
+    }
+
+    function changePrice(price, stock, market_price) {
+        $('*[shoptype="SHOP_PRICE"] span').text(parseFloat(price));
+        $('#ECS_MARKETPRICE span').text(parseFloat(market_price));
+        $('*[shoptype="goods_attr_num"]').text(parseInt(stock));
+    }
+
+    function checkLogin() {
+        if (parseInt(user_id) > 0) {
+            $('#ECS_FORMBUY').submit();
+        } else {
+            $.notLogin();
+        }
+    }
+
+    $(function () {
+        if (!(spec_price instanceof Array)) {
+            attr_key = Object.keys(spec_price)[0];
+            $('#attr_key').val(attr_key);
+            changePrice(spec_price[attr_key].product_price, spec_price[attr_key].product_number, spec_price[attr_key].product_market_price);
+        }
+        goods_desc_floor();//商品详情切换/滚动悬浮
+
+        quantity();
+        $(".spec-items li").on("mouseover", function () {
+            var type = $(this).data("type");
+            if (type == 'img') {
+                $(".gallery_wrap").find("*[shoptype='img']").show().siblings().hide();
+            } else {
+                $(".gallery_wrap").find("*[shoptype='video']").show().siblings().hide();
+            }
+            $(this).find("a").addClass("img-hover");
+            $(this).siblings().find("a").removeClass("img-hover");
+        });
+
+        // $("*[shoptype='replySubmit']").click(function () {
+        //     var T = $(this);
+        //     var comment_id = T.data("value");
+        //     var reply_content = $("#reply_content" + comment_id).val();
+        //     var user_id = $("#comment_user" + comment_id).val();
+        //     var goods_id = $("#comment_goods" + comment_id).val();
+        //
+        //     if (reply_content == '') {
+        //         $("#reply-error" + comment_id).html(json_languages.please_message_input);
+        //         return false;
+        //     }
+        //
+        //     Ajax.call('comment.php', 'act=comment_reply&comment_id=' + comment_id + '&reply_content=' + reply_content + '&goods_id=' + goods_id + '&user_id=' + user_id, commentReplyResponse, 'POST', 'JSON');
+        // });
+
+        $('.comment_nice').click(function () {
+            var T = $(this);
+            var comment_id = T.data('commentid');
+            var goods_id = T.data('idvalue');
+            var type = 'comment';
+
+            Ajax.call('comment.php', 'act=add_useful&id=' + comment_id + '&goods_id=' + goods_id + '&type=' + type, niceResponse, 'GET', 'JSON');
+        });
+
+        //商品属性选择切换
+        $("#is-attr .item").on("click", function () {
+            var $this = $(this);
+
+            $this.addClass('selected').siblings().removeClass("selected");
+
+            var selected = document.querySelectorAll("#ECS_FORMBUY .summary .item.selected");
+            // selected=$('#ECS_FORMBUY .summary .item.selected');
+            var attr_key_arr = [];
+            selected.forEach(function (v, i) {
+                attr_key_arr.push(v.dataset.id);
+            });
+
+            attr_key = attr_key_arr.join('_');
+            $('#attr_key').val(attr_key);
+            changePrice(spec_price[attr_key].product_price, spec_price[attr_key].product_number, spec_price[attr_key].product_market_price);
+        });
+
+    });
+</script>
+{include file='public/footer'}

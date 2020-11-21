@@ -1,0 +1,84 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault" id="app" v-cloak>
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <div class="user-mod user-profile" style="min-height: 1150px;">
+            <div class="user-title">
+                <h2>用户信息</h2>
+            </div>
+            <div class="user-profile-info">
+                <div class="user-items">
+                    <div class="item">
+                        <div class="label">用户名：</div>
+                        <div class="value"><span class="txt-lh2">{{info.user_name}}</span></div>
+                    </div>
+                    <div class="item">
+                        <div class="label">昵称：</div>
+                        <div class="value">
+                            <input name="nick_name" type="text" class="text text-1" v-model="info.nick_name" placeholder="用户昵称">
+                            <div class="notic"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">性别：</div>
+                        <div class="value">
+                            <div class="radio-item">
+                                <input type="radio" id="sex-1" name="sex" value="1" class="ui-radio" v-model="info.sex">
+                                <label for="sex-1" class="ui-radio-label">男</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="sex-2" name="sex" value="2" class="ui-radio" v-model="info.sex">
+                                <label for="sex-2" class="ui-radio-label">女</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" checked="checked" id="sex-3" name="sex" value="0" v-model="info.sex"
+                                       class="ui-radio">
+                                <label for="sex-3" class="ui-radio-label">保密</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item item-button">
+                        <div class="label">&nbsp;</div>
+                        <div class="value">
+                            <a href="javascript:void(0);" class="sc-btn sc-redBg-btn" shoptype="submit" @click="init()">确认修改</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="avatar_change" shoptype="upImgTouch" id="avatar">
+                    <img class="am-circle" :src="info.avatar?info.avatar:'/public/static/images/get_avatar.png'" width="120" height="120">
+                    <a href="javascript:void(0);" class="changeavatar">
+                        <div class="shadeDiv"></div>
+                        <span>修改头像</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public:footer"}
+
+
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                fajax('/home/member/profile',vm.info);
+            }
+        },
+    });
+    $(function () {
+        fmoreUploadFile("avatar",false);
+    })
+</script>
+

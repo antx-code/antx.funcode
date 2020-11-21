@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+                <li>秒杀活动仅需设置结束时间，截止时间内多个活动可同时进行。建议标题以分类区分便于管理。</li>
+                <li>秒杀活动时间都是从0点到0点。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info">
+                        <div class="items">
+                            <div class="item">
+                                <div class="label">
+                                    <span class="require-field">*</span>
+                                    标题：
+                                </div>
+                                <div class="label_value">
+                                    <input type="text" id="acti_title" class="text" value="" v-model="info.title"/>
+                                    <div class="notic"></div>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">
+                                    <span class="require-field">*</span>
+                                    副标题：
+                                </div>
+                                <div class="label_value">
+                                    <input type="text" id="subtitle" class="text" value="" v-model="info.subtitle"/>
+                                    <div class="notic"></div>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                            <div class="item shop_logo">
+                                <div class="label">海报：</div>
+                                <div class="label_value">
+                                    <div class="type-file-box">
+                                        <input type="button" name="button" id="button" class="type-file-button" value="">
+                                        <input type="text" name="textfile" class="type-file-text" id="textfield" value=""
+                                               autocomplete="off" readonly v-model="info.poster">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">
+                                    <span class="require-field">*</span>
+                                    会场背景图片：
+                                </div>
+                                <div class="label_value">
+                                    <div class="type-file-box">
+                                        <input type="button" name="button" id="bg-button" class="type-file-button" value="">
+                                        <input type="text" name="textfile" class="type-file-text" id="textfield2" value=""
+                                               autocomplete="off" readonly v-model="info.background">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="item">
+                                <div class="label">
+                                    <span class="require-field">*</span>
+                                    返回按钮：
+                                </div>
+                                <div class="label_value">
+                                    <div class="type-file-box">
+                                        <input type="button" name="button" id="bc-button" class="type-file-button" value="">
+                                        <input type="text" name="textfile" class="type-file-text" id="textfield3" value=""
+                                               autocomplete="off" readonly v-model="info.back_btn">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><span class="require-field">*</span>活动起止时间：</div>
+                                <div class="label_value">
+                                    <div class="text_time" id="text_time_start">
+                                        <input type="text" name="start_time" id="start_time" value="" class="text mr0">
+                                    </div>
+                                    <span class="bolang">~</span>
+                                    <div class="text_time" id="text_time_end">
+                                        <input type="text" name="end_time" id="end_time" value=""class="text">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="item">
+                                <div class="label">状态：</div>
+                                <div class="label_value">
+                                    <div class="checkbox_items">
+                                        <div class="checkbox_item">
+                                            <input name="is_putaway" type="radio" class="ui-radio" value="1" id="is_putaway_0" v-model="info.status"/>
+                                            <label for="is_putaway_0" class="ui-radio-label">上线</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input name="is_putaway" type="radio" class="ui-radio" value="0" id="is_putaway_1" v-model="info.status"/>
+                                            <label for="is_putaway_1" class="ui-radio-label">下线</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">&nbsp;</div>
+                                <div class="label_value info_btn">
+                                    <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                vm.info.start_time = $('#start_time').datetimebox('getValue');
+                vm.info.end_time = $('#end_time').datetimebox('getValue');
+                majax('/admin/market/venueadd',vm.info,'venue');
+            }
+        }
+    });
+    $(function () {
+        $('#start_time').datetimebox({
+            value: info.start_time_cn?info.start_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            value: info.end_time_cn?info.end_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+
+        layui.use('upload', function(){
+            var upload = layui.upload;
+
+            //执行实例
+            var uploadInst = upload.render({
+                elem: '#button',
+                url: '/admin/uploader/alioss_upload', //上传接口
+                data:{
+                    upload: 1
+                },
+                accept: 'file', //允许上传的文件类型
+                done: function(ret){
+                    vm.info.poster = ret.url;
+                    if(ret.state == 'SUCCESS'){
+                        $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                    }else{
+                        $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                    }
+
+                },
+            });
+        });
+
+        layui.use('upload', function(){
+            var upload = layui.upload;
+
+            //执行实例
+            var uploadInst = upload.render({
+                elem: '#bg-button',
+                url: '/admin/uploader/alioss_upload', //上传接口
+                data:{
+                    upload: 1
+                },
+                accept: 'file', //允许上传的文件类型
+                done: function(ret){
+                    vm.info.background = ret.url;
+                    if(ret.state == 'SUCCESS'){
+                        $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                    }else{
+                        $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                    }
+
+                },
+            });
+        });
+
+        layui.use('upload', function(){
+            var upload = layui.upload;
+
+            //执行实例
+            var uploadInst = upload.render({
+                elem: '#bc-button',
+                url: '/admin/uploader/alioss_upload', //上传接口
+                data:{
+                    upload: 1
+                },
+                accept: 'file', //允许上传的文件类型
+                done: function(ret){
+                    vm.info.back_btn = ret.url;
+                    if(ret.state == 'SUCCESS'){
+                        $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                    }else{
+                        $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                    }
+
+                },
+            });
+        });
+
+    });
+
+</script>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>账户明细</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .card-div{display:flex; justify-content: space-between}
+        .detail-list{border-bottom:1px solid #f7f7f7}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="log_info">
+        <template v-for="(vo,index) in list">
+            <div class="detail-list van-cell van-cell--clickable">
+                <div class="van-cell__value van-cell__value--alone">
+                    <div class="dis-box card-div">
+                        <div><p>充值</p><span>{{vo.create_time|timeParse}}</span></div>
+                        <div class="box-flex text-right"><p>¥{{vo.money}}</p>
+                            <span class="color-red" v-if="vo.status==0">充值失败</span>
+                            <span class="" v-if="vo.status==1">充值成功</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+    </div>
+    <div class="account_detail">
+        <div class="ectouch-notcont hide" id="nodata">
+            <div class="img">
+                <img src="/public/static/images/nodata.png" class="img"></div>
+            <span class="cont">亲，您还没有相关数据哦！</span>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: []
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.rechargelog, {}, 1).then(function (ret) {
+                    vm.list = ret.data;
+                    if (vm.list.length == 0) {
+                        $("#nodata").removeClass("hide");
+                    }
+                })
+            }
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

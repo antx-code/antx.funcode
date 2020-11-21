@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>商家管理中心</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link type="text/css" href="/topjui/css/topjui.core.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/public/static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/seller/general.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/seller/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/plugins/layui/css/layui.css"/>
+
+    <script type="text/javascript" src="/public/static/plugins/jquery/jquery.min.js"></script>
+
+    <script type="text/javascript" src="/public/static/js/topjui.config.js"></script>
+    <script type="text/javascript" src="/topjui/js/topjui.core.min.js"></script>
+
+    <script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/seller.js"></script>
+    <style>
+        input:hover {
+            border: 1px solid #139ff0;
+        }
+
+    </style>
+</head>
+<body>
+<div class="sller_login">
+    <div class="sller_login_warp">
+        <div class="ecsc-login-container">
+            <div class="logo">
+                <img src="{$logo?$logo:'/public/static/images/logo.png'}">
+            </div>
+            <div class="container">
+                <div class="warp">
+                    <div class="warp_content">
+                        <div class="title">
+                            <h3>商家管理中心</h3>
+                            <span class="txt"></span>
+                        </div>
+                        <form method="post" id="theForm" onsubmit="return login()">
+                            <div class="formInfo">
+                                <div class="formText">
+                                    <i class="login-icon login-icon-user"></i>
+                                    <input type="text" name="username" autocomplete="off" class="input-text" placeholder="用户名">
+                                </div>
+                                <div class="formText">
+                                    <i class="login-icon login-icon-pwd"></i>
+                                    <input type="password" style="display:none">
+                                    <input type="password" name="password" autocomplete="off" class="input-text" placeholder="密  码">
+                                </div>
+                                <div class="formText">
+                                    <div class="checkbox">
+                                        <div class="cur">
+                                            <input type="hidden" value="0" id="remember">
+                                        </div>
+                                    </div>
+                                    <span class="span">保存信息</span>
+                                    <a href="javascript:void(0);" class="forget_pwd">您忘记了密码吗?</a>
+                                </div>
+                                <div class="formText submitDiv">
+                                    <span class="submit_span">
+                                        <input type="submit" id="submit" class="sub qp_sub" value="登 录">
+                                    </span>
+                                    <input type="hidden" name="token" value="{$Request.token.token}"/>
+                                </div>
+                            </div>
+                            <div id="error" class="error"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="backpwd_layout" style="display: none;">
+    <div class="backpwd_info">
+        <div class="close"></div>
+        <div class="title">忘记密码</div>
+        <form action="/seller/login/forget" method="post" name="submitAdmin" id="submitAdmin1" novalidate="novalidate">
+            <div class="formInfo">
+                <div class="formText">
+                    <input type="text" name="user_name" class="input-text" autocomplete="off" placeholder="管理员用户名">;
+                    <div class="form_prompt"></div>
+                </div>
+                <div class="formText">
+                    <input type="text" name="email" class="input-text" autocomplete="off" placeholder="Email地址">
+                    <div class="form_prompt"></div>
+                </div>
+                <div class="formText submitDiv">
+                    <input type="button" class="sub qp_sub" value="发 送" id="submitBtn">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="backpwd_layout_bg" style="display: none;"></div>
+
+<script>
+    function login() {
+        var seller_name = $('#theForm input[name=username]'),
+            token = $(":input[name='token']"),
+            pwd = $('#theForm input[name=password]');
+        var seller = seller_name.val(), _password = pwd.val();
+        if (seller == '') {
+            $('#error').html('用户名不能为空');
+            seller_name.focus();
+            return false;
+        }
+
+        if (_password == '') {
+            $('#error').html('密码不能为空');
+            pwd.focus();
+            return false;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "/seller/login/index",
+            data: {
+                username: seller,
+                password: _password,
+                token: token.val(),
+                remeber: $('#remember').val()
+            },
+            success: function (data) {
+                var url = $.cookie('seller_refer');
+                location.href = url ? url : "/seller/index/index";
+            },
+            error: function (xhr, type) {
+                token.val(xhr.responseJSON.token);
+                easyshow(xhr.responseJSON.msg);
+            }
+        });
+        return false;
+    }
+
+    $(function () {
+        $(".checkbox").click(function () {
+            if ($(this).hasClass("checked")) {
+                $(this).removeClass("checked");
+                $('#remember').val(0);
+            } else {
+                $(this).addClass("checked");
+                $('#remember').val(1);
+            }
+        });
+
+        $(".forget_pwd").on("click", function () {
+            $('.backpwd_layout_bg').show();
+            $('.backpwd_layout').show('fast');
+        });
+        $(".close").on("click", function () {
+            $('.backpwd_layout').hide('fast');
+            $('.backpwd_layout_bg').hide();
+        });
+
+        $('#submitAdmin1').validate({
+            errorPlacement: function (error, element) {
+                var error_div = element.parents('.formText').find('div.form_prompt');
+                element.parents('.formText').find(".notic").hide();
+                error_div.append(error);
+            },
+            rules: {
+                username: {
+                    required: true
+                },
+                email: {
+                    required: true,
+                    email: true
+                }
+            },
+            messages: {
+                username: {
+                    required: '<i class="icon icon-exclamation-sign"></i>用户名不能为空'
+                },
+                email: {
+                    required: '<i class="icon icon-exclamation-sign"></i>邮箱不能为空',
+                    email: '<i class="icon icon-exclamation-sign"></i>邮箱格式错误'
+                }
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

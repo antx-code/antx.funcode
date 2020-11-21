@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>.stat_order_search2{padding-bottom:0px;border-bottom:1px dashed #e6e6e6}</style>
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak="">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span id="explanationZoom" title="收起提示"></span></div>
+            <ul>
+                <li>订单总数：所选时间段内所有状态下的订单总数。</li>
+                <li>有效订单：所选时间段内除无效订单状态下的所有订单总数。</li>
+            </ul>
+        </div>
+        <div class="flexilist mt30">
+            <div class="query_result">
+                <div class="common-content">
+                    <div class="switch_info">
+                        <div class="stat_order_search stat_order_search2">
+                            <div class="search_item">
+                                <strong class="label_txt">时间：</strong>
+                                <div class="text_time" id="text_time_start">
+                                    <input type="text" class="text" name="start_time" value="" id="start_time">
+                                </div>
+                                <span class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                                <div class="text_time" id="text_time_end">
+                                    <input type="text" class="text" name="end_time" value="" id="end_time">
+                                </div>
+
+                                <strong class="label_txt">关键词：</strong>
+                                <input type="text" name="keywords" class="text w150"  placeholder="店铺名称" v-model="keywords">
+                                <strong class="label_txt">&nbsp;</strong>
+                                <a href="javascript:void(0);" class="btn btn30 blue_btn ml0" shoptype="searchButton"  @click="secrchInit()">
+                                    <i class="icon icon-search"></i>查询
+                                </a>
+                            </div>
+                        </div>
+                        <div class="query_result mt10">
+                            <div class="section-module">
+                                <div class="module-content module-content-bor">
+                                    <ul class="module_ss_ul">
+                                        <li>
+                                            <div class="desc desc-tc">
+                                                <h2>订单总金额</h2>
+                                                <div class="price"><font shoptype="stats_total_fee">5575.10</font><span>元</span></div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="desc desc-tc">
+                                                <h2>有效订单总金额</h2>
+                                                <div class="price"><font shoptype="stats_valid_fee">5575.10</font><span>元</span></div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="desc desc-tc">
+                                                <h2>总订单数</h2>
+                                                <div class="price"><font shoptype="stats_order_num">9</font><span>个</span></div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="desc desc-tc">
+                                                <h2>有效订单量</h2>
+                                                <div class="price"><font shoptype="stats_valid_num">8</font><span>个</span></div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="desc desc-tc">
+                                                <h2>下单会员数</h2>
+                                                <div class="price"><font shoptype="stats_user_num">6</font><span>个</span></div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="desc desc-tc">
+                                                <h2>退款总金额</h2>
+                                                <div class="price"><font shoptype="stats_return_fee">0</font><span>元</span></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="common-head">
+                                <div class="fl layui-hide">
+                                    <div class="fbutton m0" id="fbutton_1">
+                                        <a href="javascript:void(0);">
+                                            <div class="csv" title="导出列表">
+                                                <span><i class="icon icon-download-alt"></i>导出列表</span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="refresh">
+                                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()"><i class="icon icon-refresh"></i></div>
+                                    <div class="refresh_span">刷新 - 共20条记录</div>
+                                </div>
+                            </div>
+                            <div class="list-div" id="listDiv">
+                                <table cellpadding="0" cellspacing="0" border="0">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%"><div class="tDiv">编号</div></th>
+                                            <th width="10%"><div class="tDiv">店铺名称</div></th>
+                                            <th width="10%"><div class="tDiv">下单会员总数</div></th>
+                                            <th width="10%"><div class="tDiv">下单量</div></th>
+                                            <th width="10%"><div class="tDiv">有效下单量</div></th>
+                                            <th width="10%"><div class="tDiv">订单总价</div></th>
+                                            <th width="10%"><div class="tDiv">实付金额</div></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template v-for="(vo,index) in list">
+                                            <tr>
+                                                <td><div class="tDiv">{{vo.store_id}}</div></td>
+                                                <td><div class="tDiv">{{vo.store_name}}</div></td>
+                                                <td><div class="tDiv">{{vo.userConut}}</div></td>
+                                                <td><div class="tDiv">{{vo.orderCount}}</div></td>
+                                                <td><div class="tDiv">{{vo.orderCount}}</div></td>
+                                                <td><div class="tDiv">{{vo.orderAmount}}</div></td>
+                                                <td><div class="tDiv">{{vo.payAmount}}</div></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="12">
+                                                <div class="list-page">
+                                                    <div id="turn-page"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            start_time: '',
+            end_time: '',
+            list: [],
+            ids: [],
+        },
+        methods: {
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            init: function () {
+                vm.start_time = $('#start_time').datetimebox('getValue');
+                vm.end_time = $('#end_time').datetimebox('getValue');
+                $.post('/admin/finance/shopsale', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    start_time: vm.start_time,
+                    end_time: vm.end_time,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        }
+    });
+    $(function () {
+        $('#start_time').datetimebox({
+            value: getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            value: getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+
+        vm.init();
+    });
+</script>

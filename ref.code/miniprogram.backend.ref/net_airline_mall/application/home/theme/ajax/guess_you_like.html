@@ -1,0 +1,14 @@
+{volist name="$goodsList" id="goods"}
+<li class="opacity_img">
+    <a href="{:url('goods/detail',['id'=>$goods.goods_id])}" target="_blank">
+        <div class="p-img"><img src="{$goods.original_img}"></div>
+        <div class="p-name" title="{$goods.goods_name}">{$goods.goods_name}</div>
+        <div class="p-price">
+            <div class="shop-price">
+                <em>¥</em>{$goods.shop_price}
+            </div>
+            <div class="original-price">{$goods.market_price}</div>
+        </div>
+    </a>
+</li>
+{/volist}

@@ -1,0 +1,166 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li><a href="/seller/goods/store_brand">商家品牌</a></li>
+        <li class="active"><a href="javascript:">品牌申请记录</a></li>
+    </ul>
+</div>
+<div id="app" v-cloak>
+    <div class="btn-info">
+        <a class="sc-btn sc-blue-btn" href="/seller/goods/add_brand_apply"><i class="icon-plus"></i>添加品牌</a>
+    </div>
+    <div class="search-info">
+        <div class="search-form">
+            <div>
+                <div class="search-key">
+                    <input type="text" v-model="keywords" name="brand_name" size="15" class="text text_2" placeholder="关键词" @keyup.enter="getData()">
+                    <input type="button" value=" 搜索 " class="submit" @click="getData()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- start brand list -->
+    <div class="list-div" id="listDiv">
+        <table class="ecsc-default-table">
+            <thead>
+            <tr>
+                <th width="6%"><a @click="orderby('brand_id')">编号</a></th>
+                <th width="16%" class="tl">申请品牌中文名称</th>
+                <th width="12%" class="tl">申请品牌英文名称</th>
+                <th width="6%">品牌LOGO</th>
+                <th width="15%">申请时间</th>
+                <th width="6%"><a @click="orderby('sort_order')">排序</a></th>
+                <th width="13%">审核状态</th>
+                <th width="13%">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="bd-line" v-for="(vo,index) in list">
+                <td>{{vo.apply_id}}</td>
+                <td class="tl">{{vo.brand_name}}</td>
+                <td class="tl">{{vo.brand_letter}}</td>
+                <td>
+                    <div class="tDiv">
+                        <span class="show">
+                            <a :href="vo.brand_logo" target="_blank"><i class="icon icon-picture" @mouseover="showTip(vo.brand_logo)" onmouseout="toolTip()"></i></a>
+                        </span>
+                    </div>
+                </td>
+                <td>{{vo.add_time | timeParse}}</td>
+                <td>{{vo.sort_order}}</td>
+                <td>
+                    <em class="org" v-if="vo.audit_status==0">待审核</em>
+                    <em class="green" v-else-if="vo.audit_status==1">已通过</em>
+                    <em class="red" v-else :title="vo.remark">拒绝审批</em>
+                </td>
+                <td class="ecsc-table-handle" v-if="vo.audit_status!=1">
+                    <span><a :href="'/seller/goods/add_brand_apply.html?id='+vo.apply_id" title="编辑重新提交审核" class="btn-green"><i class="icon icon-edit"></i><p>编辑</p></a></span>
+                    <span><a @click="del(index)" title="删除" class="btn-red"><i class="icon icon-trash"></i><p>删除</p></a></span>
+                </td>
+                <td class="ecsc-table-handle" v-else></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            keywords: '',
+            list: [],
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            getData: function (instance) {
+                instance = instance ? instance : vm;
+                var param = {
+                    keywords: instance.keywords,
+                    page: instance.page,
+                    pageSize: instance.pageSize,
+                    field: instance.field,
+                    sort: instance.sort
+                };
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/goods/brand_apply',
+                    data: param,
+                    success: function (data) {
+                        instance.list = data.list;
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        if (data.page == 1) instance.pagerender();
+                    }
+                });
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count),
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            showTip: function (src) {
+                if (src.indexOf('http') < 0)
+                    toolTip('<img src="/public/static/' + src + '" >');
+                else
+                    toolTip('<img src="' + src + '" >');
+            },
+            del:function(index){
+                if (alert) {
+                    if (!window.confirm('确实要删除吗？')) {
+                        return;
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/brand_apply.html?act=delete',
+                    data: {apply_id: vm.list[index]['apply_id']},
+                    success: function (data) {
+                        vm.list.splice(index, 1);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            orderby: function (field) {
+                this.field = field;
+                this.sort = this.sort == 'desc' ? 'asc' : 'desc';
+                this.getData();
+            }
+        },
+        created: function () {
+            this.getData(this);
+        }
+    });
+</script>
+{include file="public/footer"}

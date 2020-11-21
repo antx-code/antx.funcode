@@ -1,0 +1,105 @@
+<style>
+    .item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 10px 0;
+    }
+
+    .item .label {
+        width: 35%;
+        color: #333;
+        font-size: 12px;
+        text-align: right;
+    }
+
+    .item .label_value {
+        width: 65%;
+    }
+
+    .text {
+        border: 1px solid #dbdbdb;
+        border-radius: 2px;
+        height: 28px;
+        line-height: 28px;
+        padding: 0 10px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+        -moz-box-shadow: 0 2px 3px 0 rgba(0, 0, 0, .1) inset;
+        -webkit-box-shadow: 0 2px 3px 0 rgba(0, 0, 0, .1) inset;
+        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, .1) inset;
+        -o-transition: all .2s;
+        -moz-transition: all .2s;
+        -webkit-transition: all .2s;
+        -ms-transition: all .2s;
+        margin-right: 10px;
+    }
+
+    .info_btn input[type="button"] {
+        margin-top: 20px;
+        border: 1px solid #ec5151;
+        background: #ec5151;
+        height: 30px;
+        line-height: 30px;
+        color: #fff;
+        font-size: 14px;
+        padding: 0 20px;
+        border-radius: 3px;
+        cursor: pointer;
+        float: left;
+        margin-right: 15px;
+    }
+</style>
+<link href="/public/static/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+<script type="text/javascript" src="/public/static/plugins/jquery/jquery.min.js"></script>
+<div class="item">
+    <div class="label"><span class="require-field">*</span>
+        原密码：
+    </div>
+    <div class="label_value">
+        <input type="password" class="text" id="oldpassword" placeholder="请输入旧密码">
+    </div>
+</div>
+<div class="item">
+    <div class="label"><span class="require-field">*</span>
+        新密码：
+    </div>
+    <div class="label_value">
+        <input type="password" class="text" id="newpassword" placeholder="请输入密码">
+    </div>
+</div>
+<div class="item">
+    <div class="label">&nbsp;</div>
+    <div class="label_value info_btn"><input type="button" value=" 确定 " id="pwd-submit" class="button"></div>
+</div>
+<script>
+    $('#pwd-submit').on('click', function () {
+        let oldpwd = $('#oldpassword').val();
+        let newpwd = $('#newpassword').val();
+        if ($.trim(oldpwd).length < 1 || $.trim(newpwd).length < 6) {
+            layer.msg('密码至少6位');
+            return;
+        }
+        let idx = layer.load(1);
+        $.ajax({
+            type: 'POST',
+            url: '/admin/system/userupdatePwd',
+            data: {newpassword: newpwd, oldpassword: oldpwd},
+            dataType: 'json',
+            success: function (data) {
+                layer.close(idx);
+                if (data.status) {
+                    let index = parent.layer.getFrameIndex(window.name);
+                    window.parent.layer.close(index);
+                } else {
+                    layer.msg(data.msg);
+                }
+            },
+            error: function (xhr, type) {
+                layer.close(idx);
+                layer.msg(xhr.responseJSON);
+            }
+        });
+    });
+</script>
+

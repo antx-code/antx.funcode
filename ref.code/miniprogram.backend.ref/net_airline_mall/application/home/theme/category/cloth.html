@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="Keywords" content="{$siteInfo.shop_keywords}">
+    <meta name="Description" content="{$siteInfo.shop_desc}">
+    <title>{$siteInfo.shop_title}</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript" src="__STATIC__/js/jquery.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/transport_jquery.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/vue.js"></script>
+    <script type="text/javascript" src="__STATIC__/plugins/moment/moment.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/function.js"></script>
+    <script type="text/javascript" src="__THEME__/js/suggest.js"></script>
+    <script type="text/javascript" src="__THEME__/js/scroll_city.js"></script>
+    <script type="text/javascript" src="__THEME__/js/cart_common.js"></script>
+    <script type="text/javascript" src="__THEME__/js/cart_quick_links.js"></script>
+    <script type="text/javascript" src="__THEME__/js/region.js"></script>
+    <!--layui库引入开始-->
+    <link href="__STATIC__/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="__STATIC__/plugins/layui/layui.all.js"></script>
+    <!--layui库引入结束-->
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/purebox.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/base.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/style.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/user.css"/>
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/quickLinks.css"/>
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/suggest.css"/>
+    <style>
+        .catetop-jiadian .catetop-floor .f-bd .bd-right {float: left;width: 1200px;}
+        .catetop-cloth .categorys-tab-content {background-color: #FD5F8E;height: 500px;}
+    </style>
+</head>
+<body class="catetop-cloth">
+<input type="hidden" name="user_id" value="{$Think.session.user.user_id|default=0}">
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/right_bar'}
+
+<div class="nav shop-zoom" shoptype='shopNav'>
+    <div class="w w1200">
+        <div class="categorys">
+            <div class="categorys-type">
+                <a href="javascript:;">
+                    {$category.cat_name}
+                </a>
+            </div>
+            <div class="categorys-tab-content">
+                <div class="categorys-items" shoptype="items">
+                    {if isset($category.children)}
+                    {foreach $category.children as $k=>$v}
+                    {if $k<5}
+                    <div class="categorys-item" shoptype="item" data-catid="{$v.cat_id}" data-eveval="0">
+                        <div class="item-content">
+                            <i class="iconfont icon-right"></i>
+                            <div class="categorys-title">
+                                <strong>
+									<a href="{:url('category/index',['id'=>$v.cat_id])}"  >
+                                        {$v.cat_name}
+                                    </a>
+                                </strong>
+                                <span>
+                                {if isset($v.children)}
+                                {foreach $v.children as $k2=>$v2 }
+                                    {if $k2<6}
+                                    <a href="{:url('category/index',['id'=>$v2.cat_id])}" target="_blank">
+                                        {$v2.cat_name}
+                                    </a>
+                                    {/if}
+                                {/foreach}
+                                {/if}
+							    </span>
+                            </div>
+                        </div>
+                        <div class="categorys-items-layer" shoptype="cateLayer" style="display: none;">
+                            <div class="catetop-layer-con clearfix">
+                                <h3>
+                                    <a href="javascript:;">
+                                        {$v.cat_name}
+                                    </a>
+                                </h3>
+                                <ul class="cate-list">
+                                    {if isset($v.children)}
+                                    {foreach $v.children as $k2=>$v2 }
+                                    <li>
+                                        <a href="{:url('category/index',['id'=>$v2.cat_id])}">
+                                            {$v2.cat_name}
+                                        </a>
+                                    </li>
+                                    {/foreach}
+                                    {/if}
+                                </ul>
+                                <ul class="cate-logo" shoptype="subitems_{$v.cat_id}"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                    {/foreach}
+                    {/if}
+
+                </div>
+            </div>
+        </div>
+        <div class="nav-main">
+            <ul class="navitems">
+                <li><a href="/">首页</a></li>
+                {foreach $siteInfo['nav'] as $nav}
+                <li><a href="{$nav.url}" target="{if $nav.is_newwin==1}_blank{else /}_self{/if}">{$nav.name}</a></li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="homeindex" shoptype="homeWrap">
+    <div class="content">
+        <!--轮播图-->
+        <div class="visual-item" data-mode="lunbo" data-purebox="banner" data-li="1" data-length="5" shoptype="visualItme"
+             style="display: block;" data-diff="0">
+            <div class="view">
+                <div class="banner home-banner">
+                    <div class="bd">
+                        {if count($carcousel)}
+                        <ul data-type="range" data-slide="fold">
+                            {volist name="carcousel" id="vo"}
+                            <li style="background: url('{$vo.ad_img}') center center no-repeat; background-size: {$vo.ad_width}px {$vo.ad_height}px;">
+                                <div class="banner-width"><a href="{$vo.ad_link}" target="_blank"></a></div>
+                            </li>
+                            {/volist}
+                        </ul>
+                        {/if}
+                        <div class="spec" data-spec=""></div>
+                    </div>
+                    <div class="hd">
+                        <ul></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="catetop-main w w1200" shoptype="catetopWarp">
+    <!--楼层数据-->
+    <div class="catetop-floor-wp" shoptype="goods_cat_level" id="app">
+        <template v-for="(vo,index) in list.children">
+            <div class="catetop-floor" id="floor_1" shoptype="floorItem">
+                <div class="f-hd">
+                    <h2>{{vo.cat_name}}</h2>
+                    <h3>{{index}}F</h3>
+                    <div class="extra">
+                        <div class="fgoods-hd">
+                            <ul>
+                                <template v-for="(vo2,index2) in vo.children" v-if="index2<6">
+                                    <li :class="{'on':index2==vo.checkitem}"
+                                        @click="goodsListInit(index,vo2.cat_id,index2)">{{vo2.cat_name}}
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="f-bd clearfix">
+                    <div class="bd-left">
+                        <div class="l-ad">
+                            <ul>
+                                <li><a href="" target="_blank">
+                                    <img src="" width="400" height="660">
+                                </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bd-right">
+                        <div class="right-top clearfix">
+                            <div class="rt-ad">
+                                <a href="https://www.hngpmall.com/" target="_blank"><img src="" width="399" height="170"></a>
+                            </div>
+                            <div class="rt-ad">
+                                <a href="" target="_blank"><img src="" width="399" height="170"></a>
+                            </div>
+                        </div>
+                        <div class="right-bottom" style="position: relative; width: 800px; height: 488px;">
+                            <ul class="fgoods-list" style="position: absolute; width: 804px; left: 0px; top: 0px;">
+                                <template v-for="(vo3,index3) in vo.goods_list">
+                                    <li>
+                                        <div class="p-img">
+                                            <a href="goods.php?id=650" target="_blank"><img :src="vo3.original_img"></a>
+                                        </div>
+                                        <div class="p-name">
+                                            <a href="goods.php?id=650" target="_blank" :title="vo3.goods_name">{{vo3.goods_name}}</a>
+                                        </div>
+                                        <div class="p-price">
+                                            <em>¥</em>{{vo3.shop_price}}
+                                        </div>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <ul class="brands">
+                        <template v-for="(vb,indexb) in list.brands">
+                            <li>
+                                <a :href="'/home/brand?cat_id='+cat_id+'&id='+vb.brand_id" target="_blank">
+                                    <img :src="vb.brand_logo" :alt="vb.brand_name">
+                                </a>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!---随手购--->
+    <div class="atwillgo" id="atwillgo">
+        <div class="awg-hd">
+            <h2>随手购</h2>
+        </div>
+        <div class="awg-bd">
+            <div class="atwillgo-slide">
+                <a href="javascript:;" class="prev prevStop"><i class="iconfont icon-left"></i></a>
+                <a href="javascript:;" class="next"><i class="iconfont icon-right"></i></a>
+                <div class="hd">
+                    <ul>
+                        <li class="on"></li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                </div>
+                <div class="bd">
+                    <div class="tempWrap" style="overflow:hidden; position:relative; width:1200px">
+                        <ul style="width: 3600px; left: 0px; position: relative; overflow: hidden; padding: 0px; margin: 0px;">
+                            {volist name='suiList' id='vo'}
+                            <li style="float: left; width: 158px;">
+                                <div class="p-img">
+                                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank">
+                                        <img src="{$vo.original_img}" alt="">
+                                    </a>
+                                </div>
+                                <div class="p-price">
+                                    <em>¥</em>{$vo.shop_price}
+                                </div>
+                                <div class="p-name">
+                                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank"
+                                       title="{$vo.goods_name}">{$vo.goods_name}</a></div>
+                                <div class="p-btn"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}"
+                                                      target="_blank">查看详情</a></div>
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!---楼层悬浮--->
+    <div class="catetop-lift lift-hide" shoptype="lift">
+        <div class="lift-list" shoptype="liftList">
+            {if isset($category.children)}
+            {foreach $category.children as $k=>$v}
+            <div class="catetop-lift-item lift-floor-item" shoptype="liftItem"><span>{$v.cat_name}</span></div>
+            {/foreach}
+            {/if}
+            <div class="catetop-lift-item lift-item-top" shoptype="liftItem"><span><i class="iconfont icon-up"></i></span>
+            </div>
+        </div>
+    </div>
+</div>
+{include file='public/footer'}
+
+<link rel="stylesheet" type="text/css" href="__THEME__/css/index.css">
+<link rel="stylesheet" type="text/css" href="__THEME__/css/color.css">
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__THEME__/js/asyLoadfloor.js"></script>
+
+<script>
+    $(".hotrecommend").slide({hd: ".hr-slide-hd ul", effect: "fold"});
+    /*首页轮播开始*/
+    $(".nav .site-mast .categorys-tab-content").show();
+    var length = $(".banner .bd").find("li").length;
+    if (length > 1) {
+        $(".banner").slide({
+            titCell: ".hd ul",
+            mainCell: ".bd ul",
+            effect: "fold",
+            interTime: 3500,
+            delayTime: 500,
+            autoPlay: true,
+            autoPage: true,
+            trigger: "click",
+            endFun: function (i, c, s) {
+                $(window).resize(function () {
+                    var width = $(window).width();
+                    s.find(".bd li").css("width", width);
+                });
+            }
+        });
+    } else {
+        $(".banner .hd").hide();
+    }
+    /*首页轮播结束*/
+
+    $(function () {
+        $(window).scroll(function () {
+            var scrollTop = $(document).scrollTop();
+            var navTop = $("*[shoptype='shopNav']").offset().top;
+
+            if (scrollTop > navTop) {
+                $("*[shoptype='suspColumn']").addClass("show");
+            } else {
+                $("*[shoptype='suspColumn']").removeClass("show");
+            }
+        });
+
+    });
+
+    //随手购
+    if ($(".atwillgo-slide .bd").find("li").length > 6) {
+        $(".atwillgo-slide").slide({
+            mainCell: ".bd ul",
+            titCell: ".hd ul",
+            effect: "left",
+            pnLoop: false,
+            vis: 6,
+            scroll: 6,
+            autoPage: "<li></li>"
+        });
+    } else {
+        $(".atwillgo-slide").find(".prev,.next").hide();
+    }
+
+
+    var categoryList = {$categoryList|raw};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: categoryList,
+            cat_id: {$cat_id}
+        },
+        methods: {
+            init: function () {
+                for (var i = 0; i < vm.list.children.length; i++) {
+                    $.post('/home/category/categoryGoodsList', {
+                        cat_id: vm.list.children[i].children[0].cat_id,
+                        limit: 12
+                    }, function (ret) {
+                        vm.list.children[i].goods_list = ret.data;
+                    }, 'json');
+                }
+                $.catetopLift();
+                $.ajaxSetup({async: true});
+            },
+            goodsListInit: function (index, cat_id, index2) {
+                vm.list.children[index].checkitem = index2;
+                $.post('/home/category/categoryGoodsList', {
+                    cat_id: cat_id,
+                    limit: 12
+                }, function (ret) {
+                    vm.list.children[index].goods_list = ret.data;
+                }, 'json');
+            }
+        }
+    });
+    $(function () {
+        $.ajaxSetup({async: false});
+        vm.init();
+    });
+
+</script>

@@ -1,0 +1,215 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">库存日志</a></li>
+    </ul>
+</div>
+
+<div id="app" v-cloak>
+    <div class="search-form">
+        <div class="fl mr10">
+            <label for="status">日志类型</label>
+            <select id="status" v-model="status" @change="getData()">
+                <option value="0">全部</option>
+                <option value="1">入库</option>
+                <option value="-1">出库</option>
+            </select>
+        </div>
+        <input type="text" v-model="goods_name" size="15" class="text w120 mr10" placeholder="商品名称" @keyup.enter="getData()">
+        <div class="text_time mr10">
+            <input class="easyui-datetimebox" id="start_time" placeholder="开始时间">
+        </div>
+        <div class="text_time mr10">
+            <input class="easyui-datetimebox" id="end_time" placeholder="结束时间">
+        </div>
+        <input type="button" value="搜索" class="sc-btn btn30 sc-blueBg-btn" @click="getData()">
+    </div>
+    <div class="clear"></div>
+    <div class="list-div clear mt10">
+        <table class="ecsc-default-table">
+            <thead>
+            <tr>
+                <th width="8%">
+                    <div class="first_all">
+                        <input type="checkbox" id="all" class="ui-checkbox" @change="selectAll">
+                        <label for="all" class="ui-label"><a>编号</a></label>
+                        <div class="img"></div>
+                    </div>
+                </th>
+                <th width="30%">商品名称</th>
+                <th width="10%" class="tc">订单编号</th>
+                <th width="10%" class="tc">操作人员</th>
+                <th width="5%" class="tc">库存</th>
+                <th width="12%" class="tc">规格名称</th>
+                <th width="15%" class="tc">操作时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="bd-line" v-for="(vo,index) in list">
+                <td class="first_td_checkbox">
+                    <div class="first_all">
+                        <input type="checkbox" name="checkboxes" :value="index" :id="'checkboxes_'+index" v-model="selected" class="ui-checkbox">
+                        <label :for="'checkboxes_'+index" class="ui-label">{{vo.id}}</label>
+                    </div>
+                </td>
+                <td class="tl"><a :href="'/home/goods/detail.html?id='+vo.goods_id" target="_blank">{{vo.goods_name}}</a></td>
+                <td class="tc"><span>{{vo.order_sn}}</span></td>
+                <td class="tc"><span>{{vo.username}}</span></td>
+                <td class="tc"><span>{{vo.stock}}</span></td>
+                <td class="tc">
+                    <span class="navy">{{vo.goods_spec}}</span>
+                </td>
+                <td class="tc"><span>{{vo.ctime | timeParse}}</span></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="8" class="td_border">
+                    <div class="shenhe">
+                        <input name="drop_type_id" type="button" value="删除日志" :class="['sc-btn',{btn_disabled:selected.length<1}]" @click="del">
+                    </div>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            status: 0,
+            selected: [],
+            goods_name: '',
+            start_time: '{$start}',
+            end_time: '{$end}'
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            getData: function (instance) {
+                instance = instance ? instance : vm;
+                var param = {
+                    page: instance.page,
+                    pageSize: instance.pageSize,
+                    status: instance.status,
+                    goods_name: instance.goods_name,
+                    start_time: moment(instance.start_time).unix(),
+                    end_time: moment(instance.end_time).unix(),
+                };
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/goods/stock_log',
+                    data: param,
+                    success: function (data) {
+                        instance.page = data.page;
+                        instance.count = data.count;
+                        instance.list = data.list;
+                        if (data.page == 1) vm.pagerender(instance);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            selectAll: function () {
+                var _this = this;
+                var checked = event.currentTarget.checked;
+                if (_this.selected.length) {
+                    _this.selected = [];
+                } else {
+                    _this.list.forEach(function (v, i) {
+                        _this.selected.push(i);
+                    });
+                }
+            },
+            del: function () {
+                var _this = this;
+                if (_this.selected.length < 1) {
+                    easyshow('请选择要操作的记录');
+                    return;
+                }
+                var ids = [];
+                _this.selected.forEach(function (v) {
+                    ids.push(_this.list[v]['id']);
+                });
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/stock_log',
+                    data: {ids: ids},
+                    success: function (data) {
+                        _this.selected.sort(function (a, b) {
+                            return b - a;
+                        });
+                        _this.selected.forEach(function (i) {
+                            _this.list.splice(i, 1);
+                        });
+                        _this.selected = [];
+                        easyshow();
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        },
+        created: function () {
+            var _this = this;
+            _this.getData(_this);
+        },
+        mounted: function () {
+            var _this = this;
+            $('#start_time').datetimebox({
+                value: _this.start_time,
+                width: 145,
+                onChange: function (date) {
+                    _this.start_time = date;
+                    _this.getData(_this);
+                }
+            });
+            $('#end_time').datetimebox({
+                value: _this.end_time,
+                width: 145,
+                onChange: function (date) {
+                    _this.end_time = date;
+                    _this.getData(_this);
+                }
+            });
+        }
+    });
+</script>
+{include file="public/footer"}

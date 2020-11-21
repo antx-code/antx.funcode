@@ -1,0 +1,152 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault" id="app">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <div class="user-mod" style="min-height: 1150px;">
+            <div class="user-title">
+                <h2>意见建议</h2>
+            </div>
+            <div class="user-message-warp clearfix">
+                <div class="user-items">
+                    <div class="item">
+                        <div class="label"><em class="red">*</em>&nbsp;留言类型：</div>
+                        <div class="value">
+                            <div class="radio-item">
+                                <input type="radio" checked="" name="msg_type" class="ui-radio"
+                                       id="checkbox-message" value="0" v-model="info.type">
+                                <label for="checkbox-message" class="ui-radio-label">留言</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="msg_type" class="ui-radio" id="checkbox-complaint"
+                                       value="1" v-model="info.type">
+                                <label for="checkbox-complaint" class="ui-radio-label">投诉</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="msg_type" class="ui-radio" id="checkbox-ask" value="2"
+                                       v-model="info.type">
+                                <label for="checkbox-ask" class="ui-radio-label">询问</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="msg_type" class="ui-radio" id="checkbox-customer"
+                                       value="3" v-model="info.type">
+                                <label for="checkbox-customer" class="ui-radio-label">售后</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" name="msg_type" class="ui-radio" id="checkbox-buy" value="4"
+                                       v-model="info.type">
+                                <label for="checkbox-buy" class="ui-radio-label">求购</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><em class="red">*</em>&nbsp;留言主题：</div>
+                        <div class="value">
+                            <input type="text" name="msg_title" class="text text-2" v-model="info.title">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><em class="red">*</em>&nbsp;留言内容：</div>
+                        <div class="value">
+                            <textarea name="msg_content" class="textarea textarea2" v-model="info.content"></textarea>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item item-button">
+                        <div class="label">&nbsp;</div>
+                        <div class="value">
+                            <input type="submit" class="sc-btn sc-redBg-btn" value="提交" id="pingjia_form"
+                                   @click="doupdate()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="user-title">
+                <h2>留言</h2>
+                <ul class="tabs">
+                    <li class="active"><a href="user.php?act=message_list">普通留言</a></li>
+                </ul>
+            </div>
+            <div class="user-message-list">
+                <template v-for="(vo,index) in flist">
+                    <div class="m-item last">
+                        <div class="u-ico"><img :src="vo.avatar?vo.avatar:'/public/static/images/touxiang.jpg'"></div>
+                        <div class="ud-right">
+                            <div class="m-tit">
+                                <h3>{{vo.title}}</h3>
+                                <span>
+                                    <template v-if="vo.type==0">留言</template>
+                                    <template v-if="vo.type==1">投诉</template>
+                                    <template v-if="vo.type==2">询问</template>
+                                    <template v-if="vo.type==3">售后</template>
+                                    <template v-if="vo.type==4">求购</template>
+                                </span>
+                                <div class="fr">
+                                    <a href="javascript:void(0)" @click="dodelet(vo.id)" class="ftx-05 fr ml0">删除</a>
+                                    <em class="mr10">{{vo.addtime|timeParse}}</em>
+                                </div>
+                            </div>
+                            <div class="txt">{{vo.content}}</div>
+                            <template v-if="vo.reply">
+                                <div class="txt">回复：{{vo.reply}}</div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public:footer"}
+
+
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var flist = {$flist|raw};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+            flist: flist,
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            doupdate: function () {
+                if (vm.info.type && vm.info.title && vm.info.content) {
+                    fajax('/home/member/feedbkadd', vm.info);
+                } else {
+                    pbDialog(json_languages.pageparmALLneed, '', 0, '', '', '', false);
+                }
+            },
+            dodelet:function (id) {
+                if (confirm('你确实要彻底删除这条留言吗？')){
+                    console.log(100);
+
+                    $.post('/home/member/feeddelete', {
+                    	id: id
+                    }, function (ret) {
+                    	if (ret.status == 1) {
+                            pbDialog(ret.msg, '', 1, '', '', '', false);
+                            location.reload();
+                    	} else {
+                            pbDialog(ret.msg, '', 0, '', '', '', false);
+                    	}
+                    }, 'json');
+                }
+            }
+
+        },
+    });
+</script>
+

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper">
+    <div class="title"><a href="merchants_users_list.php?act=list" class="s-back">返回</a>店铺 - 店铺列表</div>
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span id="explanationZoom" title="收起提示"></span></div>
+            <ul><li>自信审查信息，谨慎操作。</li></ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <form method="post" enctype="multipart/form-data"
+                          action="/admin/store/applydetail"
+                          name="theForm"
+                          id="merchants_users_list_form" onsubmit="return false">
+                    <div class="switch_info business_info">
+                        <div class="step">
+                            <div class="tit"><h4>提交基本信息</h4></div>
+                            <div class="items">
+                                {volist name="list" id="vo"}
+                                    {if $vo.fieldsDateType=='IMG'}
+                                        <div class="item">
+                                            <div class="label">{$vo.fieldsFormTitle}：</div>
+                                            <div class="value">
+                                                <div class="type-file-box">
+                                                    <input type="button" name="button" id="button" class="type-file-button" value="">
+                                                    <input type="file" class="type-file-file" name="{$vo.fields_name}" size="30" hidefocus="true" disabled>
+                                                    <input name="{$vo.fields_name}" type="hidden" value="{$vo.value}">
+                                                    <span class="show">
+                                                    <a href="{$vo.value}" target="_blank" class="nyroModal">
+                                                        <i class="icon icon-picture" data-tooltipimg="{$vo.value}" shoptype="tooltip" title="tooltip"></i>
+                                                    </a>
+                                                    </span>
+                                                    <input type="text" name="{$vo.fields_name}" class="type-file-text" id="textfield" readonly="">
+                                                </div>
+                                                <div class="fl org"> </div>
+                                            </div>
+                                        </div>
+                                    {/if}
+                                    {if $vo.fieldsDateType == 'VARCHAR'}
+                                    <div class="item">
+                                        <div class="label">{$vo.fieldsFormTitle}：</div>
+                                        <div class="value">
+                                            <input class="text" type="text" value="{$vo.value}" size="20" name="{$vo.fields_name}">
+                                            <div class="fl org"> </div>
+                                        </div>
+                                    </div>
+                                    {/if}
+                                {/volist}
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="tit"><h4>管理员操作</h4></div>
+                            <div class="items items_w60">
+                                <div class="item">
+                                    <div class="label">用户提交状态：</div>
+                                    <div class="value red">已提交</div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">是否关闭店铺：</div>
+                                    <div class="value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input name="store_close" type="radio" value="0" class="ui-radio" id="shop_close_yes">
+                                                <label for="shop_close_yes" class="ui-radio-label">关闭</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input name="store_close" type="radio" value="1" class="ui-radio" id="shop_close_no" checked="checked">
+                                                <label for="shop_close_no" class="ui-radio-label">开启</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">店铺信息审核：</div>
+                                    <div class="value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input type="radio" name="merchants_status" value="1" id="merchants_audit_0" class="ui-radio"
+                                                       {if $merchant_apply.status==1}checked="checked"{/if}>
+                                                <label for="merchants_audit_0" class="ui-radio-label">未审核</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="radio" name="merchants_status" value="2" id="merchants_audit_1" class="ui-radio"
+                                                       {if $merchant_apply.status==2}checked="checked"{/if}>
+                                                <label for="merchants_audit_1" class="ui-radio-label">通过</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="radio" name="merchants_status" value="3" id="merchants_audit_2" class="ui-radio"
+                                                       {if $merchant_apply.status==3}checked="checked"{/if}>
+                                                <label for="merchants_audit_2" class="ui-radio-label">未通过</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="items">
+                                <div class="item">
+                                    <div class="label">&nbsp;</div>
+                                    <div class="value info_btn">
+                                        <input name="numAdd" value="1" id="numAdd" type="hidden">
+                                        <input type="submit" value=" 确定 " class="button" id="submitBtn" onclick="init()">
+                                        <input type="hidden" name="apply_id" value="{$apply_id}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+function init() {
+    $.post('/admin/store/applydetail',
+        $('#merchants_users_list_form').serialize(),
+        function (ret) {
+        if (ret.status == 1) {
+            $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+            if(typeof(window.parent.vm.init) == 'function'){
+                window.parent.vm.init();
+            }
+        } else {
+            $.messager.alert('提示', ret.msg, 'warning');
+        }
+    }, 'json');
+}
+</script>

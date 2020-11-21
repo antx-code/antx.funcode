@@ -1,0 +1,112 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault" id="app" v-cloak="">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+
+
+        <div class="user-mod" style="min-height: 1047px;">
+            <div class="user-title">
+                <h2>我的收藏</h2>
+                <ul class="tabs">
+                    <li class="active"><a href="/home/member/favorite">收藏商品</a></li>
+                    <li><a href="/home/member/favstore">关注店铺</a></li>
+                </ul>
+            </div>
+            <div class="collection-list-warp clearfix c-tab-box-ajax">
+                <ul class="list-ul">
+                    <template v-for="(vo,index) in list">
+                        <li>
+                            <div class="coll-goods">
+                                <div class="p-img"><a :href="'/home/goods/detail?id='+vo.goods_id" target="_blank"><img :src="vo.original_img"></a></div>
+                                <div class="p-name"><a :href="'/home/goods/detail?id='+vo.goods_id" target="_blank" :title="vo.goods_name">{{vo.goods_name}}</a></div>
+                                <div class="p-price">
+                                    <em>¥</em>{{vo.shop_price}}
+                                </div>
+                                <div class="p-btn"><a :href="'/home/goods/detail?id='+vo.goods_id" class="sc-btn">查看详情</a></div>
+                                <div class="p-oper">
+                                    <a href="javascript:void(0);" id="delete_goods_collect" @click="dodelete(index)">取消收藏</a>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+                <div class="no_records" id="no_records" style="display: none">
+                    <i class="no_icon"></i>
+                    <div class="no_info"><h3>主人，您还没有收藏任何商品哟~</h3></div>
+                </div>
+            </div>
+
+            <div class="clearfix" id="pages_ajax"></div>
+
+        </div>
+
+
+    </div>
+</div>
+{include file="public:footer"}
+
+
+<script>
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 12,
+            count: 0,
+            keywords: '',
+            list: []
+
+        },
+        methods: {
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 12;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            init: function () {
+                $.post('/home/member/favorite', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1 && vm.conut > 0) {
+                        pageinit('pages_ajax','#EF4F4F');
+                    }
+
+                    if(!vm.count){
+                        $("#no_records").css('display','block');
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.post('/home/member/dodelete', {
+                    pageparm: JSON.stringify(vm.list[index]),
+                    table: 'goods_collect'
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        vm.list.splice(index,1);
+                        pbDialog(ret.msg, '', 1, '', '', '', false);
+                    } else {
+                        pbDialog(ret.msg, '', 0, '', '', '', false);
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    })
+</script>
+

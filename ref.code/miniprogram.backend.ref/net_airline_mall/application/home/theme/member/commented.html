@@ -1,0 +1,191 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<style>.tag {
+    cursor: pointer;
+}
+
+.comment-tag {
+    display: inline-block;
+    margin-bottom: 10px
+}</style>
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <div class="user-mod" style="min-height: 1047px;">
+            <div class="user-title">
+                <h2>评论/晒单</h2>
+            </div>
+            <div class="comment-list-warp clearfix">
+                <div class="user-order-list">
+                    {volist name="info.goodslist" id="vo2"}
+                    <dl class="item">
+                        <dt class="item-t">
+                            <div class="t-statu">待评价</div>
+                            <div class="t-info">
+                                <span class="info-item">订单号：{$info.order.order_sn}</span>
+                                <span class="info-item">{$info.order.add_time|date='Y-m-d H:i'}</span>
+                                <span class="info-item"></span>
+                            </div>
+                            <div class="t-price"><em>¥</em>{$vo2.goods_price*$vo2.goods_num}</div>
+                        </dt>
+                        <dd class="item-c">
+                            <div class="c-left">
+                                <div class="c-goods">
+                                    <div class="c-img"><a href="/home/goods/detail?id={$vo2.goods_id}" target="_blank" title="{$vo2.goods_name}">
+                                        <img src="{$vo2.original_img}" alt=""></a></div>
+                                    <div class="c-info">
+                                        <div class="info-name">
+                                            <a href="/home/goods/detail?id={$vo2.goods_id}" target="_blank" title="{$vo2.goods_name}">{$vo2.goods_name}</a>
+                                        </div>
+                                        <div></div>
+                                        <div class="info-price"><b><em>¥</em>{$vo2.goods_price}</b><i>×</i><span>{$vo2.goods_num}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="c-handle">
+                                {if !$vo2.comment_id}
+                                <a href="javascript:void(0);" class="sc-btn"
+                                   shoptype="btn-comment" data-foot="true" onclick="openForm('{$vo2.rec_id}')">
+                                    添加评论
+                                </a>
+                                {else /}
+                                <span class="commint-tag">已评论</span>
+                                {/if}
+                                <a href="/home/member/orderdetail?order_id={$info.order.order_id}" target="_blank" class="sc-btn">订单详情</a>
+                            </div>
+                        </dd>
+                    </dl>
+                    {/volist}
+                </div>
+
+                <div class="votelist">
+                    <div class="title">满意度评价</div>
+                    <div class="votelist-content">
+                        <div class="service-lcol">
+                            <div class="mt15">
+                                <div class="shopper-img" style="display: flex;align-items: center">
+                                    <img width="100" src="{$store.logo}" style="height: auto">
+                                </div>
+                                <div class="shopper-info">
+                                    <div class="shopper-msg">
+                                        <h3>{$store.store_name}</h3>
+                                        <p>电话：暂无</p>
+                                    </div>
+                                    <div class="shopper-name">
+                                        <div class="item">
+                                            <strong>综合</strong>
+                                            <span>{$store.store_average_score}</span>
+                                        </div>
+                                        <div class="item">
+                                            <span>商品</span>
+                                            <span>{$store.store_desc_score}</span>
+                                        </div>
+                                        <div class="item">
+                                            <span>服务</span>
+                                            <span>{$store.store_service_score}</span>
+                                        </div>
+                                        <div class="item">
+                                            <span>发货</span>
+                                            <span>{$store.store_delivery_score}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="service-rcol">
+                            {if !$info.order.order_commemt_id}
+                            <div class="score">
+                                <dl class="ev-list">
+                                    <dt><em>*</em>商品描述相符</dt>
+                                    <dd shoptype="rates">
+                                    <span class="commstar" shoptype="p_rate">
+                                        <a href="javascript:;" data-value="1" class="star1"></a>
+                                        <a href="javascript:;" data-value="2" class="star2"></a>
+                                        <a href="javascript:;" data-value="3" class="star3"></a>
+                                        <a href="javascript:;" data-value="4" class="star4"></a>
+                                        <a href="javascript:;" data-value="5" class="star5"></a>
+                                    </span>
+                                        <input type="hidden" name="desc_rank" value="0">
+                                        <span class="degree-text" style="display: none;"><em shoptype="number">0</em>分</span>
+                                        <span class="comt-error" style="display: none;">请打分</span>
+                                    </dd>
+                                </dl>
+                                <dl class="ev-list">
+                                    <dt><em>*</em>卖家服务态度</dt>
+                                    <dd shoptype="rates">
+                                    <span class="commstar" shoptype="p_rate">
+                                        <a href="javascript:;" data-value="1" class="star1"></a>
+                                        <a href="javascript:;" data-value="2" class="star2"></a>
+                                        <a href="javascript:;" data-value="3" class="star3"></a>
+                                        <a href="javascript:;" data-value="4" class="star4"></a>
+                                        <a href="javascript:;" data-value="5" class="star5"></a>
+                                    </span>
+                                        <input type="hidden" name="service_rank" value="0">
+                                        <span class="degree-text" style="display: none;"><em shoptype="number">0</em>分</span>
+                                        <span class="comt-error" style="display: none;">请打分</span>
+                                    </dd>
+                                </dl>
+                                <dl class="ev-list">
+                                    <dt><em>*</em>物流发货速度</dt>
+                                    <dd shoptype="rates">
+                                    <span class="commstar" shoptype="p_rate">
+                                        <a href="javascript:;" data-value="1" class="star1"></a>
+                                        <a href="javascript:;" data-value="2" class="star2"></a>
+                                        <a href="javascript:;" data-value="3" class="star3"></a>
+                                        <a href="javascript:;" data-value="4" class="star4"></a>
+                                        <a href="javascript:;" data-value="5" class="star5"></a>
+                                    </span>
+                                        <input type="hidden" name="delivery_rank" value="0">
+                                        <span class="degree-text" style="display: none;"><em shoptype="number">0</em>分</span>
+                                        <span class="comt-error" style="display: none;">请打分</span>
+                                    </dd>
+                                </dl>
+                                <input type="hidden" name="store_id" value="{$info.order.store_id}">
+                                <div class="op-btn">
+                                    <a href="javascript:void(0);" class="sc-btn sc-redBg-btn" shoptype="storeRateBtn" data-orderid="{$info.order.order_id}">提交</a>
+                                </div>
+                            </div>
+                            {else /}
+                            <h3><s class="icon-02"></s><span>已评价</span></h3>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openForm(rec_id) {
+        $(event.currentTarget).addClass('commenting');
+        layer.open({
+            type: 2,
+            title: '发布评论',
+            area: ['50%', '60%'],
+            content: '/home/member/comments_form?rec_id=' + rec_id,
+            cancel: function (index, layero) {
+                updateStatus(false);
+            }
+        });
+    }
+
+    function updateStatus(flag) {
+        if (flag) {
+            let parent = $('.commenting').parent();
+            parent.children().first().remove();
+            parent.prepend('<span class="commint-tag">已评论</span>');
+        } else {
+            $('.commenting').removeClass('commenting');
+        }
+    }
+</script>
+
+{include file="public:footer"}

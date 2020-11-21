@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>
+    .list-div .handle .tDiv a.red {
+        color: red;
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="content">
+        <div class="tabs_info">
+            <ul>
+                <li :class="{curr:store_id==0}" @click="storeListInit(0)">
+                    <a href="javascript:void(0);" shoptype="tabs_info">自营</a>
+                </li>
+                <li :class="{curr:store_id=='store'}" @click="storeListInit('store')">
+                    <a href="javascript:void(0);" shoptype="tabs_info">店铺</a>
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keyword" v-model.trim="keywords" class="text nofocus" placeholder="订单编号" @keyup.enter="secrchInit()">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%">
+                                <div class="tDiv">编号</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">订单ID</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">订单号</div>
+                            </th>
+                            <th width="5%">
+                                <div class="tDiv">用户名</div>
+                            </th>
+                            <th width="10%" v-if="store_id=='store'">
+                                <div class="tDiv">店铺名称</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">申请时间</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">退款金额</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">状态</div>
+                            </th>
+                            <th width="20%">
+                                <div class="tDiv">图片证据</div>
+                            </th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(vo,index) in list">
+                            <td>
+                                <div class="tDiv">{{vo.return_id}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv">{{vo.order_id}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv">{{vo.order_sn}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv">{{vo.consignee}}</div>
+                            </td>
+                            <td v-if="store_id=='store'">
+                                <div class="tDiv">{{vo.store_name}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv">{{vo.addtime}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv">￥&nbsp;
+                                    <span v-if="vo.status==5" title="实际退款">{{vo.real_refund}}</span>
+                                    <span v-else title="申请退款">{{vo.refund}}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="tDiv">{{vo.show_status}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv">
+                                    <template v-for="(vo2,index2) in vo.imgs.split(',')">
+                                        <a class="example-image-link" :href="vo2"
+                                           data-lightbox="example-set">
+                                            <img class="example-image" :src="vo2" style="width: 25px;margin-right: 10px;">
+                                        </a>
+                                    </template>
+                                </div>
+                            </td>
+                            <td class="handle">
+                                <div class="tDiv a3">
+                                    <a href="javascript:void(0)" class="btn_edit" @click="detail(vo)" v-if="vo.status == 5 || vo.status == -2">
+                                        <i class="icon icon-eye-open"></i>查看
+                                    </a>
+                                    <a href="javascript:void(0)" class="btn_edit red" @click="detail(vo)" v-else>
+                                        <i class="icon icon-edit"></i>处理
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="list-page">
+                                    <div id="turn-page"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            store_id: 0,
+
+            list: []
+        },
+        methods: {
+            storeListInit: function (store_id) {
+                vm.store_id = store_id;
+                vm.pageFreash();
+            },
+
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+
+            init: function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/order/refund_list',
+                    data: {
+                        page: vm.page,
+                        rows: vm.rows,
+                        keywords: vm.keywords,
+                        store_id: vm.store_id
+                    },
+                    success: function (data) {
+                        vm.list = data.list;
+                        vm.count = data.count;
+                        if (vm.page == 1) {
+                            pageinit();
+                        }
+                    },
+                    error: function (xhr, type) {
+                        layer.msg(xhr.responseJOSN);
+                    }
+                });
+            },
+
+            detail: function (vo) {
+                if (vo.order_id) {
+                    window.parent.addParentTab(
+                        {
+                            title: '退款详情-' + vo.order_sn,
+                            href: '/admin/order/refund_detail?return_id=' + vo.return_id
+                        }
+                    );
+                }
+            },
+        }
+    });
+    $(function () {
+        vm.init();
+        window.addEventListener("storage", function (e) {
+            if (e.key == 'refreshRefund') {
+                vm.init();
+                localStorage.removeItem('refreshRefund');
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>首页</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+
+        .img-box img{max-width:100%}
+        .listicon{padding: 15px 10px !important;}
+        .listicon .txt{font-size: 12px !important;}
+        .title_index{display: flex;justify-content:space-between;height:3rem!important;line-height:3rem!important;margin-top:2rem;padding:0 1rem;}
+        .title_index h4{font-size:1.6rem!important;height:3rem!important;line-height:3rem!important;font-weight:bold;}
+        .title_index h5{font-size:1rem!important;height:3rem!important;line-height:3rem!important;font-weight:normal;color:#999}
+        .title_date{ text-align: center}
+        .count-down{ background: #fff}
+        .s2 .swiper-slide{display: flex; justify-content: center;align-items: center;width:26vw;height:26vw;}
+        .nav{display:flex; text-align: center }
+        .nav .list .txt{line-height:200%}
+        .nav .list img{max-width:100%;padding:1rem}
+        .miaosha del{color:#999}
+        .count-down .swiper-slide{padding:5px;text-align: center}
+        .img-box{display: flex; justify-content: center;align-items: center;width:calc(25vw - 10px);height:calc(25vw - 10px);border:1px solid #f7f7f7;text-align: center}
+        .img-box2{display: flex; justify-content: center;align-items: center;border:1px solid #f7f7f7;text-align: center;overflow: hidden;width:26vw;height:26vw;}
+        .img-box2 img{max-width: 100%;}
+        .seckill-box dfn{font-size:12px;color:#666}
+
+
+        .title_date{text-align:center;height:5rem!important;color:#cc0000;font-size:1.2rem;}
+        .title_date span{ background: #cc0000;border-radius: 4px;color:#fff;margin:0 5px;font-size:1.2rem;width:2.4rem;height:2.4rem;display:inline-block;text-align:center;line-height:2.4rem;}
+        .pro-img{width:calc(50vw - 0.9rem) !important;height:calc(50vw - 0.9rem) !important;overflow: hidden}
+        #app #logo img{
+            max-width: 100%;
+        }
+        .areaList img{max-width: 100%;border-radius: 5px;}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div id="logo">
+        <img src="/public/wap/static/images/tishilan.png">
+    </div>
+    <section class="goods_info">
+        <div class="goods_photo d_jump">
+            <div id="slider" class="swipe">
+                <div class="swiper-wrapper">
+                    <template v-for="(vo,index) in info.adlist">
+                        <div class="swiper-slide aui-text-center">
+                            <img :src="vo.ad_img" />
+                        </div>
+                    </template>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+    <div class="home">
+        <nav class="nav list-style2 whole-margin all-padding">
+            <section class="list listicon" style="width: 25%;" onclick="openwind('store','storelist_win',0)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_shop.png" class="icon" />
+                <div class="txt">
+                    东家店
+                </div>
+            </section>
+            <section class="list listicon" style="width: 25%;" onclick="openwind('store','xiaxiang_win',0)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_haowu.png" class="icon" />
+                <div class="txt">
+                    真货下乡
+                </div>
+            </section>
+            <section class="list listicon" style="width: 25%;" onclick="openwind('store','jincheng_win',0)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_nonghuo.png" class="icon" />
+                <div class="txt">
+                    农货进城
+                </div>
+            </section>
+
+            <section class="list listicon" style="width: 25%;" onclick="openwind('store','zgchange_win',0)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_integral.png" class="icon" />
+                <div class="txt">
+                    积分商城
+                </div>
+            </section>
+            <!--
+            <section class="list listicon" style="width: 20%;" onclick="openwind('store','pmgoods_win',0)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_sale.png" class="icon" />
+                <div class="txt">
+                    拍卖专区
+                </div>
+
+            </section>
+            <section class="list listicon" style="width: 20%;" onclick="openwind('store','skgoods_win',0)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_rob.png" class="icon" />
+                <div class="txt">
+                    秒杀
+                </div>
+            </section>
+            <section class="list listicon" style="width: 20%;" onclick="openwind('store','zggoods_win',0)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_zggoods.png" class="icon" />
+                <div class="txt">
+                    直购区
+                </div>
+            </section>
+            -->
+        </nav>
+        <div class="areaList">
+            <div style="max-width: 100%;float: left;padding: 5px;overflow: hidden;">
+                <img src="http://resource.heimicms.com/pic_xianyu.png">
+            </div>
+        </div>
+        <!---区域专区-->
+        <div class="areaList">
+            <template v-for="(vo,index) in info.areaList">
+                <div style="max-width: 50%;float: left;padding: 5px;overflow: hidden;" @click="openGoodList(vo.area)">
+                    <img :src="vo.imgurl">
+                </div>
+            </template>
+        </div>
+        <!---区域专区-->
+
+        <!--分类楼层区域-->
+        <div class="catelistFloor">
+            <template v-for="(va,index) in info.catelist">
+                <div>
+                    <img :src="va.cat_banner" alt="" style="width: 100%;max-height: 200px;" @click="openCateGoodList(va)">
+                </div>
+                <div class="count-down" style="margin-bottom: 12px;">
+                    <section class="count-down-all">
+                        <div class="swiper-container scroll-prolist swiper-container-horizontal catelist">
+                            <div class="swiper-wrapper">
+                                <template v-for="(vo,index) in va.goodslist">
+                                    <div class="spike-swiper-slide swiper-slide" @click="openGoodsdetail(vo)" style="width: 30.3%;">
+                                        <div class="img-box2">
+                                            <img  class="swiper-lazy" :data-src="vo.original_img" :src="vo.original_img" lazy="loaded" />
+                                        </div>
+                                        <p style="height: 30px;line-height: 15px;overflow: hidden;text-overflow:ellipsis;text-align: left;font-size: 12px;color: #666;margin-bottom: 10px;">{{vo.goods_name}}</p>
+                                        <p class="price" style="font-size: 16px;font-weight: bold;text-align: left;"><span style="font-size: 12px;color: #f92028">&yen;</span>{{vo.shop_price}} </p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </template>
+        </div>
+        <!--分类楼层区域-->
+
+        <!--
+        <div class="title_index">
+            <h4>限时秒杀</h4>
+        </div>
+        <div class="title_date">
+            <section class="date">
+                <p><span>{{c_h}}</span>: <span>{{c_m}}</span>: <span>{{c_s}}</span><strong style="font-size: 1.24rem;"></strong></p>
+            </section>
+        </div>
+        <div class="count-down miaosha" modules-index="5">
+            <section class="count-down-all">
+                <div class="swiper-container scroll-prolist swiper-container-horizontal" id="seccontainer">
+                    <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;">
+                        <template v-for="(vo,index) in info.seckillList">
+                            <div class="spike-swiper-slide swiper-slide" @click="openskGoodsdetail(vo)">
+                                <div class="img-box">
+                                    <img  class="swiper-lazy" :data-src="vo.original_img" :src="vo.original_img" lazy="loaded" />
+                                </div>
+                                <p class="price">&yen;{{vo.sec_price}} </p>
+                                <del>
+                                    &yen;{{vo.shop_price}}
+                                </del>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </section>
+        </div>
+        -->
+        <div class="title_index">
+            <h4>东家店</h4>
+            <h5 onclick="openwind('store','storelist_win',0)">更多</h5>
+        </div>
+        <div class="count-down doongjiadian" modules-index="5">
+            <section class="count-down-all">
+                <div class="swiper-container scroll-prolist swiper-container-horizontal" id="storecontainer">
+                    <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;">
+                        <template v-for="(vo,index) in info.storelist">
+                            <div  class="spike-swiper-slide swiper-slide"  @click="openStoreindex(vo)">
+                                <div  class="img-box">
+                                    <img class="swiper-lazy" :data-src="vo.logo" :src="vo.logo"/>
+                                </div>
+
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="hide">
+            <div class="title_index">
+                <h4>拍卖区</h4>
+            </div>
+            <div class="seckill-box">
+                <div waterfall-disabled="disabled" waterfall-offset="300" class="goods-li">
+                    <template v-for="(vo,index) in info.paimaigoods">
+                        <div class="show bg-color-write li" @click="openGoodspaimai(vo)">
+                            <div class="left"><img :src="vo.original_img" class="img"></div>
+                            <div class="right bg-color-write">
+                                <h4 class="f-04 color-3 twolist-hidden">{{vo.goods_name}}</h4>
+                                <div class="dis-box p-r">
+                                    <div class="box-flex m-top08">
+                                        <div class="color-red f-06">
+
+                                            <p><dfn>市场价：</dfn><del class="f-02 color-9">¥{{vo.max_price}}</del></p>
+                                            <p><dfn>起拍价：</dfn>¥{{vo.min_price}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="btn-right">
+                                        <div class="box-flex">
+                                            <span class="btn-seckill tag-bg-color br-5 f-05 color-white p-a">马上拍</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+        <div class="title_index">
+            <h4>推荐商品</h4>
+        </div>
+        <section class="product-list product-list-medium">
+            <div class="prolist">
+                <template v-for="(vo,index) in info.goodsList">
+                    <div class="prolist-item" @click="openGoodsdetail(vo)">
+                        <div class="pro-img">
+                            <a href="javascript:void(0)" class=""> <img :src="vo.original_img" class="img" /></a>
+                        </div>
+                        <div class="pro-info">
+                            <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                            <div class="price">
+                                &yen;{{vo.shop_price}}
+                            </div>
+                            <div class="outer">
+                                <em class="tag">自营</em>
+                                <span>{{vo.total_sale_num}}人已购买</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </div>
+    <footer data-v-36897c18="" data-v-3aa553e3="" class="tab-down" style="position: fixed;">
+        <ul data-v-36897c18="">
+            <li data-v-36897c18="" class="active">
+                <a data-v-36897c18="" href="/wap/" class="router-link-exact-active router-link-active"></a><i data-v-36897c18=""></i><span data-v-36897c18="">首页</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/category" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">分类</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/zgchange" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">积分</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/cart" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">购物车</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/center" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">我的</span>
+            </li>
+        </ul>
+    </footer>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            token: '',
+            info: {},
+
+            c_h: 0,//时
+            c_m: 0,//分
+            c_s: 0,//秒
+            page: 0,
+            keywords: '',
+        },
+        methods: {
+            openskGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'skdetail_win',
+                    url: 'widget://html/store/skdetail_win.html',
+                    pageParam: {
+                        id: vo.goods_id
+                    }
+                });
+            },
+            openGoodspaimai: function (vo) {
+                api.openWin({
+                    name: 'pmdetail_win',
+                    url: 'widget://html/store/pmdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            openStoreindex: function (vo) {
+                api.openWin({
+                    name: 'index_win.html',
+                    url: 'widget://html/store/store_win.html',
+                    pageParam: {
+                        store_id: vo.store_id
+                    }
+                });
+            },
+            cutdowntime: function () {
+                if(vm.info.sklist.length > 0){
+                    var end_time = vm.info.sklist[0].end_time;
+                    var curr_time = parseInt(Date.parse(new Date()) / 1000);
+                    var diff_time = parseInt(end_time - curr_time);// 倒计时时间差
+                    vm.c_h = wxapp.fillzero(Math.floor(diff_time / 3600));
+                    vm.c_m = wxapp.fillzero(Math.floor((diff_time / 60 % 60)));
+                    vm.c_s = wxapp.fillzero(Math.floor((diff_time % 60)));
+                    if (diff_time <= 0) {
+                        vm.c_h = '00';
+                        vm.c_m = '00';
+                        vm.c_s = '00';
+                    }
+                }
+
+            },
+            init: function () {
+                wxapp.ajax(config.indexapp, {ad_code:'wapIndex'},1).then(function (ret) {
+                    vm.info = ret.data;
+                    vm.swiperInit();
+                    var countdown = setInterval(function () {
+                        vm.cutdowntime();
+                    }, 1000);
+                });
+            },
+            swiperInit: function () {
+                setTimeout(function () {
+                    var slider = new Swiper('#slider', {
+                        autoplay: 3000,
+                        visibilityFullFit: true,
+                        loop: true,
+                        pagination: '.swiper-pagination',
+                        paginationClickable: true
+                    });
+                    var seccontainer = new Swiper('#seccontainer', {
+                        autoplay: 5000,
+                        visibilityFullFit: true,
+                        loop: true,
+                        slidesPerView: 4,
+                        paginationClickable: true
+                    });
+                    var storecontainer = new Swiper('#storecontainer', {
+                        autoplay: 1000000,
+                        visibilityFullFit: true,
+                        loop: true,
+                        slidesPerView: 4,
+                        paginationClickable: true
+                    });
+                    var catelist = new Swiper('.catelist', {
+                        autoplay: false,
+                        visibilityFullFit: true,
+                        slidesPerView: 3.3,
+                        loop: true,
+                        paginationClickable: true,
+                    });
+
+                }, 1000);
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'goodsdetail_win',
+                    url: 'widget://html/goodsdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            searchInit:function () {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        keywords: vm.keywords
+                    }
+                });
+            },
+            openGoodList:function (area) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        area: area
+                    }
+                });
+            },
+            openCateGoodList:function (vo) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+
+                    pageParam: {
+                        cat_id: vo.cat_id
+                    }
+                });
+            }
+        },
+    });
+    window.onload = function () {
+        vm.init();
+    }
+</script>

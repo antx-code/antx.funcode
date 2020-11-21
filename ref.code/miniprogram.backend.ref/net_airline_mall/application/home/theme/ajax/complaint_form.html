@@ -1,0 +1,168 @@
+{include file='public/head'}
+<style>.pb-ft {margin: 20px 0 20px 75px;}</style>
+<div class="comment-goods" id="app" v-cloak>
+    <div class="user-items">
+        <div class="item">
+            <div class="label"><em>*</em>问题描述：</div>
+            <div class="value">
+                {if $complaint.complaint_id>0}
+                <textarea name="content" class="textarea" id="textarea" cols="30" rows="10" size="10"
+                          placeholder="{$complaint.complaint_content}"
+                          onkeyup="figure()" maxlength="500" disabled>
+                </textarea>
+                {else /}
+                <textarea name="content" class="textarea" id="textarea" cols="30" rows="10" size="10"
+                          placeholder="问题描述！"
+                          onkeyup="figure()" maxlength="500">
+                </textarea>
+                {/if}
+
+                <div class="clear"></div>
+                <div class="error">尊敬的用户，为了更好的解决您的问题，请您在问题描述中反馈具体纠纷问题，并上传相关证据图片，避免上传外部链接等内容，以免耽误您的纠纷处理。<br/>
+                    您还可以输入<span id="sp">500</span>字</div>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="label">证据上传：</div>
+            <div class="value">
+                <div class="upload-img-box">
+                    <div class="img-lists">
+                        <ul class="img-list-ul" shoptype="imglist">
+                            <template v-for="(vo,index) in imglist">
+                                <li><a :href="vo" target="_blank">
+                                    <img width="78" height="78" alt="" :src="vo"></a>
+                                    <i class="iconfont icon-cha" shoptype="cimg-remove" @click="imgdelete(index)"
+                                       :data-imgid="index"></i>
+                                </li>
+                            </template>
+                        </ul>
+                        <div class="upload-btn">
+                            <div id="file_upload" class="uploadify" style="position: relative;">
+                                <a href="javascript:void(0);" id="uploadbutton" class="uploadbutton" style="position: relative; z-index: 1;">
+                                    <i class="iconfont icon-digital"></i>
+                                </a>
+                                <div id="html5_1dag942ph1vog11053ao1rn4e8g8_container"
+                                     class="moxie-shim moxie-shim-html5"
+                                     style="position: absolute; top: 0px; left: 0px; width: 78px; height: 78px; overflow: hidden; z-index: 0;">
+                                    <input id="html5_1dag942ph1vog11053ao1rn4e8g8" type="file"
+                                           style="font-size: 999px; opacity: 0; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;"
+                                           multiple="" accept="image/bmp,image/gif,image/jpeg,image/png">
+                                </div>
+                            </div>
+                        </div>
+                        {if $complaint.complaint_id > 0}
+
+                        {else /}
+                        <div class="img-utips">为了能够更快更好地解决问题，请您上传与卖家沟通的记录图片或者其他证明图片。<br/>
+                            共<em shoptype="num">{{start}}</em>张,还能上传<span id="img_number" shoptype="ima_number">{{end}}</span>张
+                        </div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {if $complaint.complaint_id > 0}
+
+    {else /}
+    <div class="pb-ft">
+        <a href="javascript:void(0)" class="pb-btn pb-ok" @click="init()">确定</a>
+        <a href="javascript:void(0)" class="pb-btn pb-cl" onclick="window.parent.layer.closeAll()">取消</a>
+    </div>
+    {/if}
+
+</div>
+</body>
+<script type="text/javascript" src="__STATIC__/js/jquery.purebox.js"></script>
+<script type="text/javascript" src="__STATIC__/js/jquery.validation.min.js"></script>
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__STATIC__/js/common.js"></script>
+<script type="text/javascript" src="__THEME__/js/magiczoomplus.min.js"></script>
+<script type="text/javascript" src="__THEME__/js/parabola.js"></script>
+<script type="text/javascript" src="__THEME__/js/mall-common.js"></script>
+
+<script type="text/javascript">
+    var imgs = '{$complaint.imgs}';
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            uid: '',
+            imglist: imgs?imgs.split(','):[],
+            start: 0,
+            end: 10,
+            order_id: {$order_id},
+        },
+        methods: {
+            init: function () {
+                $.post('/home/member/complaint_form', {
+                    content: document.getElementById("textarea").value,
+                    imgs: vm.imglist.join(','),
+                    order_id: vm.order_id,
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        pbDialog(ret.msg, "", 1);
+                        window.parent.vm.init();
+                    } else {
+                        pbDialog(ret.msg, "", 0);
+                    }
+                    setTimeout(function () {
+                        window.parent.layer.closeAll();
+                    },1000);
+                }, 'json');
+            },
+            imgdelete:function (index) {
+                vm.imglist.splice(index, 1);
+                vm.start--;
+                vm.end++;
+            }
+        }
+    });
+    {if $complaint.complaint_id < 1}
+    var upload = layui.upload;
+    upload.render({
+        elem: '#file_upload',
+        url: '/admin/uploader/alioss_upload', //上传接口
+        accept: 'file', //允许上传的文件类型
+        acceptMime: 'image/jpg, image/png', //允许上传的文件类型
+        multiple: true,
+        number: 10,
+        before: function (obj) {
+            if (vm.start > 9) {
+                pbDialog('最多上传10张', "", 0);
+                return false;
+            }
+        },
+        done: function (ret) {
+            if (ret.state == 'SUCCESS') {
+                if(vm.start<10){
+                    vm.imglist.push(ret.url);
+                    vm.start++;
+                    vm.end--;
+                }
+            } else {
+                pbDialog(ret.message, "", 0);
+            }
+
+        },
+    });
+    {/if}
+
+
+    //心得评价输入字数计算
+    function figure() {
+        var textarea = document.getElementById("textarea");
+        var maxlength = 500;
+        var length = textarea.value.length;
+        var count = maxlength - length;
+        var sp = document.getElementById("sp");
+        sp.innerHTML = count;
+        if (count <= 10) {
+            sp.style.color = "red";
+        } else {
+            sp.removeAttribute("style");
+        }
+    }
+</script>
+
+

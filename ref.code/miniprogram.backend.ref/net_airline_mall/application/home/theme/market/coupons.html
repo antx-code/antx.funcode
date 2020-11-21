@@ -1,0 +1,185 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+{include file='public/right_bar'}
+<link rel="stylesheet" type="text/css" href="__THEME__/css/coupons.css"/>
+<div id="g-slider">
+    <div id="g-scroll">
+        <div class="silder-panel">
+            <ul>
+                <li class="silder-item">
+                    <div class=" w">
+                        <a href="" target="_blank">
+                            <img src="/public/static/theme/images/1490207084408068909.png" height="300"></a>
+                    </div>
+                </li>
+                <li class="silder-item">
+                    <div class=" w">
+                        <a href="" target="_blank">
+                            <img src="/public/static/theme/images/1490207084408068909.png" height="300"></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="num-ctrl">
+            <ul></ul>
+        </div>
+    </div>
+</div>
+
+<div id="content" class="quan_content">
+    <div class="quan-main">
+        <div class="gray-wrap">
+            <div class="w1200 w">
+                <div class="quan-seckill">
+                    <div class="mt">
+                        <h3><b class="seckill-icon"></b>优惠券专区</h3>
+                    </div>
+                    <div class="mc cou-seckill">
+                        <div class="ui-switchable-panel-main">
+                            <div class="ui-switchable-panel">
+                                <div class="seckill-list">
+                                    {volist name="plist" id="vo"}
+                                    {if $vo.num == $vo.send_num}
+                                    <div class="quan-sk-item quan-gray-sk-item">
+                                        <div class="sk-img"><img width="130px" height="130px"
+                                                                 src="/public/static/theme/images/coupons_default.png">
+                                        </div>
+                                        <div class="q-type">
+                                            <div class="q-price">
+                                                <em>￥</em>
+                                                <strong class="num">{$vo.money}</strong>
+                                                <div class="txt">
+                                                    <div class="typ-txt">全场券</div>
+                                                </div>
+                                            </div>
+                                            <div class="limit"><span class="quota">满{$vo.min_goods_amount}元可用</span>
+                                            </div>
+                                            <div class="q-range">
+                                                <div class="range-item"
+                                                     title="购满{$vo.min_goods_amount}立即{$vo.money}优惠券">
+                                                    购满{$vo.min_goods_amount}立即{$vo.money}优惠券
+                                                </div>
+                                                <div class="range-item">全场通用</div>
+                                            </div>
+                                        </div>
+                                        <div class="q-opbtns">
+                                            <b class="semi-circle"></b>
+                                            <div class="btn-state btn-getend"></div>
+                                            <a href="javascript:void(0);" class="q-btn">
+                                                <span class="txt">活动已抢完</span><b></b>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {else /}
+                                    <div class="quan-sk-item">
+                                        <div class="sk-img"><img width="130px" height="130px"
+                                                                 src="/public/static/theme/images/coupons_default.png">
+                                        </div>
+                                        <div class="q-type">
+                                            <div class="q-price">
+                                                <em>￥</em>
+                                                <strong class="num">{$vo.money}</strong>
+                                                <div class="txt">
+                                                    <div class="typ-txt">优惠券</div>
+                                                </div>
+                                            </div>
+                                            <div class="limit"><span class="quota">订单满{$vo.min_goods_amount}元可用</span>
+                                            </div>
+                                            <div class="q-range">
+                                                <div class="range-item">{$siteInfo.shop_name} 自营专用</div>
+                                            </div>
+                                            <div class="task-time">
+                                                <b class="fl_b"></b>
+                                                <div class="cd-time fl" shoptype="time" data-time="{$vo.send_end_time_cn}">
+                                                    <span>剩余</span><span class="days">00</span><span
+                                                        class="split">天</span><span class="hours"></span><span
+                                                        class="split">时</span><span class="minutes"></span><span
+                                                        class="split">分</span><span class="seconds"></span><span
+                                                        class="split">秒</span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="q-opbtns">
+                                            <b class="semi-circle"></b>
+                                            <div class="canvas-qcode-box">
+                                                <div class="canvas-box">
+                                                    <div class="canvas" data-per="{$vo.dataper}">
+                                                        {if isset($vo.children)}
+                                                        <div class="btn-state btn-geted">已领取</div>
+                                                        {else /}
+                                                        <div class="canvas_wrap">
+                                                            <div class="circle">
+                                                                <div class="circle_item circle_left"
+                                                                     style="transform: rotate(7.2deg);"></div>
+                                                                <div class="circle_item circle_right wth0"></div>
+                                                            </div>
+                                                            <div class="canvas_num">
+                                                                <span>剩余<br><i>{$vo.dataper}</i>%</span></div>
+                                                        </div>
+                                                        {/if}
+                                                    </div>
+                                                    <a href="javascript:void(0);" class="q-btn get-coupon"
+                                                       cou_id="{$vo.coupon_id}"><span class="txt">立即领取</span><b></b></a>
+                                                    <a href="#none" class="qcode-btn"><b></b></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/if}
+
+                                    {/volist}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file='public/footer'}
+<script type="text/javascript" src="/public/static/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript">
+    //首页轮播广告
+    var length = $(".silder-panel ul").find("li").length;
+    if (length > 1) {
+        $("#g-scroll").slide({
+            titCell: ".num-ctrl ul",
+            mainCell: ".silder-panel ul",
+            effect: "left",
+            autoPlay: true,
+            autoPage: true,
+            interTime: 3500,
+            delayTime: 500
+        });
+    }
+
+    //优惠券秒杀切换
+    $(".seckill-tab li").hover(function () {
+        $(this).addClass("curr").siblings().removeClass("curr");
+        var index = $(this).index();
+
+        $(".ui-switchable-panel-main").find(".ui-switchable-panel").eq(index).show().siblings().hide();
+    });
+
+    $(".canvas").each(function () {
+        var per = 100 - $(this).data("per");
+        if (per > 50) {
+            $(this).find('.circle').addClass('clip-auto');
+            $(this).find('.circle_right').removeClass('wth0');
+        }
+        $(this).find(".circle_left").css("-webkit-transform", "rotate(" + (18 / 5) * per + "deg)");
+    });
+
+    $(".cd-time").each(function () {
+        $(this).yomi();
+    });
+</script>
+
+
+

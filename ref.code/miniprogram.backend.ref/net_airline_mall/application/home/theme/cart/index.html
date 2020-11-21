@@ -1,0 +1,537 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+<div id="app" v-cloak>
+    <div class="header header-cart">
+        <div class="w w1200">
+            <div class="logo">
+                <div class="logoImg">
+                    <a href="/"><img src="{$siteInfo.shop_logo}"></a>
+                </div>
+                <div class="tit">购物车（<em shoptype="cartNum">{{selectGoodsNum}}</em>）</div>
+            </div>
+            <div class="shop-search">
+                <div class="form">
+                    <form id="searchForm" name="searchForm" method="get" action="/home/category/catgoodslist" class="search-form">
+                        <input autocomplete="off" name="keywords" type="text" id="keyword" value="请输入关键词" class="search-text">
+                        <button type="submit" class="button button-icon"><i></i></button>
+                    </form>
+                    <div class="suggestions_box" id="suggestions" style="display:none;">
+                        <div class="suggestions_list" id="auto_suggestions_list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="w w1200">
+            <div class="cart-warp hide" :class="{'show':list.length>0}">
+                <div class="cart-filter">
+                    <div class="cart-stepflex">
+                        <div class="cart-step-item curr">
+                            <span>1.我的购物车</span>
+                            <i class="iconfont icon-arrow-right-alt"></i>
+                        </div>
+                        <div class="cart-step-item">
+                            <span>2.填写订单信息</span>
+                            <i class="iconfont icon-arrow-right-alt"></i>
+                        </div>
+                        <div class="cart-step-item">
+                            <span>3.成功提交订单</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-table">
+                    <div class="cart-head">
+                        <div class="column c-checkbox">
+                            <div class="cart-checkbox cart-all-checkbox">
+
+                                <input type="checkbox" id="cart-selectall" v-model="ckAll" @change="cartAllupdate()" class="ui-checkbox CheckBoxShop">
+                                <label for="cart-selectall" class="ui-label-14">全选</label>
+                            </div>
+                        </div>
+                        <div class="column c-goods">商品</div>
+                        <div class="column c-props"></div>
+                        <div class="column c-price">单价（元）</div>
+                        <div class="column c-quantity">数量</div>
+                        <div class="column c-sum">小计</div>
+                        <div class="column c-action">操作</div>
+                    </div>
+                    <div class="cart-tbody" shoptype="cartTboy">
+                        <!--店铺-->
+                        <template v-for="(vo,index) in list">
+                            <div class="cart-item" :key="index" shoptype="shopItem">
+                                <div class="shop">
+                                    <!--店铺全选-->
+                                    <div class="cart-checkbox" shoptype="ckList">
+                                        <input type="checkbox" :id="'shopid_'+index" name="checkShop"
+                                               class="ui-checkbox CheckBoxShop" v-model="checkboxes[index]" @change="store_select_all(index)">
+                                        <label :for="'shopid_'+index" class="ui-label-14">&nbsp;</label>
+                                    </div>
+                                    <div class="shop-txt">
+                                        <template v-if="vo.store_name">
+                                            <a href="javascript:void(0);" class="shop-name self-shop-name">{{vo.store_name}}</a>
+                                        </template>
+                                        <template v-else>
+                                            {$shop_config['shop_name']}
+                                        </template>
+                                    </div>
+                                </div>
+                                <div class="item-list" shoptype="itemList">
+                                    <!--产品列表-->
+                                    <template v-for="(vo2,index2) in vo.goodsList">
+                                        <div class="item-single">
+                                            <div class="item-item selected" shoptype="item" :id="product+vo.id"
+                                                 :data-recid="vo.id" :data-goodsid="vo2.goods_id">
+                                                <div class="item-form">
+                                                    <div class="cell s-checkbox">
+                                                        <div class="cart-checkbox" shoptype="ckList">
+                                                            <input type="checkbox"
+                                                                   name="checkItem"
+                                                                   v-model="vo2.selected"
+                                                                   @change="init(true)"
+                                                                   :id="'checkItem_'+index+'_'+index2"
+                                                                   class="ui-checkbox">
+                                                            <label :for="'checkItem_'+index+'_'+index2" class="ui-label-14">&nbsp;</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="cell s-goods">
+                                                        <div class="goods-item">
+                                                            <div class="p-img">
+                                                                <a :href="'/home/goods/detail?id='+vo2.goods_id" target="_blank">
+                                                                    <img :src="vo2.original_img" width="70"
+                                                                         height="70">
+                                                                </a>
+                                                            </div>
+                                                            <div class="item-msg">
+                                                                <a :href="'/home/goods/detail?id='+vo2.goods_id" target="_blank">{{vo2.goods_name}}</a>
+                                                                <div class="gds-types"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="cell s-props">
+                                                        <template v-if="vo2.tempvalue">{{vo2.tempvalue}}</template>
+                                                        <br>
+                                                    </div>
+                                                    <div class="cell s-price">
+                                                        <strong><em>¥</em>{{vo2.goods_price}}</strong>
+                                                        <p class="gray"><em>¥</em>{{vo2.market_price}}</p>
+                                                    </div>
+                                                    <div class="cell s-quantity">
+                                                        <div class="amount-warp">
+                                                            <input type="text" class="text buy-num" shoptype="number" v-model="vo2.goods_num" @change="init(true)">
+                                                            <div class="a-btn">
+                                                                <a href="javascript:void(0);" @click="changenum(index,index2,1)" class="btn-add">
+                                                                    <i class="iconfont icon-up"></i>
+                                                                </a>
+                                                                <a href="javascript:void(0);" @click="changenum(index,index2,-1)" class="btn-reduce ">
+                                                                    <i class="iconfont icon-down"></i>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="tc ftx-03">有货</div>
+                                                    </div>
+                                                    <div class="cell s-sum">
+                                                        <strong id="goods_subtotal_51">
+                                                            <em id="_51_subtotal"><em>¥</em>{{vo2.goodsxiaoji}}</em>
+                                                        </strong>
+                                                        <div class="cuttip hide">
+                                                            <span class="tit">优惠</span>
+                                                            <span class="price"><em>¥</em>0.00</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="cell s-action">
+                                                        <a href="javascript:void(0);" class="cart-remove"
+                                                           @click="cartDelete(vo2)">删除</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="cart-tfoot">
+                        <div class="cart-toolbar" shoptype="tfoot-toolbar">
+                            <div class="w w1200">
+                                <!--全选-->
+                                <div class="cart-checkbox cart-all-checkbox" shoptype="ckList">
+                                    <input type="checkbox" id="toggle-checkboxes-down" shoptype="ckAll"
+                                           v-model="ckAll"
+                                           @change="cartAllupdate()" class="ui-checkbox checkboxshopAll">
+                                    <label for="toggle-checkboxes-down" class="ui-label-14">全选</label>
+                                </div>
+                                <div class="operation">
+                                    <a href="javascript:void(0);" class="cart-remove-batch" @click="cartDeleteAll()">删除选中的商品</a>
+                                    <a href="javascript:void(0);" class="cart-follow-batch" @click="transferCollect()">移到我的收藏</a>
+                                </div>
+                                <div class="toolbar-right">
+                                    <div class="comm-right">
+                                        <div class="btn-area">
+                                            <input name="goPay" type="button" class="submit-btn" @click="getToCart()" value="去支付">
+                                        </div>
+                                        <div class="price-sum" id="total_desc">
+                                            <span class="txt">总价(不含运费)：</span>
+                                            <span class="price sumPrice" id="cart_goods_amount"
+                                                  shoptype="goods_total"><em>¥</em>{{selectGoodsTotal}}</span>
+                                        </div>
+                                        <div class="reduce-sum">
+                                            <span class="txt">已节省：</span>
+                                            <span class="price totalRePrice" id="save_total_amount" shoptype="save_total"><em>¥</em>{{marketGoodsTotal}}</span>
+                                        </div>
+                                        <div class="amount-sum">已选择<em class="cart_check_num" shoptype="cartNum">{{selectGoodsNum}}</em>件商品
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cart-empty hide" :class="{'show':emptyCart==1}">
+                <div class="cart-message">
+                    <div class="txt">购物车快饿瘪了，主人快给我挑点宝贝吧</div>
+
+                    <div class="info">
+                        <a href="/" class="btn sc-redBg-btn">马上去逛逛</a>
+                        {if !$user}
+                        <a href="javascript:void(0);" id="go_pay" data-url="/home/cart/index" class="login">
+                            去登录
+                        </a>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+            <div class="p-panel-main c-history">
+                <div class="ftit ftit-delr"><h3>猜你喜欢</h3></div>
+                <div class="gl-list clearfix">
+                    <ul class="clearfix">
+                        <transition-group name="list" tag="p">
+                            <li class="opacity_img" :key="index" v-for="(vo,index) in likelist" style="margin-bottom:20px">
+                                    <div class="p-img">
+                                        <a :href="'/home/goods/detail?id='+vo.goods_id" target="_blank">
+                                            <img :src="vo.original_img" width="190" height="190"></a>
+                                    </div>
+                                    <div class="p-price"><em>¥</em>{{vo.shop_price}}</div>
+                                    <div class="p-name">
+                                        <a :href="'/home/goods/detail?id='+vo.goods_id" :title="vo.goods_name" target="_blank">
+                                            {{vo.goods_name}}
+                                        </a>
+                                    </div>
+                                    <div class="p-num">已售<em>{{vo.total_sale_num+vo.virtual_sale_num}}</em>件</div>
+                                </li>
+                        </transition-group>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hide">
+        <div id="dialog_remove" class="hide">
+            <div class="tip-box icon-box">
+                <span class="warn-icon m-icon"></span>
+                <div class="item-fore">
+                    <h3 class="ftx-04">删除商品？</h3>
+                    <div class="ftx-03">您可以选择移到收藏，或删除商品。</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dialog_collect" class="hide">
+            <div class="tip-box icon-box">
+                <span class="warn-icon m-icon"></span>
+                <div class="item-fore">
+                    <h3 class="ftx-04">移到收藏</h3>
+                    <div class="ftx-03">移动后选中商品将不在购物车中显示。</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="flow_add_cart" class="hide">
+            <div class="tip-box icon-box">
+                <span class="warn-icon m-icon"></span>
+                <div class="item-fore">
+                    <h3 class="ftx-04">请至少选中一件商品！</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="cart_gift_goods" class="hide">
+            <div class="tip-box icon-box">
+                <span class="warn-icon m-icon"></span>
+                <div class="item-fore">
+                    <h3 class="ftx-04 rem">最多领取<em shoptype="giftNumber"></em>个商品</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="set_default" class="hide">
+            <div class="tip-box icon-box">
+                <span class="warn-icon m-icon"></span>
+                <div class="item-fore">
+                    <h3 class="ftx-04">您确定要设置为默认收货地址吗？</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="del_address" class="hide">
+            <div class="tip-box icon-box">
+                <span class="warn-icon m-icon"></span>
+                <div class="item-fore">
+                    <h3 class="ftx-04">你确认要删除该收货地址吗？</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="no_address_cart" class="hide">
+            <div class="tip-box icon-box">
+                <span class="warn-icon m-icon"></span>
+                <div class="item-fore">
+                    <h3 class="ftx-04">您还没有选择收货地址！</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="no_goods_cart" class="hide">
+            <div class="tip-box icon-box">
+                <span class="warn-icon m-icon"></span>
+                <div class="item-fore">
+                    <h3 class="ftx-04">您的购物车中没有商品！</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="cart_address_not" class="hide">
+            <div class="tip-box icon-box">
+                <span class="warn-icon m-icon"></span>
+                <div class="item-fore">
+                    <h3 class="ftx-04">您还没有选择收货地址！</h3>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+{include file='public/footer'}
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            likelist: [],
+            list: [],
+            selectGoodsNum: 0,
+            selectGoodsTotal: 0.00,
+            marketGoodsTotal: 0.00,
+            checkItem: 'checkItem_',
+            product: 'product_',
+            ckAll: true,
+            user_id: $("input[name='user_id']").val(),
+            emptyCart: 0,
+            checkboxes: []
+        },
+        methods: {
+            init: function (update, ckAll) {
+                var param = {};
+                if (update) {
+                    param = {select: {}, num: {}};
+                    vm.list.forEach(function (v, i) {
+                        var f = true;
+                        v.goodsList.forEach(function (goods, index) {
+                            if (typeof ckAll == 'boolean') {
+                                vm.list[i].goodsList[index].selected = ckAll;
+                                param.select[goods.id] = ckAll;
+                            } else {
+                                param.select[goods.id] = goods.selected;
+                                f = (Boolean)(f && goods.selected);
+                            }
+                            param.num[goods.id] = goods.goods_num;
+                        });
+                        if (typeof ckAll == 'boolean') {
+                            vm.checkboxes[i] = ckAll;
+                        } else {
+                            vm.checkboxes[i] = f;
+                        }
+                    });
+                    vm.checkAll();
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/home/cart/index',
+                    data: param,
+                    dataType: 'json',
+                    success: function (ret) {
+                        vm.list = ret.data.storeList;
+                        if (vm.list.length == 0) {
+                            vm.emptyCart = 1;
+                        }
+                        vm.selectGoodsNum = ret.data.selectGoodsNum;
+                        vm.selectGoodsTotal = ret.data.selectGoodsTotal;
+                        vm.marketGoodsTotal = ret.data.marketGoodsTotal;
+                        if (!update) {
+                            //xxx初始化店铺全选状态
+                            ret.data.storeList.forEach(function (v) {
+                                var flag = true;
+                                v.goodsList.forEach(function (goods) {
+                                    flag = (Boolean)(flag && goods.selected);
+                                });
+                                vm.checkboxes.push(flag);
+                            });
+                            vm.checkAll();
+                        }
+                    },
+                    error: function (xhr, type) {
+                        pbDialog(xhr.responseJSON.msg, "", 0);
+                        try {
+                            vm.list.forEach(function (v, i) {
+                                v.goodsList.forEach(function (rec, j) {
+                                    if (rec.id == xhr.responseJSON.id) {
+                                        vm.list[i].goodsList[j].goods_num = xhr.responseJSON.num;
+                                        throw new Error(xhr.responseJSON.msg);
+                                    }
+                                });
+                            });
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    }
+                });
+            },
+            store_select_all: function (index) {
+                var status = this.checkboxes[index];
+                vm.list[index].goodsList.forEach(function (goods, idx) {
+                    vm.list[index].goodsList[idx].selected = status;
+                });
+                vm.init(true);
+            },
+            changenum: function (index1, index2, num) {
+                if (vm.list[index1].goodsList[index2].goods_num + num == 0) {
+                    pbDialog(json_languages.Purchase_restrictions, "", 0);
+                    return false;
+                }
+                vm.list[index1].goodsList[index2].goods_num += num;
+                this.init(true);
+            },
+            cartAllupdate: function () {
+                this.init(true, vm.ckAll);
+            },
+            checkAll: function () {
+                var flag = true;
+                vm.checkboxes.forEach(function (v) {
+                    flag = (Boolean)(flag && v);
+                });
+                this.ckAll = flag;
+            },
+            cartDelete: function (vo2) {
+                var user_id = $("#user_id").val();
+                var ok_title, cl_title, content;
+                var obj = {"divId": "cart_remove", "title": "删除"};
+                if (obj.divId == 'cart_remove') {
+                    ok_title = json_languages.remove;
+                    cl_title = json_languages.move_collection;
+                    content = $("#dialog_remove").html();
+                } else if (obj.divId == 'cart_collect') {
+                    ok_title = json_languages.follow;
+                    cl_title = json_languages.cancel;
+                    content = $("#dialog_collect").html();
+                }
+
+                if (user_id > 0 || obj.divId == 'cart_remove') {
+                    pb({
+                        id: obj.divId,
+                        title: obj.title,
+                        width: 455,
+                        height: 58,
+                        ok_title: ok_title, //按钮名称
+                        cl_title: cl_title, //按钮名称
+                        content: content, //调取内容
+                        drag: false,
+                        foot: true,
+                        onOk: function () {
+                            $.post('/home/cart/cartDelete', {
+                                id: vo2.id,
+                            }, function (ret) {
+                                if (ret.status == 1) {
+                                    vm.init();
+                                }
+                            }, 'json');
+                        },
+                        onCancel: function () {
+
+                            $.post('/home/cart/goodsCollectAdd', {
+                                id: vo2.id,
+                                goods_id: vo2.goods_id,
+                            }, function (ret) {
+                                if (ret.status == 1) {
+                                    vm.init();
+                                }
+                            }, 'json');
+                        }
+                    });
+                }
+            },
+            cartDeleteAll: function () {
+                pbDialog("删除商品？", "", 0, 450, 50, 50, true, function () {
+                    $.post('/home/cart/cartDeleteAll', {}, function (ret) {
+                        if (ret.status == 1) {
+                            vm.init();
+                        }
+                    }, 'json');
+                });
+            },
+            transferCollect: function () {
+                pbDialog("转移到我的收藏？", "", 0, 450, 50, 50, true, function () {
+                    $.post('/home/cart/transferCollect', {}, function (ret) {
+                        if (ret.status == 1) {
+                            vm.init();
+                        }
+                    }, 'json');
+                });
+            },
+            guessYouLike: function () {
+                $.post('/home/cart/guessYouLike', {
+                    table: ''
+                }, function (ret) {
+                    vm.likelist = ret.data;
+                }, 'json');
+            },
+            getToCart: function () {
+                //弹窗登录
+                if (parseInt(this.user_id) == 0) {
+                    $.notLogin();
+                    return;
+                }
+                //判断选中数量
+                if (this.selectGoodsNum <= 0) {
+                    var content = $("#flow_add_cart").html();
+                    pb({
+                        id: "flow_add_cart",
+                        title: json_languages.pb_title,
+                        width: 455,
+                        height: 58,
+                        content: content,
+                        drag: false,
+                        foot: false
+                    });
+                    return;
+                }
+                location.href = '/home/cart/confirmOrder';
+            }
+        },
+        mounted: function () {
+            setTimeout(tfootScroll, 300);
+        }
+    });
+    $(function () {
+        vm.init();
+        vm.guessYouLike();
+    });
+</script>
+

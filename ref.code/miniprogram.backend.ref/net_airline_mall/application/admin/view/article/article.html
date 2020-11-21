@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>该页面展示所有分类下的文章。</li>
+                <li>可通过搜索文章标题进行搜索，侧边栏可进行高级搜索。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="doadd()">
+                        <div class="fbutton">
+                            <div class="add" title="添加">
+                                <span>
+                                    <i class="icon icon-plus"></i>
+                                    添加
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="select_w120 imitate_select" style="margin-right: 250px;">
+                        <!--文章分类聚合选择开始-->
+                        <div class="step_value">
+                            <div class="search_select">
+                                <div class="categorySelect">
+                                    <div class="selection">
+                                        <input type="text" name="category_name" id="category_name"
+                                               class="text w290 valid"
+                                               v-model="category_name" readonly/>
+                                        <input type="hidden" name="parent_id" id="category_id"
+                                               v-model="parent_id"/>
+                                    </div>
+                                    <div class="select-container w319" style="display:none;height: 300px;">
+                                        <div class="select-top">
+                                            <a href="javascript:;" class="categoryTop"
+                                               @click="getcategoryListInitReset()">重选</a>
+                                            &gt<span>{{category_tip}}</span>
+                                        </div>
+                                        <div class="select-list2" style="height: 300px;">
+                                            <ul style="height: 300px;top:0px;">
+                                                <template v-for="(vo,index) in categoryList">
+                                                    <li @click="getcategoryListInit(vo.cat_id,vo.cat_name)">
+                                                        <em>
+                                                            <template v-if="catlevel==1">Ⅰ</template>
+                                                            <template v-if="catlevel==2">Ⅱ</template>
+                                                            <template v-if="catlevel==3">Ⅲ</template>
+                                                            <template v-if="catlevel==4">Ⅳ</template>
+                                                        </em>
+                                                        {{vo.cat_name}}
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--文章分类聚合选择结束-->
+                    </div>
+
+                    <div class="input">
+                        <input type="text" name="keyword" class="text nofocus"
+                               placeholder="文章标题" autocomplete="off" v-model="keywords"/>
+                        <input type="submit" class="btn" name="secrch_btn"
+                               @click=secrchInit() shoptype="secrch_btn" value=""/>
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%" class="sign">
+                                <div class="tDiv">
+                                    <input type="checkbox" name="all_list" class="checkbox" id="all_list"/>
+                                    <label for="all_list" class="checkbox_stars"></label>
+                                </div>
+                            </th>
+                            <th width="5%">
+                                <div class="tDiv">编号</div>
+                            </th>
+                            <th width="20%">
+                                <div class="tDiv">
+                                    <a href="javascript:listTable.sort('title'); ">文章标题</a>
+                                </div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">
+                                    <a href="javascript:listTable.sort('cat_id'); ">文章分类</a>
+                                </div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">
+                                    <a href="javascript:listTable.sort('sort_order'); ">排序</a>
+                                </div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">
+                                    <a href="javascript:listTable.sort('is_open'); ">是否显示</a>
+                                </div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">
+                                    <a href="javascript:listTable.sort('add_time'); ">添加日期</a>
+                                </div>
+                            </th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td class="sign">
+                                    <div class="tDiv">
+                                        <input type="checkbox" name="checkboxes[]" :value="vo.article_id"
+                                               class="checkbox" :id="checkboxitem+vo.article_id">
+                                        <label :for="checkboxitem+vo.article_id" class="checkbox_stars"></label>
+                                    </div>
+                                </td>
+                                <td><div class="tDiv">{{vo.article_id}}</div></td>
+                                <td><div class="tDiv">{{vo.title}}</div></td>
+                                <td><div class="tDiv">{{vo.cat_name}}</div></td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input type="text" name="sort_order" class="text w100" v-model="vo.sort_order"
+                                               @keyup.enter="doupdate(vo)"/>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.is_open==1}"
+                                             @click="showinnav(index)">
+                                            <div class="circle"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.add_time_cn}}</div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0);" class="btn_edit" @click="doadd(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="tfoot_btninfo">
+                                        <input type="hidden" name="act" value="batch"/>
+                                        <div class="item">
+                                            <div class="label_value">
+                                                <div id="type_select" class="imitate_select select_w120">
+                                                    <div class="cite">请选择...</div>
+                                                    <ul>
+                                                        <li>
+                                                            <a href="javascript:void(0);" data-value="" class="ftx-01">请选择...</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:void(0);" data-value="button_remove"
+                                                               class="ftx-01" @click="doallupdate(1)">删除</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:void(0);" data-value="button_hide"
+                                                               class="ftx-01" @click="doallupdate(0,0)">批量隐藏</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:void(0);" data-value="button_show"
+                                                               class="ftx-01" @click="doallupdate(0,1)">批量显示</a>
+                                                        </li>
+                                                    </ul>
+                                                    <input name="type" type="hidden" value="" id="type_val">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="submit" value="确定" id="btnSubmit" name="btnSubmit"
+                                               shoptype="btnSubmit"
+                                               class="btn btn_disabled" disabled="">
+                                    </div>
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            cat_id: 0,
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+            //文章分类聚合选择开始
+            categoryList: [],
+            catlevel: 0,
+            category_name: '全部分类',
+            category_tip: '请选择分类',
+            parent_id: 0,
+            //文章分类聚合选择结束
+            article_ids: [],
+
+        },
+        methods: {
+            showinnav: function (index) {
+                if (vm.list[index].is_open == 0) {
+                    vm.list[index].is_open = 1;
+                } else {
+                    vm.list[index].is_open = 0;
+                }
+                vm.doupdate(vm.list[index]);
+            },
+            pageFreash: function (cat_id = 0, is_delete = 0) {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.cat_id = cat_id;
+                vm.keywords = '';
+                vm.category_name = '全部分类';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            doupdate: function (vo) {
+                majax('/admin/article/doupdate', vo, 'article');
+            },
+
+            doadd: function (vo = {}) {
+                if (vo.article_id >0) {
+                    layerOpenwin('编辑文章', '/admin/article/articleadd?article_id=' + vo.article_id);
+                } else {
+                    layerOpenwin('添加文章', '/admin/article/articleadd');
+                }
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/article/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'article'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            init: function () {
+                $.post('/admin/article/article', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    cat_id: vm.cat_id,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            //商品分类聚合选择开始
+            getcategoryListInit: function (parent_id, cat_name) {
+                $(".select-list2 ul").show();
+                if (cat_name) {
+                    vm.category_name = cat_name;
+                }
+                vm.parent_id = parent_id;
+                vm.cat_id = parent_id;
+                $.post('/admin/article/catListInitAjax', {
+                    parent_id: parent_id
+                }, function (ret) {
+                    if (ret.data.length > 0) {
+                        vm.categoryList = ret.data;
+                        vm.catlevel++;
+                    } else {
+                        $(".select-container").hide();
+                    }
+                }, 'json');
+            },
+            getcategoryListInitReset: function () {
+                vm.catlevel = 0;
+                vm.category_name = '顶级分类';
+                vm.category_tip = '请选择分类';
+                vm.parent_id = 0;
+                vm.getcategoryListInit(vm.parent_id, '');
+            },
+            //商品分类聚合选择结束
+
+            //批量操作
+            doallupdate: function (is_delete = 0, is_open = 1) {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.article_ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/article/doallupdate', {
+                            article_ids: vm.article_ids,
+                            is_delete: is_delete,
+                            is_open: is_open,
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+        vm.getcategoryListInit(vm.parent_id, '');
+    });
+</script>

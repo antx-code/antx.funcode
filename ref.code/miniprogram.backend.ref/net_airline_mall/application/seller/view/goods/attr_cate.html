@@ -1,0 +1,198 @@
+{include file="public/header"}
+<div id="app" v-cloak>
+    <div class="tabmenu">
+        <ul class="tab">
+            <li><a href="/seller/goods/attr_type.html">商品类型</a></li>
+            <li><a href="/seller/goods/attr_group.html">属性分组</a></li>
+            <li class="active"><a href="javascript:">属性分类</a></li>
+        </ul>
+    </div>
+
+    <div class="btn-info">
+        <a class="sc-btn sc-blue-btn" :href="'/seller/goods/attr_cate_add.html?parent_id='+parent_id" v-if="previous.length<3"><i class="icon-plus"></i>添加分类</a>
+    </div>
+
+    <div class="search-info" v-show="previous.length>0">
+        <div class="search-form">
+            <a @click="showPrev" class="sc-btn sc-blue-btn"><i class="icon icon-reply"></i>&nbsp;返回上一级</a>
+        </div>
+    </div>
+
+    <div class="list-div" id="listDiv">
+        <table id="list-table" class="ecsc-default-table">
+            <thead>
+            <tr>
+                <th width="15%" class="tl pl10">级(一级别)</th>
+                <th width="25%" class="tl">分类名称</th>
+                <th width="10%">属性类型数量</th>
+                <th width="10%">属性分组数量</th>
+                <th width="11%">排序</th>
+                <th width="12%" class="handle">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr align="center" v-for="(vo,index) in list">
+                <td class="tl pl10">
+                    <div class="tDiv first_setup">
+                        <div class="setup_span">
+                            <em><i class="icon icon-cog"></i>设置<i class="arrow"></i></em>
+                            <ul>
+                                <li v-if="vo.level<3"><a :href="'/seller/goods/attr_cate_add.html?parent_id='+vo.id">新增下一级</a></li>
+                                <li v-if="vo.level<3"><a @click="showNext(vo.id)">查看下一级</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </td>
+                <td class="first-cell tl" id="level_0_47">
+                    <div class="first_column">{{vo.name}}</div>
+                </td>
+                <td><a :href="'/seller/goods/attr_type.html?cate_id='+vo.id" class="ftx-01">{{vo.type_count}}</a></td>
+                <td><a :href="'/seller/goods/attr_group.html?cate_id='+vo.id" class="ftx-01">{{vo.group_count}}</a></td>
+                <td align="center"><span @click="edit('sort', index)">{{vo.sort}}</span></td>
+                <td class="ecsc-table-handle">
+                    <span><a :href="'/seller/goods/attr_cate_add.html?id='+vo.id" class="btn-green"><i class="icon icon-edit"></i><p>编辑</p></a></span>
+                    <span><a @click="del(index)" class="btn-red"><i class="icon icon-trash"></i><p>删除</p></a></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            parent_id: 0,
+            previous: []
+        },
+        methods: {
+            getData: function (instance, previous) {
+                instance = instance ? instance : vm;
+                var param = {
+                    parent_id: instance.parent_id,
+                    page: instance.page,
+                    pageSize: instance.pageSize
+                };
+                if (typeof previous != 'undefined') {
+                    param.parent_id = previous;
+                }
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/goods/attr_cate',
+                    data: param,
+                    success: function (data) {
+                        instance.list = data.list;
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        if (data.page == 1) instance.pagerender();
+                    }
+                });
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            showNext: function (cat_id) {
+                this.previous.push(this.parent_id);
+                this.parent_id = cat_id;
+                this.page = 1;
+                this.getData();
+            },
+            showPrev: function () {
+                this.parent_id = this.previous.pop();
+                this.page = 1;
+                this.getData();
+            },
+            edit: function (field, index) {
+                var obj = event.currentTarget;
+                var param = {
+                    cat_id: vm.list[index]['cat_id'],
+                    field: field
+                };
+                clickEdit(obj, param, vm.modify);
+            },
+            del: function (index) {
+                if (alert) {
+                    if (!window.confirm('确定要删除吗？')) {
+                        return;
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/attr_cate_add?operate=del',
+                    data: {id: vm.list[index]['id']},
+                    success: function (data) {
+                        easyshow();
+                        vm.list.splice(index, 1);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            toggle: function (field, index) {
+                var param = {
+                    cat_id: vm.list[index]['cat_id'],
+                    field: field,
+                    value: parseInt(vm.list[index][field]) ? 0 : 1
+                };
+                this.modify(param, function (res) {
+                    if (res.msg) {
+                        easyshow(res.msg);
+                    } else {
+                        vm.list[index][field] = parseInt(res.content);
+                    }
+                });
+            },
+            modify: function (param, callback) {
+                if (vm.beforeRequest) {
+                    return;
+                }
+                vm.beforeRequest = true;
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/goods/attr_cate_add?operate=modify",
+                    data: param,
+                    success: function (data) {
+                        vm.beforeRequest = false;
+                        callback(data);
+                    },
+                    error: function (xhr, type) {
+                        vm.beforeRequest = false;
+                        callback(xhr.responseJSON);
+                    }
+                });
+            }
+        },
+        created: function () {
+            this.getData(this);
+        }
+    });
+</script>
+{include file="public/footer"}

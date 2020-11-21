@@ -1,0 +1,68 @@
+<div class="shopCart-con shop-cm">
+    <a href="{:url('cart/index')}">
+        <i class="iconfont icon-carts"></i>
+        <span>我的购物车</span>
+        <em class="count cart_num">{$cartList.cart_num | default=0}</em>
+    </a>
+</div>
+
+<div class="dorpdown-layer" shoptype="dorpdownLayer">
+    <div class="settleup-content">
+        {if count($cartList.cartList)}
+        <div class="mc">
+            <ul>
+                {foreach $cartList.cartList as $index=>$goods}
+                <li>
+                    <div class="p-img"><a href="{:url('goods/detail',['id'=>$goods.goods_id])}" target="_blank"><img src="{$goods.original_img}" width="50" height="50"></a></div>
+                    <div class="p-name"><a href="{:url('goods/detail',['id'=>$goods.goods_id])}" target="_blank" title="{$goods.goods_name}">{$goods.goods_name}</a></div>
+                    <div class="p-number" data-id="{$goods.id}">
+                        <span class="num">{$goods.goods_num}</span>
+                        <div class="count">
+                            <a href="javascript:void(0);" onclick="changenum(this,'plus')" class="count-add"><i class="iconfont icon-up"></i></a>
+                            <a href="javascript:void(0);" onclick="changenum(this,'minus')" class="count-remove"><i class="iconfont icon-down"></i></a>
+                        </div>
+                    </div>
+                    <div class="p-oper">
+                        <div class="price"><em>¥</em>{$goods.goods_price}</div>
+                        <a href="javascript:void(0);" onclick="deleteCartGoods('{$goods.id}')" class="remove">删除</a>
+                    </div>
+                </li>
+                {/foreach}
+            </ul>
+        </div>
+        <div class="mb">
+            <input name="cart_value" id="cart_value" value="50,58,59,60" type="hidden">
+            <div class="p-total">共{$cartList.cart_num}件商品&nbsp;&nbsp;共计：{$cartList.total_price.total_fee | default=0}</div>
+            <a href="{:url('cart/index')}" class="btn-cart">去购物车</a>
+        </div>
+        {else /}
+        <div class="prompt">
+            <div class="nogoods"><b></b><span>购物车中还没有商品，赶紧选购吧！</span></div>
+        </div>
+        {/if}
+    </div>
+</div>
+
+<script>
+    function changenum(btn, type) {
+        let obj = $(btn).parents('.p-number'),
+            num = obj.find('.num'),
+            id = obj.data('id');
+        if (type != 'plus' && parseInt(num.html()) <= 1) {
+            return;
+        }
+        let param = {id: id, type: type};
+        $.ajax({
+            type: 'POST',
+            url: '/home/cart/changeNum',
+            data: param,
+            success: function (data) {
+                num.html(data.num);
+                $('.cart_num').html(data.total_num);
+            },
+            error: function (xhr, type) {
+                layer.msg(xhr.responseJSON);
+            }
+        });
+    }
+</script>

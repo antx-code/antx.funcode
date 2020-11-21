@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>新增地址</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="con bg-color-write">
+        <div class="flow-consignee">
+            <div class="text-all dis-box"><label>收货人<em>*</em></label>
+                <div class="input-text">
+                    <div class="el-input el-input--consignee">
+                        <input type="text" autocomplete="off" placeholder="请输入收货人姓名" class="el-input__inner" v-model="info.consignee">
+                    </div>
+                    <i class="iconfont icon-guanbi1 close-common"></i></div>
+            </div>
+            <div class="text-all dis-box"><label>手机号码<em>*</em></label>
+                <div class="input-text">
+                    <div class="el-input el-input--mobile">
+                        <input type="text" autocomplete="off" placeholder="请输入联系电话" class="el-input__inner" v-model="info.mobile">
+                    </div>
+                    <i class="iconfont icon-guanbi1 close-common"></i></div>
+            </div>
+            <div class="text-all dis-box"><label>所在地区<em>*</em></label>
+                <div class="input-text" id="region">
+                    <div class="address-box">
+                        <span class="text-all-span">{{info.regionname}}</span>
+                        <span class="user-more"><i class="iconfont icon-more"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-all"><label>详细信息<em>*</em></label>
+                <div class="input-text">
+                    <div class="el-input el-input--address">
+                        <input type="text" autocomplete="off" placeholder="请输入详细地址" class="el-input__inner" v-model="info.address">
+                    </div>
+                    <i class="iconfont icon-guanbi1 close-common"></i>
+                </div>
+            </div>
+            <div class="ect-button-more"><a href="javascript:void(0);" class="btn btn-submit" @click="addressrupdate()">保存</a></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<link rel="stylesheet" type="text/css" href="/public/wap/css/mobileSelect.css"/>
+<script>
+    var mobileSelect2 = null;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            regionList: [],
+
+            info: {
+                regionname: '请选择',
+                address_id: '',
+                consignee: '',
+                mobile: '',
+                province: '',
+                city: '',
+                district: '',
+                address: '',
+            }
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.addressdetail,{address_id: vm.info.address_id}).then(function (ret) {
+                    vm.info = ret.data;
+                })
+            },
+            regionListInit: function () {
+                wxapp.ajax(config.regionList).then(function (ret) {
+                    vm.regionList = ret.data;
+                    mobileSelect2 = new MobileSelect({
+                        trigger: '#region',
+                        title: '请选择',
+                        wheels: [
+                            {
+                                data: vm.regionList
+                            },
+                        ],
+                        position: [0], //初始化定位 打开时默认选中的哪个 如果不填默认为0
+                        triggerDisplayData: false,//不回显数据，便于控制
+                        callback: function (indexArr, data) {
+                            vm.info.regionname = data[0].value + data[1].value + data[2].value;
+                            vm.info.province = data[0]['id'];
+                            vm.info.city = data[1]['id'];
+                            vm.info.district = data[2]['id'];
+                        }
+                    });
+                })
+            },
+            addressrupdate:function () {
+                var info = JSON.parse(JSON.stringify(vm.info));
+                info.address = vm.info.regionname+vm.info.address;
+                if(!info.consignee || !info.mobile || !info.address){
+                    wxapp.alert('fail', '数据不全');return false;
+                }
+
+                $.post(config.addressrupdate, {
+                    pageparm: JSON.stringify(info),
+                    token: $api.getStorage('token') ? $api.getStorage('token') : 'bdd43eee1cc8bcf6006f38bcc4a96494'
+                }, function (ret) {
+                    if(ret.status == 1){
+                        wxapp.alert('success', ret.msg);
+                        setTimeout(function () {
+                            window.history.go(-1);
+                        },1000)
+                    }else{
+                        wxapp.alert('error', ret.msg);
+                    }
+                }, 'json');
+            }
+        }
+    });
+    window.onload = function () {
+        vm.info.address_id = api.pageParam.address_id ? api.pageParam.address_id : 0
+        if(vm.info.address_id > 0){
+            vm.init();
+        }
+        vm.regionListInit();
+    };
+</script>

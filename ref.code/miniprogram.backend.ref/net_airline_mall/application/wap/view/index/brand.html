@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>品牌街</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="header-list-goods" style="position: fixed;width: 100%;top: 0;">
+        <section class="secrch">
+            <div class="secrch-warp dis-box">
+                <div class="input-text box-flex">
+                    <label class="search-check" @click="searchInit()"><i class="iconfont icon-search"></i></label>
+                    <input type="search" name="keyword" autocomplete="off" placeholder="品牌名称|品牌首字母" class="j-input-text" v-model="keywords"/>
+                </div>
+                <div class="mode-switch" onclick="open_meiQia()">
+                    <i class="iconfont icon-message"></i>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="bs-list-warp" style="margin-top: 55px;">
+        <div class="brand-list-page">
+            <div class="item d_jump">
+                <ul>
+                    <template v-for="(vo,index) in list">
+                        <li>
+                            <a href="javascript:void(0)" @click="openGoodswin(vo)">
+                                <img :src="vo.brand_logo"><span>{{vo.brand_name}}</span>
+                            </a>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    let bottom = 0;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+
+            page: 1,
+            rows: 20,
+            keywords: '',
+            list: []
+        },
+        methods: {
+            searchInit: function () {
+                vm.page = 1;
+                vm.rows = 20;
+                vm.list = [];
+                vm.init();
+            },
+            init: function () {
+                wxapp.ajax(config.brand, {
+                    keywords: vm.keywords,
+                    page: vm.page,
+                    rows: vm.rows,
+                },1).then(function (ret) {
+                    if (vm.page == 1) {
+                        if (ret.data.length > 0) {
+                            vm.list = ret.data;
+                        } else {
+                            vm.list = [];
+                        }
+                    } else {
+                        if (ret.data.length > 0) {
+                            for (var i = 0; i < ret.data.length; i++) {
+                                vm.list.push(ret.data[i]);
+                            }
+                        } else {
+                            return false;
+                        }
+                    }
+                    vm.page++;
+                    bottom = 0;
+                });
+            },
+            openGoodswin: function (vo) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        brand_id: vo.brand_id
+                    }
+                });
+            }
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

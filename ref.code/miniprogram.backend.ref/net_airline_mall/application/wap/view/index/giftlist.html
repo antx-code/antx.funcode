@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>我的礼品卡</title>
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1192061_3oorxkn66wi.css">
+    <style>
+        @media (min-width: 560px) {
+            html {
+                font-size: 54px
+            }
+        }
+
+        html {
+            font-size: calc(100vw / 3.75);
+            box-sizing: border-box
+        }
+
+        body {
+            font-size: .14rem;
+            background-color: #f5f5f5
+        }
+
+        *, *:before, *:after {
+            margin: 0;
+            padding: 0;
+            box-sizing: inherit
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-size: 100%;
+            font-weight: 400
+        }
+
+        ol, ul {
+            list-style: none
+        }
+
+        address, caption, cite, code, dfn, em, strong, th, var {
+            font-style: normal;
+            font-weight: 400
+        }
+
+        fieldset, img {
+            border: 0
+        }
+
+        textarea {
+            resize: none
+        }
+
+        a {
+            color: #000;
+            text-decoration: none;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0)
+        }
+
+        img {
+            border: 0;
+            vertical-align: middle
+        }
+
+        .e-cart-wrap {
+            padding: .15rem
+        }
+
+        .e-card-scroll {
+            width: 100%;
+            overflow-y: scroll;
+            height: 4rem
+        }
+
+        .e-cart-list {
+            background-color: #fff;
+            margin-bottom: .15rem;
+            display: flex;
+            align-items: center
+        }
+
+        .e-cart-list > input {
+            margin-right: .1rem
+        }
+
+        .e-card-info {
+            border: 1px solid #EEA7BD;
+            border-radius: .05rem;
+            width: 100%
+        }
+
+        .card-head {
+            height: .65rem;
+            background-image: url(https://www.enongmall.com/public/static/images/card_few.png);
+            background-size: 100% 100%;
+            padding: .1rem .17rem .09rem .15rem;
+            color: #fff
+        }
+
+        .card-top, .card-center {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .card-center {
+            margin-top: .05rem
+        }
+
+        .card-top {
+            height: .3rem
+        }
+
+        .card-top div:nth-of-type(2) {
+            opacity: .7;
+            font-size: .12rem
+        }
+
+        .card-center div:nth-of-type(1) {
+            font-size: .12rem;
+            opacity: .7
+        }
+
+        .card-center div:nth-of-type(2) {
+            font-size: .1rem
+        }
+
+        .card-balance {
+            padding: .1rem 0 .1rem .15rem
+        }
+
+        .card-balance span:nth-of-type(1) {
+            color: #F2217D;
+            font-size: .12rem
+        }
+
+        .card-balance span:nth-of-type(2) {
+            color: #F2217D;
+            font-size: .18rem;
+            font-weight: 700
+        }
+
+        .card-balance em {
+            color: #F2217D;
+            font-weight: 700;
+            font-size: .12rem
+        }
+
+        .e-card-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, .1);
+            z-index: 1
+        }
+
+        .card-binding-tit {
+            height: .5rem;
+            line-height: .5rem;
+            color: #333;
+            border-bottom: 1px solid #E9E9E9
+        }
+
+        .card-binding-tit span > a, .card-binding-tit span > i {
+            color: #999;
+            vertical-align: middle
+        }
+
+        .card-binding-tit span > a {
+            margin-right: .05rem
+        }
+
+        .iconfont {
+            font-size: .18rem;
+            vertical-align: middle
+        }
+
+        .e-card-btn {
+            width: 3.45rem;
+            height: .45rem;
+            background-color: #D73130;
+            text-align: center;
+            line-height: .45rem;
+            color: #fff;
+            border-radius: .05rem;
+            margin-top: .05rem;
+        }
+
+        [v-cloak] {
+            display: none
+        }
+
+        #app {
+            position: relative;
+            margin-top: 40px;
+        }
+
+        .container {
+            padding-bottom: 100px;
+        }
+
+        .head {
+            width: 100%;
+            position: fixed;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            line-height: 40px;
+            background-color: #fff;
+            z-index: 999;
+        }
+
+        .head span {
+            text-align: center;
+            margin: 0 20px;
+        }
+
+        .head em {
+            border-right: 1px solid #e5e5e5;
+            height: 50%;
+        }
+
+        .head .active {
+            color: #D73130;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .warp {
+            padding: 10px 10px;
+            color: #333;
+            font-size: 14px;
+            background-color: #fff;
+        }
+
+        .warp li {
+            list-style: none;
+            margin-bottom: 20px;
+            border: 1px solid #d7d7d7;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+        }
+
+        .card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+        }
+
+        .card .info {
+            width: 70%;
+        }
+
+        .card .info p {
+            line-height: 24px;
+        }
+
+        .card .amount {
+            width: 30%;
+            font-size: 20px;
+        }
+
+        .card .amount em {
+            font-size: 24px;
+            font-style: normal;
+            font-weight: bold;
+        }
+
+        .warp .foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 8px;
+            border-top: 1px solid #dddd;
+            margin: 0 10px;
+        }
+
+        .warp .foot button {
+            border: 1px solid #eee;
+            padding: 3px 8px;
+            color: #666;
+            font-size: 15px;
+            border-radius: 4px;
+            background-color: #dedede;
+        }
+    </style>
+</head>
+
+<body>
+<div class="head">
+    <span class="active">我的礼品卡</span>
+    <em></em>
+    <span>购卡记录</span>
+</div>
+<div class="e-cart-wrap" id="app" v-cloak>
+    <div class="container">
+        <div class="e-cart-list" @click="openDetail(vo)" v-for="(vo,index) in list" v-show="tab==0">
+            <input type="checkbox" name="checkboxName" id="fed-engineer" hidden>
+            <label for="fed-engineer"></label>
+            <div class="e-card-info">
+                <div class="card-head">
+                    <div class="card-top">
+                        <div>益农E卡</div>
+                        <div>全场通用</div>
+                    </div>
+                    <div class="card-center">
+                        <div>面额 ￥{{vo.price}}元</div>
+                        <div>有效期：{{vo.over_time|timeParse}}</div>
+                    </div>
+                </div>
+                <div class="card-balance">
+                    <span>余额</span>
+                    <em>￥</em>
+                    <span>{{vo.cash}}</span>
+
+                    <span style="margin-left:20px;font-weight:700;font-size:.12rem">卡密</span>
+                    <span>{{vo.password}}</span>
+                </div>
+            </div>
+        </div>
+        <div v-show="tab==1">
+            <ul class="warp" v-if="order_list.length">
+                <li v-for="(vo,index) in order_list">
+                    <div class="card">
+                        <div class="info">
+                            <p>卡号:{{vo.card_no}}</p>
+                            <p>卡密:{{vo.password}}</p>
+                            <p>有效期:{{vo.start_time | timeParse2}} - {{vo.over_time | timeParse2}}</p>
+                        </div>
+                        <div class="amount">
+                            ￥<em>10.00</em>
+                        </div>
+                    </div>
+                    <div class="foot">
+                        <button type="button" @click="copyme(vo.password)">复制卡密</button>
+                        <button type="button" @click="bond(index)" v-if="!vo.user_id">绑定当前账号</button>
+                    </div>
+                </li>
+            </ul>
+            <div class="text-center" v-else>
+                暂无购卡记录
+            </div>
+        </div>
+    </div>
+
+    <div style="position: fixed;left: 0;bottom: 0;background-color: #FFF;width: 100%;padding: 10px 15px;display: flex;justify-content: space-between;align-items: center">
+        <div class="e-card-btn" @click="buycardwin()" style="background-color: #19be6b;margin-right: 20px;">立即购买</div>
+        <div class="e-card-btn" @click="opengiftcard()" style="right: 15px;">立即绑卡</div>
+    </div>
+
+</div>
+<textarea id="copytext" style="position: absolute;top:0;left:0;z-index: 0;width: 0;height: 0"></textarea>
+</body>
+
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<!--layui库引入开始-->
+<link href="/public/static/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+<!--layui库引入结束-->
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+<script>
+    var copytext = document.getElementById('copytext');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            order_list: [],
+            tab: 0
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            },
+            timeParse2: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD');
+            }
+        },
+        methods: {
+            buycardwin: function () {
+                if (vm.miniapp > 0) {
+                    wx.miniProgram.navigateTo({
+                        url: "/pages/user/buycard"
+                    });
+                } else {
+                    openwind('user', 'buycard_win', 1);
+                }
+            },
+            openDetail: function (vo) {
+                api.openWin({
+                    name: 'carddetail_win',
+                    url: 'widget://html/carddetail_win.html',
+                    pageParam: {
+                        id: vo.id
+                    }
+                });
+            },
+            opengiftcard: function () {
+                layer.open({
+                    type: 2,
+                    title: false,
+                    closeBtn: 0, //不显示关闭按钮
+                    shade: [0],
+                    area: ['100%', '43%'],
+                    offset: 'rb', //右下角弹出
+                    time: 0, //2秒后自动关闭
+                    anim: 2,
+                    resize: false,
+                    move: false,
+                    content: ['/wap/index/bindcard', 'no'],//iframe的url，no代表不显示滚动条
+                    resizing: function (layero) {
+                        return false;
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.giftcardBindList, {}, 0).then(function (ret) {
+                    if (ret.status == 1) {
+                        vm.list = ret.data.list;
+                    }
+                });
+                this.getOrder();
+            },
+            copyme: function (pwd) {
+                copytext.value = pwd;
+                copytext.select();
+                document.execCommand("copy");
+                wxapp.alert('success', '已复制');
+            },
+            getOrder: function () {
+                wxapp.ajax(config.giftcardBuyList, {}, 0).then(function (ret) {
+                    if (ret.status == 1) {
+                        vm.order_list = ret.data;
+                    }
+                });
+
+            },
+            bond: function (index) {
+                wxapp.ajax(config.giftcardBond, {id: vm.order_list[index].id}, 0).then(function (ret) {
+                    if (ret.status == 1) {
+                        vm.order_list[index].user_id = ret.data.uid;
+                        vm.init();
+                    }
+                });
+            },
+        },
+    });
+    window.onload = function () {
+        var pageparm = getUrlPageparm();
+        if (pageparm.token) {
+            $api.setStorage('token', pageparm.token);
+            vm.miniapp = pageparm.miniapp;
+        } else {
+            vm.miniapp = 0;
+        }
+        vm.init();
+        $('.head span').on('click', function () {
+            if ($(this).index() == 0) {
+                $(this).addClass('active').next().next().removeClass('active');
+                vm.tab = 0;
+            } else {
+                $(this).addClass('active').prev().prev().removeClass('active');
+                vm.tab = 1;
+                vm.getOrder();
+            }
+        });
+    };
+</script>

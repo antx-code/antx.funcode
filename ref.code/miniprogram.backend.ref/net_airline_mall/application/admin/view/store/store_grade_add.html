@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span></div>
+            <ul>
+                <li>平台区分商家等级有助于更好的管理商城。</li>
+                <li>对于不同等级的商家可提供不同权限的服务。</li>
+                <li>标识“<em>*</em>”的选项为必填项，其余为选填项。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info">
+                    <div class="items">
+                        <div class="item">
+                            <div class="label"><span class="require-field">*</span>等级名称：</div>
+                            <div class="label_value">
+                                <input type="text" name="grade_name" id="grade_name" class="text" v-model="info.grade_name" >
+                                <div class="form_prompt"></div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">发布商品数量：</div>
+                            <div class="label_value">
+                                <input type="text" name="goods_sun" id="goods_sun" class="text valid" value="-1"  v-model="info.goods_sun">
+                                <label class="blue_label">如果为‘-1’，将不做限制</label>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">赠送消费积分比例：</div>
+                            <div class="label_value">
+                                <input type="text" name="give_integral" id="give_integral" class="text" value="0" v-model="info.give_integral">
+                                &nbsp;%&nbsp;<label class="blue_label"></label>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">赠送等级积分比例：</div>
+                            <div class="label_value">
+                                <input type="text" name="rank_integral" id="rank_integral" class="text" value="0"  v-model="info.rank_integral">
+                                &nbsp;%&nbsp;<label class="blue_label"></label>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">积分购买金额比例：</div>
+                            <div class="label_value">
+                                <input type="text" name="pay_integral" id="pay_integral" class="text" value="0" v-model="info.pay_integral">
+                                &nbsp;%&nbsp;<label class="blue_label"></label>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label"><span class="require-field">*</span>等级标志：</div>
+                            <div class="label_value">
+                                <div class="type-file-box">
+                                    <input type="button" name="button" id="button" class="type-file-button" value="">
+                                    <input type="text" name="textfile" class="type-file-text" id="textfield" value=""
+                                           autocomplete="off" readonly v-model="info.grade_img">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">等级介绍：</div>
+                            <div class="label_value">
+                                <textarea name="grade_introduce" v-model="info.grade_introduce" id="grade_introduce" class="textarea h100" cols="50" rows="7"></textarea>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">是否开启：</div>
+                            <div class="label_value">
+                                <div class="checkbox_items">
+                                    <div class="checkbox_item">
+                                        <input name="is_open" type="radio" class="ui-radio" value="0" id="is_open_0" v-model="info.is_open">
+                                        <label for="is_open_0" class="ui-radio-label">否</label>
+                                    </div>
+                                    <div class="checkbox_item">
+                                        <input name="is_open" type="radio" class="ui-radio" value="1" id="is_open_1" v-model="info.is_open">
+                                        <label for="is_open_1" class="ui-radio-label">是</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">是否默认：</div>
+                            <div class="label_value">
+                                <div class="checkbox_items">
+                                    <div class="checkbox_item">
+                                        <input name="is_default" type="radio" class="ui-radio" value="0" id="is_default_0" v-model="info.is_default">
+                                        <label for="is_default_0" class="ui-radio-label">否</label>
+                                    </div>
+                                    <div class="checkbox_item">
+                                        <input name="is_default" type="radio" class="ui-radio" value="1" id="is_default_1" v-model="info.is_default">
+                                        <label for="is_default_1" class="ui-radio-label">是</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">&nbsp;</div>
+                            <div class="label_value info_btn">
+                                <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                majax('/admin/store/store_grade_add',vm.info);
+            }
+        }
+    });
+    layui.use('upload', function(){
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#button',
+            url: '/admin/uploader/alioss_upload', //上传接口
+            data:{
+                upload: 1
+            },
+            accept: 'file', //允许上传的文件类型
+            done: function(ret){
+                vm.info.grade_img = ret.url;
+                if(ret.state == 'SUCCESS'){
+                    $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                }else{
+                    $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                }
+
+            },
+        });
+    });
+</script>

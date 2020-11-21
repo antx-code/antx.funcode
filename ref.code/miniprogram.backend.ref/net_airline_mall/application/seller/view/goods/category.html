@@ -1,0 +1,130 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li><a href="/seller/goods/store_category">店铺分类</a></li>
+        <li class="active"><a href="javascript:">平台分类</a></li>
+    </ul>
+</div>
+<div id="app" v-cloak>
+    <div class="search-info" v-show="previous.length>0">
+        <div class="search-form">
+            <a @click="showPrev" class="sc-btn sc-blue-btn"><i class="icon icon-reply"></i>&nbsp;返回上一级</a>
+        </div>
+    </div>
+
+    <div class="list-div" id="listDiv">
+        <table id="list-table" class="ecsc-default-table">
+            <thead>
+            <tr>
+                <th width="15%" class="tl pl10">级(一级别)</th>
+                <th width="25%" class="tl">分类名称</th>
+                <th width="10%">商品数量</th>
+                <th width="11%">排序</th>
+                <th width="7%">是否显示</th>
+                <th width="12%" class="handle">是否导航菜单</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr align="center" v-for="(vo,index) in list">
+                <td class="tl pl10">
+                    <div class="tDiv first_setup">
+                        <div class="setup_span">
+                            <em><i class="icon icon-cog"></i>设置<i class="arrow"></i></em>
+                            <ul>
+                                <li v-if="previous.length<2"><a @click="showNext(vo.cat_id)">查看下一级</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </td>
+                <td class="first-cell tl" id="level_0_47">
+                    <div class="first_column">
+                        <span><a :href="'/seller/goods/goods_list.html?cat_id='+vo.cat_id">{{vo.cat_name}}</a></span>
+                    </div>
+                </td>
+                <td>{{vo.cat_count}}</td>
+                <td align="center">{{vo.sort_order}}</td>
+                <td><span v-if="vo.is_show">是</span><span v-else>否</span></td>
+                <td><span v-if="vo.show_in_nav">是</span><span v-else></span></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            cat_id: 0,
+            parent_id: 0,
+            previous: []
+        },
+        methods: {
+            getData: function (instance, previous) {
+                instance = instance ? instance : vm;
+                var param = {
+                    parent_id: instance.parent_id,
+                    page: instance.page,
+                    pageSize: instance.pageSize
+                };
+                if (typeof previous != 'undefined') {
+                    param.parent_id = previous;
+                }
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/goods/category',
+                    data: param,
+                    success: function (data) {
+                        instance.list = data.list;
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        if (data.page == 1) instance.pagerender();
+                    }
+                });
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            showNext: function (cat_id) {
+                this.previous.push(this.parent_id);
+                this.parent_id = cat_id;
+                this.page = 1;
+                this.getData();
+            },
+            showPrev: function () {
+                this.parent_id = this.previous.pop();
+                this.page = 1;
+                this.getData();
+            }
+        },
+        created: function () {
+            this.getData(this);
+        }
+    });
+</script>
+{include file="public/footer"}

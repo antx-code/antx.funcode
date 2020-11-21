@@ -1,0 +1,80 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+
+<div class="container">
+    <div class="w w1200">
+        {if $child_order>0}
+        <div class="shopend-info-many">
+            <div class="shopend-info">
+                <div class="s-i-left"><i class="ico-success"></i></div>
+                <div class="s-i-right">
+                    <h3>恭喜您,付款成功!</h3>
+                    <span class="txt">亲爱的用户由于是不同商家，此订单将分为<em>{$child_order}</em>个不同的子订单配送：</span>
+                </div>
+            </div>
+            <div class="shopend-info-items">
+
+                {foreach $child_order_info as $index => $c_order}
+                <div class="shopend-info-item">
+                    <p>订单编号：<em class="nku">{$c_order.order_sn}</em></p>
+                    <p>应付总金额：<em>{$c_order.order_amount}</em></p>
+                    {if $c_order.shipping_price>0}
+                    <p>运费：<em>￥{$c_order.shipping_price}</em></p>
+                    {/if}
+                    <p>收货人：<span>{$c_order.consignee}</span><span class="ml20">{$c_order.mobile}</span></p>
+                    <p>寄送至：<span>{$child_order_info[0]['province_text']} {$child_order_info[0]['city_text']} {$child_order_info[0]['district_text']}&nbsp;{$c_order.address}</span></p>
+                </div>
+                {/foreach}
+            </div>
+            <div class="clear"></div>
+            <div class="s-i-btn">
+                <a href="{:url('member/order')}" class="btn sc-redBg-btn">查看订单</a>
+                <a href="/">返回首页</a>
+            </div>
+
+        </div>
+        {else /}
+        <div class="shopend-info">
+            <div class="s-i-left"><i class="ico-success"></i></div>
+            <div class="s-i-right">
+                <h3>恭喜您，付款成功</h3>
+                <div class="s-i-tit">
+                    <p>订单编号：<em>{$order.order_sn}</em></p>
+                    <p>应付总金额：<em>{$order.order_amount}</em></p>
+                    {if $order.shipping_price>0}
+                    <p>运费：<em>￥{$order.shipping_price}</em></p>
+                    {/if}
+                    <p>收货人：<span>{$order.consignee}</span><span class="ml20">{$order.mobile}</span></p>
+                    <p>寄送至： <span>{$order.province_text} {$order.city_text} {$order.district_text}&nbsp;{$order.address}</span></p>
+                </div>
+                <div class="s-i-btn">
+                    <a href="{:url('member/order')}" class="btn sc-redBg-btn">查看订单</a>
+                    <a href="/">返回首页</a>
+                </div>
+            </div>
+        </div>
+        {/if}
+
+        <div class="p-panel-main c-history">
+            <div class="ftit ftit-delr"><h3>继续剁手</h3></div>
+            <div class="gl-list clearfix">
+                <ul class="clearfix" id="guess_goods_love"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function guessYouLike() {
+        $.post('/home/index/ajaxGuessYouLike', {limit: 6}, function (res) {
+            $("#guess_goods_love").html(res);
+        });
+    }
+
+    guessYouLike();
+
+</script>
+
+{include file='public/footer'}

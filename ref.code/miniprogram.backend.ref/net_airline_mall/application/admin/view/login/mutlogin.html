@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>服务商后台</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link href="//hngpmall.com/public/static/plugins/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="//hngpmall.com/public/static/css/seller/font-awesome.min.css" rel="stylesheet">
+    <link href="//hngpmall.com/public/static/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="//hngpmall.com/public/static/plugins/ladda/ladda-themeless.min.css" rel="stylesheet">
+    <link href="//hngpmall.com/public/static/css/seller/animate.css" rel="stylesheet">
+    <link href="//hngpmall.com/public/static/css/seller/style.css" rel="stylesheet">
+    <link href="//hngpmall.com/public/static/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+
+    <script type="text/javascript" src="/public/static/plugins/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="//hngpmall.com/public/static/plugins/toastr/toastr.min.js"></script>
+    <script type="text/javascript" src="//hngpmall.com/public/static/plugins/ladda/spin.min.js"></script>
+    <script type="text/javascript" src="//hngpmall.com/public/static/plugins/ladda/ladda.min.js"></script>
+    <script type="text/javascript" src="//hngpmall.com/public/static/plugins/ladda/ladda.jquery.min.js"></script>
+    <script type="text/javascript" src="//hngpmall.com/public/static/js/jquery.validation.min.js"></script>
+    <script type="text/javascript" src="//hngpmall.com/public/static/js/serller/seller.js"></script>
+    <style>
+        .white-bg {
+            background-color: #ffffff;
+        }
+        input:hover, input:focus {
+            border: 1px solid #139ff0 !important;
+        }
+
+        input {
+            border-radius: 2px !important;
+            height: 50px !important;
+        }
+
+        .ladda-button {
+            height: 50px !important;
+            margin-top: 40px;
+        }
+
+        body {
+            background-color: #fff;
+        }
+
+        .loginscreen {
+            background: url("https://hngpmall.oss-cn-shanghai.aliyuncs.com//upload/image/20190720/1563620535941676713.png") center center no-repeat;
+            width: 100%;
+            height: calc(100% - 130px);
+            position: relative;
+        }
+
+        .header {
+            height: 130px;
+            display: flex;
+            padding-left: 15%;
+            padding-bottom: 20px;
+            align-items: flex-end;
+            justify-content: flex-start;
+        }
+
+        .header a {
+            width: 230px;
+        }
+
+        .header h2 {
+            margin-left: 20px;
+        }
+
+        .form-box {
+            width: 100%;
+            display: inline-block;
+        }
+
+
+        @media (min-width: 992px) {
+            .form-box {
+                width: 500px;
+                position: absolute;
+                top: 60px;
+                right: 160px;
+            }
+
+            .loginscreen {
+                text-align: right;
+                height: 600px;
+                position: relative;
+            }
+        }
+
+        @media (min-width: 1370px) {
+            .form-box {
+                width: 600px;
+                position: absolute;
+                top: 70px;
+                right: 250px;
+            }
+
+            .loginscreen {
+                text-align: right;
+                height: 600px;
+                position: relative;
+            }
+        }
+
+
+        .tit {
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .tit h3 {
+            font-size: 16px;
+            color: #8c8c8c;
+            padding: 0 15px;
+            display: inline-block;
+            position: relative;
+            z-index: 2;
+            background-color: #fff;
+        }
+
+        .tit span {
+            position: absolute;
+            z-index: 1;
+            left: 0;
+            right: 0;
+            top: 12px;
+            height: 1px;
+            border-bottom: 1px dashed #e5e5e5;
+        }
+
+        .footer {
+            position: relative;
+            text-align: center;
+            padding-top: 25px;
+            bottom: 0;
+        }
+
+        .footer, .footer a {
+            color: rgba(85, 85, 85, .5);
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        label {
+            margin-bottom: 10px;
+        }
+
+        .tabs-container .tabs-left > .nav-tabs {
+            float: left;
+            width: 30%;
+            background-color: #f5f5f5;
+            padding: 10px 0 10px 10px;
+        }
+
+        .tabs-container .tabs-left .panel-body {
+            width: 70%;
+            margin-left: 30%;
+        }
+
+        .nav.nav-tabs li {
+            background: none;
+            border: none;
+        }
+
+        .tabs-container .nav-tabs > li {
+            float: left;
+            margin-bottom: -1px;
+        }
+
+        .tabs-container .tabs-left > .nav-tabs > li > a {
+            margin-right: -1px;
+            -webkit-border-radius: 4px 0 0 4px;
+            -moz-border-radius: 4px 0 0 4px;
+            border-radius: 4px 0 0 4px;
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+
+        .tabs-container .nav-tabs > li.active > a, .tabs-container .nav-tabs > li.active > a:hover {
+            background-image: url("//hngpmall.com/public/static/images/arrow.gif");
+            background-repeat: no-repeat;
+            background-position-x: 101%;
+            background-position-y: 50%;
+        }
+
+        .tabs-container .nav-tabs > li.active > a, .tabs-container .tabs-left > .nav-tabs > li > a:hover {
+            background-color: #4583c5;
+            color: #fff;
+        }
+
+        .tabs-container .tabs-left > .nav-tabs > li > a, .tabs-container .tabs-right > .nav-tabs > li > a {
+            min-width: 74px;
+            margin-right: 0;
+            margin-bottom: 3px;
+        }
+
+        .tabs-container .tabs-left > .nav-tabs > li, .tabs-container .tabs-right > .nav-tabs > li {
+            float: none;
+        }
+
+        .tabs-container .tabs-left > .nav-tabs .active > a {
+            border-color: #e7eaec transparent #e7eaec #e7eaec;
+        }
+
+        .tabs-container .nav-tabs > li a:hover {
+            background: transparent;
+            border-color: transparent;
+        }
+
+        .tabs-container .tabs-left .tab-pane .panel-body {
+            padding-bottom: 0;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <a href="/">
+        <img class="logo-name" src="{$site.shop_logo}" alt="{$site.shop_name}">
+    </a>
+    <h2 class="hidden-xs">供服商后台</h2>
+</div>
+<div class="middle-box text-center loginscreen">
+    <div class="tabs-container form-box white-bg animated fadeInDown">
+        <div class="tabs-left">
+            <ul class="nav nav-tabs">
+                <li><a data-toggle="tab" href="//crm.djbix.com/mutlogin" aria-expanded="false">工单系统</a></li>
+                <li><a data-toggle="tab" href="//crm.hngpmall.com/mutlogin" aria-expanded="false">客户管理</a></li>
+                <li><a data-toggle="tab" href="//as.hngpmall.com/public/mutlogin" aria-expanded="false">售后管理</a></li>
+                <li><a data-toggle="tab" href="//hr.hngpmall.com/" aria-expanded="false">人资管理</a></li>
+                <li><a data-toggle="tab" href="//hngpmall/mutlogin" aria-expanded="true">网航商城</a></li>
+                <li class="active"><a data-toggle="tab" href="javascript:" aria-expanded="false">益农商城</a></li>
+                <li><a data-toggle="tab" href="//djbix.com/mutlogin" aria-expanded="false">东家汇</a></li>
+                <li><a data-toggle="tab" href="//api.360ifu.com/office/mutlogin" aria-expanded="false">IFU</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="tab-1" class="tab-pane active">
+                    <div class="panel-body">
+                        <form class="m-t" role="form" id="theForm">
+
+                            <div class="form-group m-t-lg">
+                                <label>用户名</label>
+                                <input type="text" name="username" class="form-control" placeholder="请输入">
+                            </div>
+                            <div class="form-group">
+                                <label>密码</label>
+                                <input type="password" name="password" class="form-control" placeholder="请输入">
+                            </div>
+                            <div class="form-group">
+                                <div class="checkbox checkbox-primary text-left">
+                                    <input id="checkbox2" type="checkbox" name="remember">
+                                    <label for="checkbox2">记住密码10天</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="ladda-button btn btn-success block full-width m-b" data-style="expand-right" id="sub_btn">登录</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div class="footer">
+    <p class="copyright_info">
+        ICP备案证书号:<a href="http://www.beian.miit.gov.cn" target="_blank">{$site.icp_number}</a>
+    </p>
+    <p>
+        POWERED BY<a href="/" target="_blank">{$site.shop_name}</a>
+    </p>
+</div>
+<script>
+    var class_name = 'toast-top-center';
+    if (window.innerWidth < 768) {
+        class_name = 'toast-top-full-width';
+    }
+    toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: class_name,
+        showMethod: 'slideDown',
+        timeOut: 3000
+    };
+    $(function () {
+        $('#theForm').validate({
+            rules: {
+                username: {
+                    required: true
+                },
+                password: {
+                    required: true,
+                }
+            },
+            messages: {
+                username: {
+                    required: '<i class="icon icon-exclamation-sign"></i>用户名不能为空'
+                },
+                password: {
+                    required: '<i class="icon icon-exclamation-sign"></i>密码不能为空',
+                }
+            },
+            submitHandler: function (form) {
+                var btn = $('#sub_btn').ladda().ladda('start');
+                $.ajax({
+                    type: 'POST',
+                    url: "/admin/login/login",
+                    data: $(form).serialize(),
+                    dataType: 'json',
+                    success: function (data) {
+                        btn.ladda('stop');
+                        if (data.status == 0) {
+                            location.href = "/admin/index/index";
+                        } else {
+                            toastr.error(data.msg);
+                        }
+                    },
+                    error: function (xhr, type) {
+                        btn.ladda('stop');
+                        toastr.error(xhr.responseJSON.msg);
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

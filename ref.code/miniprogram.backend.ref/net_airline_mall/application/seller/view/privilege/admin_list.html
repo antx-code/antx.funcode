@@ -1,0 +1,111 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">管理员列表</a></li>
+    </ul>
+</div>
+
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/privilege/add"><i class="icon-plus"></i>添加管理员</a>
+</div>
+<!-- 订单搜索 -->
+<div class="search-info">
+    <div class="search-form">
+        <form onsubmit="vm.search()">
+            <div class="search-key">
+                <input name="keywords" type="text" id="keywords" size="15" class="text text_2" placeholder="用户名称">
+                <input type="submit" value=" 搜索 " class="submit"/>
+            </div>
+        </form>
+    </div>
+</div>
+<!--  管理员列表  -->
+<div class="list-div" id="listDiv">
+    <table class="ecsc-default-table mt20">
+        <thead>
+        <tr>
+            <th width="15%">用户名</th>
+            <th width="18%">商家名称</th>
+            <th width="18%">Email地址</th>
+            <th width="15%">加入时间</th>
+            <th width="15%">最后登录时间</th>
+            <th width="18%">操作</th>
+        </tr>
+        </thead>
+        <tbody id="tbody">
+        <tr class="bd-line" v-for="(vo,index) in list" v-cloak>
+            <td class="first-cell">{{vo.username}}</td>
+            <td align="center"><em class="red">{{store_name}}</em></td>
+            <td align="center">{{vo.email}}</td>
+            <td align="center">{{vo.add_time | timeParse}}</td>
+            <td align="center">{{vo.last_login_time | timeParse}}</td>
+            <td align="center" class="ecsc-table-handle tr">
+                <span><a @click="allot(vo.id)" title="分派权限" class="btn-blue"><i class="icon icon-cog"></i><p>分派权限</p></a></span>
+                <span><a @click="edit(vo.id)" title="编辑" class="btn-green"><i class="icon icon-edit"></i><p>编辑</p></a></span>
+                <span><a @click="del(index)" title="删除" class="btn-red"><i class="icon icon-trash"></i><p>删除</p></a></span>
+            </td>
+        </tr>
+        </tbody>
+
+        <tfoot>
+        <tr>
+            <td colspan="20">
+                <!---->
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+<script>
+    var vm = new Vue({
+        el: '#tbody',
+        data: {
+            list: JSON.parse('{:json_encode($list)}'),
+            store_name: '{$store_name}'
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            allot: function (id) {
+                location.href = "/seller/privilege/allot.html?id=" + id;
+            },
+            edit: function (id) {
+                location.href = "/seller/privilege/add.html?id=" + id;
+            },
+            del: function (index) {
+                layer.confirm('确定要删除?', {icon: 3, title: '提示'}, function (idx) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "/seller/privilege/del",
+                        data: {id: vm.list[index].id},
+                        success: function (data) {
+                            vm.list.splice(index, 1);
+                        },
+                        error: function (xhr, type) {
+                            easyshow(xhr.responseJSON);
+                        }
+                    });
+                    layer.close(idx);
+                });
+            },
+            search: function () {
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/api/admin_search",
+                    data: {keyword: $('#keywords').val()},
+                    success: function (data) {
+                        vm.list = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        }
+    });
+</script>
+{include file="public/footer"}

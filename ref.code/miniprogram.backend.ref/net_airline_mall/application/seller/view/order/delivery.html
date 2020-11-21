@@ -1,0 +1,227 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:;">发货单列表</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/order/delivery_list.html"><i class="icon-reply"></i>发货单列表</a>
+</div>
+
+<div class="ecsc-order-show" id="app" v-cloak>
+    <div class="order-step-info order-step-handle">
+        <div class="step-title"><i class="dian"></i>
+            <h3>操作信息</h3>
+        </div>
+        <div class="handle-info">
+            <div class="handle-note"><textarea cols="80" rows="3" placeholder="操作备注" class="textarea"></textarea></div>
+            <div class="handle-btn">
+                <button class="sc-btn sc-redBg-btn" @click="send()" v-if="delivery.status==0">发货</button>
+            </div>
+            <div class="ecsc-order-condition">
+                <table class="ecsc-default-table order">
+                    <thead>
+                    <tr>
+                        <th width="15%" class="tc">操作者</th>
+                        <th width="18%" class="tc">操作时间</th>
+                        <th width="9%" class="tc">订单状态</th>
+                        <th width="9%" class="tc">付款状态</th>
+                        <th width="9%" class="tc">发货状态</th>
+                        <th width="40%" class="tc">备注</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(vo,index) in action_log">
+                        <td class="bdl">{{vo.action_user_name}}</td>
+                        <td class="bdl">{{vo.log_time | timeParse}}</td>
+                        <td class="bdl">{{order_status[vo.order_status]}}</td>
+                        <td class="bdl">{{shipping_status[vo.shipping_status]}}</td>
+                        <td class="bdl">{{pay_status[vo.pay_status]}}</td>
+                        <td class="bdl bdr" v-html="vo.action_remark"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-step-info">
+        <div class="step-title"><i class="dian"></i>
+            <h3>发货单</h3></div>
+        <ul class="order-info-list">
+            <li>
+                <dl>
+                    <dt>流水号：</dt>
+                    <dd>{{delivery.delivery_sn}}</dd>
+                </dl>
+                <dl>
+                    <dt>生成发货单时间：</dt>
+                    <dd>{{delivery.add_time | timeParse}}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>订单号：</dt>
+                    <dd>{{delivery.order_sn}}</dd>
+                </dl>
+                <dl>
+                    <dt>下单时间：</dt>
+                    <dd>{{order.add_time | timeParse}}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>购货人：</dt>
+                    <dd>{{delivery.shipping_name}}</dd>
+                </dl>
+                <dl>
+                    <dt>收货人：</dt>
+                    <dd>{{delivery.consignee}}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>物流公司：</dt>
+                    <dd>
+                        <select name="shipping_id" id="shipping_id" v-model="delivery.shipping_id">
+                            <option value="0">请选择</option>
+                            <option :value="index" v-for="(vo,index) in shipping_list">{{vo.shipping_name}}</option>
+                        </select>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>配送费用：</dt>
+                    <dd>{{delivery.shipping_fee}}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>发货单号：</dt>
+                    <dd><input v-model="delivery.shipping_no" type="text" class="text text_2" id="shipping_no"></dd>
+                </dl>
+                <dl>
+                    <dt>缺货处理：</dt>
+                    <dd>等待所有商品备齐后再发</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>电子邮件：</dt>
+                    <dd><span class="grey" v-if="delivery.email">{{delivery.email}}</span><span class="grey" v-else>无</span></dd>
+                </dl>
+                <dl>
+                    <dt>收货地址：</dt>
+                    <dd>[{{delivery.province_text}} {{delivery.city}} {{delivery.distract}} ] {{delivery.address}}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>邮政编码：</dt>
+                    <dd><span class="grey">{{delivery.zipcode}}</span></dd>
+                </dl>
+                <dl>
+                    <dt>手机号码：</dt>
+                    <dd><span class="grey">{{delivery.mobile}}</span></dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>送货时间：</dt>
+                    <dd><span class="grey" v-if="delivery.best_time">{{delivery.best_time}}</span><span class="grey" v-else>无</span></dd>
+                </dl>
+                <dl>
+                    <dt>买家留言：</dt>
+                    <dd><span class="grey" v-if="order.user_note">{{order.user_note}}</span><span class="grey" v-else>无</span></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+
+    <div class="order-step-info">
+        <div class="step-title">
+            <i class="dian"></i>
+            <h3>商品信息</h3>
+        </div>
+        <div class="ecsc-order-contnet">
+            <table class="ecsc-default-table order">
+                <thead>
+                <tr>
+                    <th width="45%">商品名称 [ 品牌 ]</th>
+                    <th width="15%">货号</th>
+                    <th width="22%">属性</th>
+                    <th width="8%">发货数量</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="bd-line" v-for="(vo,index) in goods">
+                    <td class="tl"><a :href="'/home/goods/detail.html?id=' + vo.goods_id">{{vo.goods_name}}</a></td>
+                    <td class="center">{{vo.goods_sn}}</td>
+                    <td align="center">{{vo.tempvalue}}</td>
+                    <td align="center">{{vo.send_num}}</td>
+                </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            delivery: JSON.parse('{:json_encode($delivery)}'),
+            order: JSON.parse('{:json_encode($order)}'),
+            goods: JSON.parse('{:addslashes(json_encode($goods))}'),
+            order_status: JSON.parse('{:json_encode($order_status)}'),
+            pay_status: JSON.parse('{:json_encode($pay_status)}'),
+            shipping_status: JSON.parse('{:json_encode($shipping_status)}'),
+            action_log: JSON.parse('{:json_encode($action_log)}'),
+            shipping_list: JSON.parse('{:json_encode($shipping)}'),
+            action_note: '',
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            send() {
+                if (this.delivery.shipping_id == 0) {
+                    $('#shipping_id').addClass('error').focus().on('blur', function () {
+                        $(this).remove('error');
+                    });
+                    easyshow('请选择物流公司');
+                    return;
+                }
+                if (this.delivery.shipping_no.length < 1) {
+                    $('#shipping_no').addClass('error').focus().on('blur', function () {
+                        $(this).removeClass('error');
+                    });
+                    easyshow('请输入发货单号');
+                    return;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/order/delivery',
+                    data: {delivery_id: vm.delivery.delivery_id, shipping_id: vm.delivery.shipping_id, shipping_no: vm.delivery.shipping_no, action_note: vm.action_note},
+                    success: function (data) {
+                        location.href = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        },
+        mounted() {
+            if (this.delivery.status > 0) {
+                $('#shipping_no').attr('disabled', true);
+            }
+        }
+    });
+</script>
+
+{include file="public/footer"}

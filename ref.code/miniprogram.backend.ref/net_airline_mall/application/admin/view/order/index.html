@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>
+    .bot_btn {
+        position: unset;
+        margin-top: 20px;
+    }
+
+    .btn_blue {
+        border: 1px solid #31b4e1 !important;
+        color: #31b4e1 !important;
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="content">
+        <div class="tabs_info">
+            <ul>
+                <li :class="{curr:store_id==0}" @click="storeListInit(0)">
+                    <a href="javascript:void(0);" shoptype="tabs_info">自营</a>
+                </li>
+                <li :class="{curr:store_id==1}" @click="storeListInit(1)">
+                    <a href="javascript:void(0);" shoptype="tabs_info">店铺</a>
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist mt30" id="listDiv">
+            <div class="common-head order-coomon-head">
+                <div class="order_state_tab">
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==100&&shipping_status==100&&shipping_status==100}"
+                       @click="secrchInit(100,100,100)">
+                        全部订单<em>({{count}})</em>
+                    </a>
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==0&&pay_status==1}"
+                       @click="secrchInit(0,1)">待确认
+                    </a>
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==0&&pay_status==0}"
+                       @click="secrchInit(0,0)">待付款
+                    </a>
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==1&&pay_status==1&&shipping_status==0}"
+                       @click="secrchInit(1,1,0)">待发货
+                    </a>
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==1&&pay_status==1&&shipping_status==1}"
+                       @click="secrchInit(1,1,1)">待收货
+                    </a>
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==2&&pay_status==1}"
+                       @click="secrchInit(2,1)">待评论
+                    </a>
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==4&&pay_status==1}"
+                       @click="secrchInit(4,1)">已完成
+                    </a>
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==3}"
+                       @click="secrchInit(3)">取消
+                    </a>
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==6}"
+                       @click="secrchInit(6)">无效
+                    </a>
+                    <a href="javascript:void(0)"
+                       :class="{'current':order_status==5}"
+                       @click="secrchInit(5)">退货
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共 <span class="red">{{count}}</span> 条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keywords" v-model.trim="keywords" @keyup.enter="secrchInit()" class="text nofocus w180" placeholder="订单编号">
+                        <input type="submit" class="btn" name="secrch_btn" shoptype="secrch_btn" value="" @click="secrchInit()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div list-tb-div">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="3%" class="sign">
+                                <div class="tDiv">
+                                    <input type="checkbox" name="all_list" class="checkbox" id="all_list"/>
+                                    <label for="all_list" class="checkbox_stars"></label>
+                                </div>
+                            </th>
+                            <th width="25%">
+                                <div class="tDiv">订单号</div>
+                            </th>
+                            <th width="6%">
+                                <div class="tDiv">价格</div>
+                            </th>
+                            <th width="3%">
+                                <div class="tDiv">数量</div>
+                            </th>
+                            <th width="11%">
+                                <div class="tDiv">到店自提</div>
+                            </th>
+                            <th width="6%">
+                                <div class="tDiv" v-if="store_id==0">供应商名称</div>
+                                <div class="tDiv" v-else>商家名称</div>
+                            </th>
+                            <th width="7%">
+                                <div class="tDiv">用户名</div>
+                            </th>
+                            <th width="16%">
+                                <div class="tDiv">收货人</div>
+                            </th>
+                            <th width="6%">
+                                <div class="tDiv">金额</div>
+                            </th>
+                            <th width="8%">
+                                <div class="tDiv">订单状态</div>
+                            </th>
+                            <th width="7%">
+                                <div class="tDiv">操作</div>
+                            </th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <template v-for="(vo,index) in list">
+                        <table cellpadding="0" cellspacing="0" border="0" :key="index">
+                            <colgroup>
+                                <col width="28%">
+                                <col width="6%">
+                                <col width="3%">
+                                <col width="11%">
+                                <col width="6%">
+                                <col width="7%">
+                                <col width="16%">
+                                <col width="6%">
+                                <col width="8%">
+                                <col width="7%">
+                            </colgroup>
+                            <tbody>
+                            <tr class="tr-order-sn">
+                                <td colspan="10">
+                                    <div class="tDiv ml10">
+                                            <span class="sign">
+                                                <input type="checkbox" name="checkboxes[]"
+                                                       :value="vo.order_id" class="checkbox"
+                                                       :id="checkboxitem+vo.order_id"/>
+                                                <label :for="checkboxitem+vo.order_id" class="checkbox_stars"></label>
+                                            </span>
+                                        <span class="words">订单号：{{vo.order_sn}}</span>
+                                        <span class="words">下单时间：{{vo.add_time|timeParse}}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <template v-for="(vo2,index2) in vo.goods_list">
+                                <tr class="tr_bg_blue">
+                                    <td class="td-product">
+                                        <div class="tDiv relative tpinfo last">
+                                            <div class="img">
+                                                <img width="80" :src="vo2.goods_img">
+                                            </div>
+                                            <div class="product-info">
+                                                <div class="name mb5">
+                                                    <a :href="'/home/goods/detail?id='+vo2.goods_id" target="_blank">
+                                                        {{vo2.goods_name}}
+                                                        <template v-if="vo.brand_name">
+                                                            <span class="org">[ {{vo.brand_name}} ]</span>
+                                                        </template>
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    商品编号：{{vo2.goods_sn}}
+                                                </div>
+                                                <div class="order_icon_items">
+                                                    <div class="order_icon order_icon_pt" title="普通订单">普通订单</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="td-price" style="vertical-align: top;">
+                                        <div class="tDiv tpinfo last">{{vo2.goods_price}}</div>
+                                    </td>
+                                    <td class="td-number">
+                                        <div class="tDiv tpinfo last">{{vo2.goods_num}}</div>
+                                    </td>
+                                    <td>
+                                        <div class="tDiv tpinfo last">
+                                            <div v-if="vo.self_pickup_time">
+                                                <span class="red">预约时间:<br>{{vo.self_pickup_time}}</span>
+                                                <div class="mt10 green" v-if="vo.write_off>0">提货时间:<br>{{vo.shipping_time | timeParse}}</div>
+                                            </div>
+                                            <div v-else>否</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="tDiv" style="height: 100px;">
+                                            <font>{{vo2.sr_name}}</font>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="tDiv" style="height: 100px;">
+                                            <a href="javascript:vo(0)">{{vo.user_name}}</a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="tDiv" style="height: 100px;text-align: left;">
+                                            {{vo.consignee}}<br>
+                                            TEL: {{vo.mobile}}<br>
+                                            <span v-if="vo.regionname">{{vo.regionname}}</span>
+                                            <span v-else-if="vo.province_text">{{vo.province_text+vo.city_text+vo.district_text}}</span>
+                                            {{vo.address}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="tDiv" style="height: 100px;">
+                                            <span class="order-price">
+                                                <em>¥</em>
+                                                {{(vo2.goods_price * vo2.goods_num).toFixed(2)}}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td :rowspan="vo.goods_list.length" v-if="index2==0">
+                                        <div class="tDiv" style="height: 100px;">
+                                            <template v-if="vo.abnormal"><span class="red">{{vo.abnormal}}</span></template>
+                                            <div v-else>
+                                                <template v-if="vo.order_status==0"><span class="red">待确认</span></template>
+                                                <template v-else-if="vo.order_status==1"><span class="blue3">已确认</span></template>
+                                                <template v-else-if="vo.order_status==2"><span class="blue3">待评价</span></template>
+                                                <template v-else-if="vo.order_status==3"><span class="navy2">已取消</span></template>
+                                                <template v-else-if="vo.order_status==4"><span class="green">已完成</span></template>
+                                                <template v-else-if="vo.order_status==5"><span class="navy2">退款</span></template>
+                                                <template v-else-if="vo.order_status==6"><span class="navy2">作废</span></template>
+                                                <br/>
+                                                <template v-if="vo.pay_status==0"><span class="red">未付款</span></template>
+                                                <template v-else><span class="green">已付款</span></template>
+                                                <br/>
+                                                <template v-if="vo.shipping_status==0"><span class="red">未发货</span></template>
+                                                <template v-if="vo.shipping_status==1"><span class="">发货中</span></template>
+                                                <template v-if="vo.shipping_status==2"><span class="">已发货</span></template>
+                                                <template v-if="vo.shipping_status==3"><span class="">部分发货</span></template>
+                                                <template v-if="vo.shipping_status==4"><span class="green">已签收</span></template>
+                                                <div class="price-shipping">
+                                                    <p>订单来源：{{vo.from_source}}</p>
+                                                    <p v-if="vo.pay_status">支付方式：
+                                                        <template v-if="vo.pay_code">{{vo.pay_name}}</template>
+                                                        <template v-else><span class="red">暂无</span></template>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td :rowspan="vo.goods_list.length" v-if="index2==0">
+                                        <div class="tDiv" style="height: 100px;">
+                                            <div class="btn-wrap">
+                                                <p>
+                                                    <a href="javascript:void(0)" class="btn-tb" :class="vo.abnormal?'btn-tb-red':'btn-tb-blue'" :title="vo.abnormal" @click="add(vo)">
+                                                        查看
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                            </tbody>
+                        </table>
+                    </template>
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <tfoot>
+                        <tr>
+                            <td colspan="10">
+                                <div class="tDiv">
+                                    <div class="tfoot_btninfo">
+                                        <input type="submit" value="确认" name="confirm" shoptype="btnSubmit"
+                                               class="btn btn_disabled" disabled=""
+                                               @click="orderUpdate(1)">
+                                        <input type="submit" value="无效" name="invalid" shoptype="btnSubmit"
+                                               class="btn btn_disabled" disabled=""
+                                               @click="orderUpdate(6)">
+                                        <input type="submit" value="取消" name="cancel" shoptype="btnSubmit"
+                                               class="btn btn_disabled" disabled=""
+                                               @click="orderUpdate(3)">
+                                        <input type="submit" value="打印订单" name="print" shoptype="btnSubmit"
+                                               class="btn btn_disabled" disabled=""
+                                               onclick="this.form.target = '_blank'">
+                                        <input type="button" value="打印快递单" shoptype="btnSubmit" class="btn btn_disabled"
+                                               disabled="" print-data="print_shipping">
+                                        <input name="batch" type="hidden" value="1"/>
+                                        <input name="order_id" type="hidden" value=""/>
+                                    </div>
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="gj_search">
+        <div class="search-gao-list" id="searchBarOpen">
+            <i class="icon icon-zoom-in"></i>
+            高级搜索
+        </div>
+        <div class="search-gao-bar">
+            <div class="handle-btn" id="searchBarClose">
+                <i class="icon icon-zoom-out"></i>
+                收起边栏
+            </div>
+            <div class="searchContent">
+                <div class="layout-box">
+                    <dl>
+                        <dt>订单号</dt>
+                        <dd>
+                            <input type="text" value="" v-model.trim="keywords" name="order_sn" id="order_sn" @keyup.enter="secrchInit()"
+                                   class="s-input-txt" placeholder="按订单号搜索"/>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>收货人</dt>
+                        <dd><input type="text" value="" v-model.trim="consignee" id="consignee" @keyup.enter="secrchInit()"
+                                   class="s-input-txt" placeholder="收货人/手机号"/>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>商品名称/编号</dt>
+                        <dd>
+                            <input type="text" value="" v-model.trim="keywords_goods" @keyup.enter="secrchInit()" name="keywords_goods" placeholder="按商品名称/编号搜索" class="s-input-txt"/>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>供应商</dt>
+                        <dd>
+                            <input type="text" value="" v-model.trim="keywords_sr" @keyup.enter="secrchInit()" name="keywords_sr" placeholder="按供应商搜索" class="s-input-txt"/>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>按分享人搜索</dt>
+                        <dd>
+                            <input type="text" value="" v-model.trim="share_man" @keyup.enter="secrchInit()" name="share_man" placeholder="手机号、账号、昵称" class="s-input-txt"/>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>付款时间(起)</dt>
+                        <dd>
+                            <div class="text_time" id="text_time_start">
+                                <input type="text" class="text" name="start_time" value="" id="start_time">
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>付款时间(止)</dt>
+                        <dd>
+                            <div class="text_time" id="text_time_end">
+                                <input type="text" class="text" name="end_time" value="" id="end_time">
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>订单分类</dt>
+                        <dd>
+                            <div id="order_cat" class="imitate_select select_w145">
+                                <div class="cite">请选择...</div>
+                                <ul style="display: none;">
+                                    <li><a href="javascript:;" data-value="">请选择...</a></li>
+                                    <li><a href="javascript:;" data-value="1">抢购</a></li>
+                                    <li><a href="javascript:;" data-value="2">团购</a></li>
+                                    <li><a href="javascript:;" data-value="6">积分订单</a></li>
+                                    <li><a href="javascript:;" data-value="7">秒杀</a></li>
+                                </ul>
+                                <input name="order_cat" type="hidden" value="" id="order_cat_val">
+                            </div>
+                        </dd>
+                    </dl>
+
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div class="bot_btn">
+                <input type="submit" class="btn red_btn" name="tj_search" value="提交查询"
+                       @click="secrchInit(order_status,pay_status,shipping_status)"/>
+                <input type="reset" class="btn btn_reset" name="reset" value=" 重置" @click="pageFreash()"/>
+            </div>
+            <div class="bot_btn">
+                <button type="button" class="btn btn_blue" @click="exportExcel()">导出Excel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //table order 之 order_status：订单状态  0:待确认 1:已确认 2:待评价 3:已取消 4:已完成 5:退款 6:作废
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            consignee: '',
+            keywords_goods: '',
+            keywords_sr: '',
+            share_man: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+            order_status: 100,
+            pay_status: 100,
+            shipping_status: 100,
+            order_prom_type: 0,
+            store_id: 0,
+            start_time: '',
+            end_time: ''
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            exportExcel: function () {
+                layer.confirm('要导出 ' + vm.count + ' 条订单?', function (index) {
+                    let load = layer.load(2);
+                    let param = {
+                        page: vm.page,
+                        rows: vm.rows,
+                        keywords: vm.keywords,
+                        keywords_goods: vm.keywords_goods,
+                        keywords_sr: vm.keywords_sr,
+                        order_status: vm.order_status,
+                        pay_status: vm.pay_status,
+                        shipping_status: vm.shipping_status,
+                        store_id: vm.store_id,
+                        share_man: vm.share_man,
+                        consignee: vm.consignee,
+                        order_prom_type: vm.order_prom_type,
+                        start_time: $('#start_time').datetimebox('getValue'),
+                        end_time: $('#end_time').datetimebox('getValue')
+                    };
+                    let form = $('<form id="export" action="/admin/order/index" method="post"></form>');
+                    for (let key in param) {
+                        form.append($('<input type="text" name="' + key + '" value="' + param[key] + '">'));
+                    }
+                    form.append($('<input type="text" name="download" value="1">'));
+                    // console.log(form.find('input[name="store_id"]').val());
+                    form.appendTo('body').submit().remove();
+                    layer.close(index);
+                    layer.close(load);
+                });
+            },
+            add: function (vo = {}) {
+                if (vo.order_id) {
+                    window.parent.addParentTab(
+                        {
+                            title: '编辑订单-' + vo.order_sn,
+                            href: '/admin/order/orderdetail?order_id=' + vo.order_id
+                        }
+                    );
+                }
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.share_man = '';
+                vm.keywords_goods = '';
+                vm.keywords_sr = '';
+                vm.order_status = 100;
+                vm.pay_status = 100;
+                vm.shipping_status = 100;
+                vm.order_prom_type = 0;
+                vm.consignee = '';
+                vm.start_time = '';
+                vm.end_time = '';
+                $('#start_time').datetimebox('setValue', '');
+                $('#end_time').datetimebox('setValue', '');
+                vm.init();
+            },
+            storeListInit: function (store_id = 0) {
+                vm.store_id = store_id;
+                vm.pageFreash();
+            },
+            secrchInit: function (order_status, pay_status, shipping_status) {
+                if (typeof order_status == 'undefined') {
+                    order_status = 100;
+                }
+                if (typeof pay_status == 'undefined') {
+                    pay_status = 100;
+                }
+                if (typeof shipping_status == 'undefined') {
+                    shipping_status = 100;
+                }
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.order_status = order_status;
+                vm.pay_status = pay_status;
+                vm.shipping_status = shipping_status;
+                vm.order_prom_type = $("input[name='order_cat']").val();
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/order/index', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    order_status: vm.order_status,
+                    pay_status: vm.pay_status,
+                    shipping_status: vm.shipping_status,
+                    store_id: vm.store_id,
+                    consignee: vm.consignee,
+                    keywords_goods: vm.keywords_goods,
+                    keywords_sr: vm.keywords_sr,
+                    share_man: vm.share_man,
+                    order_prom_type: vm.order_prom_type,
+                    start_time: $('#start_time').datetimebox('getValue'),
+                    end_time: $('#end_time').datetimebox('getValue'),
+                }, function (ret) {
+                    if (ret.status) {
+                        vm.list = ret.data.list;
+                        vm.count = ret.data.total;
+                        if (vm.page == 1) {
+                            setTimeout(function () {
+                                pageinit('turn-page');
+                            }, 100);
+                        }
+                        if (ret.status == 2) {
+                            $.messager.alert('本次搜索结果，分享人信息：', ret.msg, 'success');
+                        }
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            orderUpdate: function (order_status = '') {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.post('/admin/order/orderUpdate', {
+                    ids: vm.ids,
+                    order_status: order_status,
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.pageFreash();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/order/orderDelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            doalldelete: function () {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/order/orderDelete', {
+                            ids: vm.ids,
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.log_ids = [];
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+        }
+    });
+    $(function () {
+        $('#start_time').datetimebox({
+            value: '',
+            required: false,
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            value: '',
+            required: false,
+            showSeconds: false
+        });
+        vm.init();
+        window.addEventListener("storage", function (e) {
+            if (e.key == 'refreshOrder' || e.key == 'refreshDelivery') {
+                vm.init(vm);
+                localStorage.removeItem('refreshOrder');
+                localStorage.removeItem('refreshDelivery');
+            }
+        });
+    });
+    $.gjSearch("-240px");
+    $.divselect("#store_search", "#store_search_val", function () {
+        val = $("#store_search_val").val();
+        $("#merchant_id_dl").hide();
+        $("#store_keyword_dl").hide();
+        $("#store_type_dl").hide();
+        if (val == 1) {
+            $("#merchant_id_dl").show();
+        } else if (val == 2) {
+            $("#store_keyword_dl").show();
+        } else if (val == 3) {
+            $("#store_keyword_dl").show();
+            $("#store_type_dl").show();
+        }
+    });
+</script>
+</body>
+</html>

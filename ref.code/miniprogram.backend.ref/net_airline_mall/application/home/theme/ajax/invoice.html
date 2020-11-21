@@ -1,0 +1,256 @@
+<div class="invoice-dialog" id="edit_invoice">
+    <div class="tab-nav">
+        <ul class="radio-list">
+            <li class="{if !isset($invoice_type) || ($invoice_type == 0)}item-selected{/if}" data-value="0">普通发票<b></b></li>
+            <li class="{if  isset($invoice_type) && ($invoice_type == 1)}item-selected{/if}" data-value="1">增值税发票<b></b></li>
+        </ul>
+    </div>
+    <div class="invoice-thickbox">
+        <div class="form">
+            <div class="item">
+                <span class="label">发票抬头：</span>
+                <div class="invoice-list">
+                    <div class="invoice-item selected">
+                    	<span>
+                            <input type="text" value="个人" name="inv_payee" class="inv_payee" readonly>
+                            <input name="invoice_id" type="radio" class="hide" value="0" checked>
+                            <b></b>
+                        </span>
+                    </div>
+                     {foreach $invoice as $index=>$invoice}
+                    <div class='invoice-item' data-invoiceid="{$invoice.invoice_id ?? 0}">
+                        <span>
+                            <input type='text' name='inv_payee' class='inv_payee' value='{$invoice.inv_payee}' readonly>
+                            <input name='invoice_id' type='radio' class='hide' value='{$invoice.invoice_id}'>
+							<input type='hidden' value="{$invoice.tax_id}" name="invoice_tax_{$invoice.invoice_id ?? 0}" shoptype="taxId" />
+                            <b></b>
+                        </span>
+                        <div class='btns'>
+                            <a href='javascript:void(0);' class='ftx-05 edit-tit'>编辑</a>
+                            <a href='javascript:void(0);' class='ftx-05 update-tit hide'>保存</a>
+                            <a href='javascript:void(0);' class='ftx-05 ml10 del-tit'>删除</a>
+                        </div>
+                    </div>
+                     {/foreach}
+                </div>
+                <div class="add-invoice"><a href="javascript:void(0);" class="ftx-05 add-invoice-btn">新增单位发票</a></div>
+            </div>
+            <div class="item" shoptype="tax" style=" display:none;">
+                <span class="label"><em class="red">*</em>纳税人识别号：</span>
+                <div class="value">
+                    <input type="text" name="tax_id" id="tax_id" class="text" value="">
+                </div>
+            </div>
+            <div class="item">
+                <span class="label">发票内容：</span>
+                <div class="radio-list">
+                    <ul>
+                         {foreach $inv_content_list as $key=>$list}
+                        <li class=" {if $key eq 0}item-selected{/if}"><input type="radio" name="inv_content" value="{$list}" {if $key eq 0}checked{/if}>{$list}<b></b></li>
+                         {/foreach}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="reminder">
+                    <span>温馨提示：发票的开票金额不包括消费卡、优惠券和支付部分</span>
+                    <a href="{:url('article/content','article_id=88')}" target="_blank" class="ftx-05">发票信息相关问题>></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="form" style="display:none;">
+            {if isset($vat_invoice.audit_status) && ($vat_invoice.audit_status == 0)}
+            <div class="iis-state-warp">
+                <i class="icon icon-iis-1"></i>
+                <div class="iis-state-info">
+                    <div class="tit">您的增票资质已提交，等待审核。</div>
+                </div>
+            </div>
+            {elseif isset($vat_invoice.audit_status) && ($vat_invoice.audit_status == 1)}
+            <div class="steps">
+                <div class="step">
+                    <input type="hidden" id="vatCanEdit" value="{$vat_invoice.id}">
+                    <div class="item">
+                        <span class="label"><em class="red">*</em>单位名称：</span>
+                        <div class="fl"><input type="text" class="text" name="company_name" readonly value="{$vat_invoice.company_name}"></div>
+                    </div>
+                    <div class="item">
+                        <span class="label"><em class="red">*</em>银行账号：</span>
+                        <div class="fl"><input type="text" class="text" name="bank_account" readonly value="{$vat_invoice.bank_account}"></div>
+                    </div>
+                    <div class="item">
+                        <span class="label"><em class="red">*</em>纳税人识别号：</span>
+                        <div class="fl"><input type="text" class="text" name="tax_id" readonly value="{$vat_invoice.tax_id}"></div>
+                    </div>
+                    <div class="item">
+                        <span class="label"><em class="red">*</em>收票人姓名：</span>
+                        <div class="fl"><input type="text" class="text" name="consignee_name" readonly value="{$vat_invoice.consignee_name}"></div>
+                    </div>
+                    <div class="item">
+                        <span class="label"><em class="red">*</em>收票人手机号：</span>
+                        <div class="fl"><input type="text" class="text" name="consignee_mobile_phone" readonly value="{$vat_invoice.consignee_mobile_phone}"></div>
+                    </div>
+
+                    <div class="item">
+                        <span class="label"><em class="red">*</em>收票人详细地址：</span>
+                        <div class="fl"><input type="text" class="text" name="consignee_address" readonly value="{$vat_invoice.consignee_address}"></div>
+                    </div>
+                </div>
+            </div>
+            {elseif isset($vat_invoice.audit_status) && ($vat_invoice.audit_status == 2)}
+            <div class="iis-state-warp">
+                <i class="icon icon-iis-2"></i>
+                <div class="iis-state-info">
+                    <div class="tit">抱歉！您的增票资质信息错误，审核不通过。</div>
+                </div>
+            </div>
+            {else}
+            <form action="" method="POST" name="inv_form">
+                <div class="steps" shoptype="invReturn">
+                    <div class="step">
+                        <div class="item">
+                            <span class="label">开票方式：</span>
+                            <div class="radio-list">
+                                <ul>
+                                    <li class="item-selected"><input type="radio" name="" value="" checked>订单完成后开票<b></b></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <span class="label">开票内容：</span>
+                            <div class="radio-list">
+                                <ul>
+                                    <li class="item-selected"><input type="radio" name="" value="" checked>明细<b></b></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <ul class="invoice-status">
+                            <li class="fore curr">1.选择开票方式</li>
+                            <li class="gap curr"></li>
+                            <li class="fore">2.填写或公司信息</li>
+                            <li class="gap"></li>
+                            <li class="fore">3.填写收票收信息</li>
+                        </ul>
+                        <div class="item" id="vat-inv-type-tips">
+                            <span class="label">&nbsp;</span>
+                            <div class="fl"><span class="ftx-03">发票将在订单完成之后7-15个工作日寄出</span></div>
+                        </div>
+                        <div class="item">
+                            <span class="label">&nbsp;</span>
+                            <div class="fl">
+                                <a href="javascript:;" class="sc-btn sc-redBg-btn" shoptype="nextStep" data-type="1">下一步</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step" style="display:none;">
+                        <input type="hidden" id="vatCanEdit" value="0">
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>单位名称：</span>
+                            <div class="fl"><input type="text" class="text" name="company_name"><div class="form_prompt"></div></div>
+                        </div>
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>纳税人识别号：</span>
+                            <div class="fl"><input type="text" class="text" name="tax_id"><div class="form_prompt"></div></div>
+                        </div>
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>注册地址：</span>
+                            <div class="fl"><input type="text" class="text" name="company_address"><div class="form_prompt"></div></div>
+                        </div>
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>注册电话：</span>
+                            <div class="fl"><input type="text" class="text" name="company_telephone"><div class="form_prompt"></div></div>
+                        </div>
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>开户银行：</span>
+                            <div class="fl"><input type="text" class="text" name="bank_of_deposit"><div class="form_prompt"></div></div>
+                        </div>
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>银行账号：</span>
+                            <div class="fl"><input type="text" class="text" name="bank_account" shoptype="bank_card"><div class="form_prompt"></div></div>
+                        </div>
+                        <div class="item">
+                            <span class="label">&nbsp;</span>
+                            <div class="fl">
+                                <a href="javascript:;" class="sc-btn sc-redBg-btn" shoptype="nextStep" data-type="2">下一步</a>
+                                <a href="javascript:;" class="sc-btn" shoptype="backStep" data-type="2">返回</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step" style="display:none;">
+                        <input type="hidden" id="vatConsigneeInfo" value="">
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>收票人姓名：</span>
+                            <div class="fl"><input type="text" class="text" name="consignee_name"><div class="form_prompt"></div></div>
+                        </div>
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>收票人手机号：</span>
+                            <div class="fl"><input type="text" class="text" name="consignee_mobile_phone"><div class="form_prompt"></div></div>
+                        </div>
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>收票人地址：</span>
+                            <div class="fl">
+                                <div class="form-value" shoptype="regionLinkage">
+                                    <dl class="mod-select mod-select-small" shoptype="smartdropdown" id="selCountries_">
+                                        <dt>
+                                            <span class="txt" shoptype="txt">中国</span>
+                                            <input type="hidden" value="1" name="country">
+                                        </dt>
+                                        <dd shoptype="layer">
+                                            <div class="option" data-value="1" data-text="中国" shoptype="ragionItem" data-type="1">中国</div>
+                                        </dd>
+                                    </dl>
+                                    <dl class="mod-select mod-select-small" shoptype="smartdropdown" id="selProvinces_">
+                                        <dt>
+                                            <span class="txt" shoptype="txt">请选择</span>
+                                            <input type="hidden" value="{$consignee.province ?? 0}" name="province">
+                                        </dt>
+                                        <dd shoptype="layer"></dd>
+                                    </dl>
+                                    <dl class="mod-select mod-select-small" shoptype="smartdropdown" id="selCities_">
+                                        <dt>
+                                            <span class="txt" shoptype="txt">请选择</span>
+                                            <input type="hidden" value="" name="city">
+                                        </dt>
+                                        <dd shoptype="layer"></dd>
+                                    </dl>
+                                    <dl class="mod-select mod-select-small" shoptype="smartdropdown" id="selDistricts_" style="display:none;">
+                                        <dt>
+                                            <span class="txt" shoptype="txt">请选择</span>
+                                            <input type="hidden" value="" name="district">
+                                        </dt>
+                                        <dd shoptype="layer"></dd>
+                                    </dl>
+                                    <span id="consigneeEreaNote" class="status error hide"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <span class="label"><em class="red">*</em>收票人详细地址：</span>
+                            <div class="fl"><input type="text" class="text" name="consignee_address"><div class="form_prompt"></div></div>
+                        </div>
+                        <div class="item">
+                            <span class="label">&nbsp;</span>
+                            <div class="fl">
+                                <a href="javascript:;" class="sc-btn sc-redBg-btn" shoptype="nextStep" data-type="3">保存收票人信息</a>
+                                <a href="javascript:;" class="sc-btn" shoptype="backStep" data-type="3">取消</a>
+                                <input type="hidden" name="action" value="update_vat">
+                                <input type="hidden" name="user_id" value="{$user_id}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            {/if}
+        </div>
+    </div>
+</div>
+<script>
+    $.levelLink(1);
+    $(document).on("click","a[shoptype='showVat']",function(){
+        var prompt = $(this).parents(".iis-state-warp");
+        prompt.hide();
+        prompt.next().show();
+    })
+</script>

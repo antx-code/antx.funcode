@@ -1,0 +1,64 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault" id="app">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <div class="user-mod" style="min-height: 1150px;">
+            <div class="type">
+                <div class="user-title">
+                    <h2>实名认证</h2>
+                </div>
+                <div class="account-main account-bind">
+                    <div class="user-items">
+                        <div class="item">
+                            <div class="label"><em class="red">*</em>真实姓名：</div>
+                            <div class="value">
+                                <input class="text text-1" type="text" id="real_name" name="real_name" v-model="info.true_name">
+                                <div id="span-notify-holderName" class="notic">为确保您的账户安全，请填写您本人的实名认证信息</div>
+                                <div class="form_prompt"></div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label"><em class="red">*</em>身份证号：</div>
+                            <div class="value">
+                                <input class="text text-5" type="text" id="self_num" name="self_num" v-model="info.id_card">
+                                <div class="form_prompt"></div>
+                            </div>
+                        </div>
+                        <div class="item item-button">
+                            <div class="label">&nbsp;</div>
+                            <div class="value">
+                                <input type="submit" id="authSubmit" class="sc-btn sc-redBg-btn" value="提交" @click="doupdate()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public:footer"}
+
+
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            doupdate:function () {
+                fajax('/home/member/updateicard',vm.info);
+            }
+        },
+    });
+</script>
+

@@ -1,0 +1,171 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">添加/编辑商品属性</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="{:url('goods/attr_list',['type_id'=>$Request.param.type_id,'group_id'=>$Request.param.group_id])}"><i class="icon-reply"></i>商品属性</a>
+</div>
+
+<div class="ecsc-form-goods" id="app" v-cloak>
+    <form method="post" name="theForm" id="attribute_form">
+        <div class="wrapper-list border1">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;属性名称：</dt>
+                <dd>
+                    <input type="text" id="name" v-model="base.attr.name" size="30" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;所属商品类型：</dt>
+                <dd>
+                    <select v-model="base.attr.type_id" id="type_id">
+                        <option value="0">请选择</option>
+                        <option :value="vo.id" v-for="(vo,index) in base.type">{{vo.name}}</option>
+                    </select>
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl v-if="base.group.length">
+                <dt>属性分组：</dt>
+                <dd>
+                    <select id="group" v-model="base.attr.group_id">
+                        <option value="0">请选择</option>
+                        <option :value="vo.group_id" v-for="(vo,index) in base.group">{{vo.name}}</option>
+                    </select>
+                </dd>
+            </dl>
+            <dl>
+                <dt>该属性值的录入方式：</dt>
+                <dd>
+                    <div class="checkbox_items">
+                        <div class="checkbox_item" v-for="(val,key,index) in base.value_type">
+                            <input type="radio" name="showtype" :value="key" class="ui-radio" :id="'attr_input_type_'+index" v-model="default_type">
+                            <label class="ui-radio-label" :for="'attr_input_type_'+index">{{val}}</label>
+                        </div>
+                    </div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>可选值列表：</dt>
+                <dd>
+                    <textarea name="attrvaluejson" cols="30" rows="5" class="textarea" v-model="base.attr.attrvaluejson"></textarea>
+                    <div class="notic">一行代表一个可选值。<br>或者,多个选项写在同一行,使用英文逗号隔开</div>
+                </dd>
+            </dl>
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="button" value=" 确定 " class="sc-btn sc-blueBg-btn btn35" @click="subform()">
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+
+<script>
+
+    /**
+     * 改变商品类型的处理函数
+     */
+    function changeGoodsTypeResponse(res) {
+        if (res.error == 0) {
+            var row = document.getElementById('attrGroups');
+            if (res.content.length == 0) {
+                row.style.display = 'none';
+            } else {
+                row.style.display = document.all ? 'block' : 'table-row';
+
+                var sel = document.forms['theForm'].elements['attr_group'];
+
+                sel.length = 0;
+
+                for (var i = 0; i < res.content.length; i++) {
+                    var opt = document.createElement('OPTION');
+                    opt.value = i;
+                    opt.text = res.content[i];
+                    sel.options.add(opt);
+                    if (i == '') {
+                        opt.selected = true;
+                    }
+                }
+            }
+        }
+
+        if (res.message) {
+            alert(res.message);
+        }
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            dis: {datetime: true, textarea: true, text: true},
+            base: JSON.parse('{:addslashes(json_encode($data,JSON_UNESCAPED_UNICODE))}'),
+            default_type: '',
+        },
+        watch: {
+            default_type: function (val) {
+                if (this.dis[val]) {
+                    $("textarea[name='attrvaluejson']").attr("disabled", true);
+                } else {
+                    $("textarea[name='attrvaluejson']").attr("disabled", false);
+                }
+            }
+        },
+        methods: {
+            error_div: function (obj, error) {
+                var error_div = $(obj).parents('dd').find('div.form_prompt');
+
+                error_div.find("label").remove();
+                if (!error) {
+                    $(obj).removeClass("error");
+                    return;
+                } else {
+                    $(obj).addClass("error");
+                }
+
+                $(obj).focus();
+                $(obj).bind('change', function () {
+                    vm.error_div(this);
+                    $(this).unbind('change');
+                });
+                error_div.find("label").remove();
+                error_div.append("<label class='error'><i class='icon icon-exclamation-sign'></i>" + error + "</label>");
+            },
+            subform: function () {
+                this.base.attr.showtype = this.default_type;
+                if (!this.base.attr.name) {
+                    this.error_div(document.getElementById('name'), '属性名称不能为空');
+                    return;
+                }
+                if (!this.base.attr.type_id) {
+                    this.error_div(document.getElementById('type_id'), '请选择属性类型');
+                    return;
+                }
+                if (this.base.attr.attrvaluejson) {
+                    this.base.attr.attrvaluejson = this.base.attr.attrvaluejson.replace(/[\r\n]/g, ',');
+                }
+                var index = layer.load(1);
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/attr_edit',
+                    data: {attr: vm.base.attr},
+                    success: function (data) {
+                        location.href = data;
+                    },
+                    error: function (xhr, type) {
+                        layer.close(index);
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        },
+        created: function () {
+            this.default_type = this.base.attr.showtype ? this.base.attr.showtype : 'checkbox';
+        }
+    });
+</script>
+{include file="public/footer"}

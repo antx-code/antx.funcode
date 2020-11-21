@@ -1,0 +1,32 @@
+<style>
+    .contact-box {
+        text-align: center
+    }
+
+    img {
+        max-width: 128px;
+        border-radius: 50%;
+    }
+
+    .blod {
+        font-weight: bold
+    }
+
+    .mt10 {
+        margin-top: 10px
+    }
+</style>
+<div class="contact-box">
+    <div class="col-sm-4">
+        <div class="text-center">
+            <img alt="{$user.user_name}" class="img-circle m-t-xs img-responsive" src="{$user.avatar | default='/public/static/theme/images/touxiang.jpg'}">
+            <div class="blod mt10">{if $user.nick_name} {$user.nick_name}{else}{$user.user_name}{/if}</div>
+        </div>
+    </div>
+    <div>
+        <h3><strong>{$user.rank_name}</strong></h3>
+        <address>
+            <abbr title="电话">Phone:</abbr> {$user.mobile}
+        </address>
+    </div>
+</div>

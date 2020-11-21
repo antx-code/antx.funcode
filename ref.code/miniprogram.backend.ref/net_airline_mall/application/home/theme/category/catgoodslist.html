@@ -1,0 +1,450 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+<div class="nav shop-zoom" shoptype="shopNav">
+    <div class="w w1390">
+        {include file="public/categorys"}
+        <div class="nav-main" id="nav">
+            <ul class="navitems">
+                <li><a href="/" class="curr">首页</a></li>
+                {foreach $siteInfo['nav'] as $nav}
+                <li><a href="{$nav.url}" target="{if $nav.is_newwin==1}_blank{else /}_self{/if}">{$nav.name}</a></li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" type="text/css" href="__THEME__/css/select.css"/>
+<div class="hot-sales">
+    <div class="hotsale w1390 w">
+        <div class="hatsale-mt">热门推荐</div>
+        <div class="bd">
+            <ul>
+                {volist name="hotList" id="vo"}
+                <li class="{if $key==3}last{/if}">
+                    <div class="item">
+                        <div class="p-img">
+                            <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank">
+                                <img src="{$vo.original_img}">
+                            </a>
+                        </div>
+                        <div class="p-name">
+                            <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" title="{$vo.goods_name}" target="_blank">
+                            {$vo.goods_name}
+                            </a>
+                        </div>
+                        <div class="p-price">
+                            <em>¥</em>{$vo.shop_price}
+                        </div>
+                        <div class="p-btn">
+                            <a class="btn sc-redBg-btn" href="{:url('goods/detail',['id'=>$vo.goods_id])}">立即购买</a>
+                        </div>
+                    </div>
+                </li>
+                {/volist}
+            </ul>
+            <a href="javascript:void(0);" class="prev"></a>
+            <a href="javascript:void(0);" class="next"></a>
+        </div>
+    </div>
+</div>
+{if $id>0}
+<div class="w w1390">
+    <div class="crumbs-nav">
+        <div class="crumbs-nav-main clearfix">
+            {if $categoryInfo.parent_id>0}
+            <div class="crumbs-nav-item">
+                <div class="menu-drop">
+                    <div class="trigger">
+                        <a href="{:url('category/index',['id'=>$pargoryInfo.cat_id])}"><span>{$pargoryInfo.cat_name}</span></a>
+                        <i class="iconfont icon-down"></i>
+                    </div>
+                    <div class="menu-drop-main">
+                        <ul>
+                            {volist name="pcatList" id="vo"}
+                            <li><a href="{:url('category/index',['id'=>$vo.cat_id])}">{$vo.cat_name}</a></li>
+                            {/volist}
+                        </ul>
+                    </div>
+                </div>
+                <i class="iconfont icon-right"></i>
+            </div>
+            {/if}
+            <div class="crumbs-nav-item">
+                <div class="menu-drop">
+                    <div class="trigger">
+                        <a href="{:url('category/index',['id'=>$categoryInfo.cat_id])}"><span>{$categoryInfo.cat_name}</span></a>
+                        <i class="iconfont icon-down"></i>
+                    </div>
+                    <div class="menu-drop-main">
+                        <ul>
+                            {volist name="scatList" id="vo"}
+                            <li><a href="{:url('category/index',['id'=>$vo.cat_id])}">{$vo.cat_name}</a></li>
+                            {/volist}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/if}
+<div class="container">
+    <div class="w w1390">
+        <div class="filter">
+            <div class="filter-wrap">
+                <div class="filter-sort">
+                    <a href="/home/category/catgoodslist?id={$id}&&price_min={$price_min}&&price_max={$price_max}&&sort=goods_id&&order={if $order=='ASC'}DESC{else /}ASC{/if}&have={$have}&ship={$ship}&self={$self}"
+                       class="sort-item {if $sort=='goods_id'}curr{/if}">综合
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}"></i>
+                    </a>
+                    <a href="/home/category/catgoodslist?id={$id}&&price_min={$price_min}&&price_max={$price_max}&&sort=total_sale_num&&order={if $order=='ASC'}DESC{else /}ASC{/if}&have={$have}&ship={$ship}&self={$self}"
+                       class="sort-item {if $sort=='total_sale_num'}curr{/if}">销量
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}"></i>
+                    </a>
+                    <a href="/home/category/catgoodslist?id={$id}&&price_min={$price_min}&&price_max={$price_max}&&sort=last_update&&order={if $order=='ASC'}DESC{else /}ASC{/if}&have={$have}&ship={$ship}&self={$self}"
+                       class="sort-item {if $sort=='last_update'}curr{/if}">新品
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}"></i>
+                    </a>
+                    <a href="/home/category/catgoodslist?id={$id}&&price_min={$price_min}&&price_max={$price_max}&&sort=comment_num&&order={if $order=='ASC'}DESC{else /}ASC{/if}&have={$have}&ship={$ship}&self={$self}"
+                       class="sort-item {if $sort=='comment_num'}curr{/if}">评论数
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}"></i>
+                    </a>
+                    <a href="/home/category/catgoodslist?id={$id}&&price_min={$price_min}&&price_max={$price_max}&&sort=shop_price&&order={if $order=='ASC'}DESC{else /}ASC{/if}&have={$have}&ship={$ship}&self={$self}"
+                       class="sort-item {if $sort=='shop_price'}curr{/if}">价格
+                        <i class="iconfont {if $order=='ASC'}icon-arrow-up{else /}icon-arrow-down{/if}"></i>
+                    </a>
+                </div>
+                <div class="filter-range">
+                    <div class="fprice">
+                        <form method="GET" action="/home/category/catgoodslist?id={$id}&&sort={$sort}&&order={if $order=='ASC'}DESC{else /}ASC{/if}" class="sort" name="listform">
+                            <div class="fP-box">
+                                <input type="text" name="price_min" class="f-text price-min" autocomplete="off" maxlength="6" placeholder="￥" id="price-min" value="{$price_min}">
+                                <span>&nbsp;~&nbsp;</span>
+                                <input type="text" name="price_max" class="f-text price-max" autocomplete="off" maxlength="6" id="price-max" value="{$price_max}" placeholder="￥">
+                            </div>
+                            <div class="fP-expand" style="display: none;">
+                                <a class="ui-btn-s ui-btn-clear" href="javascript:void(0);" id="clear_price">清空</a>
+                                <a href="javascript:void(0);" class="ui-btn-s ui-btn-s-primary ui-btn-submit">确定</a>
+                            </div>
+                            <input type="hidden" name="id" value="{$id}">
+                            <input type="hidden" name="sort" value="{$sort}">
+                            <input type="hidden" name="order" value="{$order}">
+                        </form>
+                    </div>
+                    <div class="fcheckbox">
+                        <div class="checkbox_items">
+                            <div class="checkbox_item {if $ship==1}checkbox-checked{/if}">
+                                <input type="checkbox" name="fk-type" class="ui-checkbox" value="" id="store-checkbox-011"
+                                       {if $ship>0}checked='checked'{/if}>
+                                <label class="ui-label" for="store-checkbox-011">包邮</label>
+                                <i id="input-i1" rev="/home/category/catgoodslist?id={$id}&&sort={$sort}&&order={$order}&&ship=1&&self={$self}&&have={$have}"></i>
+                                <i id="input-i2" rev="/home/category/catgoodslist?id={$id}&&sort={$sort}&&order={$order}&&ship=0&&self={$self}&&have={$have}"></i>
+                            </div>
+                            <div class="checkbox_item">
+                                <input type="checkbox" name="fk-type" class="ui-checkbox" value="" id="store-checkbox-012"
+                                       {if $self==0}checked='checked'{/if}>
+                                <label class="ui-label" for="store-checkbox-012">自营商品</label>
+                                <i id="input-i1" rev="/home/category/catgoodslist?id={$id}&&sort={$sort}&&order={$order}&&ship={$ship}&&self=0&&have={$have}"></i>
+                                <i id="input-i2" rev="/home/category/catgoodslist?id={$id}&&sort={$sort}&&order={$order}&&ship={$ship}&&self=1&&have={$have}"></i>
+                            </div>
+                            <div class="checkbox_item">
+                                <input type="checkbox" name="fk-type" class="ui-checkbox" value="" id="store-checkbox-013"
+                                       {if $have>0}checked='checked'{/if}>
+                                <label class="ui-label" for="store-checkbox-013">仅显示有货</label>
+                                <i id="input-i1" rev="/home/category/catgoodslist?id={$id}&&sort={$sort}&&order={$order}&&ship={$ship}&&self={$self}&&have=1"></i>
+                                <i id="input-i2" rev="/home/category/catgoodslist?id={$id}&&sort={$sort}&&order={$order}&&ship={$ship}&&self={$self}&&have=0"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-right">
+                    <div class="styles">
+                        <ul class="items" shoptype="fsortTab">
+                            <li class="item current" data-type="large"><a href="javascript:void(0)" title="大图模式"><span class="iconfont icon-switch-grid"></span>大图</a></li>
+                            <li class="item" data-type="samll"><a href="javascript:void(0)" title="小图模式"><span class="iconfont icon-switch-list"></span>小图</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="g-view w">
+            <!--分类对应产品列表-->
+            <div class="goods-list goods-list-w1390" shoptype="gMain">
+                <div class="gl-warp gl-warp-large">
+                    <div class="goods-list-warp">
+                        <ul shoptype="items">
+                            {volist name="goodsList" id="vo"}
+                            <li class="gl-item">
+                                <div class="gl-i-wrap">
+                                    <div class="p-img">
+                                        <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank">
+                                            <img src="{$vo.original_img}">
+                                        </a>
+                                    </div>
+                                    <div class="sider">
+                                        <a href="javascript:void(0);" class="sider-prev prevStop">
+                                            <i class="iconfont icon-left"></i>
+                                        </a>
+                                        <ul>
+                                            {volist name="vo.goods_gallery" id="vo2"}
+                                            <li>
+                                                <img src="{$vo2.img_original}" width="26" height="26">
+                                            </li>
+                                            {/volist}
+                                        </ul>
+                                        <a href="javascript:void(0);" class="sider-next nextStop">
+                                            <i class="iconfont icon-right"></i>
+                                        </a>
+                                    </div>
+                                    <div class="p-lie">
+                                        <div class="p-price">
+                                            <em>¥</em>{$vo.shop_price}
+                                        </div>
+                                        <div class="p-num">已售<em>{$vo.total_sale_num+$vo.virtual_sale_num}</em>件</div>
+                                    </div>
+                                    <div class="p-name">
+                                        <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" title="{$vo.goods_name}"
+                                           target="_blank">{$vo.goods_name}</a>
+                                    </div>
+                                    <div class="p-activity">
+                                        {if $vo.is_new==1}
+                                        <span class="tag tac-mn">
+                                                <i class="i-left"></i>新品<i class="i-right"></i>
+                                            </span>
+                                        {/if}
+                                        {if $vo.is_hot==1}
+                                        <span class="tag tac-mh">
+                                                <i class="i-left"></i>热卖<i class="i-right"></i>
+                                            </span>
+                                        {/if}
+                                        {if $vo.is_best==1}
+                                        <span class="tag tac-mb">
+                                                <i class="i-left"></i>精品<i class="i-right"></i>
+                                            </span>
+                                        {/if}
+                                        {if $vo.store_id==0}
+                                        <span class="tag tac-sr">
+                                                <i class="i-left"></i>自营<i class="i-right"></i>
+                                            </span>
+                                        {/if}
+                                    </div>
+                                    <div class="p-operate">
+                                        <a href="javascript:void(0);" id="compareLink">
+                                            <input id="{$vo.goods_id}" type="checkbox" name="duibi" class="ui-checkbox"
+                                                   onclick="Compare.add(this, '{$vo.goods_id}','{$vo.goods_name}','1', '{$vo.original_img}', '<em>¥</em>{$vo.shop_price}', '<em>¥</em>{$vo.market_price}')">
+                                            <label class="ui-label" for="{$vo.goods_id}">对比</label>
+                                        </a>
+
+                                        <a href="javascript:void(0);" class="collection choose-btn-coll {if $vo.is_collect}selected{/if}"
+                                           data-dialog="goods_collect_dialog"
+                                           data-divid="goods_collect"
+                                           data-goodsid="{$vo.goods_id}"
+                                           data-type="goods">
+                                            <i class="iconfont choose-btn-icon icon-collection{if $vo.is_collect}-alt{/if}" style="vertical-align: initial"></i>
+                                            <em>收藏</em>
+                                        </a>
+                                        {if $vo.product_id>0}
+                                        <a href="{:url('goods/detail',['id'=>$vo.goods_id])}">
+                                            <i class="iconfont icon-carts"></i>
+                                            加入购物车
+                                        </a>
+                                        {else /}
+                                        <a href="javascript:void(0);"
+                                           onclick="javascript:goodsListaddToCart('{$vo.goods_id}',0,event,this,'flyItem');"
+                                           rev="{$vo.original_img}"
+                                           data-dialog="addCart_dialog"
+                                           data-divid="addCartLog" class="addcart">
+                                            <i class="iconfont icon-carts"></i>
+                                            加入购物车
+                                        </a>
+                                        {/if}
+                                    </div>
+                                </div>
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+                    <div id="flyItem" class="fly_item"><img src="" width="40" height="40"></div>
+                </div>
+                <div class="gl-warp gl-warp-samll">
+                    <div class="goods-list-warp">
+                        <ul shoptype="items">
+                            {volist name="goodsList" id="vo"}
+                            <li class="gl-h-item item_bg">
+                                <div class="gl-i-wrap">
+                                    <div class="col col-1">
+                                        <div class="p-img">
+                                            <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank">
+                                                <img src="{$vo.original_img}">
+                                            </a>
+                                        </div>
+                                        <div class="p-right">
+                                            <div class="p-name">
+                                                <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" title="{$vo.goods_name}" target="_blank">
+                                                    {$vo.goods_name}
+                                                </a>
+                                            </div>
+                                            <div class="p-lie">
+                                                <div class="p-num">销量：{$vo.total_sale_num+$vo.virtual_sale_num}</div>
+                                                <div class="p-comm">评价：{$vo.comment_num}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col col-2">
+                                    </div>
+                                    <div class="col col-3">
+                                        <div class="p-price">
+                                            <div class="shop-price"><em>¥</em>{$vo.shop_price}</div>
+                                            <div class="original-price"><em>¥</em>{$vo.market_price}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col col-4">
+                                        <div class="p-operate">
+                                            <a href="javascript:void(0);" id="compareLink">
+                                                <input id="{$vo.goods_id}" type="checkbox" name="duibi" class="ui-checkbox"
+                                                       onclick="Compare.add(this, '{$vo.goods_id}','{$vo.goods_name}','1', '{$vo.original_img}', '<em>¥</em>{$vo.shop_price}', '<em>¥</em>{$vo.market_price}')">
+                                                <label class="ui-label" for="{$vo.goods_id}">对比</label>
+                                            </a>
+                                            <a href="javascript:void(0);" class="collection choose-btn-coll "
+                                               data-dialog="goods_collect_dialog"
+                                               data-divid="goods_collect"
+                                               data-goodsid="{$vo.goods_id}"
+                                               data-type="goods">
+                                                <i class="iconfont icon-zan-alt"></i>
+                                                <em>收藏</em>
+                                            </a>
+                                            <a href="javascript:addToCartShowDiv('{$vo.goods_id}')" rev="images/201703/thumb_img/0_thumb_G_1490209464713.jpg" data-dialog="addCart_dialog" data-id="" data-divid="addCartLog" data-url="" data-title="请选择属性" class="addcart">
+                                                <i class="iconfont icon-carts"></i>加入购物车
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+
+                    <div id="flyItem2" class="fly_item2"><img src="" width="40" height="40"></div>
+                </div>
+                <div class="clear"></div>
+                <div class="clearfix text-ceter" id="pages_ajax"></div>
+
+                <div class="no_records hide">
+                    <i class="no_icon_two"></i>
+                    <div class="no_info no_info_line">
+                        <h3>抱歉，没有找到符合条件的数据</h3>
+                        <div class="no_btn">
+                            <a href="/" class="btn sc-redBg-btn">返回首页</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="duibi_box" id="slideTxtBox">
+    <div class="parWarp">
+        <div class="parTit">对比栏</div>
+        <div class="parBd">
+            <div class="slideBox5" id="duibilan">
+                <div id="diff-items" class="diff-items clearfix">
+                    <dl class="hasItem" id="compare_goods1">
+                        <dt><h1>1</h1></dt>
+                        <dd><span class="ts">您还可以继续添加</span></dd>
+                    </dl>
+                    <dl class="hasItem" id="compare_goods2">
+                        <dt><h1>2</h1></dt>
+                        <dd><span class="ts">您还可以继续添加</span></dd>
+                    </dl>
+                    <dl class="hasItem" id="compare_goods3">
+                        <dt><h1>3</h1></dt>
+                        <dd><span class="ts">您还可以继续添加</span></dd>
+                    </dl>
+                    <dl class="hasItem" id="compare_goods4">
+                        <dt><h1>4</h1></dt>
+                        <dd><span class="ts">您还可以继续添加</span></dd>
+                    </dl>
+                </div>
+                <div class="diff-operate">
+                    <a id="compare_button" class="compare-active"></a>
+                    <a id="qingkong" class="del-items">清空对比栏</a>
+                    <a href="javascript:;" class="hide-me" shoptype="db_hide">隐藏</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file='public/footer'}
+{include file='public/right_bar'}
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__STATIC__/js/common.js"></script>
+<script type="text/javascript" src="__THEME__/js/magiczoomplus.min.js"></script>
+<script type="text/javascript" src="__THEME__/js/parabola.js"></script>
+<script type="text/javascript" src="__THEME__/js/compare.js"></script>
+<script type="text/javascript">
+    var total = {$total};
+    $(function(){
+        $(".gl-i-wrap").slide({mainCell:".sider ul",effect:"left",pnLoop:false,autoPlay:false,autoPage:true,prevCell:".sider-prev",nextCell:".sider-next",vis:5});
+        $("*[shoptype='fsortTab'] .item").on("click",function(){
+            var index = $(this).index();
+        });
+        Compare.init();//对比初始化
+        if(total > 0){
+            pageinitGet();
+            $(".goods-spread").removeClass('hide');
+        }else{
+            $(".no_records").removeClass('hide');
+            $(".goods-spread").hide();
+        }
+        $("#site-nav div:eq(0)").addClass('w1390');
+        $(".header div:eq(0)").addClass('w1390');
+    });
+    /* *
+     * 添加商品到购物车
+     */
+    function goodsListaddToCart(goods_id, parentId, event, obj, divId, store_id, end_time, store_mobile) {
+        var client_x = 0, client_y = 0, img_url = 0;
+        if (typeof (obj) != "undefined" && event) {
+            img_url = obj.rev;
+            client_x = event.clientX;
+            client_y = event.clientY;
+        }
+
+        $.post('/home/cart/addCart', {
+            goods_id: goods_id,
+            num: 1,
+            attr_keys: '',
+        }, function (ret) {
+            if(ret.status == 1){
+                flyCart(client_x, client_y, img_url, ret.cart_num, ret, 'flyItem');
+            }else{
+                pbDialog(ret.msg, "", 0, 500, 80, 50);
+            }
+            console.log(JSON.stringify(ret));
+        }, 'json');
+    }
+
+    function pageinitGet(elem = "pages_ajax", theme="#EF4F4F") {
+        layui.use('laypage', function () {
+            var laypage = layui.laypage;
+            laypage.render({
+                elem: elem, //注意，这里的 test1 是 ID，不用加 # 号
+                count: total, //数据总数，从服务端得到
+                limit: {$rows},
+                limits: [10, 20, 30, 40, 50, 100],
+                groups: 5,
+                theme: theme,
+                curr: {$page},
+                layout: ['prev', 'page', 'next', 'limit'],
+                jump: function (obj, first) {
+                    if(!first){
+                        window.location.href = "/home/category/catgoodslist?brand_id={$brand_id}&&keywords={$keywords}&&id={$id}&&price_min={$price_min}&&price_max={$price_max}&&sort={$sort}&&order={$order}&&ship={$ship}&&self={$self}&&have={$have}&&page="+obj.curr+'&&rows='+obj.limit;
+                    }
+                }
+            });
+        });
+    }
+</script>

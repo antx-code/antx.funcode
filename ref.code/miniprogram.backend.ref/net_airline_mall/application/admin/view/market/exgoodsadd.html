@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="cboxContent">
+        <div class="pb-bd">
+            <div class="pb-ct">
+                <div class="sku_goods_info">
+                    <div class="warehouse_item">
+                        <span class="item">
+                            <span class="tit"></span>
+                            <div class="search mt0">
+                                <div class="input">
+                                    <input v-model="keywords" class="text nofocus w200" placeholder="商品名称" type="text">
+                                    <button type="button" class="btn pro_btn" name="secrch_btn"
+                                            @click="secrchInit()"></button>
+                                </div>
+                                <div class="refresh" @click="pageFreash()">
+                                     <div title="刷新数据" class="refresh_tit"><i class="icon icon-refresh"></i></div>
+                                     <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+                    <div class="common-content">
+                        <div class="list-div" id="listDiv">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th width="40%">商品名称</th>
+                                        <th width="10%">销售积分</th>
+                                        <th width="10%">市场积分</th>
+                                        <th width="5%">兑换</th>
+                                        <th width="5%">热销</th>
+                                        <th width="5%">精品</th>
+                                        <th width="10%">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="(vo,index) in list">
+                                    <tr>
+                                        <td>{{vo.goods_name}}</td>
+                                        <td>
+                                            <input  class="text w100 tc fn" v-model="vo.exchange_integral" type="text">
+                                        </td>
+                                        <td>
+                                            <input  class="text w100 tc fn" v-model="vo.market_integral" type="text">
+                                        </td>
+                                        <td>
+                                            <div class="tDiv">
+                                                <div class="switch" :class="{'active':vo.is_exchange==1}" title="是"
+                                                     @click="doupdate_is_exchange(index)">
+                                                    <div class="circle"></div>
+                                                </div>
+
+                                                <input type="hidden" value="0" name="">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="tDiv">
+                                                <div class="switch" :class="{'active':vo.is_hot==1}" title="是"
+                                                     @click="doupdate_is_hot(index)">
+                                                    <div class="circle"></div>
+                                                </div>
+                                                <input type="hidden" value="0" name="">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="tDiv">
+                                                <div class="switch" :class="{'active':vo.is_best==1}" title="是"
+                                                     @click="doupdate_is_best(index)">
+                                                    <div class="circle"></div>
+                                                </div>
+                                                <input type="hidden" value="0" name="">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <template v-if="vo.eid>0">
+                                                <a href="javascript:void(0)" class="btn_trash" @click="doupdate(index)">
+                                                    <i class="icon icon-save"></i>
+                                                    提交
+                                                </a>
+                                            </template>
+                                            <template v-else>
+                                                <a href="javascript:void(0)" class="btn_trash" @click="doadd(index)">
+                                                    <i class="icon icon-plus"></i>
+                                                    添加
+                                                </a>
+                                            </template>
+
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="list-page">
+                                            <div id="turn-page"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var eid = '{$eid}';
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            eid: eid,
+            page: 1,
+            rows: 5,
+            count: 0,
+            keywords: '',
+            list: []
+        },
+        methods: {
+            doupdate:function(index){
+                majax('/admin/market/doupdate', vm.list[index],'exchange_goods')
+            },
+            doupdate_is_exchange: function (index) {
+                var is_exchange = vm.list[index].is_exchange  ? 0 : 1;
+                vm.list[index].is_exchange = is_exchange;
+            },
+            doupdate_is_hot: function (index) {
+                var is_hot = vm.list[index].is_hot ? 0 : 1;
+                vm.list[index].is_hot = is_hot;
+            },
+            doupdate_is_best: function (index) {
+                var is_best = vm.list[index].is_best ? 0 : 1;
+                vm.list[index].is_best = is_best;
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 5;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 5;
+                vm.count = 0;
+                vm.init();
+            },
+            doadd:function(index){
+                if(vm.list[index].exchange_integral<1){
+                    layer.msg('请填写销售积分');
+                    return;
+                }
+                vm.list[index].review_status = 1;
+
+                $.post('/admin/market/doadd', {
+                    pageparm: JSON.stringify(vm.list[index]),
+                    table: 'exchange_goods'
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.pageFreash();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            init: function () {
+                $.post('/admin/market/exgoodsadd', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    eid: vm.eid,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+
+
+
+
+
+

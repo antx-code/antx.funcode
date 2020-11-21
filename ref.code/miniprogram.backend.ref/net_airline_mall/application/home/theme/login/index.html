@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="Keywords" content=""/>
+    <meta name="Description" content=""/>
+    <title>{$siteInfo.shop_title}-注册-登录</title>
+    <link rel="shortcut icon" href="/favicon.ico"/>
+
+
+    <script type="text/javascript" src="/public/static/plugins/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.json.js"></script>
+    <script type="text/javascript" src="/public/static/js/transport_jquery.js"></script>
+    <script type="text/javascript" src="/public/static/js/utils.js"></script>
+    <script type="text/javascript" src="/public/static/js/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.form.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.nyroModal.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.SuperSlide.2.1.1.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/public/static/js/lib_ecmobanFunc.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.SuperSlide.2.1.1.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+
+    <script type="text/javascript" src="/public/static/js/vue.js"></script>
+    <script type="text/javascript" src="/public/static/plugins/moment/moment.min.js"></script>
+    <!--FIXME delete console the error msg of eCharts, by Alex 6/13<script type="text/javascript" src="/public/static/js/walden.js"></script>-->
+    <script type="text/javascript" src="/public/static/js/function.js"></script>
+
+    <script type="text/javascript" src="/public/static/theme/js/user.js"></script>
+    <script type="text/javascript" src="/public/static/theme/js/user_register.js"></script>
+    <script type="text/javascript" src="/public/static/theme/js/scroll_city.js"></script>
+    <script type="text/javascript" src="/public/static/theme/js/mall-common.js"></script>
+    <script type="text/javascript" src="/public/static/theme/js/language.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/purebox.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/quickLinks.css"/>
+</head>
+<body class="bg-ligtGary">
+<div class="login">
+    <div class="loginRegister-header">
+        <div class="w w1200">
+            <div class="logo">
+                <div class="logoImg">
+                    <a href="/" class="logo">
+                        <img src="{$siteInfo.shop_logo}"/>
+                    </a>
+                </div>
+                <div class="logo-span"></div>
+            </div>
+            <div class="header-href">
+                <span>
+                    还没有账号<a href="/home/login/register" class="jump">免费注册</a>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="login-wrap">
+            <div class="w w1200">
+                <div class="login-form">
+                    <div class="login-box">
+                        <div class="tit">
+                            <h3>账号登录</h3>
+                            <span></span>
+                        </div>
+                        <div class="msg-wrap">
+                            <div class="msg-error" style="display:none">账户名与密码不匹配，请重新输入</div>
+                        </div>
+                        <div class="form">
+                            <form name="formLogin" action="/home/login/index" method="post" onSubmit="userLogin();return false;">
+                                <div class="item">
+                                    <div class="item-info">
+                                        <i class="iconfont icon-name"></i>
+                                        <input type="text" id="username" name="username" class="text" value="" placeholder="用户名/邮箱/手机" autocomplete="off"/>
+                                    </div>
+                                </div>
+                                <div class="item" shoptype="password">
+                                    <div class="item-info">
+                                        <i class="iconfont icon-password"></i>
+                                        <input type="password" style="display:none"/>
+                                        <input type="password" id="nloginpwd" name="password" class="text" value="" placeholder="密码" autocomplete="off"/>
+                                    </div>
+                                </div>
+                                {if $shop_config['login_captcha']}
+                                <div class="item" shoptype="captcha">
+                                    <div class="item-info">
+                                        <i class="iconfont icon-security"></i>
+                                        <input type="text" id="captcha" name="captcha" class="text text-2" value="" placeholder="验证码" autocomplete="off">
+                                        <img src="/home/login/verify" class="captcha_img fr" onclick="this.src='/home/login/verify?time='+Math.random()">
+                                    </div>
+                                </div>
+                                {/if}
+                                <div class="item">
+                                    <input id="remember" name="remember" type="checkbox" class="ui-checkbox" onclick="rememberMe()">
+                                    <label for="remember" class="ui-label">请保存我这次的登录信息。</label>
+                                </div>
+                                <div class="item item-button">
+                                    <input type="submit" name="submit" id="loginSubmit" value="登&nbsp;&nbsp;录" class="btn sc-redBg-btn">
+                                </div>
+                                <input type="hidden" name="beforeUrl" value="{$beforeUrl}">
+                                <a href="/home/login/smslogin" class="notpwd gary">短信登录</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a class="login-banner" href="javascript:void(0)"
+               style="background:url(/public/static/images/1551384848434769152.png) center center no-repeat;">
+            </a>
+        </div>
+    </div>
+</div>
+<div class="footer user-footer">
+    <div class="shop-copyright">
+        <div class="w w1200">
+            <p class="footer-ecscinfo pb10">
+                <a href="/">首页</a>
+                |
+                <a href="/home/merchant/index.html=2">隐私保护</a>
+                |
+                <a href="/home/merchant/index.html=4">联系我们</a>
+                |
+                <a href="/home/merchant/index.html=1">免责条款</a>
+                |
+                <a href="/home/merchant/index.html=5">公司简介</a>
+                |
+                <a href="/home/merchant/index.html" target="_blank">商家入驻</a>
+            </p>
+            <p class="footer-otherlink">
+                <a href="http://www.taobao.com" target="_blank" title="淘宝">淘宝</a>
+                |
+                <a href="http://www.alibaba.com" target="_blank" title="阿里巴巴">阿里巴巴</a>
+            </p>
+            <p class="copyright_info">
+                ICP备案证书号:<a href="http://www.beian.miit.gov.cn" target="_blank">{$siteInfo.icp_number}</a>
+                POWERED BY<a href="/" target="_blank">{$siteInfo.shop_name}</a>
+                2.0
+            </p>
+        </div>
+    </div>
+    <div class="hidden">
+        <input type="hidden" name="seller_kf_IM" value="" rev="" ru_id=""/>
+        <input type="hidden" name="seller_kf_qq" value="11647006"/>
+        <input type="hidden" name="seller_kf_tel" value="400-1234-5678"/>
+        <input type="hidden" name="user_id" value="0"/>
+    </div>
+</div>
+</body>
+</html>
+
+<script type="text/javascript">
+    $(function () {
+        var storage = window.localStorage;
+        if("yes" == storage["isstorename"]){
+            $("#remember").attr("checked", true);
+            $("#username").val(storage["username"]);
+            $("#nloginpwd").val(storage["password"]);
+        }
+    });
+    function rememberMe() {
+        var storage = window.localStorage;
+        if ($("#remember").is(':checked')) {
+            storage["username"] = $("#username").val();
+            storage["password"] = $("#nloginpwd").val();
+            storage["isstorename"] = "yes";
+        } else {
+            storage["username"] = "";
+            storage["password"] = "";
+            storage["isstorename"] = "no";
+        }
+    }
+</script>

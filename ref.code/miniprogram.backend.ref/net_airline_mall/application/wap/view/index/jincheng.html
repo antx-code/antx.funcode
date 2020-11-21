@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>农货进城</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/index.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css"/>
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css"/>
+
+    <style>
+        .nav .list {
+            padding: 15px 10px !important;
+            width: 20vw;
+            padding-bottom: 0 !important;
+        }
+
+        .nav .list .txt {
+            font-size: 12px !important;
+            height: 24px;
+            overflow: hidden
+        }
+
+        .nav {
+            display: flex;
+            text-align: center;
+            flex-wrap: wrap;
+        }
+
+        .nav .list .txt {
+            line-height: 200%
+        }
+
+        .nav .list img {
+            max-width: 100%;
+            padding: 0.5rem
+        }
+
+        .title_index {
+            text-align: center;
+            height: 5rem !important;
+            line-height: 5rem !important;
+        }
+
+        .title_index h4 {
+            font-size: 1.8rem !important;
+            height: 5rem !important;
+            line-height: 5rem !important;
+            font-weight: bold
+        }
+
+        .pro-img {
+            width: calc(50vw - 0.9rem) !important;
+            height: calc(50vw - 0.9rem) !important;
+            overflow: hidden
+        }
+
+        .catelist {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #f7f7f7;
+            text-align: center;
+            overflow: hidden;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .listcate {
+            width: 33.33%;
+            overflow: hidden;
+            padding: 5px;
+            padding-bottom: 10px;
+        }
+
+        .img-box2 {
+            height: 28vw;
+            background: #fff;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        .img-box2 img {
+            max-width: 100%;
+        }
+
+        .seckill-box dfn {
+            font-size: 12px;
+            color: #666
+        }
+
+        .title_date {
+            text-align: center;
+            height: 5rem !important;
+            color: #cc0000;
+            font-size: 1.2rem;
+        }
+
+        .title_date span {
+            background: #cc0000;
+            border-radius: 4px;
+            color: #fff;
+            margin: 0 5px;
+            font-size: 1.2rem;
+            width: 2.4rem;
+            height: 2.4rem;
+            display: inline-block;
+            text-align: center;
+            line-height: 2.4rem;
+        }
+
+        .pro-img {
+            width: calc(50vw - 0.9rem) !important;
+            height: calc(50vw - 0.9rem) !important;
+            overflow: hidden
+        }
+
+        #app #logo img {
+            max-width: 100%;
+        }
+
+        .areaList img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <section class="goods_info">
+        <div class="goods_photo d_jump">
+            <div id="slider" class="swipe">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide aui-text-center" v-for="(vo,index) in info.adlist" @click="adLink(vo.ad_link)">
+                        <img :src="vo.ad_img"/>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+    <div class="home">
+        <!--分类楼层区域-->
+        <div class="catelistFloor">
+            <template v-for="(va,index) in info.catelist">
+                <div @click="openCategory(va.cat_id)">
+                    <img :src="va.cat_banner" alt="" style="width: 100%;max-height: 200px;">
+                </div>
+                <div class="catelist" style="margin-bottom: 12px;">
+                    <template v-for="(vo,index) in va.goodslist" v-if="index<6">
+                        <div class="listcate" @click="openGoodsdetail(vo.goods_id)">
+                            <div class="img-box2">
+                                <img class="swiper-lazy" :data-src="vo.original_img" :src="vo.original_img" lazy="loaded"/>
+                            </div>
+                            <p style="height:30px;line-height:30px;margin-top:5px;overflow: hidden;text-overflow:ellipsis;text-align: left;font-size: 12px;color: #666;margin-bottom: 5px;">{{vo.goods_name}}</p>
+                            <p class="price" style="font-size: 14px;font-weight: bold;text-align: left;"><span style="font-size: 12px;color: #f92028">&yen;</span>{{vo.shop_price}} </p>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+        <!--分类楼层区域-->
+
+        <!---
+        <div class="title_index">
+            <h4>推荐商品</h4>
+        </div>
+        <section class="product-list product-list-medium">
+            <div class="prolist">
+                <template v-for="(vo,index) in info.goodsList">
+                    <div class="prolist-item" @click="openGoodsdetail(vo)">
+                        <div class="pro-img">
+                            <a href="javascript:void(0)" class=""> <img :src="vo.original_img" class="img" /></a>
+                        </div>
+                        <div class="pro-info">
+                            <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                            <div class="price">
+                                &yen;{{vo.shop_price}}
+                            </div>
+                            <div class="outer">
+                                <em class="tag">自营</em>
+                                <span>{{vo.total_sale_num}}人已购买</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+        -->
+    </div>
+</div>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            token: '',
+            info: {},
+
+            c_h: 0,//时
+            c_m: 0,//分
+            c_s: 0,//秒
+
+            page: 0,
+
+            keywords: '',
+
+            miniapp: 0,//0：公众号，1：小程序
+        },
+        methods: {
+            openGoodswin: function (vo) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        cat_id: vo.cat_id
+                    }
+                });
+            },
+            openStoreindex: function (vo) {
+                api.openWin({
+                    name: 'index_win.html',
+                    url: 'widget://html/store/index_win.html',
+                    pageParam: {
+                        store_id: vo.store_id
+                    }
+                });
+            },
+            cutdowntime: function () {
+                var end_time = vm.info.sklist[0].end_time;
+                var curr_time = parseInt(Date.parse(new Date()) / 1000);
+                var diff_time = parseInt(end_time - curr_time);// 倒计时时间差
+                vm.c_h = wxapp.fillzero(Math.floor(diff_time / 3600));
+                vm.c_m = wxapp.fillzero(Math.floor((diff_time / 60 % 60)));
+                vm.c_s = wxapp.fillzero(Math.floor((diff_time % 60)));
+                if (diff_time <= 0) {
+                    vm.c_h = '00';
+                    vm.c_m = '00';
+                    vm.c_s = '00';
+                }
+            },
+            init: function () {
+                $.post(config.jincheng, {}, function (ret) {
+                    if (ret) {
+                        vm.info = ret.data;
+                        vm.$nextTick(function () {
+                            vm.swiperInit();
+                        });
+                    }
+                }, 'json');
+            },
+            swiperInit: function () {
+                setTimeout(function () {
+                    new Swiper('#slider', {
+                        autoplay: 3000,
+                        visibilityFullFit: true,
+                        loop: true,
+                        pagination: '.swiper-pagination',
+                        paginationClickable: true
+                    });
+                }, 200);
+            },
+            openGoodsdetail: function (goods_id) {
+                if (vm.miniapp == 1) {
+                    wx.miniProgram.navigateTo({
+                        url: '/pages/goods/index?goods_id=' + goods_id
+                    });
+                } else {
+                    api.openWin({
+                        name: 'goodsdetail_win',
+                        url: 'widget://html/goodsdetail_win.html',
+                        pageParam: {
+                            goods_id: goods_id
+                        }
+                    });
+                }
+            },
+            openCategory: function (cat_id) {
+                if (vm.miniapp == 1) {
+                    wx.miniProgram.navigateTo({
+                        url: '/pages/category/list?cat_id=' + cat_id
+                    });
+                } else {
+                    api.openWin({
+                        name: 'goodslist_win',
+                        url: 'widget://html/goodslist_win.html',
+                        pageParam: {
+                            goods_id: goods_id
+                        }
+                    });
+                }
+            },
+            searchInit: function () {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        keywords: vm.keywords
+                    }
+                });
+            },
+            adLink: function (link) {
+                wapAdLink(link);
+            },
+        },
+    });
+    window.onload = function () {
+        var pageparm = getUrlPageparm();
+        if (pageparm.token) {
+            $api.setStorage('token', pageparm.token);
+            vm.miniapp = pageparm.miniapp;
+        }
+        vm.init();
+    };
+</script>

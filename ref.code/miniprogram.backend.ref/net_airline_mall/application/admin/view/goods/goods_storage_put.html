@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>
+    .warpper .content {
+        padding: 20px 30px;
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="content">
+        <div class="explanation mb10" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>展示了商城商品入库/出库的操作日志。</li>
+                <li>可以按照时间段筛选、商品名称关键字搜索，查看具体商品入库/出库日志。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="label_txt fl" style="line-height: 30px;">时间：</div>
+                    <div class="text_time" id="text_time_start">
+                        <input type="text" class="text" name="start_time" value="" id="start_time">
+                    </div>
+                    <span class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                    <div class="text_time" id="text_time_end" style="margin-right: 20px;">
+                        <input type="text" class="text" name="end_time" value="" id="end_time">
+                    </div>
+                    <div class="input">
+                        <input type="text" name="keyword" v-model="keywords" class="text nofocus" placeholder="商品名称"
+                               autocomplete="off" @keyup.enter="secrchInit()">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%" class="sign">
+                                <div class="tDiv">
+                                    <input type="checkbox" name="all_list" class="checkbox" id="all_list"/>
+                                    <label for="all_list" class="checkbox_stars"></label>
+                                </div>
+                            </th>
+                            <th width="5%">
+                                <div class="tDiv">编号</div>
+                            </th>
+                            <th width="30%">
+                                <div class="tDiv">商品名称</div>
+                            </th>
+                            <th width="15%">
+                                <div class="tDiv">商品属性</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">订单号</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">库存</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">库存类型</div>
+                            </th>
+                            <th width="20%">
+                                <div class="tDiv">操作信息</div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td class="sign">
+                                    <div class="tDiv">
+                                        <input type="checkbox" name="checkboxes[]" :value="vo.id"
+                                               class="checkbox" :id="'checkboxitem'+vo.id">
+                                        <label :for="'checkboxitem'+vo.id" class="checkbox_stars"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv goods_list_info">
+                                        <div class="img">
+                                            <a :href="'/home/goods/detail?id='+vo.goods_id" target="_blank">
+                                                <img :src="imgs[vo.goods_id]" :alt="vo.goods_name" width="68" height="68">
+                                            </a>
+                                        </div>
+                                        <div class="desc">
+                                            <div class="name"><a><span class="span">{{vo.goods_name}}</span></a></div>
+
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.goods_spec}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.order_sn}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.stock}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv"></div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        {{vo.username}}<br>
+                                        {{vo.ctime}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="tfoot_btninfo">
+                                        <input type="submit" value="删除" id="btnSubmit"
+                                               name="btnSubmit" shoptype="btnSubmit" class="btn btn_disabled"
+                                               disabled="disabled" @click="doalldelete()">删除
+                                    </div>
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+            imgs: {},
+            ids: [],
+        },
+        methods: {
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            init: function () {
+                let param = {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords
+                };
+                let start = $('#start_time').val();
+                let end = $('#end_time').val();
+                if (start) param.start_time = start;
+                if (end) param.end_time = end;
+                $.post('/admin/goods/goods_storage_put', param, function (ret) {
+                    vm.list = ret.list;
+                    vm.count = ret.total;
+                    vm.imgs = ret.imgs;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                });
+            },
+            doalldelete: function () {
+                let arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/admin/goods/goods_storage_del',
+                            data: {ids: vm.ids},
+                            success: function (data) {
+                                vm.pageFreash();
+                                $(".list-div input[type='checkbox']").each(function () {
+                                    $(this).attr('checked', false);
+                                });
+                                $(".list-div tbody").removeClass('tr_bg_org');
+                            },
+                            error: function (xhr, type) {
+                                $.messager.alert('提示', xhr.responseJSON, 'warning');
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    });
+    $(function () {
+        $('#start_time').datetimebox({
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            showSeconds: false
+        });
+
+        vm.init();
+    });
+</script>
+</body>
+</html>

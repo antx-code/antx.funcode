@@ -1,0 +1,76 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+
+<div class="content article-content">
+    <div class="article-search-hd mb20">
+        <div class="w w1200">
+            <div class="hd-tit">文档帮助中心</div>
+            <div class="hd-search">
+                <form action="/home/article/index" name="search_form" method="post" class="article_search">
+                    <div class="f-search">
+                        <input name="keywords" type="text" id="requirement" value="" class="text" placeholder="请填写搜索内容">
+                        <a href="javascript:void(0);" class="ui-btn-submit" shoptype="searchSubmit">
+                            <i class="iconfont icon-search"></i>搜索
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="w w1200 clearfix">
+        <div class="article-side">
+            <dl class="article-menu">
+                <dt class="am-t"><a href="javascript:void(0);">目录</a></dt>
+                <dd class="am-c">
+                    {volist name="list" id="vo"}
+                    {if count($vo.childrenList)}
+                    <div class="menu-item">
+                        <div class="item-hd"><a href="javascript:">{$vo.cat_name}</a>
+                            <i class="iconfont {if $vo.cat_id==$info.cat_id || in_array($info.cat_id,array_column($vo.childrenList,'cat_id'))}icon-down{else /}icon-up{/if}"></i>
+                        </div>
+                        <ul class="item-bd {if $vo.cat_id==$info.cat_id || in_array($info.cat_id,array_column($vo.childrenList,'cat_id'))}{else/}hidden{/if}">
+                            {volist name="vo['childrenList']" id="vo2"}
+                            <li><a href="/home/article/content?article_id={$vo2.article_id}">{$vo2.title} </a></li>
+                            {/volist}
+                        </ul>
+                    </div>
+                    {/if}
+                    {/volist}
+                </dd>
+            </dl>
+        </div>
+        {if $info}
+        <div class="article-main">
+            <div class="am-hd">
+                <h2>{$info.cat_name}</h2>
+            </div>
+            <div class="am-bd">
+                <ul class="artilce-list">
+                    {volist name="info.articleList" id="vo"}
+                    <li>
+                        <h3><a href="/home/article/content?article_id={$vo.article_id}" title="{$vo.title}">{$vo.title}</a></h3>
+                        <p></p>
+                    </li>
+                    {/volist}
+                </ul>
+            </div>
+        </div>
+        {else /}
+        <div class="article-main">
+            <div class="am-hd">
+                <h2>暂时没有相关文档</h2>
+            </div>
+        {/if}
+    </div>
+</div>
+
+<script>
+    $(function(){
+        $("[shoptype='searchSubmit']").on("click",function(){
+            $(this).parents("form").submit();
+        });
+    });
+</script>
+{include file='public/footer'}

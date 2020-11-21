@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span></div>
+            <ul>
+                <li>活动规则：团购活动时间内，根据后台设置的价格阶梯，买家先支付保证金，根据商家评判标准决定活动是否成功，如果成功，买家根据阶梯价格支付尾款；如果失败，已支付保证金退回买家账户。</li>
+            </ul>
+        </div>
+    </div>
+
+    <template v-if="gid==0">
+        <div class="cboxContent">
+            <div class="pb-bd">
+                <div class="pb-ct">
+                    <div class="sku_goods_info">
+                        <div class="warehouse_item">
+                        <span class="item">
+                            <span class="tit"></span>
+                            <div class="search mt0">
+                                <div class="input">
+                                    <input v-model="keywords" class="text nofocus w200" placeholder="商品名称" type="text">
+                                    <button type="button" class="btn pro_btn" name="secrch_btn" @click="secrchInit()"></button>
+                                </div>
+                                <div class="refresh" @click="pageFreash()">
+                                     <div title="刷新数据" class="refresh_tit"><i class="icon icon-refresh"></i></div>
+                                     <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                                </div>
+                            </div>
+                        </span>
+                        </div>
+                        <div class="common-content">
+                            <div class="list-div" id="listDiv">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th width="40%">商品名称</th>
+                                        <th width="10%">店铺价格</th>
+                                        <th width="10%">操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <template v-for="(vo,index) in list">
+                                        <tr>
+                                            <td>{{vo.goods_name}}</td>
+                                            <td>{{vo.shop_price}}</td>
+                                            <td>
+                                                <template v-if="vo.eid>0">
+                                                    <a href="javascript:void(0)" class="btn_trash" @click="doupdate(index)">
+                                                        <i class="icon icon-save"></i>
+                                                        提交
+                                                    </a>
+                                                </template>
+                                                <template v-else>
+                                                    <a href="javascript:void(0)" class="btn_trash" @click="pageparmInit(index)">
+                                                        <i class="icon icon-plus"></i>
+                                                        添加
+                                                    </a>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="12">
+                                            <div class="list-page">
+                                                <div id="turn-page"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <div class="common-content">
+        <div class="mian-info">
+            <div class="switch_info">
+                <div class="items">
+                    <div class="item">
+                        <div class="label">商品名称：</div>
+                        <div class="label_value">
+                            <input type="text" name="goods_name" v-model="info.goods_name" class="text" disabled>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">团购价格：</div>
+                        <div class="label_value">
+                            <input type="number" name="goods_name" v-model="info.shop_price" class="text">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>活动起止时间：</div>
+                        <div class="label_value">
+                            <div class="text_time" id="text_time_start">
+                                <input type="text" name="start_time" id="start_time" class="text mr0">
+                            </div>
+                            <span class="bolang">~~</span>
+                            <div class="text_time" id="text_time_end">
+                                <input type="text" name="end_time" id="end_time" class="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">限购数量：</div>
+                        <div class="label_value">
+                            <input type="text" name="restrict_amount" v-model="info.restrict_amount" class="text" >
+                            <div class="notic">达到此数量，团购活动自动结束。0表示没有数量限制。</div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">赠送积分数：</div>
+                        <div class="label_value">
+                            <input type="text" name="gift_integral" v-model="info.gift_integral" class="text" >
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>价格阶梯：</div>
+                        <div class="label_value">
+                            <table class="table_div table_heng">
+                                <tbody>
+                                    <tr class="first_tr">
+                                        <td class="first_td">数量达到</td>
+                                        <td class="first_td">享受价格</td>
+                                        <td class="last_td" rowspan="1">
+                                            <a href="javascript:void(0);" class="addTd" @click="extinfoAdd()"></a>
+                                        </td>
+                                    </tr>
+                                    <template v-for="(vo,index) in info.ext_info">
+                                        <tr class="first_tr">
+                                            <td><input type="text" v-model="vo.num"  class="text w150" ></td>
+                                            <td><input type="text" v-model="vo.price"  class="text w150" ></td>
+                                            <td class="last_td" rowspan="1"></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">活动说明：</div>
+                        <div class="label_value">
+                            <textarea v-model="info.group_desc" cols="40" rows="3" class="textarea"></textarea>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">新品：</div>
+                        <div class="label_value step_goods_service">
+                            <div class="switch switch_2 " title="是" :class="{'active':info.is_new==1}">
+                                <div class="circle"></div>
+                            </div>
+                            <input type="hidden" value="" name="is_new" v-model="info.is_new">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">热销：</div>
+                        <div class="label_value step_goods_service">
+                            <div class="switch switch_2 " title="是" :class="{'active':info.is_hot==1}">
+                                <div class="circle"></div>
+                            </div>
+                            <input type="hidden" value="" name="is_hot" v-model="info.is_hot">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" name="submit" value=" 确定 " class="button" @click="doadd()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var gid = '{$gid}';
+    var ext_info_item = {num:0,price:0.00};
+
+    var infotemp = '';
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            gid: gid,
+            page: 1,
+            rows: 5,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            info: info,
+        },
+        methods: {
+            extinfoAdd:function(){
+                vm.info.ext_info.push(JSON.parse(JSON.stringify(ext_info_item)))
+            },
+            pageparmInit:function(index){
+                vm.info.goods_id = vm.list[index].goods_id;
+                vm.info.goods_name= vm.list[index].goods_name;
+            },
+            doupdate:function(index){
+                majax('/admin/market/doupdate', vm.list[index],'exchange_goods')
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 5;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 5;
+                vm.count = 0;
+                vm.init();
+            },
+            doadd:function(){
+                vm.info.start_time = moment($('#start_time').datetimebox('getValue')).unix();;
+                vm.info.end_time = moment($('#end_time').datetimebox('getValue')).unix();;
+                vm.info.is_new = $("input[name=is_new]").val();
+                vm.info.is_hot = $("input[name=is_hot]").val();
+                var url = '';
+                if(gid > 0){
+                    url ='/admin/market/doupdate';
+                }else{
+                    url ='/admin/market/doadd';
+                }
+                $.post(url, {
+                    pageparm: JSON.stringify(vm.info),
+                    table: 'group_goods'
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.pageFreash();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            init: function () {
+                $.post('/admin/market/groupgoodsadd', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    gid: vm.gid,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        $('#start_time').datetimebox({
+            value: info.start_time_cn?info.start_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            value: info.end_time_cn?info.end_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+    });
+</script>
+
+
+
+
+
+

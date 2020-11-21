@@ -1,0 +1,73 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+{include file='public/right_bar'}
+<style>.brand-list li .img img {width: 200px;height: 88px;}</style>
+<div class="content">
+    <div class="banner brand-banner">
+        <div class="w w1200 relative">
+            <div class="brand-banner-wp">
+                <a href="https://www.hngpmall.com/" target="_blank">
+                    <img src="/public/static/theme/images/1490573204950514231.png" width="1920" height="300">
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="brand-main" shoptype="brandMain">
+        <div class="w w1200">
+            <div class="brand-cate" shoptype="brandCate">
+                <a href="{:url('home/index/brand',['cat_id'=>0])}" class="{if $cat_id==0}curr{/if}" data-catid="0" shoptype="cateItem">全部分类</a>
+                {volist name="categoryListTemp" id="ob"}
+                <i class="point">·</i><a href="{:url('home/index/brand',['cat_id'=>$ob.cat_id])}" class="{if $cat_id==$ob.cat_id}curr{/if}">{$ob.cat_name}</a>
+                {/volist}
+            </div>
+            {volist name="categoryList" id="ob"}
+
+            <div class="brand-title"><span>{$ob.cat_name}</span></div>
+            <div class="brand-list" shoptype="brandList">
+                <ul shoptype="items">
+                    {volist name="ob.list" id="vo"}
+                    {if $vo['brand_id']>0}
+                    <li>
+                        <a href="{:url('category/catgoodslist',['brand_id'=>$vo.brand_id])}" class="img"
+                           target="_blank">
+                            <img src="{if $vo.brand_logo}{$vo.brand_logo}{else /}/public/static/images/brand_defalut.jpg{/if}"
+                                 alt="">
+                            <div class="brand_desc brand_desc_notic">
+                                <div class="tit">品牌描述</div>
+                                {if $vo.brand_desc}
+                                <div class="info"><p>{$vo.brand_desc}</p></div>
+                                {else /}
+                                <div class="info"><p>暂无描述</p></div>
+                                {/if}
+                            </div>
+                            <div class="mask"></div>
+                        </a>
+                        <div class="slogan">{$vo.brand_name}</div>
+                    </li>
+                    {/if}
+                    {/volist}
+
+                </ul>
+            </div>
+
+            {/volist}
+        </div>
+    </div>
+    <input type="hidden" name="user_id" value="0">
+</div>
+
+<div class="rTop" shoptype="rTop" style="right: 321.5px; top: 504px;"><img src="/public/static/theme/images/returnTop.png"></div>
+{include file='public/footer'}
+
+<script type="text/javascript" src="__THEME__/js/asyLoadfloor.js"></script>
+<script type="text/javascript">
+    $.scrollTop("*[shoptype='brandList']", "*[shoptype='rTop']");
+    /**
+    $.scrollLoad("*[shoptype='brandMain']", "*[shoptype='brandList'] *[shoptype='items']", "li", {
+        url: '/home/index/brand',
+        data: 'act=load_more_brand'
+    })
+    **/
+</script>

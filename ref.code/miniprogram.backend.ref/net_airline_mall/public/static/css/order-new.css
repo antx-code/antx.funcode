@@ -1,0 +1,62 @@
+/*html{ background: #fff; }
+body{ width: 1374px; margin: 0 auto; }
+body.iframe_body {width: 100%; overflow-x: hidden; background: #fff;}
+.warpper{ width: 970px; }
+.admin-main{ width: 1377px; }
+.admin-main-right{ width: 1170px; }*/
+
+
+
+.order_state_tab_2{border-bottom: 2px solid #E8E8E8;}
+.order_state_tab_2 a{ font-weight: 700; position: relative; margin-right: 0 height: 34px; border: 0 none; }
+.order_state_tab_2 a em{ display: none; }
+.order_state_tab_2 a:after{ content: ""; width: 0; height: 14px; border-right: 1px solid #E8E8E8; position: absolute; right: 0; top: 50%; margin-top: -7px; }
+.order_state_tab_2 a.current{ border-bottom: 2px solid #ff6000; color: #ff6000; }
+
+
+.list-tb-div a{ color: #3366CC; }
+.list-tb-div table{ margin-bottom: 5px; }
+.list-tb-div table:hover { border: 1px solid #bfbfbf; }
+.list-tb-div thead{ border: 1px solid #ddd; }
+.list-tb-div th{ border-top: 0 none; border-bottom: 0 none; background: #f0f0f0; font-weight: 100; color: #3C3C3C; }
+.list-tb-div th .tDiv{ padding: 0; text-align: center; }
+.list-tb-div th.sign .tDiv{ text-align: left; padding-left: 10px; }
+.list-tb-div td{ border: 1px solid #ECECEC;}
+.list-tb-div td .tDiv {padding: 10px; text-align: center; word-break: break-all;}
+.list-tb-div .tr_bg_blue td{ background: #fff; }
+.list-tb-div .tr-order-sn td{ background: #EAF8FF; }
+.list-tb-div .tr-order-sn .tDiv{ text-align: left; padding: 0;}
+.list-tb-div .tr-order-sn .sign{ vertical-align: middle; }
+.list-tb-div .tr-order-sn .words{ margin-right: 15px; }
+.list-tb-div .tr_bg_org td,
+.list-tb-div .tr_bg_org + tr td{ background: #fffef4; }
+/*.list-tb-div .td-product{ border-right: 0 none; }
+.list-tb-div .td-price{ border-left: 0 none; border-right: 0 none;}
+.list-tb-div .td-number{ border-left: 0 none; }*/
+.list-tb-div .td-product .img{ float: left; width: 80px; height: 80px; }
+.list-tb-div .td-product .product-info{ padding-left: 90px; text-align: left; }
+.list-tb-div .td-product .product-info .name a{ color: #333; max-height: 36px; overflow: hidden; display:block;}
+.list-tb-div .td-product .product-info .name a:hover{ color: #ff6000; }
+.list-tb-div .td-product .product-info .attr{ color: #9e9e9e;}
+.list-tb-div .td-product .product-info .attr span{ margin-right: 5px; }
+.list-tb-div .order-price,
+.list-tb-div .order-price em{font-family: verdana; font-weight: 700; color: #3C3C3C;}
+.list-tb-div .price-shipping{ margin: 2px 0; }
+.list-tb-div .price-tag span{ display: inline-block; box-sizing: border-box; height: 16px; line-height: 14px; font-family: '宋体', sans-serif; font-size: 12px; border: 1px solid #5CB8E7; color: #fff; padding: 0 2px; background: #98D3F0; text-shadow: 0 1px 1px #429ac5; border-radius: 2px;
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ade0f6+0,5aa3cf+100 */
+background: rgb(173,224,246); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(173,224,246,1) 0%, rgba(90,163,207,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, rgba(173,224,246,1) 0%,rgba(90,163,207,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, rgba(173,224,246,1) 0%,rgba(90,163,207,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ade0f6', endColorstr='#5aa3cf',GradientType=0 ); /* IE6-9 */}
+.list-tb-div .btn-wrap{ display: block; margin-top: 5px; }
+.list-tb-div .btn-tb{ display: inline-block; height: 28px; line-height: 28px; border-radius: 3px; font-weight: 700; text-align: center; padding: 0 12px; font-size: 12px; cursor: pointer; box-sizing:border-box; }
+.list-tb-div .btn-tb-blue{color: #fff; background: #66B6FF; }
+.list-tb-div .btn-tb-blue:hover{ background: #5caef9; }
+.list-tb-div .btn-tb-red{color: #fff; background: #ff3f3e; }
+.list-tb-div .btn-tb-red:hover{ background: #ff3f3e; }
+.list-tb-div .btn-tb-default{ background-color: #fff; border: 1px solid #dcdcdc; color: #3c3c3c; }
+.list-tb-div .btn-tb-default:hover{ border-color: #ff1d00; color: #ff1d00;}
+
+.tpinfo{ min-height: 100px; border-bottom: 1px solid #ececec; }
+.tpinfo.last{ border-bottom: 0 none; }

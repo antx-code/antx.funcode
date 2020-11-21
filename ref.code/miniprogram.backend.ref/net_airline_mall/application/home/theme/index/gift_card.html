@@ -1,0 +1,518 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+{include file='public/right_bar'}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font: 12px/150% tahoma, arial, Microsoft YaHei, Hiragino Sans GB, "\u5b8b\u4f53", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        color: #666;
+        background-color: #f5f5f5;
+        position: relative;
+    }
+
+    .w {
+        width: 1210px;
+        margin: 0 auto;
+    }
+
+    .e-cards {
+        margin-top: 20px;
+        height: 495px;
+        background-color: #fff;
+        overflow: hidden;
+        zoom: 1;
+    }
+
+    .cards-left {
+        width: 280px;
+        height: 200px;
+        margin-left: 66px;
+        position: relative;
+        float: left;
+        margin-top: 46px;
+    }
+
+    .cards-value {
+        position: absolute;
+        bottom: 45px;
+        left: 25px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .cards-num {
+        font-size: 40px;
+        font-family: impact;
+    }
+
+    .cards-unit {
+        font-size: 20px;
+    }
+
+    .cards-right {
+        width: 730px;
+        height: 215px;
+        margin-left: 70px;
+        float: left;
+        margin-top: 46px;
+    }
+
+    .recommend-name {
+        width: 75px;
+        float: left;
+        text-align: right;
+        line-height: 36px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .recommend-cont {
+        float: left;
+        list-style: none;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .cards-recommend,
+    .card-value,
+    .cards-count,
+    .cards-btn {
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .recommend-cont li {
+        margin-left: 15px;
+        float: left;
+        width: 86px;
+        border: 1px solid #ddd;
+        cursor: pointer;
+        text-align: center;
+        line-height: 36px;
+    }
+
+    .recommend-cont .recommend-current {
+        position: relative;
+        height: 34px;
+        border: 2px solid #c81d22;
+    }
+
+    .recommend-current i {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 12px;
+        height: 12px;
+        background: url(https://misc.360buyimg.com/user/o/5.0.0/css/i/select-icon.png) no-repeat;
+    }
+
+    em {
+        font-style: normal;
+    }
+
+    .cards-inp {
+        margin-left: 15px;
+        padding-left: 10px;
+        width: 279px;
+        height: 36px;
+        background-color: transparent;
+        outline: 0;
+        border: 1px solid #ddd;
+    }
+
+    .cards-count .count {
+        margin-left: 15px;
+        float: left;
+        width: 110px;
+        height: 36px;
+        border: 1px solid #ddd;
+    }
+
+    .minus,
+    .add {
+        width: 34px;
+        cursor: pointer;
+        float: left;
+        text-align: center;
+        margin-top: 9px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .num {
+        width: 38px;
+        border-style: none;
+        background-color: transparent;
+        outline: 0;
+        float: left;
+        text-align: center;
+        margin-top: 9px;
+    }
+
+    .cards-btn {
+        margin-left: 90px;
+    }
+
+    .cards-btn a {
+        width: 110px;
+        height: 100%;
+        display: block;
+        float: left;
+        text-align: center;
+        line-height: 36px;
+        border: 2px solid #e62634;
+        border-radius: 30px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .cards-btn a:hover {
+        color: #fff;
+        background-color: #e6000d;
+    }
+
+    .buy-list {
+        background-color: #e62634;
+        color: #fff;
+    }
+
+    .cards-banner img {
+        width: 100%;
+    }
+
+    .payOrder-list {
+        float: left;
+        margin-left: 15px;
+        overflow: hidden;
+    }
+
+    .p-mode-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .p-mode-item {
+        float: left;
+        width: 178px;
+        height: 60px;
+        border: 1px solid #d2d2d2;
+        text-align: center;
+        position: relative;
+        margin: 0 12px 12px 0;
+    }
+
+    .p-mode-item.item-selected {
+        border: 1px solid #24be00;
+    }
+
+    .p-mode-item img {
+        vertical-align: middle;
+        display: inline-block;
+        width: 30%;
+    }
+
+    .p-mode-item .pay-name {
+        max-width: 70%;
+        overflow: hidden;
+        font-size: 20px;
+        font-weight: bold;
+        margin-left: 5px;
+        line-height: 20px;
+    }
+
+    .p-mode-item.item-selected b {
+        display: block;
+    }
+
+    .p-mode-item b {
+        position: absolute;
+        background: url(/public/static/theme/images/shop-icon.png) 0 -50px no-repeat;
+        right: 0;
+        bottom: 0;
+        width: 20px;
+        height: 20px;
+        display: none;
+    }
+
+    #qr-pay-div {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, .7);
+        align-items: center;
+        justify-content: center;
+        top: 0;
+        z-index: 9999;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .flex {
+        display: flex;
+    }
+
+    .pay-box {
+        width: 560px;
+        height: 420px;
+        background: #FFF;
+        padding: 25px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    #left {
+        width: 200px;
+        height: 180px;
+        padding-top: 100px;
+        background: url(__THEME__/images/icon-pay.png) 50px 0 no-repeat;
+    }
+
+    #right {
+        width: 200px;
+        height: 180px;
+        padding-top: 100px;
+        background: url(__THEME__/images/icon-pay.png) -220px 0 no-repeat;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    .btn-block {
+        padding: 0 10%;
+    }
+
+    .btn-block button {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    #qr-img {
+        width: 150px;
+        height: 150px;
+    }
+</style>
+<div class="w">
+    <div class="cards-banner">
+        <img src="{$banner}">
+    </div>
+    <div class="e-cards">
+        <div class="cards-left">
+            <div class="cards-bg">
+                <img width="280" height="200" src="https://img13.360buyimg.com/cms/jfs/t1/10383/26/9258/6826/5c3e9d8bE8fe6c345/c5eae008d69b19c3.jpg">
+                <div class="cards-value">
+                    <span class="cards-num">100</span>
+                    <span class="cards-unit">元</span>
+                </div>
+            </div>
+        </div>
+        <div class="cards-right">
+            <div class="cards-recommend">
+                <span class="recommend-name">推荐面值：</span>
+                <ul class="recommend-cont">
+                    <li class="recommend-current">
+                        <span><em>100</em></span>
+                        <i></i>
+                    </li>
+                    <li>
+                        <span><em>200</em></span>
+                        <i></i>
+                    </li>
+                    <li>
+                        <span><em>500</em></span>
+                        <i></i>
+                    </li>
+                    <li>
+                        <span><em>1000</em></span>
+                        <i></i>
+                    </li>
+                    <li>
+                        <span><em>2000</em></span>
+                        <i></i>
+                    </li>
+                    <li>
+                        <span><em>5000</em></span>
+                        <i></i>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-value">
+                <span class="recommend-name">其它面值：</span>
+                <input class="cards-inp" placeholder="10-5000的整数" type="number" min="10" max="5000" required>
+            </div>
+            <div class="cards-count">
+                <span class="recommend-name">数量：</span>
+                <div class="count">
+                    <span class="minus">-</span>
+                    <input class="num" value="1">
+                    <span class="add">+</span>
+                </div>
+            </div>
+            <div class="cards-count">
+                <span class="recommend-name">在线支付：</span>
+                <div class="payOrder-list">
+                    <div class="p-mode-item item-selected" data-code="2">
+                        <img src="http://mallscsj.oss-cn-beijing.aliyuncs.com//upload/return_goods/20181115/HHah7C7j7f.png">
+                        <span class="pay-name">微信支付</span>
+                        <b></b>
+                    </div>
+                    <div class="p-mode-item" data-code="1">
+                        <img src="http://mallscsj.oss-cn-beijing.aliyuncs.com//upload/return_goods/20181115/kM7R5KBBZ6.png">
+                        <span class="pay-name">支付宝</span>
+                        <b></b>
+                    </div>
+                </div>
+            </div>
+            <div class="cards-btn">
+
+                <a onclick="pay()" class="buy-list">立即购买</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="qr-pay-div">
+    <div class="pay-box center">
+        <h3>请打开手机微信,使用扫一扫功能完成付款!</h3>
+        <div class="center gray">付款完成前请不要关闭此窗口.完成付款后请根据您的情况点击下面的按钮.</div>
+        <div class="flex">
+            <div id="left" class="center">
+                支付完成<br><br>
+                <a class="sc-btn sc-redBg-btn" onclick="queryStatus()">支付完成</a>
+            </div>
+            <div class="center">
+                <img src="" alt="微信支付" id="qr-img" class="mt30">
+            </div>
+            <div id="right" class="center">
+                支付遇到问题<br><br>
+                <a class="sc-btn sc-org-btn" onclick="rePay()">支付失败</a>
+            </div>
+        </div>
+        <div class="btn-block">
+            <button type="button" class="sc-btn sc-org-btn" onclick="rePay()">返回选择其他支付方式</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let beforRequest = false, time = 30, timer, order_sn;
+    $('.recommend-cont li').on('click', function () {
+        let amount = $(this).find('span em').html();
+        $('.cards-value .cards-num').html(amount);
+        $('.cards-inp').val(0);
+        $(this).addClass('recommend-current').siblings().removeClass('recommend-current');
+    });
+    $('input.cards-inp').blur(function () {
+        let cards_num = $('.cards-value .cards-num');
+        let amount = parseInt(this.value);
+        if (amount < 10) {
+            this.value = 10;
+        } else if (amount > 5000) {
+            this.value = 5000;
+        }
+        cards_num.html(this.value);
+    });
+    $('.count .minus').on('click', function () {
+        let input = $(this).parent().find('input.num');
+        if (parseInt(input.val()) == 1) {
+            return;
+        }
+        input.val(parseInt(input.val()) - 1);
+    });
+    $('.count .add').on('click', function () {
+        let input = $(this).parent().find('input.num');
+        if (parseInt(input.val()) > 10000) {
+            return;
+        }
+        input.val(parseInt(input.val()) + 1);
+    });
+    $('.p-mode-item').on('click', function () {
+        $(this).addClass('item-selected').siblings().removeClass('item-selected');
+    });
+
+    function pay() {
+        if (!parseInt(user_id)) {
+            $.notLogin();
+            return;
+        }
+        let amount = parseInt($('.cards-value .cards-num').html());
+        let num = $('.cards-count input.num').val();
+        let pay_code = $('.p-mode-item.item-selected').data('code');
+        if (parseInt(pay_code) == 1) {
+            location.href = '/home/cart/gift_card?amount=' + amount + '&num=' + num + '&pay_code=' + pay_code;
+            return;
+        }
+        layer.load(1);
+        $.ajax({
+            type: 'POST',
+            url: '/home/cart/gift_card',
+            data: {amount: amount, num: num, pay_code: pay_code},
+            success: function (data) {
+                layer.closeAll();
+                if (parseInt(pay_code) == 2) {
+                    order_sn = data.order_sn;
+                    $('#qr-img').attr('src', '/api/common/qrcodePay?str=' + data.result);
+                    $('#qr-pay-div').css('display', 'flex');
+                    $(document.body).css({
+                        "overflow-y": "hidden"
+                    });
+                    timer = setInterval(function () {
+                        queryStatus();
+                        time--;
+                    }, 1000);
+                }
+            },
+            error: function (xhr, type) {
+                layer.closeAll();
+                layer.msg(xhr.responseJSON);
+            }
+        });
+    }
+
+    function rePay() {
+        $('#qr-pay-div').hide();
+        $(document.body).css({
+            "overflow-y": "auto"
+        });
+        clearInterval(timer);
+        time = 300;
+    }
+
+    function queryStatus() {
+        if (beforRequest) {
+            return;
+        }
+        if (time < 1) {
+            clearInterval(timer);
+        }
+        let pay_code = $('.p-mode-item.item-selected').data('code');
+        pay_code = parseInt(pay_code) == 1 ? 'alipay' : 'weixin';
+        beforRequest = true;
+        $.ajax({
+            type: 'POST',
+            url: '/home/payment/queryGiftCard.html',
+            data: {order_sn: order_sn, pay_code: pay_code},
+            success: function (data) {
+                beforRequest = false;
+                if (data.pay_status == 1) {
+                    location.href = '/home/member/giftcard.html';
+                }
+            }
+        });
+    }
+</script>
+{include file='public/footer'}

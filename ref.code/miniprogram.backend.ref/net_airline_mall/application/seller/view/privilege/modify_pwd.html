@@ -1,0 +1,103 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">修改密码</a></li>
+    </ul>
+</div>
+
+<div class="ecsc-form-goods">
+    <div class="wrapper-list border1">
+        <dl>
+            <dt><span class="require-field">*</span>&nbsp;用户名：</dt>
+            <dd>
+                <input type="text" value="{$username}" class="text" readonly>
+                <div class="form_prompt"></div>
+            </dd>
+        </dl>
+        <dl>
+            <dt><span class="require-field">*</span>&nbsp;Email地址：</dt>
+            <dd>
+                <input type="text" id="email" value="{$email}" class="text">
+                <div class="form_prompt"></div>
+            </dd>
+        </dl>
+        <dl>
+            <dt><span class="require-field">*</span>&nbsp;新密码：</dt>
+            <dd class="relative">
+                <i class="sc_icon_see" id="eye" style="background: url(/public/static/images/seller/login_icon.png) no-repeat;width: 15px;height:15px;display: inline-block;background-position: -79px -62px;padding:7px;position: absolute;left:291px;"></i>
+                <input type="password" class="text ignore" id="password">
+                <div class="form_prompt"></div>
+            </dd>
+        </dl>
+        <dl>
+            <dt><span class="require-field">*</span>&nbsp;确认密码：</dt>
+            <dd>
+                <input type="password" id="pwd_confirm" class="text ignore">
+                <div class="form_prompt"></div>
+            </dd>
+        </dl>
+
+        <dl class="button_info">
+            <dt>&nbsp;</dt>
+            <dd>
+                <input type="button" value=" 确定 " class="sc-btn sc-blueBg-btn btn35" id="submitBtn">
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<script>
+    $('#eye').on('click', function () {
+        var obj = document.getElementById('password');
+        obj.type = obj.type == 'password' ? 'text' : 'password';
+    });
+    $('#submitBtn').on('click', function () {
+        var email = $('#email');
+        var pwd = $('#password');
+        var cfm_pwd = $('#pwd_confirm');
+        var err_div;
+        if (email.val().length && !(/^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/.test(email.val()))) {
+            err_div = email.parent().find('div.form_prompt');
+            err_div.find("label").remove();
+            email.addClass('error').focus().bind('change', function () {
+                $(this).removeClass('error').parent().find('div.form_prompt').find('label').remove();
+            });
+            err_div.append("<label class='error'><i class='icon icon-exclamation-sign'></i>邮箱格式不正确</label>");
+            return;
+        }
+        if (pwd.val().length < 6) {
+            err_div = pwd.parent().find('div.form_prompt');
+            err_div.find("label").remove();
+            pwd.addClass('error').focus().bind('change', function () {
+                $(this).removeClass('error').parent().find('div.form_prompt label').remove();
+            });
+            err_div.append("<label class='error'><i class='icon icon-exclamation-sign'></i>密码长度至少6位</label>");
+            return;
+        }
+        if (cfm_pwd.val().length < 6 || pwd.val() != cfm_pwd.val()) {
+            err_div = cfm_pwd.parent().find('div.form_prompt');
+            err_div.find("label").remove();
+            cfm_pwd.addClass('error').focus().bind('change', function () {
+                $(this).removeClass('error').parent().find('div.form_prompt label').remove();
+            });
+            err_div.append("<label class='error'><i class='icon icon-exclamation-sign'></i>两次输入密码不一致</label>");
+            return;
+        }
+        var index = layer.load(1);
+        $.ajax({
+            type: 'POST',
+            url: '/seller/privilege/modify_pwd',
+            data: {email: email.val(), password: pwd.val(), repassword: cfm_pwd.val()},
+            success: function (data) {
+                layer.close(index);
+                easyshow();
+            },
+            error: function (xhr, type) {
+                layer.close(index);
+                easyshow(xhr.responseJSON);
+            }
+        });
+
+    });
+</script>
+{include file="public/footer"}

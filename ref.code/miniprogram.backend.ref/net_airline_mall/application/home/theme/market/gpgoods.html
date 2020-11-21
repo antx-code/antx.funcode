@@ -1,0 +1,66 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+{include file='public/right_bar'}
+<div class="content">
+    <div class="act-banner">
+        <div class="banner">
+            <div class="w w1200 relative">
+                <div class="act-banner-wp">
+                    <a href="https://www.hngpmall.com/" target="_blank">
+                        <img src="https://hngpmall.oss-cn-shanghai.aliyuncs.com//upload/image/20191011/1570760674534233934.png" style="max-width:1920px; max-height:500px;">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="gb-crazy">
+        <div class="w w1200">
+            <div class="crazy-hd">
+                <h2>疯狂团购</h2>
+            </div>
+            <div class="crazy-bd">
+                <ul class="crazy-list clearfix">
+                    {volist name="list" id="vo"}
+                    <li class="mod-shadow-card">
+                        <a href="{:url('market/gpdetail',['id'=>$vo.goods_id])}" target="_blank" class="img">
+                            <img src="{$vo.original_img}" alt="{$vo.goods_name}" title="{$vo.goods_name}"></a>
+                        <p class="price">¥{$vo.shop_price}</p>
+                        <a href="{:url('market/gpdetail',['id'=>$vo.goods_id])}" target="_blank" class="name" title="{$vo.goods_name}">{$vo.goods_name}</a>
+                        <div class="lefttime" data-time="{$vo.end_time_cn}">
+                            <i class="iconfont icon-time"></i>
+                            <span>剩余时间：</span>
+                            <span class="days">00</span>
+                            <em>:</em>
+                            <span class="hours">00</span>
+                            <em>:</em>
+                            <span class="minutes">00</span>
+                            <em>:</em>
+                            <span class="seconds">00</span>
+                        </div>
+                        <a href="{:url('market/gpdetail',['id'=>$vo.goods_id])}" class="crazy-btn">立即团</a>
+                    </li>
+                    {/volist}
+                </ul>
+            </div>
+            {if $act!='all'}
+            <a href="{:url('market/gpgoods',['act'=>'all'])}" class="gb-btn-all mt10 hide">全部团购</a>
+            {/if}
+        </div>
+    </div>
+
+</div>
+{include file='public/footer'}
+
+<script type="text/javascript">
+    $(function(){
+        //倒计时
+        $(".lefttime").each(function(){
+            $(this).yomi();
+        });
+    });
+</script>
+
+
+

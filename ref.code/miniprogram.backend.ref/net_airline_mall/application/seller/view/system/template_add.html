@@ -1,0 +1,164 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">模板详情</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/system/template"><i class="icon-reply"></i>商品运费模板</a>
+</div>
+
+<div class="ecsc-form-goods">
+    <form id="transport_form">
+        <div class="wrapper-list border1">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;模板名称：</dt>
+                <dd>
+                    <input type="text" name="transport_name" class="text" autocomplete="off" value="{$template.transport_name}">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>运费标题：</dt>
+                <dd>
+                    <input type="text" name="transport_title" class="text" autocomplete="off" value="{$template.transport_title}">
+                    <div class="notic"></div>
+                </dd>
+            </dl>
+            <div id="Fixed_freight" class="">
+                <dl>
+                    <dt>计算方式：</dt>
+                    <dd>
+                        <div class="checkbox_items">
+                            <div class="checkbox_item">
+                                <input name="type" type="radio" class="ui-radio" value="0" id="type_0" checked="" autocomplete="off">
+                                <label for="type_0" class="ui-radio-label">固定费用</label>
+                            </div>
+                            <div class="checkbox_item">
+                                <input name="type" type="radio" class="ui-radio" value="1" id="type_1" autocomplete="off">
+                                <label for="type_1" class="ui-radio-label">按商品件数</label>
+                            </div>
+                            <div class="checkbox_item">
+                                <input name="type" type="radio" class="ui-radio" value="2" id="type_2" autocomplete="off">
+                                <label for="type_2" class="ui-radio-label">按重量</label>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt id="price_title">固定运费</dt>
+                    <dd>
+                        <input type="text" name="price" class="text" value="">
+                        <div class="form_prompt"></div>
+                        <div class="notic" id="price_notic">金额/kg</div>
+                    </dd>
+                </dl>
+                <dl class="notBg">
+                    <dt>物流公司：</dt>
+                    <dd>
+                        <select name="shipping_id" id="shipping_id" class="fl">
+                            <option value="0">请选择</option>
+                            {volist name="shipping" id="vo"}
+                            <option value="{$vo.shipping_id}">{$vo.shipping_name}</option>
+                            {/volist}
+                        </select>
+                        <div class="form_prompt"></div>
+                    </dd>
+                </dl>
+            </div>
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="hidden" name="transport_id" value="{$template.transport_id}">
+                    <input type="submit" value=" 确定 " class="sc-btn btn35 sc-blueBg-btn">
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+
+<script>
+    $('#transport_form').validate({
+        errorPlacement: function (error, element) {
+            var error_div = element.parents('dl').find('div.form_prompt');
+            element.parents('.formText').find(".notic").hide();
+            error_div.append(error);
+        },
+        rules: {
+            transport_name: {
+                required: true
+            },
+            price: {
+                required: true,
+                number: true
+            },
+            shipping_id: {
+                min: 1
+            },
+        },
+        messages: {
+            transport_name: {
+                required: '<i class="icon icon-exclamation-sign"></i>运费模板名称不能为空'
+            },
+            price: {
+                required: '<i class="icon icon-exclamation-sign"></i>请填写运费',
+                number: '<i class="icon icon-exclamation-sign"></i>运费必须为数字'
+            },
+            shipping_id: {
+                min: '<i class="icon icon-exclamation-sign"></i>请选择物流公司'
+            },
+        },
+        submitHandler: function (form) {
+            $.ajax({
+                type: 'POST',
+                url: '/seller/system/template_add',
+                data: $(form).serialize(),
+                success: function (data) {
+                    location.href = '/seller/system/template';
+                },
+                error: function (xhr, type) {
+                    easyshow(xhr.responseJSON);
+                }
+            });
+        }
+    });
+
+    if ('{$Think.get.shipping_id}') {
+        $('#shipping_id').val('{$Think.get.shipping_id}');
+    } else if ('{$template.shipping_id}') {
+        $('#shipping_id').val('{$template.shipping_id}');
+        $('input[name="type"][value="{$template.type}"]').attr('checked', true);
+        var price = $('input[name="price"]');
+        switch (parseInt('{$template.type}')) {
+            case 0:
+                price.val('{$template.transport_price}');
+                break;
+            case 1:
+                price.val('{$template.unit_price}');
+                break;
+            case 2:
+                price.val('{$template.kg_price}');
+                break;
+        }
+    }
+
+    $('input[name="type"]').on('change', function (e) {
+        var title = $('#price_title');
+        var text = $('#price_notic');
+        switch (parseInt(this.value)) {
+            case 2:
+                title.html('按重量计算');
+                text.html('金额/kg');
+                break;
+            case 1:
+                title.html('按件计算');
+                text.html('金额/件');
+                break;
+            default:
+                title.html('固定运费');
+                text.html('固定运费');
+        }
+    });
+</script>
+
+{include file="public/footer"}

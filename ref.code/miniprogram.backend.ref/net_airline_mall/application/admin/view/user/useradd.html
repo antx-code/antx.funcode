@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>请认真填写链接名称、链接地址等信息。</li>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info user_basic">
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            会员名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.user_name" class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            会员昵称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.nick_name" class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            会员手机：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.mobile" class="text"/>
+                        </div>
+                    </div>
+                    <template v-if="info.user_id>0">
+                        <div class="item">
+                            <div class="label">当前余额：</div>
+                            <div class="label_valuered ">
+                                <span class="blue">{{info.user_money}} 元</span>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label red">操作余额：</div>
+                            <div class="label_value">
+                                <select v-model="money_switch" style="width: 60px;float: left;height: 30px;line-height: 30px;border-right: none">
+                                    <option value="0">请选择</option>
+                                    <option value="1">增加</option>
+                                    <option value="2">减少</option>
+                                </select>
+                                <input type="number" min="0" v-model="amount" class="text red" :disabled="money_switch == 0" style="width: 240px;border-left:none;border-radius: 0 2px 2px 0;"/>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-if="!info.user_id">
+                        <div class="item">
+                            <div class="label">
+                                <span class="require-field">*</span>
+                                登录密码：
+                            </div>
+                            <div class="label_value">
+                                <input type="password" v-model="info.password" class="text easyui-validatebox" data-options="required:true"/>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="item">
+                        <div class="label">会员等级：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <template v-for="(vo,index) in rankList">
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="rank_id" :value="vo.rank_id"
+                                               :id="rank+vo.rank_id" v-model="info.rank_id">
+                                        <label :for="rank+vo.rank_id" class="ui-radio-label">{{vo.rank_name}}</label>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">性别：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="sex" id="sex_0" value="0" v-model="info.sex">
+                                    <label for="sex_0" class="ui-radio-label">保密</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="sex" id="sex_1" value="1" v-model="info.sex">
+                                    <label for="sex_1" class="ui-radio-label">男</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="sex" id="sex_2" value="2" v-model="info.sex">
+                                    <label for="sex_2" class="ui-radio-label">女</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let info = JSON.parse('{$info|raw}');
+    let infoColumn = JSON.parse('{$infoColumn|raw}');
+    let rankList = JSON.parse('{$rankList|raw}');
+    let vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+            rankList: rankList,
+            rank: 'rank_',
+            money_switch: 0,
+            amount: 0
+        },
+        methods: {
+            init: function () {
+                let data = JSON.parse(JSON.stringify(vm.info));
+                if (vm.info.user_id > 0 && vm.money_switch > 0) {
+                    if (parseFloat(vm.amount) < 0) {
+                        $.messager.alert('提示', '操作余额必须大于0元', 'warning');
+                        return;
+                    }
+                    if (vm.money_switch == 2 && parseFloat(vm.amount) > parseFloat(data.user_money)) {
+                        $.messager.alert('提示', '扣款超过余额，用户余额不能为负数', 'warning');
+                        return;
+                    }
+                    data.change_amount = vm.money_switch == 1 ? vm.amount : -1 * vm.amount;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/user/useradd',
+                    data: {pageparm: JSON.stringify(data)},
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.status) {
+                            window.parent.refreashTab();
+                        } else {
+                            $.messager.alert('提示', res.msg, 'warning');
+                        }
+                    },
+                    error: function (xhr, type) {
+                        console.log(xhr);
+                    }
+                });
+            }
+        }
+    });
+</script>
+</body>
+</html>

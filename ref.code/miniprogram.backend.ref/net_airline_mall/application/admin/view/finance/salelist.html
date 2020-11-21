@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>.stat_order_search2 {
+    padding-bottom: 0px;
+    border-bottom: 1px dashed #e6e6e6
+}</style>
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span id="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>统计所有销售统计信息。</li>
+                <li>根据订单时间、订单类型、发货状态等筛选出某个时间段的订单信息。</li>
+            </ul>
+        </div>
+        <div class="flexilist mt30">
+            <div class="common-content">
+                <div class="mian-info sale_info">
+                    <div class="switch_info">
+                        <form id="from1" name="from1">
+                            <div class="items pb30 bor_bt_das">
+                                <div class="item">
+                                    <div class="label"><em class="require-field">*</em>起始时间：</div>
+                                    <div class="label_value">
+                                        <div class="text_time" id="text_time_start">
+                                            <input type="text" class="text" name="start_time" value="" id="start_time">
+                                        </div>
+                                        <span class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                                        <div class="text_time" id="text_time_end">
+                                            <input type="text" class="text" name="end_time" value="" id="end_time">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">订单走势：</div>
+                                    <div class="label_value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="order_status" value="0" class="ui-checkbox"
+                                                       id="order_status_00">
+                                                <label for="order_status_00" class="ui-label">未确认</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="order_status" value="1" class="ui-checkbox"
+                                                       id="order_status_01">
+                                                <label for="order_status_01" class="ui-label">已确认</label>
+                                            </div>
+
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="order_status" value="4" class="ui-checkbox"
+                                                       id="order_status_05">
+                                                <label for="order_status_05" class="ui-label"><font
+                                                        color="green">已完成</font></label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="order_status" value="3" class="ui-checkbox"
+                                                       id="order_status_02">
+                                                <label for="order_status_02" class="ui-label"><font color="red">
+                                                    取消</font></label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="order_status" value="6" class="ui-checkbox"
+                                                       id="order_status_03">
+                                                <label for="order_status_03" class="ui-label"><font
+                                                        color="red">无效</font></label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="order_status" value="5" class="ui-checkbox"
+                                                       id="order_status_04">
+                                                <label for="order_status_04" class="ui-label"><font
+                                                        color="red">退货</font></label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">发货状态：</div>
+                                    <div class="label_value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="shipping_status" value="0"
+                                                       class="ui-checkbox" id="shipping_status_00">
+                                                <label for="shipping_status_00" class="ui-label">未发货</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="shipping_status" value="1"
+                                                       class="ui-checkbox" id="shipping_status_05">
+                                                <label for="shipping_status_05" class="ui-label">发货中</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="shipping_status" value="3"
+                                                       class="ui-checkbox" id="shipping_status_04">
+                                                <label for="shipping_status_04" class="ui-label">已发货(部分商品)</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="shipping_status" value="2"
+                                                       class="ui-checkbox" id="shipping_status_01">
+                                                <label for="shipping_status_01" class="ui-label">已发货</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="shipping_status" value="4"
+                                                       class="ui-checkbox" id="shipping_status_02">
+                                                <label for="shipping_status_02" class="ui-label">已完成</label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item mt20">
+                                    <div class="label">&nbsp;</div>
+                                    <div class="label_value">
+                                        <a href="javascript:void(0);" class="btn btn30 blue_btn" shoptype="query"
+                                           @click="secrchInit()"><i class="icon icon-search"></i>查询</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="query_result mt30">
+                            <div class="common-head">
+                                <div class="fl layui-hide">
+                                    <div class="fbutton m0" id="fbutton_1"><a href="javascript:void(0);">
+                                        <div class="csv " title="导出数据">
+                                            <span><i class="icon icon-download-alt"></i>导出列表</span>
+                                        </div>
+                                    </a>
+                                    </div>
+                                </div>
+                                <div class="refresh">
+                                    <div class="refresh_tit" onclick="getList(this)" title="刷新数据">
+                                        <i class="icon icon-refresh"></i>
+                                    </div>
+                                </div>
+                                <div class="refresh_span" style="position: absolute;left:50px;top: 0px;">刷新 -
+                                    共{{count}}条记录
+                                </div>
+                            </div>
+                            <div class="list-div" id="listDiv" style="position: relative">
+
+                                <table cellpadding="0" cellspacing="0" border="0">
+                                    <thead>
+                                    <tr>
+                                        <th width="10%">
+                                            <div class="tDiv">商家名称</div>
+                                        </th>
+                                        <th width="10%">
+                                            <div class="tDiv">订单号</div>
+                                        </th>
+                                        <th width="10%">
+                                            <div class="tDiv">订单总价</div>
+                                        </th>
+                                        <th width="10%">
+                                            <div class="tDiv">实付金额</div>
+                                        </th>
+                                        <th width="10%">
+                                            <div class="tDiv">支付方式</div>
+                                        </th>
+                                        <th width="10%">
+                                            <div class="tDiv">支付时间</div>
+                                        </th>
+                                        <th width="10%">
+                                            <div class="tDiv">下单时间</div>
+                                        </th>
+                                        <th width="10%">
+                                            <div class="tDiv">订单状态</div>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <template v-for="(vo,index) in list">
+                                        <tr>
+                                            <td>
+                                                <div class="tDiv">
+                                                    <template v-if="vo.store_name">{{vo.store_name}}</template>
+                                                    <template v-else><span class="red">平台自营</span></template>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="tDiv">{{vo.order_sn}}</div>
+                                            </td>
+                                            <td>
+                                                <div class="tDiv">{{vo.total_amount}}</div>
+                                            </td>
+                                            <td>
+                                                <div class="tDiv">{{vo.order_amount}}</div>
+                                            </td>
+                                            <td>
+                                                <div class="tDiv">{{vo.pay_name}}</div>
+                                            </td>
+                                            <td>
+                                                <div class="tDiv">{{vo.pay_time>0?vo.pay_time:vo.add_time|timeParse}}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="tDiv">{{vo.add_time|timeParse}}</div>
+                                            </td>
+                                            <td>
+                                                <div class="tDiv">
+                                                    <div>
+                                                        <template v-if="vo.order_status==0"><span class="red">待确认</span>
+                                                        </template>
+                                                        <template v-else-if="vo.order_status==1"><span
+                                                                class="blue3">已确认</span></template>
+                                                        <template v-else-if="vo.order_status==2"><span
+                                                                class="blue3">待评价</span></template>
+                                                        <template v-else-if="vo.order_status==3"><span
+                                                                class="navy2">已取消</span></template>
+                                                        <template v-else-if="vo.order_status==4"><span
+                                                                class="green">已完成</span></template>
+                                                        <template v-else-if="vo.order_status==5"><span
+                                                                class="navy2">退款</span></template>
+                                                        <template v-else-if="vo.order_status==6"><span
+                                                                class="navy2">作废</span></template>
+                                                        <br/>
+                                                        <template v-if="vo.shipping_status==0"><span
+                                                                class="red">未发货</span></template>
+                                                        <template v-if="vo.shipping_status==1"><span class="">发货中</span>
+                                                        </template>
+                                                        <template v-if="vo.shipping_status==2"><span class="">已发货</span>
+                                                        </template>
+                                                        <template v-if="vo.shipping_status==3"><span
+                                                                class="">部分发货</span></template>
+                                                        <template v-if="vo.shipping_status==4"><span
+                                                                class="green">已签收</span></template>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    </tbody>
+                                    <template v-if="count===0">
+                                        <tbody>
+                                        <tr class="">
+                                            <td colspan="12" class="no_record">
+                                                <div class="tDiv">没有找到任何记录</div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </template>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="12">
+                                            <div class="list-page">
+                                                <div id="turn-page"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: null,
+            keywords: '',
+            start_time: '',
+            end_time: '',
+            list: [],
+            ids: [],
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = null;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            init: function () {
+                vm.start_time = $('#start_time').datetimebox('getValue');
+                vm.end_time = $('#end_time').datetimebox('getValue');
+                $.post('/admin/finance/salelist', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    start_time: vm.start_time,
+                    end_time: vm.end_time,
+                    order_status: getorderstatus(),
+                    shipping_status: getshippingstatus(),
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        }
+    });
+    $(function () {
+        $('#start_time').datetimebox({
+            value: '',
+            required: false,
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            value: '',
+            required: false,
+            showSeconds: false
+        });
+
+        vm.init();
+    });
+
+    function getorderstatus() {
+        var order_status = [];
+        $("input[name='order_status']:checked").each(function () {
+            order_status.push($(this).val());
+        });
+        return order_status.join(',');
+    }
+
+    function getshippingstatus() {
+        var shipping_status = [];
+        $("input[name='shipping_status']:checked").each(function () {
+            shipping_status.push($(this).val());
+        });
+        return shipping_status.join(',');
+    }
+</script>

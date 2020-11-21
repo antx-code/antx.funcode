@@ -1,0 +1,93 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:;">自定义导航栏</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="{:url('store/navigator')}"><i class="icon-reply"></i>返回列表</a>
+</div>
+<div class="ecsc-form-goods">
+    <form action="" method="post" name="form" onsubmit="return check_form();">
+        <div class="wrapper-list border1">
+            <dl>
+                <dt>名称：</dt>
+                <dd>
+                    <input type="text" name="name" value="{$nav.name|default=''}" id="item_name" class="text" size="40">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>链接地址：</dt>
+                <dd>
+                    <input type="text" name="url" value="{$nav.url|default=''}" id="item_url" class="text" size="40">
+                    <div class="form_prompt"></div>
+                    <div class="notic">如果是本站的网址，可缩写为与商城根目录相对地址，如/home/goods/detail/id/720.html；其他情况都应该输入完整的网址，如http://www.xxx.com/</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>排序：</dt>
+                <dd><input type="text" name="sort_order" value="{$nav.sort_order|default='50'}" size="40" class="text text_2"></dd>
+            </dl>
+            <dl>
+                <dt>是否显示：</dt>
+                <dd>
+
+                    <div class="checkbox_items">
+                        <div class="checkbox_item">
+                            <input type="radio" name="is_show" value="0" id="item_ifshow_0" class="ui-radio" {if isset($nav.is_show) && $nav.is_show==1}checked{/if}>
+                            <label for="item_ifshow_0" class="ui-radio-label">否</label>
+                        </div>
+                        <div class="checkbox_item">
+                            <input type="radio" name="is_show" value="1" id="item_ifshow_1" class="ui-radio" {if (isset($nav.is_show) && $nav.is_show==1) || !isset($nav)}checked{/if}>
+                            <label for="item_ifshow_1" class="ui-radio-label">是</label>
+                        </div>
+                    </div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>是否新窗口：</dt>
+                <dd>
+                    <div class="checkbox_items">
+                        <div class="checkbox_item">
+                            <input type="radio" name="blank" value="0" id="send_type_0" class="ui-radio" {if isset($nav.blank) && $nav.blank==0}checked{/if}>
+                            <label for="send_type_0" class="ui-radio-label">否</label>
+                        </div>
+                        <div class="checkbox_item">
+                            <input type="radio" name="blank" value="1" id="send_type_1" class="ui-radio" {if (isset($nav.blank) && $nav.blank==1) || !isset($nav)}checked{/if}>
+                            <label for="send_type_1" class="ui-radio-label">是</label>
+                        </div>
+                    </div>
+                </dd>
+            </dl>
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="hidden" name="id" value="{$nav.id|default=''}">
+                    <input type="submit" class="sc-btn sc-blueBg-btn btn35" value=" 确定 ">
+                </dd>
+            </dl>
+        </div>
+    </form>
+
+
+</div>
+
+
+<script>
+    function check_form() {
+        var name = document.getElementById('item_name');
+        var url = document.getElementById('item_url');
+
+        if (!name.value) {
+            error_div(name, 'PC版店铺banner必须设置');
+            return false;
+        }
+        if (!url.value) {
+            error_div(url, 'PC版店铺banner必须设置');
+            return false;
+        }
+        return true;
+    }
+</script>
+{include file="public/footer"}

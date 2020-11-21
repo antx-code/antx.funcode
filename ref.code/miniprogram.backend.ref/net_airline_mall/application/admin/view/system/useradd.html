@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>可从管理平台手动添加一名新管理员，并填写相关信息。</li>
+                <li>新增管理员后可从管理员列表中找到该条数据，并再次进行编辑操作。</li>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <form name="theForm" method="post" enctype="multipart/form-data" id="user_form">
+                        <div class="switch_info">
+                            <div class="item">
+                                <div class="label">
+                                    <span class="require-field">*</span>
+                                    用户名：
+                                </div>
+                                <div class="label_value">
+                                    <input type="text" v-model="info.username" id="username" name="username" class="text" value="" autocomplete="off"/>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">角色选择：</div>
+                                <div class="label_value">
+                                    <div class="imitate_select select_w320">
+                                        <div class="cite">请选择...</div>
+                                        <ul>
+                                            <li>
+                                                <a href="javascript:void(0);" data-value="0" class="ftx-01">请选择...</a>
+                                            </li>
+                                            <li v-for="(vo,index) in rolelist">
+                                                <a href="javascript:void(0);" :data-value="vo.role_id" class="ftx-01">
+                                                    {{vo.role_name}}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        <input name="select_role" type="hidden" :value="info.role_id">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">&nbsp;</div>
+                                <div class="label_value info_btn">
+                                    <a href="javascript:void(0);" class="button" id="submitBtn" @click="init()">确定</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var info = JSON.parse('{:addslashes($info)}');
+    var rolelist = JSON.parse('{:addslashes($rolelist)}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+            rolelist: rolelist,
+        },
+        methods: {
+            init: function () {
+                vm.info.role_id = $(".mian-info").find("input[name='select_role']").val();
+                if(vm.info.username){
+                    majax('/admin/system/useradd',vm.info);
+                }else{
+                    $.messager.alert('提示', '缺少必填项', 'warning');
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="/seller/system/shipping">物流配送</a></li>
+        <li><a href="/seller/system/template">运费模板</a></li>
+    </ul>
+</div>
+
+<div class="list-div" id="listDiv">
+    <table class="ecsc-default-table mt20">
+        <thead>
+        <tr>
+            <th width="5%">编号</th>
+            <th width="8%">物流代码</th>
+            <th width="12%" class="tl pl10">配送方式名称</th>
+            <th width="35%" class="tl pl10">配送方式描述</th>
+            <th width="6%">货到付款</th>
+            <th width="10%">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="list" id="vo"}
+        <tr>
+            <td>{$vo.shipping_id}</td>
+            <td>{$vo.shipping_code}</td>
+            <td class="tl pl10">{$vo.shipping_name}</td>
+            <td class="tl pl10">{$vo.shipping_desc}</td>
+            <td align="center">{if ($vo.pay_type_face gt 0)} 支持{else}不支持{/if}</td>
+            <td>
+                <a href="{:url('system/template_add',['shipping_id'=>$vo.shipping_id])}">添加运费模板</a>
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+</div>
+
+{include file="public/footer"}

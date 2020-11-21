@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span></div>
+            <ul>
+                <li>标识“<em>*</em>”的选项为必填项，其余为选填项。</li>
+                <li>填写在短信平台(如阿里短信)信息。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info user_basic">
+                    <div class="item">
+                        <div class="label">
+                            平台名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.name" value='' class="text" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            AccessKey：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.appkey" value='' class="text"/>
+                            <div class="notic m20">AccessKey</div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            AccessKey Secret：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.secretkey" value='' class="text"/>
+                            <div class="notic m20">AccessKey Secret</div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            signature：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.signature" value='' class="text"/>
+                            <div class="notic m20">短信签名</div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            template：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.template" value='' class="text"/>
+                            <div class="notic m20">短信模板</div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                majax('/admin/website/smsconfigadd',vm.info);
+            }
+        }
+    });
+</script>

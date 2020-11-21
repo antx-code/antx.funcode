@@ -1,0 +1,151 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">添加/编辑商品类型</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/goods/attr_type.html"><i class="icon-reply"></i>商品属性列表</a>
+</div>
+
+<div class="ecsc-form-goods">
+    <form action="" method="post" name="theForm" id="type_form">
+        <div class="wrapper-list border1">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;商品类型名称：</dt>
+                <dd>
+                    <input type="text" name="name" value="{$type.name |default=''}" size="40" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>分类：</dt>
+                <dd>
+                    <div shoptype="type_cat">
+                        <div data-level="1" class="imitate_select select_w145" shoptype="typeCatSelect">
+                            <div class="cite">顶级分类</div>
+                            <ul style="display: none;">
+                                <li><a href="javascript:;" data-value="0" data-level="2" class="ftx-01">顶级分类</a></li>
+                                {foreach $cat.level1 as $cate}
+                                <li><a href="javascript:;" data-value="{$cate.id}" data-level="{$cate.level}" class="ftx-01">{$cate.name}</a></li>
+                                {/foreach}
+                            </ul>
+                            <input type="hidden" value="0" id="parent_id_val1" shoptype="typeCatVal">
+                        </div>
+                        {if $cat.level2}
+                        <div data-level="2" class="imitate_select select_w145" shoptype="typeCatSelect">
+                            <div class="cite">顶级分类</div>
+                            <ul style="display: none;">
+                                <li><a href="javascript:;" data-value="0" data-level="2" class="ftx-01">顶级分类</a></li>
+                                {foreach $cat.level2 as $cate}
+                                <li><a href="javascript:;" data-value="{$cate.id}" data-level="{$cate.level}" class="ftx-01">{$cate.name}</a></li>
+                                {/foreach}
+                            </ul>
+                            <input type="hidden" value="0" id="parent_id_val2" shoptype="typeCatVal">
+                        </div>
+                        {/if}
+                        {if $cat.level3}
+                        <div data-level="3" class="imitate_select select_w145" shoptype="typeCatSelect">
+                            <div class="cite">顶级分类</div>
+                            <ul style="display: none;">
+                                <li><a href="javascript:;" data-value="0" data-level="2" class="ftx-01">顶级分类</a></li>
+                                {foreach $cat.level3 as $cate}
+                                <li><a href="javascript:;" data-value="{$cate.id}" data-level="{$cate.level}" class="ftx-01">{$cate.name}</a></li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                        {/if}
+                        <input name="cate_id" type="hidden" value="{$type.cate_id |default=0}">
+                    </div>
+                </dd>
+            </dl>
+            <dl style="display:none">
+                <dt>状态:</dt>
+                <dd>
+                    <label><input type="radio" class="checkbox" value="0"><span>禁用</span></label>
+                    <label><input type="radio" class="checkbox" value="1" checked=""><span>启用</span></label>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;排序：</dt>
+                <dd>
+                    <input type="number" name="sort" value="{$type.sort |default=50}" size="40" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="submit" value=" 确定 " class="sc-btn sc-blueBg-btn btn35" id="submitBtn">
+                    <input type="reset" value=" 重置 " class="sc-btn btn35 sc-blue-btn">
+                    <input type="hidden" name="id" value="{$type.id |default=0}">
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(function () {
+        //表单验证
+        // $("#submitBtn").click(function () {
+        //     if ($("#type_form").valid()) {
+        //         $("#type_form").submit();
+        //     }
+        // });
+
+        $('#type_form').validate({
+            errorPlacement: function (error, element) {
+                var error_div = element.parents('dl').find('div.form_prompt');
+                error_div.append(error);
+            },
+            rules: {
+                name: {
+                    required: true
+                },
+                sort: {
+                    required: true,
+                    number: true
+                }
+            },
+            messages: {
+                name: {
+                    required: '<i class="icon icon-exclamation-sign"></i>类型名称不能为空'
+                },
+                sort: {
+                    required: '<i class="icon icon-exclamation-sign"></i>请输入排序值',
+                    number: '<i class="icon icon-exclamation-sign"></i>排序值必须为数字'
+                }
+            }
+        });
+
+        var cate_id = $('input[name="cate_id"]').val();
+        if (cate_id > 0) {
+            var obj = $('a[data-value="' + cate_id + '"]');
+            obj.parents('.imitate_select').find('.cite').html(obj.html());
+        }
+        var ids = JSON.parse('{:json_encode($ids)}');
+        ids.forEach(function (v, i) {
+            if (v > 0) {
+                $('#parent_id_val' + i).val(v);
+                var obj = $('a[data-value="' + v + '"]');
+                obj.parents('.imitate_select').find('.cite').html(obj.html());
+            }
+        });
+    });
+
+    $.divselect("*[shoptype='typeCatSelect']", "*[shoptype='typeCatVal']", function (obj) {
+        var level = obj.data('level'),
+            val = obj.data("value");
+
+        if (level != 3) {
+            get_childcat(obj, 1);
+        } else {
+            if (val == 0) {
+                val = obj.parents(".imitate_select").prev(".imitate_select").find("[shoptype='typeCatVal']").val();
+            }
+            $("input[name='cate_id']").val(val);
+        }
+    });
+</script>
+{include file="public/footer"}

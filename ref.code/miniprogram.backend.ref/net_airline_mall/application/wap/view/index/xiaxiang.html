@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>真货下乡</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+
+    <style>
+        .nav .list{padding: 15px 10px !important;width:20vw;padding-bottom:0!important;}
+        .nav .list .txt{font-size: 12px !important;height:24px;overflow:hidden}
+        .nav{display:flex; text-align: center;flex-wrap: wrap;}
+        .nav .list .txt{line-height:200%}
+        .nav .list img{max-width:100%;padding:0.5rem}
+        .title_index{text-align:center;height:5rem!important;line-height:5rem!important;}
+        .title_index h4{font-size:1.8rem!important;height:5rem!important;line-height:5rem!important;font-weight:bold}
+        .pro-img{width:calc(50vw - 0.9rem) !important;height:calc(50vw - 0.9rem) !important;overflow: hidden}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <section class="goods_info">
+        <div class="goods_photo d_jump">
+            <div id="slider" class="swipe">
+                <div class="swiper-wrapper">
+                    <template v-for="(vo,index) in info.adlist">
+                        <div class="swiper-slide aui-text-center">
+                            <img :src="vo.ad_img" />
+                        </div>
+                    </template>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+    <div class="home">
+        <nav class="nav list-style2 whole-margin all-padding" modules-index="2">
+            <template v-for="(vo,index) in info.catelist">
+                <section class="list" @click="openGoodswin(vo)">
+                    <a href="javascript:void(0)"></a>
+                    <img :src="vo.touch_icon"/>
+                    <div class="txt">
+                        {{vo.cat_name}}
+                    </div>
+                </section>
+            </template>
+        </nav>
+        <div class="title_index">
+            <h4>推荐商品</h4>
+        </div>
+        <section class="product-list product-list-medium">
+            <div class="prolist">
+                <template v-for="(vo,index) in info.goodsList">
+                    <div class="prolist-item" @click="openGoodsdetail(vo)">
+                        <div class="pro-img">
+                            <a href="javascript:void(0)" class=""> <img :src="vo.original_img" class="img" /></a>
+                        </div>
+                        <div class="pro-info">
+                            <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                            <div class="price">
+                                &yen;{{vo.shop_price}}
+                            </div>
+                            <div class="outer">
+                                <em class="tag">自营</em>
+                                <span>{{vo.total_sale_num}}人已购买</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </div>
+</div>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            token: '',
+            info: {},
+
+            c_h: 0,//时
+            c_m: 0,//分
+            c_s: 0,//秒
+
+            page: 0,
+
+            keywords: '',
+        },
+        methods: {
+            openGoodswin: function (vo) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        cat_id: vo.cat_id
+                    }
+                });
+            },
+            openStoreindex: function (vo) {
+                api.openWin({
+                    name: 'index_win.html',
+                    url: 'widget://html/store/index_win.html',
+                    pageParam: {
+                        store_id: vo.store_id
+                    }
+                });
+            },
+            cutdowntime: function () {
+                var end_time = vm.info.sklist[0].end_time;
+                var curr_time = parseInt(Date.parse(new Date()) / 1000);
+                var diff_time = parseInt(end_time - curr_time);// 倒计时时间差
+                vm.c_h = wxapp.fillzero(Math.floor(diff_time / 3600));
+                vm.c_m = wxapp.fillzero(Math.floor((diff_time / 60 % 60)));
+                vm.c_s = wxapp.fillzero(Math.floor((diff_time % 60)));
+                if (diff_time <= 0) {
+                    vm.c_h = '00';
+                    vm.c_m = '00';
+                    vm.c_s = '00';
+                }
+            },
+            init: function () {
+                $.post(config.xiaxiang, {}, function (ret) {
+                    if (ret) {
+                        vm.info = ret.data;
+                        vm.$nextTick(function(){
+                            vm.swiperInit();
+                        })
+                    }
+                }, 'json');
+            },
+            swiperInit: function () {
+                setTimeout(function () {
+                    new Swiper('#slider', {
+                        autoplay: 3000,
+                        visibilityFullFit: true,
+                        loop: true,
+                        pagination: '.swiper-pagination',
+                        paginationClickable: true
+                    });
+                }, 200);
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'goodsdetail_win',
+                    url: 'widget://html/goodsdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            searchInit:function () {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        keywords: vm.keywords
+                    }
+                });
+            }
+        },
+    });
+    window.onload = function () {
+        vm.init();
+    }
+</script>

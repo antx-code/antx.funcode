@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul><li>商品属性值列表，不参与价格结算！！！</li></ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info">
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>名称：</div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.name" value='' class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>参数：</div>
+                        <div class="label_value">
+                            <div class="date-item year">
+                                <div id="position_id_div" class="imitate_select select_w320">
+                                    <div class="cite"><span>选择</span></div>
+                                    <ul style="display: none;">
+                                        <template v-for="(vo,index) in product_type_list">
+                                            <li @click="product_group_listInit(vo.id)">
+                                                <a href="javascript:void(0)" :data-value="vo.id" class="ftx-01">
+                                                    {{vo.name}}
+                                                </a>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                    <input type="hidden" :value="info.type_id">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>分组：</div>
+                        <div class="label_value">
+                            <div class="date-item year">
+                                <div class="imitate_select select_w320">
+                                    <div class="cite"><span>选择</span></div>
+                                    <ul style="display: none;">
+                                        <template v-for="(vo,index) in product_group_list">
+                                            <li @click="info.group_id=vo.group_id">
+                                                <a href="javascript:void(0)" :data-value="vo.group_id" class="ftx-01">
+                                                    {{vo.name}}
+                                                </a>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                    <input type="hidden" :value="info.group_id">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label">参数值列表：</div>
+                        <div class="label_value">
+                            <template v-for="(vo,index) in info.attrvaluejson">
+                                <div style="height: 35px;">
+                                    <input type="text" v-model="info.attrvaluejson[index]" class="text" placeholder="填写属性值"/>
+                                    <a href="javascript:void(0)" class="fl mr10" shoptype="operation" @click="filter_attr_reduce(index)">[-]</a>
+                                </div>
+                            </template>
+                            <div class="lv-item">
+                                <a href="javascript:void(0)" class="fl mr10" shoptype="operation"
+                                   @click="filter_attr_add()">[+]</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">是否显示：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isenabled" id="is_show_1" value="1"
+                                           v-model="info.isenabled"/>
+                                    <label for="is_show_1" class="ui-radio-label">是</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isenabled" id="is_show_0" value="0"
+                                           v-model="info.isenabled"/>
+                                    <label for="is_show_0" class="ui-radio-label">否</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label">是否必填：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isrequired" id="is_show_2" value="1"
+                                           v-model="info.isrequired"/>
+                                    <label for="is_show_2" class="ui-radio-label">是</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isrequired" id="is_show_3" value="0"
+                                           v-model="info.isrequired"/>
+                                    <label for="is_show_3" class="ui-radio-label">否</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">呈现方式：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isrequired" id="is_show_4" value="checkbox"
+                                           v-model="info.showtype"/>
+                                    <label for="is_show_4" class="ui-radio-label">多选</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isrequired" id="is_show_5" value="radio"
+                                           v-model="info.showtype"/>
+                                    <label for="is_show_5" class="ui-radio-label">单选</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isrequired" id="is_show_6" value="datetime"
+                                           v-model="info.showtype"/>
+                                    <label for="is_show_6" class="ui-radio-label">时间</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isrequired" id="is_show_7" value="select"
+                                           v-model="info.showtype"/>
+                                    <label for="is_show_7" class="ui-radio-label">下拉菜单</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isrequired" id="is_show_8" value="textarea"
+                                           v-model="info.showtype"/>
+                                    <label for="is_show_8" class="ui-radio-label">文本域</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="isrequired" id="is_show_9" value="text"
+                                           v-model="info.showtype"/>
+                                    <label for="is_show_9" class="ui-radio-label">文本域</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>排序：</div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.sort" value='' class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="add()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = {$info|raw};
+    var product_type_list = {$product_type_list|raw};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+            product_type_list: product_type_list,
+            product_group_list: [],
+        },
+        methods: {
+            add: function () {
+                majax('/admin/goods/product_attradd', vm.info);
+            },
+            filter_attr_add: function () {
+                vm.info.attrvaluejson.push('');
+            },
+            filter_attr_reduce:function (index) {
+                vm.info.attrvaluejson.splice(index,1);
+            },
+            product_group_listInit:function (id) {
+                vm.info.type_id = id;
+                $.post('/admin/goods/product_groupAjax', {
+                    id: id
+                }, function (ret) {
+                    vm.product_group_list = ret.data;
+                    vm.selectInit();
+                }, 'json');
+            },
+            selectInit:function () {
+                setTimeout(function () {
+                    $('.imitate_select').each(function () {
+                        var sel_this = $(this);
+                        var val = sel_this.children('input[type=hidden]').val();
+                        sel_this.find('a').each(function () {
+                            if ($(this).attr('data-value') == val) {
+                                sel_this.children('.cite').html($(this).html());
+                            }
+                        })
+                    });
+                },300);
+            }
+        }
+    });
+    $(function () {
+        if(info.type_id > 0){
+            vm.product_group_listInit(info.type_id);
+        }
+    })
+</script>

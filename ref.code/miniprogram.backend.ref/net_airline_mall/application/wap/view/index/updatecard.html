@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>实名认证</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .containTop {
+            text-align: center;
+            padding: 10px;
+            line-height: 200%;
+            color: #666;
+            border: 1px solid #f1f1f1;
+            margin-top: 20px;
+            font-size:1.5rem
+        }
+        .containTop h6 {line-height: 300%;font-size:1.5rem;}
+        .user-login-box .user-login-ul .item-input{padding:2rem 0!important;}
+        .smslogin{margin-top:5rem;height:2rem;line-height:2rem; text-align: center;font-size:1.4rem;color:#4b89dc}
+        .user-login-box .user-login-ul .item-input .icon-liulan1{top:1.6rem!important;}
+        .btn-submit{font-size:1.8rem}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <section class="con bg-color-write">
+        <div class="user-login-box">
+            <div class="el-form user-login-form">
+                <div class="user-login-ul">
+                    <div class="el-form-item">
+                        <div class="el-form-item__content">
+                            <div class="item-input dis-box">
+                                <div class="label"></div>
+                                <div class="value box-flex">
+                                    <div class="el-input">
+                                        <input type="text" maxlength="120" placeholder="请输入真实姓名" class="el-input__inner" v-model="true_name">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-login-ul">
+                    <div class="el-form-item">
+                        <div class="el-form-item__content">
+                            <div class="item-input dis-box">
+                                <div class="label"></div>
+                                <div class="value box-flex">
+                                    <div class="el-input">
+                                        <input type="text" maxlength="18" placeholder="请输入身份证号" class="el-input__inner" v-model="id_card">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="containTop">
+                    <h6>请上传本人身份证照片</h6>
+                    <div class="photoBox">
+                        <div class="photo">
+                            <div class="van-uploader">
+                                <div class="cardA" v-bind:style="{backgroundImage: 'url(' + carda + ')'}"><i class="preShow"></i></div>
+                                <p>上传人像页照片</p>
+                                <div type="file" class="van-uploader__input" @click="aimgupload()">
+                                </div>
+                            </div>
+                            <div class="photo m-top10">
+                                <div class="van-uploader">
+                                    <div class="cardB" v-bind:style="{backgroundImage: 'url(' + cardb + ')'}"><i class="preShow"></i></div>
+                                    <p>上传国徽页照片</p>
+                                    <div  class="van-uploader__input" @click="bimgupload()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-submit border-radius-top05" @click="updatepwd()">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script src="/public/wap/script/md5.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+
+            token: '',
+
+            true_name: '',
+            id_card: '',
+            carda: '/public/wap/static/images/card-a.png',
+            cardb: '/public/wap/static/images/card-b.png',
+
+
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.getuserinfo, {}, 1).then(function (ret) {
+                    vm.true_name = ret.data.user.true_name;
+                    vm.id_card = ret.data.user.id_card;
+                    vm.carda = ret.data.user.carda?ret.data.user.carda:'/public/wap/static/images/card-a.png';
+                    vm.cardb = ret.data.user.carda?ret.data.user.cardb:'/public/wap/static/images/card-b.png';
+                })
+            },
+            updatepwd: function () {
+                if (!vm.true_name || !vm.id_card) {
+                    wxapp.alert('fail', '数据不全');
+                    return false;
+                }
+                var pageparm = {
+                    true_name: vm.true_name,
+                    id_card: vm.id_card,
+                    carda: vm.carda,
+                    cardb: vm.cardb,
+                };
+                wxapp.ajax(config.updatecard, {
+                    token: vm.token,
+                    pageparm: JSON.stringify(pageparm)
+                }).then(function (ret) {
+                    if (ret.status == 1) {
+                        wxapp.alert('success', ret.msg);
+                        setTimeout(function () {
+                            closeWin();
+                        }, 1000)
+                    } else {
+                        wxapp.alert('fail', ret.msg);
+                    }
+                })
+            },
+            bimgupload: function () {
+                api.getPicture({
+                    //sourceType: 'album,library,camera',
+                    sourceType: 'album',
+                    encodingType: 'jpg',
+                    mediaValue: 'pic',
+                    destinationType: 'url',
+                    allowEdit: false,
+                    quality: 50,
+                    targetWidth: 1200,
+                    saveToPhotoAlbum: false
+                }, function (S, err) {
+                    if (S) {
+                        vm.filetemp = S.data;
+                        api.showProgress();
+                        api.ajax({
+                            url: config.alioss_upload,
+                            method: 'post',
+                            timeout: 30,
+                            dataType: 'json',
+                            returnAll: false,
+                            data: {
+                                values: {token: vm.token,},
+                                files: {file: vm.filetemp}
+                            }
+                        }, function (ret, err) {
+                            if (ret.error == 0) {
+                                vm.cardb = ret.url;
+                            } else {
+                                console.log(JSON.stringify(err));
+                            }
+                            api.hideProgress();
+                        });
+                    } else {
+                        api.toast({msg: err.msg, duration: 2000, location: 'bottom'});
+                    }
+                });
+            },
+            aimgupload: function () {
+                api.getPicture({
+                    //sourceType: 'album,library,camera',
+                    sourceType: 'album',
+                    encodingType: 'jpg',
+                    mediaValue: 'pic',
+                    destinationType: 'url',
+                    allowEdit: false,
+                    quality: 50,
+                    targetWidth: 1200,
+                    saveToPhotoAlbum: false
+                }, function (S, err) {
+                    if (S) {
+                        vm.filetemp = S.data;
+                        api.showProgress();
+                        api.ajax({
+                            url: config.alioss_upload,
+                            method: 'post',
+                            timeout: 30,
+                            dataType: 'json',
+                            returnAll: false,
+                            data: {
+                                values: {token: vm.token,},
+                                files: {file: vm.filetemp}
+                            }
+                        }, function (ret, err) {
+                            if (ret.error == 0) {
+                                vm.carda = ret.url;
+                            } else {
+                                console.log(JSON.stringify(err));
+                            }
+                            api.hideProgress();
+                        });
+                    } else {
+                        api.toast({msg: err.msg, duration: 2000, location: 'bottom'});
+                    }
+                });
+            }
+        },
+        mounted:function () {
+            inputFocus();
+        }
+    });
+    window.onload = function () {
+        vm.token = $api.getStorage('token') ? $api.getStorage('token') : '';
+        vm.init();
+    }
+</script>
+

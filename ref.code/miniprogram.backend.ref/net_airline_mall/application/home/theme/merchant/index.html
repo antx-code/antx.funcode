@@ -1,0 +1,141 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/merchant_header'}
+<div class="container settled-container bg-ligtGary">
+    <div class="sett-banner" style="background:url('__THEME__/images/merchant_index_ad.jpg') center center no-repeat;">
+        <div class="banner-auto">
+            <div class="s-b-tit">
+                <h3>马上入驻 开向未来</h3>
+                <div class="s-b-line"></div>
+            </div>
+            <div class="s-b-btn">
+                <a onclick="checkLogin(this)" data-url="{:url('merchant/apply')}" class="im-sett">我要入驻</a>
+                <a onclick="checkLogin(this)" data-url="{:url('merchant/inquiry')}" class="view-prog">入驻进度查询</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="sett-section s-section-step">
+        <div class="w w1200">
+            <div class="sett-title">
+                <div class="zw-tit">
+                    <h3>入驻流程</h3>
+                    <span class="line"></span>
+                </div>
+                <span class="yw-tit">ADVANCE REGISTRATION PROCESS</span>
+            </div>
+            <div class="sett-warp">
+                <div class="item item-one">
+                    <div class="item-i"><i></i></div>
+                    <div class="tit">1 提交入驻资料</div>
+                    <span>选择店铺类型/品牌</span>
+                    <span>填写入驻信息</span>
+                </div>
+                <em class="item-jt"></em>
+                <div class="item item-two">
+                    <div class="item-i"><i></i></div>
+                    <div class="tit">2 商家等待审核</div>
+                    <span>平台审核入驻信息</span>
+                    <span>通知商家</span>
+                </div>
+                <em class="item-jt"></em>
+                <div class="item item-three">
+                    <div class="item-i"><i></i></div>
+                    <div class="tit">3 完善店铺信息</div>
+                    <span>登录商家后台</span>
+                    <span>完善店铺信息</span>
+                </div>
+                <em class="item-jt"></em>
+                <div class="item item-four">
+                    <div class="item-i"><i></i></div>
+                    <div class="tit">4 店铺上线</div>
+                    <span>上传商品</span>
+                    <span>发布销售</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--
+<div class="sett-section s-section-cate">
+        <div class="w w1200">
+            <div class="sett-title">
+                <div class="zw-tit">
+                    <h3>热招类目</h3>
+                    <span class="line"></span>
+                </div>
+                <span class="yw-tit">BUSINESS CATEGORY</span>
+            </div>
+            <div class="sett-warp">
+                <div class="item"><i style="background:url('__THEME__/images/merchant/1489978876184880114.png') center center no-repeat;width:98;height:85;display:display;float:left"></i><span>家用电器</span></div>
+                <div class="item"><i style="background:url('__THEME__/images/merchant/1489978893615987749.png') center center no-repeat;width:98;height:85;display:display;float:left"></i><span>手机、数码、通信</span></div>
+                <div class="item"><i style="background:url('__THEME__/images/merchant/1489978926013749778.png') center center no-repeat;width:98;height:85;display:display;float:left"></i><span>家居、家具、家装、厨具</span></div>
+                <div class="item"><i style="background:url('__THEME__/images/merchant/1489978972367649095.png') center center no-repeat;width:98;height:85;display:display;float:left"></i><span>男装、女装、内衣</span></div>
+                <div class="item"><i style="background:url('__THEME__/images/merchant/1489978986231187639.png') center center no-repeat;width:98;height:85;display:display;float:left"></i><span>鞋靴、箱包、钟表、奢侈品</span></div>
+                <div class="item"><i style="background:url('__THEME__/images/merchant/1490910332576618152.png') center center no-repeat;width:98;height:85;display:display;float:left"></i><span>个人化妆、清洁用品</span></div>
+                <div class="item"><i style="background:url('__THEME__/images/merchant/1489978943655622374.png') center center no-repeat;width:98;height:85;display:display;float:left"></i><span>休闲、运动、户外健身</span></div>
+                <div class="item"><i style="background:url('__THEME__/images/merchant/1489978957373122314.png') center center no-repeat;width:98;height:85;display:display;float:left"></i><span>食品、酒类、生鲜、特产</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="sett-section s-section-case">
+        <div class="w w1200">
+            <div class="sett-title">
+                <div class="zw-tit">
+                    <h3>成功案例</h3>
+                    <span class="line"></span>
+                </div>
+                <span class="yw-tit">SUCCESSFUL CASE</span>
+            </div>
+            <div class="sett-warp">
+                {volist name="case" id="vo"}
+                <div class="item item{$i}">
+                    <div class="item-top">
+                        <a href="{:url('store/index',['id'=>$vo.store_id])}" target="_blank"><img src="{$vo.logo}"></a>
+                    </div>
+                    <div class="item-bot">
+                        <div class="tit">{$vo.store_name}</div>
+                        <div class="desc">{$vo.store_subtitle}</div>
+                    </div>
+                </div>
+                {/volist}
+            </div>
+        </div>
+    </div>
+    <div class="sett-section s-section-help">
+        <div class="w w1200">
+            <div class="sett-title">
+                <div class="zw-tit">
+                    <h3>常见问题</h3>
+                    <span class="line"></span>
+                </div>
+                <span class="yw-tit">COMMON PROBLEM</span>
+            </div>
+            <div class="sett-warp">
+                {foreach $question as $index=>$art}
+                <div class="item item-{if ($index % 2) == 0}left{else}right{/if}">
+                    <div class="number">0{$index}</div>
+                    <div class="info">
+                        <div class="name">
+                            <div class="tit"><a href="{:url('carticle/content',['article_id'=>$art.article_id])}" target="_blank">{$art.title}</a></div>
+                            <div class="desc">{$art.description}</div>
+                        </div>
+                    </div>
+                </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+    -->
+</div>
+
+<script>
+    function checkLogin(obj) {
+        if (parseInt(user_id) > 0) {
+            location.href = obj.dataset.url;
+        } else {
+            $.notLogin();
+        }
+    }
+</script>
+{include file='public/footer'}

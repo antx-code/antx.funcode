@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<!--layui库引入开始-->
+<link href="/public/static/plugins/layuiadmin/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+<link href="/public/static/plugins/layuiadmin/style/admin.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/public/static/plugins/layuiadmin/layui/layui.js"></script>
+<!--layui库引入结束-->
+<body class="iframe_body">
+<div class="warpper" id="app" >
+    <div class="content">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <button class="layui-btn layui-btn-sm" @click="add()">开卡</button>
+                <button class="layui-btn layui-btn-sm layui-btn-normal" @click="giftcardImport()">导出</button>
+            </div>
+
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    <li :class="{'layui-this':bind_time==10000}" @click="bindTimeInit(10000)">全部</li>
+                    <li :class="{'layui-this':bind_time==0}" @click="bindTimeInit(0)">未绑定</li>
+                    <li :class="{'layui-this':bind_time==1}" @click="bindTimeInit(1)">已绑定</li>
+                </ul>
+            </div>
+            <div class="layui-card-body">
+                <table class="layui-table" lay-size="sm">
+                    <thead>
+                        <tr>
+                            <th width="8%">ID</th>
+                            <th width="8%">面值</th>
+                            <th width="8%">余额</th>
+                            <th width="10%">卡号</th>
+                            <th width="10%">密码</th>
+                            <th width="5%">状态</th>
+                            <th width="10%">截止有效期</th>
+                            <th width="8%">类型</th>
+                            <th width="5%">消费记录</th>
+                            <th width="8%">绑定用户</th>
+                            <th width="20%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td>{{vo.id}}</td>
+                                <td>{{vo.price}}</td>
+                                <td>{{vo.cash}}</td>
+                                <td>{{vo.card_no}}</td>
+                                <td>
+                                    <span v-if="vo.status==1">{{vo.password}}</span>
+                                    <span v-if="vo.status==0">****************</span>
+                                </td>
+                                <td>
+                                    <span class="layui-badge layui-bg-green" v-if="vo.status==1">有效</span>
+                                    <span class="layui-badge layui-bg-gray" v-if="vo.status==0">冻结</span>
+                                    <span class="layui-badge layui-bg-gray" v-if="vo.status==2">失效</span>
+                                </td>
+                                <td>{{vo.over_time|timeParse}}</td>
+                                <td>
+                                    <span v-if="vo.type==1">自动发放</span>
+                                    <span v-if="vo.type==2" style="color: #0c82c6;">自助购买</span>
+                                    <span v-if="vo.type==3" style="color: #0bc756">他人赠送</span>
+                                </td>
+                                <td><button type="button" class="layui-btn layui-btn-xs" @click="opengiftlog(vo)">查看</button></td>
+                                <td><span v-if="vo.bind_time>0">{{vo.user_name}}（绑定时间：{{vo.bind_time|timeParse}}）</span></td>
+                                <td>
+                                    <button class="layui-btn layui-btn-danger layui-btn-xs" @click="dodelete(index)">删除</button>
+                                    <button class="layui-btn layui-btn-danger layui-btn-xs" @click="doupdate(index,0)" v-if="vo.status==1">冻结</button>
+                                    <button class="layui-btn layui-btn-xs" @click="doupdate(index,1)" v-if="vo.status==0">释放</button>
+                                </td>
+                            </tr>
+                        </template>
+
+                    </tbody>
+                </table>
+                <div id="turn-page"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            bind_time:10000,
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            ids: [],
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            bindTimeInit:function(index){
+                vm.bind_time = index;
+                vm.init();
+            },
+            opengiftlog:function(vo){
+                layerOpenwinMid('消费记录','/admin/giftcard/giftlog?id='+vo.id);
+            },
+            add: function () {
+                layerOpenwinMid('开卡操作：支持批量开卡操作！','/admin/giftcard/add');
+            },
+            doupdate:function(index,stauts){
+                $.messager.confirm('提示', '确定操作？', function (r) {
+                    if (r == true) {
+                        var vo = vm.list[index];
+                        vo.status = stauts;
+                        $.post('/admin/giftcard/doupdate', {
+                            pageparm: JSON.stringify(vo),
+                            table: 'giftcard'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                            vm.init();
+                        }, 'json');
+                    }
+                });
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/giftcard/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'giftcard',
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                            vm.init();
+                        }, 'json');
+                    }
+                });
+            },
+            init: function () {
+                showMask();
+                $.post('/admin/giftcard/index', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    bind_time: vm.bind_time,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                    hideMask();
+                }, 'json');
+            },
+            giftcardImport:function () {
+                $('<form action="/admin/giftcard/giftcardImport?bind_time=' + vm.bind_time + '"></form>').appendTo('body').submit().remove();
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+

@@ -1,0 +1,16 @@
+<div class="tbar-panel-main" shoptype="tbpl-main" style="height: 605px;">
+    <div class="tbar-panel-content" data-height="48" shoptype="tbpl-content" style="height: 595px;">
+        <div class="history-wrap">
+            <ul>
+                {volist name="list" id="vo" length='10'}
+                <li>
+                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" class="img-wrap" target="_blank"><img src="{$vo.original_img}" width="100" height="100"></a>
+                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" class="add-cart-button" target="_blank">加入购物车</a>
+                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" class="price" target="_blank"><em>¥</em>{$vo.shop_price}</a>
+                </li>
+                {/volist}
+            </ul>
+            <a href="{:url('index/history')}" class="follow-bottom-more">查看更多&gt;&gt;</a>
+        </div>
+    </div>
+</div>

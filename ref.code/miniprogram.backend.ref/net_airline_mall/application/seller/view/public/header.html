@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>商家管理中心</title>
+    <link type="text/css" href="/topjui/css/topjui.core.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/public/static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/plugins/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/seller/general.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/seller/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/seller/seller.css"/>
+
+    <script type="text/javascript" src="/public/static/plugins/jquery/jquery.min.js"></script>
+
+    <script type="text/javascript" src="/public/static/js/topjui.config.js"></script>
+    <script type="text/javascript" src="/topjui/js/topjui.core.min.js"></script>
+    <script type="text/javascript" src="/topjui/js/locale/topjui.lang.zh_CN.js"></script>
+
+    <script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+    <script type="text/javascript" src="/public/static/plugins/qiniu/qiniu.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+    <script type="text/javascript" src="/public/static/plugins/moment/moment.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/function.js"></script>
+    <script type="text/javascript" src="/public/static/js/seller.js"></script>
+    <script type="text/javascript" src="/public/static/js/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/lib_ecmobanFunc.js"></script>
+    <script type="text/javascript" src="/public/static/js/vue.js"></script>
+</head>
+<body>
+{include file='public/topnav'}
+
+<div class="ecsc-layout">
+    <div class="site wrapper">
+        {include file='public/leftmenu'}
+        <div class="ecsc-layout-right">
+            <div class="main-content" id="mainContent">
+                <div class="ecsc-path"><span>{$menu[$ctrl]['title']} - - {$menu[$ctrl]['left'][$actname]['title']}</span></div>

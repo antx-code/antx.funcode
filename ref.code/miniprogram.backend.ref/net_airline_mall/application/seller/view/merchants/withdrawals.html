@@ -1,0 +1,110 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li><a href="/seller/merchants/account">店铺账户</a></li>
+        <li class="active"><a href="/seller/merchants/withdrawals">提现记录</a></li>
+        <li><a href="/seller/merchants/account_log">收支明细</a></li>
+    </ul>
+</div>
+
+<div class="list-div mt10" id="app" v-cloak>
+    <div class="btn-info"><a href="/seller/merchants/withdraw_apply" class="sc-btn sc-blue-btn"><i class="icon-plus"></i>申请提现</a></div>
+
+    <table class="ecsc-default-table">
+        <thead>
+        <tr>
+            <th width="10%">编号</th>
+            <th width="15%">账户金额</th>
+            <th width="15%">提现金额</th>
+            <th width="15%">申请时间</th>
+            <th width="15%">备注</th>
+            <th width="15%">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo,index) in list">
+            <td class="left">{{vo.log_id}}</td>
+            <td align="center"><em>¥</em>{{vo.before_amount}}</td>
+            <td align="center">{{vo.amount}}</td>
+            <td align="center">{{vo.change_time | timeParse}}</td>
+            <td align="center">{{vo.remark}}</td>
+            <td align="center">
+                <span v-if="vo.is_paid">已完成</span>
+                <span v-else>待处理</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="pagination">
+        <div id="page-bar"></div>
+    </div>
+</div>
+
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+        },
+        filters: {
+            timeParse: function (val) {
+                return moment.unix(val).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            getData(instance) {
+                instance = instance ? instance : vm;
+                var param = {
+                    page: instance.page,
+                    pageSize: instance.pageSize
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/merchants/withdrawals',
+                    data: param,
+                    success: function (data) {
+                        instance.list = data.list;
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        instance.pageSize = data.pageSize;
+                        if (data.page == 1) instance.pagerender(instance);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            pagerender(instance) {
+                instance = instance ? instance : vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: parseInt(instance.pageSize),
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+        },
+        created() {
+            this.getData(this);
+        }
+    });
+</script>
+
+{include file="public/footer"}

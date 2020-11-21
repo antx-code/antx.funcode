@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>充值</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="user-recharge">
+        <div class="van-cell van-field">
+            <div class="van-cell__title"><span>充值金额 (元)</span>
+            </div>
+            <div class="van-cell__value">
+                <div class="van-field__body"><input type="text" placeholder="请输入充值金额" class="van-field__control" v-model="money">
+                </div>
+            </div>
+        </div>
+        <div class="field-tips">最低充值金额：<em class="color-red">￥10.00</em></div>
+        <div class="van-cell van-field van-field--min-height">
+
+            <div class="van-cell__title"><span>备注（50字）</span></div>
+            <div class="van-cell__value">
+                <div class="van-field__body"><textarea placeholder="选填" class="van-field__control" v-model="note"></textarea></div>
+            </div>
+        </div>
+        <div class="cashier-desk">
+            <div class="van-cell-noright m-top08 van-cell-group van-hairline--top-bottom">
+                <div class="van-cell-title b-min b-min-b van-cell">
+                    <div class="van-cell__title"><span>充值方式</span></div>
+                </div>
+                <div class="van-radio-group">
+                    <div class="van-cell">
+                        <div class="van-cell__value van-cell__value--alone">
+                            <div class="dopay-list dis-box">
+                                <div class="left-icon">
+                                    <img src="/public/wap/static/images/wxpay.png" style="width: 20px;height: 20px;">
+                                </div>
+                                <div class="box-flex">
+                                    <h3 class="text-left" style="margin-left: 5px;">微信支付</h3>
+                                </div>
+                                <div class="van-radio" @click="paycodeInit(3)">
+                                <span class="van-radio__input">
+                                    <input type="radio" class="van-radio__control" value="17">
+                                    <i class="van-icon van-icon-check"
+                                       :class="{'van-icon-checked':order_type==3}"></i>
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="padding-all"><button class="btn btn-submit border-radius-top05" @click="pay()">立即充值</button></div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var aliPayPlus = null;
+    var wxPay = null;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            order_type: 3,
+            money: 10,
+            note: '',
+
+
+            orderinfo:{},
+
+        },
+        methods: {
+            paycodeInit: function (code) {
+                vm.order_type = code;
+            },
+            pay: function () {
+
+                if(vm.money < 10){
+                    //wxapp.alert('fail','最少充值10元');
+                    //return false;
+                }
+                wxapp.ajax(config.rechargejspay, {
+                    order_type: vm.order_type,
+                    money: vm.money,
+                    note: vm.note,
+                }).then(function (ret) {
+                    if (ret.status == 0) {
+                        wxapp.alert('fail', ret.msg);return false;
+                    }else{
+                        vm.orderinfo = ret.data;
+                    }
+                    WeixinJSBridge.invoke(
+                        'getBrandWCPayRequest', {
+                            "appId": vm.orderinfo.appId,     //公众号名称，由商户传入
+                            "timeStamp": vm.orderinfo.timeStamp,         //时间戳，自1970年以来的秒数
+                            "nonceStr": vm.orderinfo.nonceStr, //随机串
+                            "package": vm.orderinfo.package,
+                            "signType": vm.orderinfo.signType,         //微信签名方式：
+                            "paySign": vm.orderinfo.paySign //微信签名
+                        },
+                        function (res) {
+                            console.log(JSON.stringify(res));
+                            if (res.err_msg == "get_brand_wcpay_request:ok") {
+                                setTimeout(function () {
+                                    window.location.href = '/wap/index/center'
+                                }, 1000);
+                            }else{
+                                wxapp.alert('fail','充值失败');
+                            }
+                        }
+                    );
+
+                });
+            }
+        },
+        mounted:function () {
+            inputFocus();
+        }
+    });
+    window.onload = function () {
+        //aliPayPlus = api.require('aliPayPlus');
+        //wxPay = api.require('wxPay');
+        vm.order_sn = api.pageParam.order_sn ? api.pageParam.order_sn : '';
+    };
+</script>
+

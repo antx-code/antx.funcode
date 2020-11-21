@@ -1,0 +1,136 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">商家品牌</a></li>
+        <li><a href="/seller/goods/brand_apply">品牌申请记录</a></li>
+    </ul>
+</div>
+<div id="app" v-cloak>
+
+    <div class="search-info">
+        <div class="search-form">
+            <div>
+                <div class="search-key">
+                    <input type="text" v-model="keywords" name="brand_name" size="15" class="text text_2" placeholder="关键词" @keyup.enter="getData()">
+                    <input type="button" value=" 搜索 " class="submit" @click="getData()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- start brand list -->
+    <div class="list-div" id="listDiv">
+        <table class="ecsc-default-table">
+            <thead>
+            <tr>
+                <th width="6%"><a @click="orderby('brand_id')">编号</a></th>
+                <th width="16%" class="tl">品牌中文名称</th>
+                <th width="12%" class="tl">品牌英文名称</th>
+                <th width="9%" class="tl">品牌LOGO</th>
+                <th width="10%" class="tl">是否推荐</th>
+                <th width="8%"><a @click="orderby('sort_order')">排序</a></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="bd-line" v-for="(vo,index) in list">
+                <td>{{vo.brand_id}}</td>
+                <td class="tl">{{vo.brand_name}}</td>
+                <td class="tl">{{vo.brand_letter}}</td>
+                <td class="tl">
+                    <div class="tDiv">
+                        <span class="show">
+                            <a :href="vo.brand_logo" target="_blank" class="nyroModal"><i class="icon icon-picture" @mouseover="showTip(vo.brand_logo)" onmouseout="toolTip()"></i></a>
+                        </span>
+                    </div>
+                </td>
+                <td class="tl">
+                    <span v-if="vo.is_recommend">是</span>
+                    <span v-else>否</span>
+                </td>
+                <td>
+                    <span>{{vo.sort_order}}</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            keywords: '',
+            list: [],
+            sort: 'desc',
+            field: 'sort_order'
+        },
+        methods: {
+            getData: function (instance) {
+                instance = instance ? instance : vm;
+                var param = {
+                    keywords: instance.keywords,
+                    page: instance.page,
+                    pageSize: instance.pageSize,
+                    field: instance.field,
+                    sort: instance.sort
+                };
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/goods/store_brand',
+                    data: param,
+                    success: function (data) {
+                        instance.list = data.list;
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        if (data.page == 1) instance.pagerender();
+                    }
+                });
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count),
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            showTip: function (src) {
+                if (src.indexOf('http') < 0)
+                    toolTip('<img src="/public/static/' + src + '" >');
+                else
+                    toolTip('<img src="' + src + '" >');
+            },
+            orderby: function (field) {
+                this.field = field;
+                this.sort = this.sort == 'desc' ? 'asc' : 'desc';
+                this.getData();
+            }
+        },
+        created: function () {
+            this.getData(this);
+        }
+    });
+</script>
+{include file="public/footer"}

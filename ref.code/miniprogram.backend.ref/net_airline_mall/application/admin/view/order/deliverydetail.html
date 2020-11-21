@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>
+    .order_total .section dl {
+        width: 20%;
+    }
+
+    .step .section {
+        overflow: unset;
+    }
+
+    #position_id_div {
+        position: unset;
+    }
+
+    .imitate_select ul {
+        width: 150px;
+        left: calc(50% + 30px);
+        top: 140px;
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="content">
+        <div class="flexilist order_info">
+            <div class="common-content">
+                <!--订单基本信息-->
+                <div class="step">
+                    <div class="step_title"><i class="ui-step"></i>
+                        <h3>基本信息</h3></div>
+                    <div class="section" style="z-index: 99999">
+                        <dl style="width:25%">
+                            <dt>发货单号：(出库单号)</dt>
+                            <dd>{{info.delivery_order.delivery_sn}}</dd>
+                            <dt>订单号：</dt>
+                            <dd>{{info.order.order_sn}}</dd>
+                        </dl>
+                        <dl style="width:25%">
+                            <dt>下单时间：</dt>
+                            <dd>{{info.order.add_time|timeParse}}</dd>
+                            <dt>出库时间：</dt>
+                            <dd>{{info.delivery_order.add_time|timeParse}}</dd>
+                        </dl>
+                        <dl style="width:25%">
+                            <dt>支付方式：</dt>
+                            <dd>{{info.order.pay_name}}</dd>
+                            <dt>配送方式：</dt>
+                            <dd style="display: flex;align-items: center;">
+                                <div id="position_id_div" class="imitate_select select_w220">
+                                    <div class="cite">
+                                        <span v-if="info.delivery_order.shipping_id>0">{{shipping_list[info.delivery_order.shipping_id].shipping_name}}</span>
+                                        <span v-else>选择发货物流</span>
+                                    </div>
+                                    <ul style="display: none;">
+                                        <template v-for="(vo,index) in shipping_list">
+                                            <li>
+                                                <a href="javascript:void(0)" :data-value="vo.shipping_id" class="ftx-01">
+                                                    {{vo.shipping_name}}
+                                                </a>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                    <input type="hidden" id="shipping_id" value="0">
+                                </div>
+                            </dd>
+                        </dl>
+
+                        <dl style="width:25%">
+                            <dt>发货状态：</dt>
+                            <dd>
+                                <template v-if="info.delivery_order.status==0"><span class="blue2">出库中</span></template>
+                                <template v-if="info.delivery_order.status==1"><span class="green">已发货</span></template>
+                                <template v-if="info.delivery_order.status==2"><span class="red">退货</span></template>
+                                <template v-if="info.delivery_order.status==3"><span class="green">已签收</span></template>
+                            </dd>
+                            <dt>物流快递单号：</dt>
+                            <dd><input name="shipping_no" type="text" class="text w120 mt2" v-model="info.delivery_order.shipping_no" @keyup.enter="shippingno()"></dd>
+                        </dl>
+                    </div>
+                </div>
+                <!--收货信息-->
+                <div class="step">
+                    <div class="step_title"><i class="ui-step"></i>
+                        <h3>收货人信息
+                            <a href="javascript:void(0)" @click="addressinfo()">
+                                <i class="icon icon-edit"></i>
+                            </a>
+                        </h3>
+                    </div>
+                    <div class="section">
+                        <dl style="width:25%">
+                            <dt>收货人：</dt>
+                            <dd>{{info.delivery_order.consignee}}</dd>
+                            <dt>收货地址：</dt>
+                            <dd>{{info.order.addressTemp}}</dd>
+                        </dl>
+                        <dl style="width:25%">
+                            <dt>手机号码：</dt>
+                            <dd>{{info.delivery_order.mobile}}</dd>
+                            <dt>&nbsp;</dt>
+                            <dd>&nbsp;</dd>
+                        </dl>
+                        <dl style="width:25%">
+                            <dd>送货时间：</dd>
+                            <dd>{{info.delivery_order.best_time}}</dd>
+                            <dt>&nbsp;</dt>
+                            <dd>&nbsp;</dd>
+                        </dl>
+                        <dl style="width:25%">
+                            <dt>买家留言：</dt>
+                            <dd>{{info.order.user_note}}</dd>
+                            <dt>&nbsp;</dt>
+                            <dd>&nbsp;</dd>
+                        </dl>
+                    </div>
+                </div>
+                <!--订单其他信息-->
+                <div class="step hide">
+                    <div class="step_title">
+                        <i class="ui-step"></i>
+                        <h3>
+                            其他信息
+                            <a href="javascript:void(0)" @click="invoiceInit()">
+                                <i class="icon icon-edit"></i>
+                            </a>
+                        </h3>
+                    </div>
+                    <div class="section">
+                        <dl>
+                            <dt>发票抬头：(个人普通发票)</dt>
+                            <dd>个人</dd>
+                            <dt>发票内容：</dt>
+                            <dd>不开发票</dd>
+                        </dl>
+                        <dl>
+                            <dt>缺货处理：</dt>
+                            <dd>等待所有商品备齐后再发</dd>
+                            <dt>识别码：</dt>
+                            <dd>无</dd>
+                        </dl>
+                        <dl style="width:66.6%">
+                            <dt>卖家留言：</dt>
+                            <dd>无</dd>
+                            <dt>买家留言：</dt>
+                            <dd>无</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!--商品信息-->
+                <div class="step">
+                    <div class="step_title">
+                        <i class="ui-step"></i>
+                        <h3>商品信息</h3>
+                    </div>
+                    <div class="step_info">
+                        <div class="order_goods_fr">
+                            <table class="table" border="0" cellpadding="0" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th width="25%" class="first">商品名称</th>
+                                    <th width="10%">货号</th>
+
+                                    <th width="10%">价格</th>
+
+                                    <th width="10%">发货数量</th>
+
+
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="(vo2,index) in info.goods_list">
+                                    <tr>
+                                        <td>
+                                            <div class="order_goods_div">
+                                                <div class="img">
+                                                    <a :href="'/home/goods/detail?id='+vo2.goods_id" target="_blank">
+                                                        <img :src="vo2.goods_img" width="72" height="72"/>
+                                                    </a>
+                                                </div>
+                                                <div class="name ml10">
+                                                    <a :href="'/home/goods/detail?id='+vo2.goods_id" target="_blank">{{vo2.goods_name}}</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{vo2.goods_sn}}</td>
+                                        <td>
+                                            <em>¥</em>
+                                            {{vo2.goods_price}}
+                                        </td>
+                                        <td>{{vo2.send_num}}</td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!--费用信息-->
+                <div class="step order_total hide">
+                    <div class="step_title">
+                        <i class="ui-step"></i>
+                        <h3>费用信息
+                            <a href="javascript:void(0)" @click="priceupdateInit()">
+                                <i class="icon icon-edit"></i>
+                            </a>
+                        </h3>
+                    </div>
+                    <div class="section">
+                        <dl>
+                            <dt>商品总金额：</dt>
+                            <dd>
+                                <em>¥</em>
+                                {{info.order.goods_price}}
+                            </dd>
+                            <dt>使用余额：</dt>
+                            <dd>
+                                - <em>¥</em>
+                                {{info.order.user_money}}
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>发票税额：</dt>
+                            <dd>
+                                + <em>¥</em>
+                                0.00
+                            </dd>
+                            <dt>使用积分：</dt>
+                            <dd>
+                                - <em>¥</em>
+                                {{info.order.integral}}
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>配送费用：</dt>
+                            <dd>
+                                + <em>¥</em>
+                                {{info.order.shipping_price}}
+                            </dd>
+                            <dt>支付费用：</dt>
+                            <dd>
+                                <template v-if="info.order.pay_status==1">
+                                    + <em>¥</em>{{info.order.order_amount}}
+                                </template>
+                                <template v-else>
+                                    <span class="red">未支付</span>
+                                </template>
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>使用优惠券：</dt>
+                            <dd>
+                                - <em>¥</em>
+                                {{info.order.coupon_price}}
+                            </dd>
+                            <dt>已付款金额：</dt>
+                            <dd>
+                                - <em>¥</em>
+                                {{info.order.order_amount}}
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>订单总金额：</dt>
+                            <dd class="red">
+                                <em>¥</em>
+                                {{info.order.total_amount}}
+
+                            </dd>
+                            <dt>应付款金额：</dt>
+                            <dd class="red">
+                                <em>¥</em>
+                                {{info.order.order_amount}}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                <!--操作信息-->
+                <div class="step order_total">
+                    <div class="step_title">
+                        <i class="ui-step"></i>
+                        <h3>发货操作信息</h3>
+                    </div>
+                    <div class="step_info">
+                        <div class="order_operation order_operation100">
+                            <div class="item">
+                                <div class="label">操作者：</div>
+                                <div class="value">{$admin_user.username}</div>
+                            </div>
+                            <div class="item">
+                                <div class="label">操作备注：</div>
+                                <div class="value">
+                                    <div class="bf100 fl">
+                                        <textarea name="action_remark" class="textarea" v-model="action_remark"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">当前可执行操作：</div>
+                                <div class="value">
+                                    <template v-if="info.delivery_order.status==0">
+                                        <input name="delivery_confirmed" type="submit" value="发货"
+                                               class="btn btn25 red_btn" @click="deliveryUpdate(1)">
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="operation_record">
+                            <table cellpadding="0" cellspacing="0">
+                                <thead>
+                                <th width="5%">&nbsp;</th>
+                                <th width="15%">操作者</th>
+                                <th width="15%">操作时间</th>
+                                <th width="15%">订单状态</th>
+                                <th width="15%">付款状态</th>
+                                <th width="15%">发货状态</th>
+                                <th width="20%">备注</th>
+                                </thead>
+                                <tbody>
+                                <template v-for="(vo,index) in info.order_log">
+                                    <tr>
+                                        <td>&nbsp;</td>
+                                        <td>{{vo.action_user_name}}</td>
+                                        <td>{{vo.log_time|timeParse}}</td>
+                                        <td>{{vo.status_desc}}</td>
+                                        <td>
+                                            {{vo.pay_status>0?'已付款':'未付款'}}
+                                        </td>
+                                        <td>
+                                            <template v-if="vo.shipping_status==0">未发货</template>
+                                            <template v-if="vo.shipping_status==1">发货中</template>
+                                            <template v-if="vo.shipping_status==2">已发货</template>
+                                            <template v-if="vo.shipping_status==3">部分发货</template>
+                                        </td>
+                                        <td><p v-html="vo.action_remark"></p></td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="userinfo" class="hide">
+        <div class="layui-card">
+            <div class="layui-card-header">用户基本信息</div>
+            <div class="layui-card-body">
+                <table class="layui-table" lay-size="sm">
+                    <thead>
+                    <tr>
+                        <th>联系电话</th>
+                        <th>用户名</th>
+                        <th>用户昵称</th>
+                        <th>账户余额</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{info.user.mobile}}</td>
+                        <td>{{info.user.user_name}}</td>
+                        <td>{{info.user.nick_name}}</td>
+                        <td>{{info.user.user_money}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="layui-card">
+            <div class="layui-card-header">收货地址基本信息</div>
+            <div class="layui-card-body">
+                <table class="layui-table" lay-size="sm">
+                    <thead>
+                    <tr>
+                        <th>收货人</th>
+                        <th>邮编</th>
+                        <th>电话</th>
+                        <th>地址</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{info.order.consignee}}</td>
+                        <td>{{info.order.zipcode}}</td>
+                        <td>{{info.order.mobile}}</td>
+                        <td>{{info.order.address}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="invoice" class="hide">
+        <div class="layui-col-md10">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">发票类型：</label>
+                        <div class="layui-input-block">
+                            <input type="radio" id="one" value="0" v-model="info.order.invoice_type">
+                            <label for="one">普通发票</label>
+
+                            <input type="radio" id="two" value="1" v-model="info.order.invoice_type">
+                            <label for="two">增值税发票</label>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">发票抬头：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.invoice_title" lay-verify="required"
+                                   class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">发票税号：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.invoice_no" lay-verify="required" class="layui-input"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">发票内容：</label>
+                        <div class="layui-input-block">
+                            <textarea name="other" class="layui-textarea" v-model="info.order.invoice_content"
+                                      disabled></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">买家留言：</label>
+                        <div class="layui-input-block">
+                            <textarea name="other" class="layui-textarea" v-model="info.order.user_note"
+                                      disabled></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商家给客户的留言：</label>
+                        <div class="layui-input-block">
+                            <textarea name="other" class="layui-textarea" v-model="info.order.admin_note"
+                                      disabled></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="priceupdate" class="hide">
+        <div class="layui-col-md10">
+            <div class="layui-card">
+                <div class="layui-card-body">
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品总金额：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.goods_price" lay-verify="required"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">使用余额：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.user_money" lay-verify="required" class="layui-input"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">使用积分：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.integral" lay-verify="required" class="layui-input"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">订单活动优惠：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.order_prom_amount" lay-verify="required"
+                                   class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">配送费用：</label>
+                        <div class="layui-input-block">
+                            <input type="number" v-model="info.order.shipping_price" lay-verify="required"
+                                   class="layui-input" @change="calc_price('shipping_price')">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">(+-)价格调整：</label>
+                        <div class="layui-input-block">
+                            <input type="number" v-model="info.order.discount" lay-verify="required" class="layui-input"
+                                   @change="calc_price('discount')">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">订单总金额：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.total_amount" lay-verify="required"
+                                   class="layui-input" disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">应付款金额：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.order_amount" lay-verify="required"
+                                   class="layui-input" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="usernote" class="hide">
+        <div class="layui-col-md10">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户备注：</label>
+                        <div class="layui-input-block">
+                            <textarea name="other" placeholder="" class="layui-textarea" v-model="info.order.user_note"
+                                      disabled></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">管理员备注：</label>
+                        <div class="layui-input-block">
+                            <textarea name="other" placeholder="" class="layui-textarea" v-model="info.order.admin_note"
+                                      disabled></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="addressinfo" class="hide">
+        <div class="layui-col-md10">
+            <div class="layui-card">
+                <div class="layui-card-body">
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">收货人：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.consignee" lay-verify="required" class="layui-input"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">手机号：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.mobile" lay-verify="required" class="layui-input"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">邮件：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.email" lay-verify="required" class="layui-input"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">邮编：</label>
+                        <div class="layui-input-block">
+                            <input type="text" v-model="info.order.zipcode" lay-verify="required" class="layui-input"
+                                   disabled>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">详细地址：</label>
+                        <div class="layui-input-block">
+                            <textarea name="other" placeholder="" class="layui-textarea" v-model="info.order.address"
+                                      disabled></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script>
+    var order_id = '{$order_id}';
+    var delivery_id = '{$delivery_id}';
+    var shipping_list = JSON.parse('{:addslashes(json_encode($shipping,320))}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            order_id: order_id,
+            delivery_id: delivery_id,
+            shipping_list: shipping_list,
+            info: {},
+            action_remark: '',
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            deliveryUpdate: function (status) {
+                let shipping_id = parseInt($('#shipping_id').val());
+                if (shipping_id == 0) {
+                    shipping_id = vm.info.delivery_order.shipping_id;
+                }
+                if (shipping_id < 1) {
+                    layer.msg('请选择物流公司');
+                    $('.cite').trigger('click');
+                    return;
+                }
+                if (vm.info.delivery_order.shipping_no.length < 2) {
+                    layer.msg('请填写运单号');
+                    $('input[name="shipping_no"]').focus();
+                    return false;
+                }
+                $.post('/admin/order/deliveryUpdate', {
+                    order_id: order_id,
+                    delivery_id: delivery_id,
+                    act: 'updatestatus',
+                    status: status,
+                    action_remark: vm.action_remark,
+                    shipping_id: shipping_id,
+                    shipping_no: vm.info.delivery_order.shipping_no
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        localStorage.setItem('refreshDelivery', 'true');
+                        vm.init();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            shippingno: function () {
+                $.post('/admin/order/deliveryUpdate', {
+                    order_id: order_id,
+                    delivery_id: delivery_id,
+                    act: 'shippingno',
+                    shipping_no: vm.info.delivery_order.shipping_no,
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.init();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            calc_price: function (flag) {
+                var price = vm.info.order[flag];
+                flag = flag == 'discount' ? 'shipping_price' : 'discount';
+                price = parseFloat(price) + parseFloat(vm.info.order[flag]);
+                vm.info.order.order_amount = (parseFloat(vm.info.order.origin_order_amount) + price).toFixed(2);
+            },
+            priceupdateInit: function () {
+                $('#priceupdate').window({
+                    title: '更改订单价格',
+                    width: 800,
+                    height: 600,
+                    modal: true,
+                });
+            },
+
+            invoiceInit: function () {
+                $('#invoice').window({
+                    title: '更改发票信息',
+                    width: 800,
+                    height: 600,
+                    modal: true,
+                });
+            },
+            usernote: function () {
+                $('#usernote').window({
+                    title: '添加备注',
+                    width: 800,
+                    height: 600,
+                    modal: true,
+                });
+            },
+            userinfo: function () {
+                $('#userinfo').window({
+                    title: '详细信息',
+                    width: 800,
+                    height: 600,
+                    modal: true,
+                });
+            },
+            addressinfo: function () {
+                $('#addressinfo').window({
+                    title: '详细信息',
+                    width: 800,
+                    height: 600,
+                    modal: true,
+                });
+            },
+            init: function () {
+                layer.load(2, {shade: [0.3, '#fff']});
+                $.post('/admin/order/deliverydetail', {
+                    order_id: vm.order_id,
+                    delivery_id: vm.delivery_id,
+                }, function (ret) {
+                    vm.info = ret.data;
+                }, 'json');
+            },
+            orderUpstatus: function (order_status = null, shipping_status = null) {
+                if (order_status == null) {
+                    return false;
+                }
+                if (shipping_status == null) {
+                    return false;
+                }
+                $.post('/admin/order/orderUpstatus', {
+                    order_id: vm.order_id,
+                    order_status: order_status,
+                    shipping_status: shipping_status,
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        vm.init();
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+</body>
+</html>

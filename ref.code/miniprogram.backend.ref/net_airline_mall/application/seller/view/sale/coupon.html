@@ -1,0 +1,102 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">优惠券列表</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/sale/add_coupon"><i class="icon-plus"></i>添加优惠券</a>
+</div>
+<div id="app" v-cloak>
+    <div class="search-info">
+        <div class="search-form">
+            <div class="search-key">
+                <input type="text" v-model="keywords" size="30" class="text text_2" placeholder="红包名称" @change="getData()">
+                <input type="button" value=" 搜索 " class="submit" @click="getData()">
+            </div>
+        </div>
+    </div>
+    <div class="list-div" id="listDiv">
+        <table class="ecsc-default-table">
+            <thead>
+            <tr>
+                <th width="18%" class="tl pl10">优惠券名称</th>
+                <th width="12%">发放类型</th>
+                <th width="10%">优惠券面额</th>
+                <th width="10%">最小订单金额</th>
+                <th width="10%">发行数量</th>
+                <th width="10%">已发放</th>
+                <th width="10%">已使用</th>
+                <th width="20%" class="tr pr20">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(vo,index) in list">
+                <td class="tl pl10">
+                    <span>{{vo.name}}</span>
+                </td>
+                <td>按商品发放</td>
+                <td>{{vo.money}}</td>
+                <td>{{vo.min_goods_amount}}</td>
+                <td>{{vo.num}}</td>
+                <td>{{vo.send_num || 0}}</td>
+                <td>{{vo.use_num || 0}}</td>
+                <td class="ecsc-table-handle tr">
+                    <span @click="view(vo.coupon_id)"><a class="btn-orange"><i class="icon sc_icon_see"></i><p>查看</p></a></span>
+                    <span><a :href="'/seller/sale/add_coupon?id='+vo.coupon_id" class="btn-green"><i class="icon icon-edit"></i><p>编辑</p></a></span>
+                    <span><a @click="del(index)" class="btn-red"><i class="icon icon-trash"></i><p>删除</p></a></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            keywords: ''
+        },
+        methods: {
+            getData: function (instance) {
+                instance = instance ? instance : vm;
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/sale/coupon',
+                    data: {keywords: instance.keywords},
+                    success: function (data) {
+                        instance.list = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseText);
+                    }
+                });
+            },
+            view: function (id) {
+                location.href = "/seller/sale/coupon_detail?id=" + id;
+            },
+            del: function (index) {
+                if (!window.confirm('确定要删除吗？')) {
+                    return;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/sale/coupon',
+                    data: {id: vm.list[index].coupon_id},
+                    success: function (data) {
+                        vm.list.splice(index, 1);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        },
+        created: function () {
+            this.getData(this);
+        }
+    });z
+</script>
+{include file="public/footer"}

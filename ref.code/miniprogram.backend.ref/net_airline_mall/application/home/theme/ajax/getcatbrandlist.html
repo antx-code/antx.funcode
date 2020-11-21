@@ -1,0 +1,7 @@
+{volist name="list" id="vo"}
+<li>
+    <a href="{:url('brand/index',['cat_id'=>$cat_id,'brand_id'=>$vo.brand_id])}" target="_blank">
+        <img src="{$vo.brand_logo}">
+    </a>
+</li>
+{/volist}

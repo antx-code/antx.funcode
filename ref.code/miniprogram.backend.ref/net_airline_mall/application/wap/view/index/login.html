@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>用户登录</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .user-login-box .user-login-ul .item-input{padding:2rem 0!important;}
+        .smslogin{margin-top:5rem;height:2rem;line-height:2rem; text-align: center;font-size:1.4rem;color:#4b89dc}
+        .user-login-box .user-login-ul .item-input .icon-liulan1{top:1.6rem!important;}
+        .btn-submit{font-size:1.8rem}
+    </style>
+</head>
+
+<body>
+<div id="app" v-cloak>
+    <section class="con bg-color-write">
+        <div class="user-login-box">
+            <div class="el-form user-login-form">
+                <div class="user-login-head">
+                    <h1>用户登录</h1>
+                </div>
+                <div class="user-login-ul">
+                    <div class="el-form-item is-required">
+                        <div class="el-form-item__content">
+                            <div class="item-input dis-box">
+                                <div class="label"><i class="iconfont icon-user"></i></div>
+                                <div class="value box-flex">
+                                    <div class="el-input el-input--username">
+                                        <input type="text" autocomplete="off" placeholder="请输入您的用户名/手机号" class="el-input__inner" v-model="username">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="el-form-item is-required">
+
+                        <div class="el-form-item__content">
+                            <div class="item-input dis-box">
+                                <div class="label"><i class="iconfont icon-pwd"></i></div>
+                                <div class="value box-flex">
+                                    <div class="el-input el-input--password">
+                                        <input type="password" autocomplete="off" placeholder="请输入6-20位登录密码" class="el-input__inner" v-model="password">
+
+                                    </div>
+                                </div>
+                                <i class="iconfont icon-liulan1 disabled"></i></div>
+                        </div>
+                    </div>
+                    <a href="javascript:void(0)" class="new-register" @click="registeropen">新用户注册</a>
+                    <a href="javascript:void(0)" class="list-password">忘记密码?</a>
+                </div>
+                <button type="button" class="btn btn-submit border-radius-top05" @click="init()">登录</button>
+
+                <div class="smslogin" onclick="openwind('','smslogin_win')">短信验证码登录</div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            username: '',
+            password: '',
+        },
+        methods: {
+            registeropen:function(){
+                api.openWin({
+                    name: 'register_win',
+                    url: 'widget://html/register_win.html',
+                });
+            },
+            init: function () {
+                if (vm.username == '') {
+                    wxapp.alert('fail', '用户名不能为空');
+                    return false;
+                }
+                if (vm.password == '') {
+                    wxapp.alert('fail', '密码不能为空');
+                    return false;
+                }
+                wxapp.ajax(config.Login, {
+                    username: vm.username,
+                    password: vm.password
+                }).then(function (ret) {
+                    if (ret.status == 1) {
+                        wxapp.alert('success', '登录成功');
+                        $api.setStorage('token', ret.data.token);
+                        window.location.href = '/wap/index/center';
+                    } else {
+                        wxapp.alert('fail', '登录失败');
+                    }
+                })
+            },
+        },
+        mounted:function () {
+            inputFocus();
+        }
+    });
+</script>
+

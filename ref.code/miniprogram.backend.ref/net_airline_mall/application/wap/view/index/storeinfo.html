@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>店铺详情</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="con">
+        <header class="goods-shop-info padding-all">
+            <section class="dis-box">
+                <div class="g-s-i-img"><img src="https://x.dscmall.cn/storage/images/seller_imgs/seller_logo/logo_thumb/1536872208964241423.jpg" class="img"></div>
+                <div class="g-s-i-title box-flex">
+                    <h3>{{info.store.store_name}}</h3>
+                    <p>已经有 <span>{{info.store.collectCount}}</span> 人关注</p>
+                </div>
+                <div class="g-s-info-add"><a href="javascript:void(0);" class=""><span>已关注</span></a></div>
+            </section>
+            <div class="goods-shop-score dis-box">
+                <p class="box-flex"><label class="fl">商品</label><span class="color-red margin-lr fl">5分</span><em class="em-promotion fl">高</em></p>
+                <p class="box-flex"><label class="fl">服务</label><span class="color-low margin-lr fl">5分</span><em class="em-promotion em-p-low fl">高</em></p>
+                <p class="box-flex"><label class="fl">时效</label><span class="color-center margin-lr fl">5分</span><em class="em-promotion em-p-center fl">高</em></p>
+            </div>
+        </header>
+        <div class="shopping-info-nums bg-color-write">
+            <ul class="dis-box text-center">
+                <li class="box-flex">
+                    <a href="javascript:;">
+                        <h4>{{info.goods_count.is_on_sale[1]>0?info.goods_count.is_on_sale[1]:0}}</h4>
+                        <p>全部商品</p>
+                    </a>
+                </li>
+                <li class="box-flex">
+                    <a href="javascript:;">
+                        <h4>{{info.goods_count.is_new[1]>0?info.goods_count.is_new[1]:0}}</h4>
+                        <p>新品</p>
+                    </a>
+                </li>
+                <li class="box-flex">
+                    <a href="javascript:;">
+                        <h4>{{info.goods_count.is_best[1]>0?info.goods_count.is_best[1]:0}}</h4>
+                        <p>促销</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="m-top08 van-cell-group van-hairline--top-bottom">
+            <div class="my-bottom van-cell">
+                <div class="van-cell__title"><span>在线客服</span>
+                </div>
+                <div class="van-cell__value">
+                    <div class="van-cell__right-icon"><i class="iconfont icon-kefu"></i></div>
+                </div>
+            </div>
+            <div class="my-bottom van-cell">
+                <div class="van-cell__title"><span>店铺二维码</span>
+                </div>
+                <div class="van-cell__value">
+                    <div class="van-cell__right-icon"><i class="iconfont icon-904anquansaoma"></i></div>
+                </div>
+            </div>
+            <a href="tel:021-62601332">
+                <div class="my-bottom van-cell">
+                    <div class="van-cell__title"><span>商家电话</span>
+                    </div>
+                    <div class="van-cell__value">
+                        <div class="van-cell__right-icon"><i class="iconfont icon-a"></i></div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="van-cell-noleft m-top08 van-cell-group van-hairline--top-bottom">
+            <div class="my-bottom van-cell">
+                <div class="van-cell__title"><span>公司简介</span>
+                </div>
+            </div>
+            <div class="my-bottom van-cell">
+                <div class="van-cell__title"><span>证照信息</span>
+                </div>
+                <div class="van-cell__value">
+                    <div solt="value" class="van-cell__value dis-box"><span class="box-flex"></span>
+                        <div class="van-cell__right-icon"><i class="iconfont icon-iconfontzhizuobiaozhun10" style="color: rgb(33, 186, 69);"></i></div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-bottom van-cell">
+                <div class="van-cell__title"><span>公司名称：</span>
+                </div>
+                <div class="van-cell__value"><span>{{info.store.store_name}}</span></div>
+            </div>
+            <div class="my-bottom van-cell">
+                <div class="van-cell__title"><span>所在地区：</span>
+                </div>
+                <div class="van-cell__value">
+                    <div solt="value" class="van-cell__value dis-box"><span class="box-flex">{{info.store.store_address?info.store.store_address:'暂无'}}</span></div>
+                </div>
+            </div>
+            <div class="my-bottom van-cell">
+                <div class="van-cell__title"><span>主营品牌：</span>
+                </div>
+                <div class="van-cell__value"><span>万卓</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            store_id: 29,
+            info: []
+        },
+        methods: {
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'goodsdetail_win',
+                    url: 'widget://html/goodsdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.storeindex, {store_id: vm.store_id}).then(function (ret) {
+                    vm.info = ret.data;
+                });
+            },
+        }
+    });
+    window.onload = function () {
+        vm.store_id = api.pageParam.store_id ? api.pageParam.store_id : 0;
+        vm.init();
+    };
+</script>

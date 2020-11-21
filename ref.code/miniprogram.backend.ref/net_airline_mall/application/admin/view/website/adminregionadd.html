@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>请合理填写区域名称。</li>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info user_basic" style="display:block;">
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            &nbsp;区域名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" name='ra_name' value='' class="text" v-model="info.ra_name"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">排序：</div>
+                        <div class="label_value">
+                            <input type="text" name='ra_sort' v-model="info.ra_sort" value='1' class="text" autocomplete="off"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">选择地区：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <template v-for="(vo,index) in regionList">
+                                    <div class="checkbox_item">
+                                        <input type="checkbox" :value="vo.region_id"
+                                               name="regionids[]" class="ui-checkbox" :id="checked_+vo.region_id">
+                                        <label :for="checked_+vo.region_id" class="ui-label">{{vo.region_name}}</label>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var regionList = JSON.parse('{$regionList|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            regionList: regionList,
+            info: info,
+            checked_: 'checked_',
+        },
+        methods: {
+            init: function () {
+                var arr = new Array();
+                $(".user_basic").find("input[name='regionids[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.info.regionids = arr.join(",");
+                majax('/admin/website/adminregionadd',vm.info);
+            }
+        }
+    });
+</script>

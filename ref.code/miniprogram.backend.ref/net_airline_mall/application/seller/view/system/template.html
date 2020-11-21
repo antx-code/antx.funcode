@@ -1,0 +1,72 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li><a href="/seller/system/shipping">物流配送</a></li>
+        <li class="active"><a href="/seller/system/template">运费模板</a></li>
+    </ul>
+</div>
+
+<div class="list-div" id="listDiv" v-cloak>
+    <div class="btn-info">
+        <a class="sc-btn sc-blue-btn" href="/seller/system/template_add"><i class="icon-plus"></i>添加模板</a>
+    </div>
+
+    <table cellpadding="1" cellspacing="1" class="ecsc-default-table mt20">
+        <thead>
+        <tr>
+            <th width="10%">编号</th>
+            <th width="20%">模板名称</th>
+            <th width="15%">运费标题</th>
+            <th width="20%">计算方式</th>
+            <th width="20%">更新时间</th>
+            <th width="15%">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo,index) in list">
+            <td align="center">{{vo.transport_id}}</td>
+            <td><span>{{vo.transport_name}}</span></td>
+            <td>{{vo.transport_title}}</td>
+            <td>{{type[vo.type]}}</td>
+            <td>{{vo.update_time | timeParse}}</td>
+            <td class="ecsc-table-handle">
+                <span><a :href="'/seller/system/template_add?id='+vo.transport_id" title="编辑" class="btn-green"><i class="icon icon-edit"></i><p>编辑</p></a></span>
+                <span class="mr0"><a @click="del(index)" title="移除" class="btn-red"><i class="icon icon-trash"></i><p>删除</p></a></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#listDiv',
+        data: {
+            list: JSON.parse('{:json_encode($list,JSON_UNESCAPED_UNICODE)}'),
+            type: JSON.parse('{:json_encode($type,JSON_UNESCAPED_UNICODE)}')
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            del: function (index) {
+                if (!window.confirm('确定要删除吗？')) {
+                    return;
+                }
+                var _this = this;
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/system/template',
+                    data: {id: _this.list[index].transport_id},
+                    success: function (data) {
+                        _this.list.splice(index, 1);
+                    },
+                });
+            }
+        }
+    });
+</script>
+
+{include file="public/footer"}

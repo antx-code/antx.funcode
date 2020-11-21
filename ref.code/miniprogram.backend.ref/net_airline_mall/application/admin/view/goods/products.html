@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="cboxContent">
+        <div class="pb-bd">
+            <div class="pb-ct">
+                <div class="sku_goods_info">
+                    <div class="warehouse_item">
+                        <span class="item">
+                            <span class="tit">商品货号</span>
+                            <div class="imitate_select select_w120 pl10">
+                                {{info.goods_sn}}
+                            </div>
+                        </span>
+                        <span class="item">
+                            <span class="tit"></span>
+                            <div class="search mt0">
+                                <div class="input">
+                                    <input v-model="keywords" class="text nofocus w200" placeholder="SKU编号" type="text">
+                                    <button type="button" class="btn pro_btn" name="secrch_btn"
+                                            @click="secrchInit()"></button>
+                                </div>
+                                <div class="refresh" @click="pageFreash()">
+                                     <div title="刷新数据" class="refresh_tit"><i class="icon icon-refresh"></i></div>
+                                     <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+                    <div id="attrlistDiv">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th width="20%">SKU编号</th>
+                                <th width="30%">规格</th>
+                                <th width="15%">条形码</th>
+                                <th width="15%">价格</th>
+                                <th width="10%">库存</th>
+                                <th width="10%">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(vo,index) in list">
+                                    <td>
+                                        <input class="text w180 tc fn" type="text" v-model="vo.product_sn">
+                                    </td>
+                                    <td>
+                                        <span class="attr_value" data-toggle="tooltip">{{vo.tempvalue}}</span>
+                                    </td>
+                                    <td>
+                                        <input @keyup.enter="productsupdate(vo)" class="text w100 tc fn" v-model="vo.bar_code" type="text">
+                                    </td>
+                                    <td>
+                                        <input @keyup.enter="productsupdate(vo)" class="text w100 tc fn" v-model="vo.product_price" type="text">
+                                    </td>
+                                    <td>
+                                        <input @keyup.enter="productsupdate(vo)" class="text w60 tc fn" v-model="vo.product_number" type="text">
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="btn_trash" @click="productdelete(index)"><i class="icon icon-trash"></i>删除</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="12">
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var goods_id = JSON.parse('{$goods_id}');
+    var info = JSON.parse('{:addslashes($info)}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            goods_id: goods_id,
+            info: info,
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: []
+        },
+        methods: {
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            productsupdate:function(vo){
+                $.post('/admin/goods/products', {
+                    pageparm: JSON.stringify(vo),
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            productdelete:function(index){
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/goods/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table:'products'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            init: function () {
+                $.get('/admin/goods/products', {
+                    goods_id: vm.goods_id,
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+
+
+
+
+
+

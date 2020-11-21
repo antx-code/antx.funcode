@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="tabs_info">
+            <ul>
+                <li class="curr">
+                    <a href="javascript:void(0)"
+                       onclick="parent.addParentTab({title: '品牌管理', href: '/admin/goods/brandlist'})">品牌管理</a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)"
+                       onclick="parent.addParentTab({title: '商家品牌', href: '/admin/goods/storebrand'})">商家品牌</a>
+                </li>
+            </ul>
+        </div>
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>展示了商城自营品牌的相关信息。可以通过品牌关键字搜索相关品牌信息。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <a href="JavaScript:void(0)" @click="doadd()">
+                        <div class="fbutton">
+                            <div class="add" title="添加品牌">
+                                <span>
+                                    <i class="icon icon-plus"></i>
+                                    添加品牌
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0)" @click="setinitials()">
+                        <div class="fbutton">
+                            <div class="add" title="生成品牌首字母">
+                                <span>
+                                    <i class="icon icon-plus"></i>
+                                    生成品牌首字母
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="brand_name" class="text nofocus" placeholder="品牌名称" autocomplete="off"
+                               v-model="keywords">
+                        <input type="submit" class="btn" name="secrch_btn" shoptype="secrch_btn" value=""
+                               @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%">
+                                <div class="tDiv">编号</div>
+                            </th>
+                            <th width="12%">
+                                <div class="tDiv">品牌中文名称</div>
+                            </th>
+                            <th width="12%">
+                                <div class="tDiv">品牌英文名称</div>
+                            </th>
+                            <th width="12%">
+                                <div class="tDiv">品牌首字母</div>
+                            </th>
+                            <th width="8%">
+                                <div class="tDiv">品牌图片</div>
+                            </th>
+                            <th width="6%">
+                                <div class="tDiv">排序</div>
+                            </th>
+                            <th width="6%">
+                                <div class="tDiv">加入推荐</div>
+                            </th>
+                            <th width="6%">
+                                <div class="tDiv">是否显示</div>
+                            </th>
+                            <th width="10%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td>
+                                    <div class="tDiv">{{vo.brand_id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <span>{{vo.brand_name}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.brand_letter}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.brand_first_char}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <span class="show">
+                                            <a :href="vo.brand_logo"
+                                               class="nyroModal">
+                                                <i class="icon icon-picture" :data-tooltipimg="vo.brand_logo+'?ctime='+time()" shoptype="tooltip" title="tooltip"></i>
+                                            </a>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input name="sort_order" class="text w100" v-model="vo.sort_order"
+                                               @keyup.enter="brandupdateSort(vo)" type="text">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.is_recommend==1}" title="是"
+                                             @click="brandupdateRecommend(vo)">
+                                            <div class="circle"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.is_show==1}" title="是"
+                                             @click="brandupdateShow(vo)">
+                                            <div class="circle"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a2">
+                                        <a href="javascript:void(0)" class="btn_edit" @click="doadd(vo)">
+                                            <i class="icon icon-edit"></i>编辑
+                                        </a>
+                                        <a href="javascript:;" @click="brandupdateDelete(vo,index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="list-page">
+                                    <div id="turn-page"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: []
+        },
+        methods: {
+            time:function(){
+              return Math.random();
+            },
+            doadd: function (vo = {}) {
+                if (vo.brand_id > 0) {
+                    layerOpenwinMid('编辑品牌', '/admin/goods/brandadd?brand_id=' + vo.brand_id);
+                } else {
+                    layerOpenwinMid('添加品牌', '/admin/goods/brandadd');
+                }
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/goods/brandlist', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+
+            brandupdateRecommend: function (vo) {
+                var is_recommend = vo.is_recommend == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_recommend = is_recommend;
+                majax('/admin/goods/doupdate', pageparm, 'brand')
+            },
+            brandupdateShow: function (vo) {
+                var is_show = vo.is_show == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_show = is_show;
+                majax('/admin/goods/doupdate', pageparm, 'brand')
+            },
+            brandupdateSort: function (vo) {
+                var pageparm = vo;
+                majax('/admin/goods/doupdate', pageparm, 'brand')
+            },
+            brandupdateDelete: function (vo, index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        var is_delete = vo.is_delete == 0 ? 1 : 0;
+                        var pageparm = vo;
+                        pageparm.is_delete = is_delete;
+                        $.post('/admin/goods/doupdate', {
+                            pageparm: JSON.stringify(pageparm),
+                            table: 'brand'
+                        }, function (ret) {
+                            $.messager.progress('close');
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+
+            setinitials: function () {
+                $.iMessager.progress({text: '批量更新中，请等待'});
+                $.post('/admin/goods/setinitials', {
+                    table: 'brand'
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 2000, showType: 'slide'});
+                        vm.pageFreash();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            }
+        },
+
+        updated:function () {
+            $.tooltipimg();
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+
+
+</script>
+<script type="text/javascript" src="/public/static/js/jquery.picTip.js"></script>

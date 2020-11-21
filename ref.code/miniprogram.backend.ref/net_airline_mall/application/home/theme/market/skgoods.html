@@ -1,0 +1,93 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="content">
+    <div class="banner seckill-banner">
+        <a href="/" style="background:url('{$banner}') center center no-repeat; width:100%; height:300px;"></a>
+    </div>
+    <div class="seckill-main">
+        <div class="w w1200">
+            <div class="seckill-hot-goods">
+                <div class="seckill-time-tabs">
+                    <ul>
+                        <li class="curr">
+                            <strong>今日秒杀</strong>
+                        </li>
+                    </ul>
+
+                    <div   style="float: right;line-height: 50px; font-size: 16px;padding-right: 10px;">
+
+                        {volist name="list" id="vo"}
+                        <div class="{if $vo.curr==1}curr{/if}">
+                            <div class="time" shoptype="time" data-time="{if $vo.curr==1}{$vo.end_time_cn}{else /}{$vo.start_time_cn}{/if}">
+                                <span><i>距结束</i></span>
+                                <span class="hours">00</span>
+                                <em>:</em>
+                                <span class="minutes">00</span>
+                                <em>:</em>
+                                <span class="seconds">00</span>
+                            </div>
+                        </div>
+                        {/volist}
+
+                    </div>
+
+                </div>
+                <div class="seckill-warp">
+
+                    {volist name="list" id="vo"}
+                        {if isset($vo.goods_list) && $vo.curr == 1}
+                            <ul class="gb-index-list clearfix">
+                                {volist name="vo['goods_list']" id="vo2"}
+                                <li class="mod-shadow-card">
+                                    <div class="p-img">
+                                        <a href="{:url('market/skdetail',['id'=>$vo2.goods_id])}" target="_blank">
+                                            <img src="{$vo2.original_img}">
+                                        </a>
+                                    </div>
+                                    <div class="p-name">
+                                        <a href="{:url('market/skdetail',['id'=>$vo2.goods_id])}" title="{$vo2.goods_name}" target="_blank">{$vo2.goods_name}</a>
+                                    </div>
+                                    <div class="p-lie clearfix">
+                                        <div class="p-pirce"><em>¥</em>{$vo2.sec_price}</div>
+                                        <div class="p-del">
+                                            <del><em>¥</em>{$vo2.shop_price}</del>
+                                        </div>
+                                    </div>
+                                    <div class="p-number clearfix">
+                                        <span>已售0%</span>
+                                        <div class="timebar"><i style="width:0%;"></i></div>
+                                    </div>
+                                    <a href="{:url('market/skdetail',['id'=>$vo2.goods_id])}" target="_blank" class="btn sc-redBg-btn">立即购买 </a>
+                                </li>
+                                {/volist}
+                            </ul>
+                        {/if}
+                    {/volist}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{include file='public/footer'}
+
+<script type="text/javascript">
+    $(function () {
+        $("*[shoptype='time']").each(function () {
+            $(this).yomi();
+        });
+
+        $("*[shoptype='seckillTab'] li").on("click", function () {
+            var index = $(this).index();
+            $(this).addClass("curr").siblings().removeClass("curr");
+
+            $(".seckill-warp").find("ul").eq(index).show().siblings().hide();
+        });
+    });
+</script>
+
+
+

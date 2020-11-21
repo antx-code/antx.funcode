@@ -1,0 +1,39 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+
+<div class="container">
+    <div class="w w1200 h-margin-20">
+        <div class="err-404 flex jujustify-content-center">
+            <img src="__THEME__/images/error_ts.png">
+            <div class="w240 flex align-item-center">
+                <div class="text-center">
+                    <h3>您要查看的页面不存在</h3>
+                    <p class="mt10"><a href="/">回首页</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="w w1200">
+        <div class="goods-main-layout">
+            <div class="rection">
+                <div class="ftit"><h3>逛逛其它吧</h3></div>
+                <ul id="guess_goods_love"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{include file='public/right_bar'}
+<script>
+    function guessYouLike() {
+        $.post('/home/index/ajaxGuessYouLike', {limit: 20}, function (res) {
+            $("#guess_goods_love").html(res);
+        });
+    }
+
+    guessYouLike();
+</script>
+{include file='public/footer'}

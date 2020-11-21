@@ -1,0 +1,37 @@
+/**公共样式表**/
+body{ background:#f5f5f5; color:#222222;}
+[v-cloak] {display: none;}
+.list-enter-active, .list-leave-active {transition: all 1s;}
+.list-enter, .list-leave-active {opacity: 0;transform: translateY(30px);}
+.aui-font-size-13 {font-size: 0.65rem !important;}
+.aui-font-size-15 {font-size: 0.75rem !important;}
+.aui-bg-white {background-color: #FFFFFF !important;}
+.aui-bg-black{background-color: #222222 !important;}
+.aui-bg-warning{background-color: #ffcc41 !important;}
+.aui-text-orange {color: #f39905 !important;}
+.aui-text-black{color: #000000 !important;}
+.aui-text-gray{color: #666 !important;}
+.aui-text-grayer{color: #999 !important;}
+.aui-text-danger{color: #fe8277 !important;}
+.aui-text-warning{color:#ffc323 !important;}
+.aui-shadow{box-shadow: 0 1px 6px rgba(0,0,0,.1);}
+.aui-radius-4{border-radius:4px; }
+.aui-list{ border:none; background-image:none;}
+.aui-list .aui-list-item{background-image:none;border:none;}
+/**AUI重写css**/
+.aui-bar-light {color: #4A4A4A;}
+/**分类样式**/
+.aui-list-view-cell {font-size: 0.65rem;color:#666;position: relative;padding:10px 0;text-align: center;}
+.aui-list-view-cell.aui-active{ background:#e7e7e7;}
+.aui-list-view-cell.active{ color:#ffc323;}
+.cateList .hd {height:2.4rem;line-height:2.4rem;text-align: center;font-size:0.7rem;color: #333;}
+.cateList .hd .text {position: relative; background:transparent}
+.cateList .hd .text:after, .cateList .hd .text:before {background-color: #333;}
+.cateList .hd .text:before {left: -1.4rem;}
+.cateList .hd .text:after, .cateList .hd .text:before {position: absolute;content: '';top: 0;bottom: 0;margin: auto;height: 1px;width: 1rem;background-color: #333;-webkit-transform-origin: 50% 100% 0;transform-origin: 50% 100% 0;}
+.cateList .hd .text:after{right:-1.4rem;}
+.cateImg {display: block; width: 100%;background: #fff;box-shadow: 0 0px 6px rgba(0,0,0,.2); border-radius:4px;}
+.aui-list-view.aui-grid-view .aui-list-view-cell .aui-img-body.name {height:1.8rem;font-size: 0.6rem;color: #333;text-align: center;line-height:0.8rem;}
+.aui-list-view.aui-grid-view .aui-list-view-cell .aui-img-body.name { height:1.8rem;padding: 5px 0;}
+
+.aui-bar-nav {top: 0;line-height: 2.25rem;background-color: #d83131;color: #ffffff;}

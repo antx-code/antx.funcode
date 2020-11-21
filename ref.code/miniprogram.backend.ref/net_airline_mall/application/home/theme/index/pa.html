@@ -1,0 +1,226 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+{include file='public/right_bar'}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .evaluateBox {
+        width: 1100px;
+        height: 480px;
+        margin: 50px auto;
+        background: #FFFFFF;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.50);
+        border-radius: 5px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .centerList {
+        height: 40%;
+        line-height: 40%;
+        padding-left: 15%;
+        padding-right: 15%;
+        margin-top: 3%;
+    }
+
+    .centerItem {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .secondBg,
+    .firstBg,
+    .thirdBg {
+        padding-left: 10px;
+        background-position: center center;
+        background-repeat: no-repeat;
+        height: 200px;
+        padding-right: 10px;
+        width: 33.33333%;
+        position: relative;
+    }
+
+    .secondBg {
+        background-image: url(/public/static/theme/images/second_bg.png);
+    }
+
+    .firstBg {
+        background-image: url(/public/static/theme/images/first_bg.png);
+        margin-bottom: 50px;
+    }
+
+    .thirdBg {
+        background-image: url(/public/static/theme/images/third_bg.png);
+    }
+
+    .itemTitle {
+        position: absolute;
+        left: 50%;
+        bottom: 27%;
+        width: 33.33333%;
+        height: 45px;
+        line-height: 45px;
+        text-align: center;
+        transform: translateX(-50%);
+        font-size: 18px;
+        color: #fff;
+        font-family: '微软雅黑', '宋体';
+    }
+
+    .bottomList {
+        display: flex;
+        height: 144px;
+        margin: 0 4%;
+        margin-top: 50px;
+        justify-content: space-between;
+    }
+
+    .pointImg {
+        display: inline-block;
+        width: 30px;
+        height: 6px;
+        margin-top: 72px;
+        border: none;
+        vertical-align: middle;
+    }
+
+    .textList {
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 100% 100%;
+        width: 108px;
+        position: relative;
+        float: left;
+        height: 100%;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .2);
+        border-radius: 6px;
+    }
+
+    .textList:nth-of-type(1) {
+        background-image: url(/public/static/theme/images/score04.png);
+    }
+
+    .textList:nth-of-type(2) {
+        background-image: url(/public/static/theme/images/score05.png);
+    }
+
+    .textList:nth-of-type(3) {
+        background-image: url(/public/static/theme/images/score06.png);
+    }
+
+    .textList:nth-of-type(4) {
+        background-image: url(/public/static/theme/images/score07.png);
+    }
+
+    .textList:nth-of-type(5) {
+        background-image: url(/public/static/theme/images/score08.png);
+    }
+
+    .textList:nth-of-type(6) {
+        background-image: url(/public/static/theme/images/score09.png);
+    }
+
+    .textList:nth-of-type(7) {
+        background-image: url(/public/static/theme/images/score10.png);
+    }
+
+    .listScore {
+        position: absolute;
+        width: 100%;
+        bottom: 22%;
+        left: 0%;
+        font-family: '微软雅黑', '宋体';
+        font-size: 14px;
+        color: #EE6B2B;
+        letter-spacing: 0;
+        text-align: center;
+    }
+
+    .listSite {
+        position: absolute;
+        padding: 0 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 80%;
+        bottom: 8%;
+        left: 0%;
+        text-align: center;
+        font-family: '微软雅黑', '宋体';
+        font-size: 16px;
+        color: #666666;
+        letter-spacing: 0;
+    }
+
+    .poster-bg {
+        height: 600px;
+        background: url('{$banner}') no-repeat;
+        background-position: center center;
+    }
+</style>
+<div class="w">
+    <div class="poster-bg"></div>
+    <div class="evaluateBox">
+        <div class="centerList">
+            <div class="centerItem">
+                <div class="secondBg">
+                    <p class="itemTitle">洛阳市</p>
+                </div>
+                <div class="firstBg">
+                    <p class="itemTitle" style="bottom:24%;">郑州市</p>
+                </div>
+                <div class="thirdBg">
+                    <p class="itemTitle">安阳市</p>
+                </div>
+            </div>
+        </div>
+        <div class="bottomList">
+            <img class="pointImg" src="/public/static/theme/images/linepoint.png">
+            <div class="textList">
+                <p class="listScore">90分</p>
+                <p class="listSite">平顶山市</p>
+            </div>
+            <img class="pointImg" src="/public/static/theme/images/linepoint.png">
+            <div class="textList">
+                <p class="listScore">89分</p>
+                <p class="listSite">商丘市</p>
+            </div>
+            <img class="pointImg" src="/public/static/theme/images/linepoint.png">
+            <div class="textList">
+                <p class="listScore">88分</p>
+                <p class="listSite">鹤壁市</p>
+            </div>
+            <img class="pointImg" src="/public/static/theme/images/linepoint.png">
+            <div class="textList">
+                <p class="listScore">87分</p>
+                <p class="listSite">新乡市</p>
+            </div>
+            <img class="pointImg" src="/public/static/theme/images/linepoint.png">
+            <div class="textList">
+                <p class="listScore">86分</p>
+                <p class="listSite">焦作市</p>
+            </div>
+            <img class="pointImg" src="/public/static/theme/images/linepoint.png">
+            <div class="textList">
+                <p class="listScore">85分</p>
+                <p class="listSite">驻马店市</p>
+            </div>
+            <img class="pointImg" src="/public/static/theme/images/linepoint.png">
+            <div class="textList">
+                <p class="listScore">84分</p>
+                <p class="listSite">信阳市</p>
+            </div>
+            <img class="pointImg" src="/public/static/theme/images/linepoint.png">
+        </div>
+    </div>
+</div>
+<script>
+
+</script>
+{include file='public/footer'}

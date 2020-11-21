@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>请认真填写物流信息。</li>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info">
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            物流名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model.trim="info.shipping_name" value='' class="text"
+                                   autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            查询代码：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" name='shipping_code' v-model.trim="info.shipping_code" value='' class="text"
+                                   autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">物流描述：</div>
+                        <div class="label_value">
+                            <textarea name="description" class="textarea" v-model="info.shipping_desc"></textarea>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">货到付款：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.pay_type_face" id="sex_3" value="1"
+                                           class="ui-radio">
+                                    <label for="sex_3" class="ui-radio-label">支持</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.pay_type_face" id="sex_4" value="0"
+                                           class="ui-radio">
+                                    <label for="sex_4" class="ui-radio-label">不支持</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">线下汇款：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.pay_type_bank" id="sex_5" value="1"
+                                           class="ui-radio">
+                                    <label for="sex_5" class="ui-radio-label">支持</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.pay_type_bank" id="sex_6" value="0"
+                                           class="ui-radio">
+                                    <label for="sex_6" class="ui-radio-label">不支持</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                if(!vm.info.shipping_name){
+                    layer.msg('请填写物流名称');
+                    return;
+                }
+                if(!vm.info.shipping_code){
+                    layer.msg('请填写物流查询代码');
+                    return;
+                }
+                majax('/admin/website/shippingadd', vm.info, 'shipping');
+            }
+        }
+    });
+</script>

@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper shop_special" id="app">
+    <div class="content">
+        <div class="tabs_info">
+            <ul>
+                <li class="curr">
+                    <a href="javascript:void(0);">平台信息</a>
+                </li>
+                <li class="">
+                    <a href="javascript:void(0);">基本设置</a>
+                </li>
+                <li class="">
+                    <a href="javascript:void(0);">显示设置</a>
+                </li>
+                <li class="">
+                    <a href="javascript:void(0);">购物流程</a>
+                </li>
+                <li class="">
+                    <a href="javascript:void(0);">WAP设置</a>
+                </li>
+                <li class="">
+                    <a href="javascript:void(0);">扩展信息</a>
+                </li>
+                <li class="">
+                    <a href="javascript:void(0);">logo设置</a>
+                </li>
+            </ul>
+        </div>
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span id="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>商店相关信息设置，请谨慎填写信息。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info shopConfig_switch">
+                    <div class="item shop_name" data-val="101">
+                        <div class="label">商店名称：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[101]" class="text shop_name" v-model="info.shop_name"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item shop_title" data-val="102">
+                        <div class="label">商店标题：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[102]" class="text shop_title" v-model="info.shop_title"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">商店的标题，将显示在浏览器的标题栏Title</div>
+                        </div>
+                    </div>
+                    <div class="item shop_desc" data-val="103">
+                        <div class="label">商店描述：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[103]" class="text shop_desc" v-model="info.shop_desc"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">商店描述内容，将显示在浏览器的Description</div>
+                        </div>
+                    </div>
+                    <div class="item shop_keywords" data-val="104">
+                        <div class="label">商店关键字：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[104]" class="text shop_keywords"
+                                   v-model="info.shop_keywords"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">商店的关键字，将显示在浏览器的Keywords</div>
+                        </div>
+                    </div>
+                    <div class="item shop_address" data-val="108">
+                        <div class="label">详细地址：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[108]" class="text shop_address" v-model="info.shop_address"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">商店详细地址，不显示在前台</div>
+                        </div>
+                    </div>
+                    <div class="item qq" data-val="109">
+                        <div class="label">客服QQ号码：</div>
+                        <div class="label_value">
+                            <textarea class="textarea" name="value[109]"
+                                      v-model="info.qq"></textarea>
+                            <div class="form_prompt"></div>
+                            <div class="notic">QQ客服名称和号码请用“|”隔开（如：客服1|123456），如果您有多个客服的QQ号码，请换行。</div>
+                        </div>
+                    </div>
+                    <div class="item qq" data-val="1048">
+                        <div class="label">发票内容：</div>
+                        <div class="label_value">
+                            <textarea class="textarea" name="value[1048]"
+                                      v-model="info.fapiaocon"></textarea>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item ww hide" data-val="110">
+                        <div class="label">淘宝旺旺：</div>
+                        <div class="label_value">
+                            <textarea class="textarea" name="value[110]"
+                                      v-model="info.ww"></textarea>
+                            <div class="form_prompt"></div>
+                            <div class="notic">旺旺客服名称和号码请用“|”隔开（如：客服2|654321），如果您有多个客服的旺旺号码，请换行。</div>
+                        </div>
+                    </div>
+                    <div class="item service_email" data-val="114">
+                        <div class="label">客服邮件地址：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[114]" class="text service_email"
+                                   v-model="info.service_email"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">商店客服邮箱地址，接收发送的信息</div>
+                        </div>
+                    </div>
+                    <div class="item service_phone" data-val="115">
+                        <div class="label">客服电话：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[115]" class="text service_phone"
+                                   v-model="info.service_phone"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">商店客服电话，联系平台电话，例：入驻页面导航显示的电话</div>
+                        </div>
+                    </div>
+                    <div class="item shop_closed hide" data-val="116">
+                        <div class="label">暂时关闭网站：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[116]" class="ui-radio evnet_shop_closed"
+                                           id="value_116_0" value="0" v-model="info.shop_closed"/>
+                                    <label for="value_116_0" class="ui-radio-label">否</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[116]" class="ui-radio evnet_shop_closed"
+                                           id="value_116_1" value="1" v-model="info.shop_closed"/>
+                                    <label for="value_116_1" class="ui-radio-label">是</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">商店需升级或者其他原因临时关闭网站</div>
+                        </div>
+                    </div>
+
+                    <div class="item close_comment hide" data-val="117">
+                        <div class="label">关闭网店的原因：</div>
+                        <div class="label_value">
+                            <textarea class="textarea" name="value[117]" id="role_describe"
+                                      v-model="info.close_comment"></textarea>
+                            <div class="form_prompt"></div>
+                            <div class="notic">商店临时关闭网站说明原因</div>
+                        </div>
+                    </div>
+
+                    <div class="item user_notice hide" data-val="120">
+                        <div class="label">用户中心公告：</div>
+                        <div class="label_value">
+                            <textarea class="textarea" name="value[120]" id="role_describe"
+                                      v-model="info.user_notice"></textarea>
+                            <div class="form_prompt"></div>
+                            <div class="notic">该信息将在用户中心欢迎页面显示</div>
+                        </div>
+                    </div>
+                    <div class="item shop_notice hide" data-val="121">
+                        <div class="label">商店公告：</div>
+                        <div class="label_value">
+                            <textarea class="textarea" name="value[121]" id="role_describe"
+                                      v-model="info.shop_notice"></textarea>
+                            <div class="form_prompt"></div>
+                            <div class="notic">以上内容将显示在首页商店公告中,注意控制公告内容长度不要超过公告显示区域大小。</div>
+                        </div>
+                    </div>
+                    <div class="item shop_reg_closed" data-val="122">
+                        <div class="label">是否关闭注册：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[122]" class="ui-radio evnet_shop_reg_closed"
+                                           id="value_122_0" value="1" v-model="info.shop_reg_closed"/>
+                                    <label for="value_122_0" class="ui-radio-label">是</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[122]" class="ui-radio evnet_shop_reg_closed"
+                                           id="value_122_1" value="0" checked="true" v-model="info.shop_reg_closed"/>
+                                    <label for="value_122_1" class="ui-radio-label">否</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">商店是否关闭前台会员注册</div>
+                        </div>
+                    </div>
+                    <div class="item shop_closed" data-val="10001">
+                        <div class="label">注册开启图片验证码：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[10001]" class="ui-radio evnet_shop_closed"
+                                           id="value_10001_0" value="0" v-model="info.reg_captcha"/>
+                                    <label for="value_10001_0" class="ui-radio-label">否</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[10001]" class="ui-radio evnet_shop_closed"
+                                           id="value_10001_1" value="1" v-model="info.reg_captcha"/>
+                                    <label for="value_10001_1" class="ui-radio-label">是</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item shop_closed" data-val="10001">
+                        <div class="label">注册开启短信验证码：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[920]" class="ui-radio evnet_shop_closed"
+                                           id="value_920_0" value="0" v-model="info.sms_signin"/>
+                                    <label for="value_920_0" class="ui-radio-label">否</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[920]" class="ui-radio evnet_shop_closed"
+                                           id="value_920_1" value="1" v-model="info.sms_signin"/>
+                                    <label for="value_920_1" class="ui-radio-label">是</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item shop_closed" data-val="10002">
+                        <div class="label">登录开启验证码：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[10002]" class="ui-radio evnet_shop_closed"
+                                           id="value_10002_0" value="0" v-model="info.login_captcha"/>
+                                    <label for="value_10002_0" class="ui-radio-label">否</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[10002]" class="ui-radio evnet_shop_closed"
+                                           id="value_10002_1" value="1" v-model="info.login_captcha"/>
+                                    <label for="value_10002_1" class="ui-radio-label">是</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item sign" data-val="924">
+                        <div class="label">订单结算周期：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[924]" class="text withdraw_day" value="15"
+                                   v-model="info.withdraw_day"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">用户签收，订单完成以后多少天结算到商家账户</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " shoptype="btnSubmit" class="button" @click="doupdate()">
+                        </div>
+                    </div>
+                </div>
+                <div class="switch_info shopConfig_switch" style="display:none">
+                    <div class="item icp_number" data-val="202">
+                        <div class="label">ICP证书或ICP备案证书号：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[202]" class="text icp_number" value="15002903"
+                                   v-model="info.icp_number"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">ICP证书号，显示在网站前台底部</div>
+                        </div>
+                    </div>
+                    <div class="item icp_file" data-val="203">
+                        <div class="label">ICP 备案证书文件：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="icp_file" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.icp_file" target="_blank" class="nyroModal">
+                                        <i class="icon icon-picture" :data-tooltipimg="info.icp_file" shoptype="tooltip" title="tooltip"></i>
+                                    </a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.icp_file">
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item rewrite" data-val="209">
+                        <div class="label">URL重写：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[209]" class="ui-radio evnet_rewrite"
+                                           id="value_209_0" value="0" v-model="info.rewrite"/>
+                                    <label for="value_209_0" class="ui-radio-label">禁用</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[209]" class="ui-radio evnet_rewrite"
+                                           id="value_209_1" value="1" v-model="info.rewrite"/>
+                                    <label for="value_209_1" class="ui-radio-label">简单重写</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[209]" class="ui-radio evnet_rewrite"
+                                           id="value_209_2" value="2" v-model="info.rewrite"/>
+                                    <label for="value_209_2" class="ui-radio-label">复杂重写</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">URL重写是一种搜索引擎优化技术，可以将动态的地址模拟成静态的HTML文件。需要Apache的支持。</div>
+                        </div>
+                    </div>
+                    <div class="item integral_name" data-val="210">
+                        <div class="label">消费积分名称：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[210]" class="text integral_name"
+                                   v-model="info.integral_name"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">您可以将消费积分重新命名。例如：商豆</div>
+                        </div>
+                    </div>
+                    <div class="item integral_scale" data-val="211">
+                        <div class="label">积分换算比例：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[211]" class="text integral_scale"
+                                   v-model="info.integral_scale"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">每100积分可抵多少现金</div>
+                        </div>
+                    </div>
+                    <div class="item integral_percent" data-val="212">
+                        <div class="label">积分支付比例：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[212]" class="text integral_percent"
+                                   v-model="info.integral_percent"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">每100元商品最多可以使用多少元积分</div>
+                        </div>
+                    </div>
+                    <div class="item comment_check" data-val="214">
+                        <div class="label">用户评论是否需要审核：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[214]" class="ui-radio evnet_comment_check"
+                                           id="value_214_0" value="0" v-model="info.comment_check"/>
+                                    <label for="value_214_0" class="ui-radio-label">不需要审核</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[214]" class="ui-radio evnet_comment_check"
+                                           id="value_214_1" value="1" v-model="info.comment_check"/>
+                                    <label for="value_214_1" class="ui-radio-label">需要审核</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item cache_time" data-val="219">
+                        <div class="label">缓存存活时间（秒）：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[219]" class="text cache_time" v-model="info.cache_time"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">前台页面缓存的存活时间，以秒为单位。</div>
+                        </div>
+                    </div>
+                    <div class="item register_points" data-val="220">
+                        <div class="label">会员注册赠送积分：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[220]" class="text register_points" value="1"
+                                   v-model="info.register_points"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">前台会员注册赠送的系统积分数</div>
+                        </div>
+                    </div>
+                    <div class="item enable_gzip" data-val="221">
+                        <div class="label">是否启用Gzip模式：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[221]" class="ui-radio evnet_enable_gzip"
+                                           id="value_221_0" value="0" v-model="info.enable_gzip"/>
+                                    <label for="value_221_0" class="ui-radio-label">禁用</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[221]" class="ui-radio evnet_enable_gzip"
+                                           id="value_221_1" value="1" v-model="info.enable_gzip"/>
+                                    <label for="value_221_1" class="ui-radio-label">启用</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">
+                                启用Gzip模式可压缩发送页面大小，加快网页传输。需要php支持Gzip。如果已经用Apache等对页面进行Gzip压缩，请禁止该功能。
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item top10_time" data-val="222">
+                        <div class="label">排行统计的时间：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[222]" class="ui-radio evnet_top10_time"
+                                           id="value_222_0" value="0" v-model="info.top10_time"/>
+                                    <label for="value_222_0" class="ui-radio-label">所有</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[222]" class="ui-radio evnet_top10_time"
+                                           id="value_222_1" value="1" v-model="info.top10_time"/>
+                                    <label for="value_222_1" class="ui-radio-label">一年</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[222]" class="ui-radio evnet_top10_time"
+                                           id="value_222_2" value="2" v-model="info.top10_time"/>
+                                    <label for="value_222_2" class="ui-radio-label">半年</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[222]" class="ui-radio evnet_top10_time"
+                                           id="value_222_3" value="3" v-model="info.top10_time"/>
+                                    <label for="value_222_3" class="ui-radio-label">三个月</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[222]" class="ui-radio evnet_top10_time"
+                                           id="value_222_4" value="4" v-model="info.top10_time"/>
+                                    <label for="value_222_4" class="ui-radio-label">一个月</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item visit_stats" data-val="231">
+                        <div class="label">站点访问统计：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[231]" class="ui-radio evnet_visit_stats"
+                                           id="value_231_0" value="on" v-model="info.visit_stats"/>
+                                    <label for="value_231_0" class="ui-radio-label">开启</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[231]" class="ui-radio evnet_visit_stats"
+                                           id="value_231_1" value="off" v-model="info.visit_stats"/>
+                                    <label for="value_231_1" class="ui-radio-label">关闭</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item send_mail_on" data-val="232">
+                        <div class="label">是否开启自动发送邮件：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[232]" class="ui-radio evnet_send_mail_on"
+                                           id="value_232_0" value="on" v-model="info.send_mail_on"/>
+                                    <label for="value_232_0" class="ui-radio-label">开启</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[232]" class="ui-radio evnet_send_mail_on"
+                                           id="value_232_1" value="off" v-model="info.send_mail_on"/>
+                                    <label for="value_232_1" class="ui-radio-label">关闭</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">启用该选项登录后台时，会自动发送邮件队列中尚未发送的邮件</div>
+                        </div>
+                    </div>
+                    <div class="item member_email_validate" data-val="235">
+                        <div class="label">是否开启会员邮件验证：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[235]"
+                                           class="ui-radio evnet_member_email_validate" id="value_235_0" value="1"
+                                           checked="true" v-model="info.member_email_validate"/>
+                                    <label for="value_235_0" class="ui-radio-label">开启</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[235]"
+                                           class="ui-radio evnet_member_email_validate" id="value_235_1" value="0"
+                                           v-model="info.member_email_validate"/>
+                                    <label for="value_235_1" class="ui-radio-label">关闭</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item message_board" data-val="236">
+                        <div class="label">是否启用留言板功能：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[236]" class="ui-radio evnet_message_board"
+                                           id="value_236_0" value="1" v-model="info.message_board"/>
+                                    <label for="value_236_0" class="ui-radio-label">开启</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[236]" class="ui-radio evnet_message_board"
+                                           id="value_236_1" value="0" v-model="info.message_board"/>
+                                    <label for="value_236_1" class="ui-radio-label">关闭</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item send_verify_email" data-val="242">
+                        <div class="label">用户注册时自动发送验证邮件：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[242]" class="ui-radio evnet_send_verify_email"
+                                           id="value_242_0" value="1" v-model="info.send_verify_email"/>
+                                    <label for="value_242_0" class="ui-radio-label">开启</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[242]" class="ui-radio evnet_send_verify_email"
+                                           id="value_242_1" v-model="info.send_verify_email"/>
+                                    <label for="value_242_1" class="ui-radio-label">关闭</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">“是否开启会员邮件验证”设为开启时才可使用此功能</div>
+                        </div>
+                    </div>
+                    <div class="item message_check" data-val="903">
+                        <div class="label">用户留言是否需要审核：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[903]" class="ui-radio evnet_message_check"
+                                           id="value_903_0" value="1" v-model="info.message_check"/>
+                                    <label for="value_903_0" class="ui-radio-label">需要审核</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[903]" class="ui-radio evnet_message_check"
+                                           id="value_903_1" value="0" checked="true" v-model="info.message_check"/>
+                                    <label for="value_903_1" class="ui-radio-label">不需要审核</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item virtual_order" data-val="983">
+                        <div class="label">是否显示首页订单提示轮播：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[983]" class="ui-radio evnet_virtual_order"
+                                           id="value_983_0" value="0" v-model="info.virtual_order"/>
+                                    <label for="value_983_0" class="ui-radio-label">不显示</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[983]" class="ui-radio evnet_virtual_order"
+                                           id="value_983_1" value="1" checked="true" v-model="info.virtual_order"/>
+                                    <label for="value_983_1" class="ui-radio-label">显示</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item virtual_limit_nim" data-val="984">
+                        <div class="label">是否显示写入虚拟已参团人数：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[984]" class="ui-radio evnet_virtual_limit_nim"
+                                           id="value_984_0" value="0" v-model="info.virtual_limit_nim"/>
+                                    <label for="value_984_0" class="ui-radio-label">不显示</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[984]" class="ui-radio evnet_virtual_limit_nim"
+                                           id="value_984_1" value="1" v-model="info.virtual_limit_nim"/>
+                                    <label for="value_984_1" class="ui-radio-label">显示</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " shoptype="btnSubmit" class="button" @click="doupdate()">
+                        </div>
+                    </div>
+                </div>
+                <div class="switch_info shopConfig_switch" style="display:none">
+                    <div class="item search_keywords" data-val="330">
+                        <div class="label">首页搜索的关键字：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[330]" class="text search_keywords"
+                                   value="周大福,内衣,Five Plus,手机" v-model="info.search_keywords"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">首页显示的搜索关键字,请用半角逗号(,)分隔多个关键字</div>
+                        </div>
+                    </div>
+                    <div class="item time_format" data-val="302">
+                        <div class="label">时间格式：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[302]" class="text time_format" value="Y-m-d H:i:s"
+                                   v-model="info.time_format"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item currency_format" data-val="303">
+                        <div class="label">货币格式：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[303]" class="text currency_format" value="<em>¥</em>%s"
+                                   v-model="info.currency_format"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">显示商品价格的格式，%s将被替换为相应的价格数字。</div>
+                        </div>
+                    </div>
+                    <div class="item thumb_width" data-val="304">
+                        <div class="label">缩略图宽度：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[304]" class="text thumb_width" value="240"
+                                   v-model="info.thumb_width"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item thumb_height" data-val="305">
+                        <div class="label">缩略图高度：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[305]" class="text thumb_height" value="240"
+                                   v-model="info.thumb_height"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item top_number" data-val="312">
+                        <div class="label">销量排行数量：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[312]" class="text top_number" value="5"
+                                   v-model="info.top_number"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item history_number" data-val="313">
+                        <div class="label">浏览历史数量：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[313]" class="text history_number" value="18"
+                                   v-model="info.history_number"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item comments_number" data-val="314">
+                        <div class="label">评论数量：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[314]" class="text comments_number" value="6"
+                                   v-model="info.comments_number"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">显示在商品详情页的用户评论数量。</div>
+                        </div>
+                    </div>
+                    <div class="item article_number" data-val="316">
+                        <div class="label">最新文章显示数量：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[316]" class="text article_number"
+                                   v-model="info.article_number"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item article_title_length" data-val="325">
+                        <div class="label">文章标题的长度：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[325]" class="text article_title_length"
+                                   v-model="info.article_title_length"
+                            />
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item name_of_region_1" data-val="326">
+                        <div class="label">一级配送区域名称：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[326]" class="text name_of_region_1"
+                                   v-model="info.name_of_region_1"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item name_of_region_2" data-val="327">
+                        <div class="label">二级配送区域名称：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[327]" class="text name_of_region_2"
+                                   v-model="info.name_of_region_2"
+                            />
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item name_of_region_3" data-val="328">
+                        <div class="label">三级配送区域名称：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[328]" class="text name_of_region_3"
+                                   v-model="info.name_of_region_3"
+                            />
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item name_of_region_4" data-val="329">
+                        <div class="label">四级配送区域名称：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[329]" class="text name_of_region_4"
+                                   v-model="info.name_of_region_4"
+                            />
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item help_open" data-val="333">
+                        <div class="label">用户帮助是否打开：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[333]" class="ui-radio evnet_help_open"
+                                           id="value_333_0" value="0" v-model="info.help_open"/>
+                                    <label for="value_333_0" class="ui-radio-label">关闭</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[333]" class="ui-radio evnet_help_open"
+                                           id="value_333_1" value="1" v-model="info.help_open"/>
+                                    <label for="value_333_1" class="ui-radio-label">打开</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item article_page_size" data-val="334">
+                        <div class="label">文章分类页列表的数量：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[334]" class="text article_page_size"
+                                   v-model="info.article_page_size"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item auction_ad" data-val="904">
+                        <div class="label">限制显示广告数量：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[904]" class="text auction_ad" v-model="info.auction_ad"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item choose_process" data-val="912">
+                        <div class="label">入驻申请必填功能：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[912]" class="ui-radio evnet_choose_process"
+                                           id="value_912_0" value="0" v-model="info.choose_process"/>
+                                    <label for="value_912_0" class="ui-radio-label">关闭</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[912]" class="ui-radio evnet_choose_process"
+                                           id="value_912_1" value="1" checked="true" v-model="info.choose_process"/>
+                                    <label for="value_912_1" class="ui-radio-label">开启</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item return_pictures" data-val="926">
+                        <div class="label">退换货上传图片凭证：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[926]" class="text return_pictures"
+                                   v-model="info.return_pictures"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">设置退换货上传图片凭证数量限制</div>
+                        </div>
+                    </div>
+                    <div class="item single_thumb_width" data-val="928">
+                        <div class="label">晒单缩略图宽度：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[928]" class="text single_thumb_width"
+                                   v-model="info.single_thumb_width"
+                            />
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item single_thumb_height" data-val="929">
+                        <div class="label">晒单缩略图高度：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[929]" class="text single_thumb_height"
+                                   v-model="info.single_thumb_height"
+                            />
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item user_helpart" data-val="931">
+                        <div class="label">会员帮助文章：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[931]" class="text user_helpart" v-model="info.user_helpart"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">此设置为会员中心默认页面右侧帮助文章（格式：1,2,3 注：逗号为英文逗号）</div>
+                        </div>
+                    </div>
+                    <div class="item marticle_index" data-val="982">
+                        <div class="label">入驻首页底部文章：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[982]" class="text marticle_index"
+                                   v-model="info.marticle_index"
+                            />
+                            <div class="form_prompt"></div>
+                            <div class="notic">入驻首页底部文章，文本框中填写文章ID（格式：1,2,3 注：逗号为英文逗号）</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " shoptype="btnSubmit" class="button" @click="doupdate()">
+                        </div>
+                    </div>
+                </div>
+                <div class="switch_info shopConfig_switch" style="display:none">
+                    <div class="item can_invoice" data-val="401">
+                        <div class="label">货到付款：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[4010]" class="ui-radio evnet_can_invoice"
+                                           id="value_401_00" value="1" v-model="info.support_cod"/>
+                                    <label for="value_401_00" class="ui-radio-label">支持</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[4010]" class="ui-radio evnet_can_invoice"
+                                           id="value_401_01" value="0" v-model="info.support_cod"/>
+                                    <label for="value_401_01" class="ui-radio-label">不支持</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item can_invoice" data-val="401">
+                        <div class="label">能否开发票：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[401]" class="ui-radio evnet_can_invoice"
+                                           id="value_401_0" value="1" v-model="info.can_invoice"/>
+                                    <label for="value_401_0" class="ui-radio-label">能</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[401]" class="ui-radio evnet_can_invoice"
+                                           id="value_401_1" value="0" v-model="info.can_invoice"/>
+                                    <label for="value_401_1" class="ui-radio-label">不能</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item use_integral" data-val="402">
+                        <div class="label">是否使用积分：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[402]" class="ui-radio evnet_use_integral"
+                                           id="value_402_0" value="1" v-model="info.use_integral"/>
+                                    <label for="value_402_0" class="ui-radio-label">使用</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[402]" class="ui-radio evnet_use_integral"
+                                           id="value_402_1" value="0" v-model="info.use_integral"/>
+                                    <label for="value_402_1" class="ui-radio-label">不使用</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item use_bonus" data-val="403">
+                        <div class="label">是否使用红包：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[403]" class="ui-radio evnet_use_bonus"
+                                           id="value_403_0" value="1" v-model="info.use_bonus"/>
+                                    <label for="value_403_0" class="ui-radio-label">使用</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[403]" class="ui-radio evnet_use_bonus"
+                                           id="value_403_1" value="0" v-model="info.use_bonus"/>
+                                    <label for="value_403_1" class="ui-radio-label">不使用</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item use_surplus" data-val="404">
+                        <div class="label">是否使用余额：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[404]" class="ui-radio evnet_use_surplus"
+                                           id="value_404_0" value="1" v-model="info.use_surplus"/>
+                                    <label for="value_404_0" class="ui-radio-label">使用</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[404]" class="ui-radio evnet_use_surplus"
+                                           id="value_404_1" value="0" v-model="info.use_surplus"/>
+                                    <label for="value_404_1" class="ui-radio-label">不使用</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item use_how_oos" data-val="405">
+                        <div class="label">是否使用缺货处理：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[405]" class="ui-radio evnet_use_how_oos"
+                                           id="value_405_0" value="1" v-model="info.use_how_oos"/>
+                                    <label for="value_405_0" class="ui-radio-label">使用</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[405]" class="ui-radio evnet_use_how_oos"
+                                           id="value_405_1" value="0" v-model="info.use_how_oos"/>
+                                    <label for="value_405_1" class="ui-radio-label">不使用</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">使用缺货处理时前台订单确认页面允许用户选择缺货时处理方法。</div>
+                        </div>
+                    </div>
+                    <div class="item send_confirm_email" data-val="406">
+                        <div class="label">确认订单时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[406]" class="ui-radio evnet_send_confirm_email"
+                                           id="value_406_0" value="1" v-model="info.send_confirm_email"/>
+                                    <label for="value_406_0" class="ui-radio-label">发送邮件</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[406]" class="ui-radio evnet_send_confirm_email"
+                                           id="value_406_1" value="0" v-model="info.send_confirm_email"/>
+                                    <label for="value_406_1" class="ui-radio-label">不发送邮件</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item send_ship_email" data-val="407">
+                        <div class="label">发货时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[407]" class="ui-radio evnet_send_ship_email"
+                                           id="value_407_0" value="1" v-model="info.send_ship_email"/>
+                                    <label for="value_407_0" class="ui-radio-label">发送邮件</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[407]" class="ui-radio evnet_send_ship_email"
+                                           id="value_407_1" value="0" v-model="info.send_ship_email"/>
+                                    <label for="value_407_1" class="ui-radio-label">不发送邮件</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item send_cancel_email" data-val="408">
+                        <div class="label">取消订单时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[408]" class="ui-radio evnet_send_cancel_email"
+                                           id="value_408_0" value="1" v-model="info.send_cancel_email"/>
+                                    <label for="value_408_0" class="ui-radio-label">发送邮件</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[408]" class="ui-radio evnet_send_cancel_email"
+                                           id="value_408_1" value="0" v-model="info.send_cancel_email"/>
+                                    <label for="value_408_1" class="ui-radio-label">不发送邮件</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item send_invalid_email" data-val="409">
+                        <div class="label">把订单设为无效时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[409]" class="ui-radio evnet_send_invalid_email"
+                                           id="value_409_0" value="1" v-model="info.send_invalid_email"/>
+                                    <label for="value_409_0" class="ui-radio-label">发送邮件</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[409]" class="ui-radio evnet_send_invalid_email"
+                                           id="value_409_1" value="0" v-model="info.send_invalid_email"/>
+                                    <label for="value_409_1" class="ui-radio-label">不发送邮件</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item order_pay_note" data-val="410">
+                        <div class="label">设置订单为“已付款”时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[410]" class="ui-radio evnet_order_pay_note"
+                                           id="value_410_0" value="1" v-model="info.order_pay_note"/>
+                                    <label for="value_410_0" class="ui-radio-label">必须填写备注</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[410]" class="ui-radio evnet_order_pay_note"
+                                           id="value_410_1" value="0" v-model="info.order_pay_note"/>
+                                    <label for="value_410_1" class="ui-radio-label">无需填写备注</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item order_unpay_note" data-val="411">
+                        <div class="label">设置订单为“未付款”时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[411]" class="ui-radio evnet_order_unpay_note"
+                                           id="value_411_0" value="1" v-model="info.order_unpay_note"/>
+                                    <label for="value_411_0" class="ui-radio-label">必须填写备注</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[411]" class="ui-radio evnet_order_unpay_note"
+                                           id="value_411_1" value="0" v-model="info.order_unpay_note"/>
+                                    <label for="value_411_1" class="ui-radio-label">无需填写备注</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item order_ship_note" data-val="412">
+                        <div class="label">设置订单为“已发货”时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[412]" class="ui-radio evnet_order_ship_note"
+                                           id="value_412_0" value="1" v-model="info.order_ship_note"/>
+                                    <label for="value_412_0" class="ui-radio-label">必须填写备注</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[412]" class="ui-radio evnet_order_ship_note"
+                                           id="value_412_1" value="0" v-model="info.order_ship_note"/>
+                                    <label for="value_412_1" class="ui-radio-label">无需填写备注</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item order_receive_note" data-val="413">
+                        <div class="label">设置订单为“收货确认”时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[413]" class="ui-radio evnet_order_receive_note"
+                                           id="value_413_0" value="1" v-model="info.order_receive_note"/>
+                                    <label for="value_413_0" class="ui-radio-label">必须填写备注</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[413]" class="ui-radio evnet_order_receive_note"
+                                           id="value_413_1" value="0" v-model="info.order_receive_note"/>
+                                    <label for="value_413_1" class="ui-radio-label">无需填写备注</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item order_unship_note" data-val="414">
+                        <div class="label">设置订单为“未发货”时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[414]" class="ui-radio evnet_order_unship_note"
+                                           id="value_414_0" value="1" v-model="info.order_unship_note"/>
+                                    <label for="value_414_0" class="ui-radio-label">必须填写备注</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[414]" class="ui-radio evnet_order_unship_note"
+                                           id="value_414_1" value="0" v-model="info.order_unship_note"/>
+                                    <label for="value_414_1" class="ui-radio-label">无需填写备注</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item order_return_note" data-val="415">
+                        <div class="label">退货时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[415]" class="ui-radio evnet_order_return_note"
+                                           id="value_415_0" value="1" v-model="info.order_return_note"/>
+                                    <label for="value_415_0" class="ui-radio-label">必须填写备注</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[415]" class="ui-radio evnet_order_return_note"
+                                           id="value_415_1" value="0" v-model="info.order_return_note"/>
+                                    <label for="value_415_1" class="ui-radio-label">无需填写备注</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item order_invalid_note" data-val="416">
+                        <div class="label">把订单设为无效时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[416]" class="ui-radio evnet_order_invalid_note"
+                                           id="value_416_0" value="1" v-model="info.order_invalid_note"/>
+                                    <label for="value_416_0" class="ui-radio-label">必须填写备注</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[416]" class="ui-radio evnet_order_invalid_note"
+                                           id="value_416_1" value="0" v-model="info.order_invalid_note"/>
+                                    <label for="value_416_1" class="ui-radio-label">无需填写备注</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item order_cancel_note" data-val="417">
+                        <div class="label">取消订单时：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[417]" class="ui-radio evnet_order_cancel_note"
+                                           id="value_417_0" value="1" v-model="info.order_cancel_note"/>
+                                    <label for="value_417_0" class="ui-radio-label">必须填写备注</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[417]" class="ui-radio evnet_order_cancel_note"
+                                           id="value_417_1" value="0" v-model="info.order_cancel_note"/>
+                                    <label for="value_417_1" class="ui-radio-label">无需填写备注</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item min_goods_amount" data-val="420">
+                        <div class="label">最小购物金额：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[420]" class="text min_goods_amount"
+                                   v-model="info.min_goods_amount"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">达到此购物金额，才能提交订单。</div>
+                        </div>
+                    </div>
+                    <div class="item one_step_buy" data-val="421">
+                        <div class="label">是否一步购物：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[421]" class="ui-radio evnet_one_step_buy"
+                                           id="value_421_0" value="1" v-model="info.one_step_buy"/>
+                                    <label for="value_421_0" class="ui-radio-label">是</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[421]" class="ui-radio evnet_one_step_buy"
+                                           id="value_421_1" value="0" checked="true" v-model="info.one_step_buy"/>
+                                    <label for="value_421_1" class="ui-radio-label">否</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item invoice_type" data-val="422">
+                        <div class="label">发票类型及税率：</div>
+                        <div class="label_value">
+                            <table>
+                                <tr>
+                                    <td colspan="2">
+                                        <div id="consumtable">
+                                            <p>
+                                                <label class="fl mr10">类型</label>
+                                                <input type="text" class="text w120" name="invoice_type[]" size="10"
+                                                       v-model="info.invoice_type"/>
+                                                <label class="fl mr10">税率（％）</label>
+                                                <input type="text" class="text w120" name="invoice_rate[]" size="10"
+                                                       v-model="info.invoice_type"/>
+                                                <span class="form_prompt ml10 fl"></span>
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="form_prompt"></div>
+                            <div class="notic" style="padding:0px;">税率填写整数值，例如（税率：12，商品金额：35.70）则公式：35.70 * （12 /
+                                100） = 4.28元
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item stock_dec_time" data-val="423">
+                        <div class="label">减库存的时机：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[423]" class="ui-radio evnet_stock_dec_time"
+                                           id="value_423_0" value="1" v-model="info.stock_dec_time"/>
+                                    <label for="value_423_0" class="ui-radio-label">付款时</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[423]" class="ui-radio evnet_stock_dec_time"
+                                           id="value_423_1" value="0" v-model="info.stock_dec_time"/>
+                                    <label for="value_423_1" class="ui-radio-label">下订单时</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item send_service_email" data-val="425">
+                        <div class="label">下订单时是否给客服发邮件：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[425]" class="ui-radio evnet_send_service_email"
+                                           id="value_425_0" value="1" v-model="info.send_service_email"/>
+                                    <label for="value_425_0" class="ui-radio-label">是</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[425]" class="ui-radio evnet_send_service_email"
+                                           id="value_425_1" value="0" v-model="info.send_service_email"/>
+                                    <label for="value_425_1" class="ui-radio-label">否</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">网店信息中的客服邮件地址不为空时，该选项有效。</div>
+                        </div>
+                    </div>
+                    <div class="item use_value_card" data-val="974">
+                        <div class="label">是否使用储值卡：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[974]" class="ui-radio evnet_use_value_card"
+                                           id="value_974_0" value="0" v-model="info.use_value_card"/>
+                                    <label for="value_974_0" class="ui-radio-label">不使用</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[974]" class="ui-radio evnet_use_value_card"
+                                           id="value_974_1" value="1" v-model="info.use_value_card"/>
+                                    <label for="value_974_1" class="ui-radio-label">使用</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item open_delivery_time" data-val="908">
+                        <div class="label">自动确认收货时间：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[908]" class="text open_delivery_time" v-model="info.open_delivery_time"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">发货多少天之后，系统自动确认收货</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " shoptype="btnSubmit" class="button" @click="doupdate()">
+                        </div>
+                    </div>
+                </div>
+                <div class="switch_info shopConfig_switch" style="display:none">
+                    <div class="item wap_app" data-val="1033">
+                        <div class="label">首页APP客户端下载地址：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[1033]" class="text wap_app" v-model="info.wap_app"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">推荐填写发布在第三方应用市场的下载链接</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " shoptype="btnSubmit" class="button" @click="doupdate()">
+                        </div>
+                    </div>
+                </div>
+                <div class="switch_info shopConfig_switch" style="display:none">
+                    <div class="item site_domain" data-val="951">
+                        <div class="label">网站域名：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[951]" class="text site_domain" v-model="info.site_domain"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">请输入您当前网站的域名，避免启用商家二级域名出现问题（如：http://www.xxxx.com/）</div>
+                        </div>
+                    </div>
+                    <div class="item user_login_register" data-val="956">
+                        <div class="label">会员登录/注册邮箱验证是否开启：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[956]" class="ui-radio evnet_user_login_register"
+                                           id="value_956_0" value="0" v-model="info.user_login_register"/>
+                                    <label for="value_956_0" class="ui-radio-label">关闭</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[956]" class="ui-radio evnet_user_login_register"
+                                           id="value_956_1" value="1" v-model="info.user_login_register"/>
+                                    <label for="value_956_1" class="ui-radio-label">开启</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">如果开启邮箱验证，用户在使用邮箱注册会员成功后必须邮箱验证才能进入会员中心</div>
+                        </div>
+                    </div>
+                    <div class="item use_coupons" data-val="965">
+                        <div class="label">是否启用优惠券：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[965]" class="ui-radio evnet_use_coupons"
+                                           id="value_965_0" value="0" v-model="info.use_coupons"/>
+                                    <label for="value_965_0" class="ui-radio-label">关闭</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[965]" class="ui-radio evnet_use_coupons"
+                                           id="value_965_1" value="1" checked="true" v-model="info.use_coupons"/>
+                                    <label for="value_965_1" class="ui-radio-label">启用</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item index_article_cat" data-val="981">
+                        <div class="label">首页文章栏目：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[981]" class="text index_article_cat"
+                                   v-model="info.index_article_cat"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">首页轮播图右侧文章栏目，请填写文章分类ID，多个分类使用半角逗号（,）分隔（注：2017模板使用）</div>
+                        </div>
+                    </div>
+                    <div class="item wholesale_article_cat" data-val="996">
+                        <div class="label">批发首页文章栏目：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[996]" class="text wholesale_article_cat"
+                                   v-model="info.wholesale_article_cat"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">批发首页轮播图右侧文章栏目，请填写文章分类ID，多个分类使用半角逗号（,）分隔（注：2017模板使用）</div>
+                        </div>
+                    </div>
+                    <div class="item bonus_adv" data-val="1002">
+                        <div class="label">是否开启首页弹出广告：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[1002]" class="ui-radio evnet_bonus_adv"
+                                           id="value_1002_0" value="1" v-model="info.bonus_adv"/>
+                                    <label for="value_1002_0" class="ui-radio-label">启用</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[1002]" class="ui-radio evnet_bonus_adv"
+                                           id="value_1002_1" value="0" v-model="info.bonus_adv"/>
+                                    <label for="value_1002_1" class="ui-radio-label">关闭</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">可视化首页弹出广告在可视化装修中设置，默认模板弹出在广告位‘首页天降红包’中添加</div>
+                        </div>
+                    </div>
+                    <div class="item deposit_fee" data-val="1003">
+                        <div class="label">会员提现手续：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[1003]" class="text deposit_fee" v-model="info.deposit_fee"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">%</div>
+                        </div>
+                    </div>
+                    <div class="item is_illegal" data-val="1007">
+                        <div class="label">是否开启举报功能：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[1007]" class="ui-radio evnet_is_illegal"
+                                           id="value_1007_0" value="0" v-model="info.is_illegal"/>
+                                    <label for="value_1007_0" class="ui-radio-label">关闭</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="value[1007]" class="ui-radio evnet_is_illegal"
+                                           id="value_1007_1" value="1" v-model="info.is_illegal"/>
+                                    <label for="value_1007_1" class="ui-radio-label">启用</label>
+                                </div>
+                            </div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item register_article_id" data-val="1009">
+                        <div class="label">会员注册协议文章ID：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[1009]" class="text register_article_id"
+                                   v-model="info.register_article_id"/>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item buyer_cash" data-val="1011">
+                        <div class="label">买家提现最低金额：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[1011]" class="text buyer_cash" v-model="info.buyer_cash"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">设置买家提现最低金额，0表示不限</div>
+                        </div>
+                    </div>
+                    <div class="item pay_effective_time" data-val="1031">
+                        <div class="label">支付有效时间（分钟）：</div>
+                        <div class="label_value">
+                            <input type="text" name="value[1031]" class="text pay_effective_time"
+                                   v-model="info.pay_effective_time"/>
+                            <div class="form_prompt"></div>
+                            <div class="notic">下单支付有效时间,过时订单失效,为0或小于0则不限时间（小数点后无效）</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " shoptype="btnSubmit" class="button" @click="doupdate()">
+                        </div>
+                    </div>
+                </div>
+                <div class="switch_info shopConfig_switch" style="display:none">
+                    <div class="item shop_logo" data-val="118">
+                        <div class="label">商店 Logo：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="shop_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.shop_logo" target="_blank" class="nyroModal"><i
+                                            class="icon icon-picture" :data-tooltipimg="info.shop_logo"
+                                            shoptype="tooltip" title="tooltip"></i></a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.shop_logo">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">上传图片格式必须是gif,jpg,jpeg,png;图片大小在200kb之内，建议尺寸：159*100</div>
+                        </div>
+                    </div>
+                    <div class="item index_down_logo" data-val="971">
+                        <div class="label">首页下滑弹出logo图片：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+
+                                <input type="button" name="button" id="index_down_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.index_down_logo" target="_blank" class="nyroModal"><i
+                                            class="icon icon-picture" :data-tooltipimg="info.index_down_logo"
+                                            shoptype="tooltip" title="tooltip"></i></a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.index_down_logo">
+
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">建议图标尺寸130*33，png格式（1.0老模板使用）</div>
+                        </div>
+                    </div>
+                    <div class="item user_login_logo" data-val="973">
+                        <div class="label">用户登录与注册页面LOGO：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="user_login_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.user_login_logo" target="_blank" class="nyroModal"><i
+                                            class="icon icon-picture" :data-tooltipimg="info.user_login_logo"
+                                            shoptype="tooltip" title="tooltip"></i></a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.user_login_logo">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">建议图标尺寸159*57，png格式</div>
+                        </div>
+                    </div>
+                    <div class="item login_logo_pic" data-val="976">
+                        <div class="label">用户登录与注册页面LOGO右侧图：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="login_logo_pic" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.login_logo_pic" target="_blank" class="nyroModal">
+                                        <i class="icon icon-picture" :data-tooltipimg="info.login_logo_pic" shoptype="tooltip" title="tooltip"></i>
+                                    </a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" disabled v-model="info.login_logo_pic">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">上传图片格式必须是gif,jpg,jpeg,png;图片大小在200kb之内</div>
+                        </div>
+                    </div>
+                    <div class="item admin_login_logo" data-val="1020">
+                        <div class="label">平台后台登录页Logo：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="admin_login_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.admin_login_logo" target="_blank" class="nyroModal">
+                                        <i class="icon icon-picture" :data-tooltipimg="info.admin_login_logo" shoptype="tooltip" title="tooltip"></i>
+                                    </a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.admin_login_logo">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">建议图标尺寸130*43，png格式</div>
+                        </div>
+                    </div>
+                    <div class="item admin_logo" data-val="1021">
+                        <div class="label">平台后台Logo：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="admin_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.admin_logo" target="_blank" class="nyroModal">
+                                        <i class="icon icon-picture" :data-tooltipimg="info.admin_logo" shoptype="tooltip" title="tooltip"></i>
+                                    </a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.admin_logo">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">建议图标尺寸174*48，png格式</div>
+                        </div>
+                    </div>
+                    <div class="item seller_login_logo" data-val="1022">
+                        <div class="label">商家后台登录页Logo：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="seller_login_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.seller_login_logo" target="_blank" class="nyroModal">
+                                        <i class="icon icon-picture" :data-tooltipimg="info.seller_login_logo" shoptype="tooltip" title="tooltip"></i>
+                                    </a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.seller_login_logo">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">建议图标尺寸172*51，png格式</div>
+                        </div>
+                    </div>
+                    <div class="item seller_logo" data-val="1023">
+                        <div class="label">商家后台Logo：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="seller_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.seller_logo" target="_blank" class="nyroModal">
+                                        <i class="icon icon-picture" :data-tooltipimg="info.seller_logo" shoptype="tooltip" title="tooltip"></i>
+                                    </a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.seller_logo">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">建议图标尺寸84*29，png格式</div>
+                        </div>
+                    </div>
+                    <div class="item stores_login_logo" data-val="1024">
+                        <div class="label">门店后台登录页Logo：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="stores_login_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.stores_login_logo" target="_blank" class="nyroModal">
+                                        <i class="icon icon-picture" :data-tooltipimg="info.stores_login_logo" shoptype="tooltip" title="tooltip"></i>
+                                    </a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.stores_login_logo">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">建议图标尺寸140*82，png格式</div>
+                        </div>
+                    </div>
+                    <div class="item stores_logo" data-val="1025">
+                        <div class="label">门店后台Logo：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="stores_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.stores_logo" target="_blank" class="nyroModal">
+                                        <i class="icon icon-picture" :data-tooltipimg="info.stores_logo" shoptype="tooltip" title="tooltip"></i>
+                                    </a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.stores_logo">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">建议图标尺寸90*32，png格式</div>
+                        </div>
+                    </div>
+                    <div class="item order_print_logo" data-val="1032">
+                        <div class="label">订单打印Logo：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="order_print_logo" class="type-file-button" value="">
+                                <span class="show">
+                                    <a :href="info.order_print_logo" target="_blank" class="nyroModal">
+                                        <i class="icon icon-picture" :data-tooltipimg="info.order_print_logo" shoptype="tooltip" title="tooltip"></i>
+                                    </a>
+                                </span>
+                                <input type="text" name="textfile" class="type-file-text" readonly v-model="info.order_print_logo">
+                            </div>
+                            <div class="form_prompt"></div>
+                            <div class="notic">建议图标尺寸159*57，png格式</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " shoptype="btnSubmit" class="button" @click="doupdate()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+
+            info: '',
+
+        },
+        methods: {
+            add: function (vo = {}) {
+                if (vo.id) {
+                    window.parent.addParentTab(
+                        {
+                            title: '编辑字典',
+                            href: '/admin/website/shopconfigadd?id=' + vo.id
+                        }
+                    );
+                } else {
+                    window.parent.addParentTab(
+                        {
+                            title: '添加字典',
+                            href: '/admin/website/shopconfigadd'
+                        }
+                    );
+                }
+
+            },
+            doupdate: function () {
+                $.messager.progress({text: '更新配置中...'});
+                $.post('/admin/website/shopconfigupdate', {
+                    pageparm: JSON.stringify(vm.info),
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.init();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            init: function () {
+                $.post('/admin/website/shopconfig', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    is_read: vm.is_read,
+                }, function (ret) {
+                    vm.info = ret.data;
+
+                    //初始化图片文件操作
+                    moreUploadFile('shop_logo');
+                    moreUploadFile('icp_file');
+                    moreUploadFile('index_down_logo');
+                    moreUploadFile('user_login_logo');
+                    moreUploadFile('login_logo_pic');
+                    moreUploadFile('admin_login_logo');
+                    moreUploadFile('admin_logo');
+                    moreUploadFile('seller_login_logo');
+                    moreUploadFile('seller_logo');
+                    moreUploadFile('stores_login_logo');
+                    moreUploadFile('stores_logo');
+                    moreUploadFile('order_print_logo');
+                }, 'json');
+            },
+        }
+    });
+    $(function () {
+        vm.init();
+        tabsinfoinit();
+    });
+</script>
+

@@ -1,0 +1,287 @@
+{include file="public/header"}
+
+<div id="app" v-cloak>
+    <div class="order-step-info order-step-handle">
+        <div class="step-title">
+            <i class="dian"></i>
+            <h3>操作信息</h3>
+        </div>
+        <div class="handle-info">
+            <div class="handle-note"><textarea v-model="action_note" cols="80" rows="3" class="textarea" placeholder="操作备注"></textarea></div>
+            <div class="handle-btn">
+                <button class="sc-btn sc-redBg-btn" @click="handle()">确认生成发货单</button>
+                <a :href="'/seller/order/order_detail.html?order_id='+order.order_id" class="sc-btn sc-redBg-btn">取消</a>
+            </div>
+            <div class="ecsc-order-condition">
+                <table class="ecsc-default-table order">
+                    <thead>
+                    <tr>
+                        <th width="15%" class="tc">操作者</th>
+                        <th width="15%" class="tc">操作日志</th>
+                        <th width="20%" class="tc">操作时间</th>
+                        <th width="10%" class="tc">订单状态</th>
+                        <th width="10%" class="tc">付款状态</th>
+                        <th width="10%" class="tc">发货状态</th>
+                        <th wdith="35%" class="tc">备注</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(vo,index) in action_log">
+                        <td class="bdl">{{vo.action_user_name}}</td>
+                        <td class="bdl">{{vo.status_desc}}</td>
+                        <td class="bdl">{{vo.log_time | timeParse}}</td>
+                        <td class="bdl">{{order_status[vo.order_status]}}</td>
+                        <td class="bdl">{{shipping_status[vo.shipping_status]}}</td>
+                        <td class="bdl">{{pay_status[vo.pay_status]}}</td>
+                        <td class="bdl bdr" v-html="vo.action_remark"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-step-info">
+        <div class="step-title"><i class="dian"></i>
+            <h3>订单信息</h3></div>
+        <ul class="order-info-list">
+            <li>
+                <dl>
+                    <dt>购货人：</dt>
+                    <dd>
+                        <span class="txt">{{order.user_name}}</span>
+                        <div class="fl"><a @click="user_info(order.user_id)" data-dialog="userinfo">信息</a></div>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt></dt>
+                    <dd></dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>收货人：</dt>
+                    <dd>
+                        <span class="txt">{{order.consignee}}</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>手机号码：</dt>
+                    <dd>{{order.mobile}}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>收货地址：</dt>
+                    <dd>
+                        <span class="txt">[{{order.province_text}}  {{order.city_text}}  {{order.district_text}}  ] {{order.address}}</span>
+                        <span class="handle"></span>
+                </dl>
+                <dl>
+                    <dt>自动确认收货时间：</dt>
+                    <dd>
+                        <span>15</span>天
+                    </dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>配送方式：</dt>
+                    <dd>
+                        <span class="txt"><span class="require-field">*</span></span>
+                        <span class="handle">
+
+                        </span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>订单号：</dt>
+                    <dd>
+                        <span class="txt">{{order.order_sn}}</span>
+                    </dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>支付方式：</dt>
+                    <dd>
+                        <span class="txt">{{order.pay_name}}</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>下单时间：</dt>
+                    <dd><span class="txt">{{order.add_time | timeParse}}</span></dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>付款时间：</dt>
+                    <dd><span class="txt" v-if="order.pay_status">{{order.pay_time | timeParse}}</span><span class="txt" v-else>未付款</span></dd>
+                </dl>
+                <dl>
+                    <dt>发货时间：</dt>
+                    <dd><span class="txt" v-if="order.shipping_status">{{order.shipping_time | timeParse}}</span><span class="txt" v-else>未发货</span></dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>发票类型：</dt>
+                    <dd>
+                        <span class="txt" v-if="order.invoice_type">增值税发票</span>
+                        <span class="txt" v-else>普通发票</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>发票抬头：</dt>
+                    <dd>
+                        <span class="txt red invoice-title" v-if="order.invoice_title!='不开发票'" title="点击查看详情" @click="showInvoice()">{{order.invoice_title}}</span>
+                    </dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>买家留言：</dt>
+                    <dd>
+                        <span class="txt" v-if="order.user_note"></span><span class="grey" v-else>无</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>订单来源：</dt>
+                    <dd>{{order.source}}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>商家留言：</dt>
+                    <dd><span class="txt" v-if="order.admin_note">{{order.admin_note}}</span><span class="grey">无</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt></dt>
+                    <dd></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+    <div class="order-step-info">
+        <div class="step-title">
+            <i class="dian"></i>
+            <h3>生成发货单</h3>
+        </div>
+        <div class="ecsc-order-content">
+            <table class="ecsc-default-table order">
+                <thead>
+                <tr>
+                    <th class="w10">&nbsp;</th>
+                    <th colspan="2">商品名称[货号]</th>
+                    <th>价格</th>
+                    <th>属性</th>
+                    <th>库存</th>
+                    <th>数量</th>
+                    <th>此单发货数量</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="bd-line" v-for="(vo,index) in goods">
+                    <td class="bdl w10">&nbsp;</td>
+                    <td class="w50">
+                        <div class="pic-thumb">
+                            <img :src="vo.goods_img">
+                        </div>
+                    </td>
+                    <td class="tl">
+                        <a :href="'/seller/home/goods/detail?id='+vo.goods_id" target="_blank">{{vo.goods_name}}</a>
+                        <br>
+                        <span>货号：[{{vo.goods_sn}}]</span>
+                    </td>
+                    <td><em>¥</em>{{vo.goods_price}}</td>
+                    <td align="center">{{vo.tempvalue}}<br>
+                    </td>
+                    <td align="center">{{vo.goods_number}}</td>
+                    <td>{{vo.goods_num}}</td>
+                    <td>
+                        <input type="number" min="0" :max="vo.goods_num" class="text_3 text" :value="vo.goods_num-vo.send_number" @change="checkNum(index)">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            order: JSON.parse('{:json_encode($order)}'),
+            goods: JSON.parse('{:addslashes(json_encode($goods))}'),
+            order_status: JSON.parse('{:json_encode($order_status)}'),
+            pay_status: JSON.parse('{:json_encode($pay_status)}'),
+            shipping_status: JSON.parse('{:json_encode($shipping_status)}'),
+            action_log: JSON.parse('{:json_encode($action_log)}'),
+            action_note: ''
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            handle: function () {
+                let check = 0;
+                $.each($('input[type="number"]'), function (i, item) {
+                    if (item.value == 0) {
+                        check++;
+                    }
+                    vm.goods[i].send_num = item.value;
+                });
+                if (check == vm.goods.length) {
+                    layer.msg('至少选择一件商品生成发货单!');
+                    return false;
+                }
+                let index = layer.load(1);
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/order/make_delivery',
+                    data: {order_id: vm.order.order_id, action_note: vm.action_note, goods: vm.goods},
+                    success: function (data) {
+                        location.href = data;
+                    },
+                    error: function (xhr, type) {
+                        layer.close(index);
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            user_info: function (user_id) {
+                layer.open({
+                    type: 2,
+                    area: ['500px', '300px'],
+                    content: ['/seller/api/get_user_info?user_id=' + user_id, 'no']
+                });
+            },
+            checkNum: function (index) {
+                var obj = event.currentTarget;
+                var valid_num = parseInt(vm.goods[index].goods_num) - parseInt(vm.goods[index].send_number);
+                if (obj.value < 0) {
+                    obj.value = 0;
+                }
+                if (obj.value > valid_num) {
+                    obj.value == valid_num;
+                    $(obj).addClass('error');
+                    layer.msg('此商品已发货:' + vm.goods[index].send_number + '<br>最多可发货: ' + valid_num);
+                } else {
+                    $(obj).removeClass('error');
+                }
+            },
+            showInvoice: function () {
+                layer.open({
+                    type: 2,
+                    content: ['/seller/order/showInvoice?order_id=' + vm.order.order_id]
+                });
+            }
+        }
+    });
+</script>
+{include file="public/footer"}

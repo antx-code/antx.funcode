@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>
+    .sort_info .lv4 .sort_list {
+        width: 21.25%;
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info">
+                        <div class="common-reply">
+                            <div class="reply_item user_reply_item">
+                                <div class="reply_item_div">
+                                    <div class="reply_label">&nbsp;</div>
+                                    <div class="reply_value">
+                                        <a href="javascript:" class="blue"><b>{$comment->user_name}</b></a>
+                                        <span>评论</span>
+                                        <a href="/home/goods/detail?id={$comment->goods_id}" target="_blank" class="blue"><b>{$comment->goods_name}</b></a>
+                                    </div>
+                                </div>
+                                <div class="reply_item_div">
+                                    <div class="reply_label">评论内容：</div>
+                                    <div class="reply_value">
+                                        <div class="msg_info">
+                                            <div class="msg_desc">{$comment->content}</div>
+                                            <ul class="msg_img">
+                                                {volist name="$comment->imgs" id="vo"}
+                                                <li><img src="{$vo}" height="60"></li>
+                                                {/volist}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="reply_item_div">
+                                    <div class="reply_label">评论日期：</div>
+                                    <div class="reply_value" style="line-height:28px;">
+                                        <span class="time">{$comment->create_time|date='Y-m-d H:i:s'}</span>
+                                        <span class="dengji">评论等级:&nbsp;&nbsp;{$comment->comment_rank}</span>
+                                        <span class="ip">IP地址:&nbsp;&nbsp;{$comment->ip_address}</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <form action="" method="post" name="theForm" id="comment_manage_form">
+                            <div class="item">
+                                <div class="label">用户名：</div>
+                                <div class="label_value">
+                                    <input name="user_name" type="text" class="text text_readonly valid" value="管理员" size="30" readonly="true" autocomplete="off" aria-invalid="false">
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><span class="require-field">*</span>回复内容：</div>
+                                <div class="label_value">
+                                    <textarea name="content" cols="50" rows="4" class="textarea" value="{$comment->reply}"></textarea>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">&nbsp;</div>
+                                <div class="label_value info_btn">
+                                    <input type="button" value=" 确定 " class="button fl" id="submitBtn" onclick="checkValidate()">
+                                    <input type="hidden" name="id" value="{$comment->comment_id}">
+                                </div>
+                            </div>
+                            <div class="item red">
+                                <div class="label red">&nbsp;</div>
+                                <div class="label_value">注意：管理员回复内容会在前台显示</div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function checkValidate() {
+        if (!$('textarea').val()) {
+            layer.msg('请输入回复内容');
+            return false;
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/admin/goods/comment_detail',
+            data: $('#comment_manage_form').serialize(),
+            success: function (data) {
+                $.messager.show({title: '提示', msg: '回复内容已保存', timeout: 2000, showType: 'slide'});
+            },
+            error: function (xhr, type) {
+                layer.msg(xhr.responseJSON);
+            }
+        });
+    }
+</script>
+</body>
+</html>

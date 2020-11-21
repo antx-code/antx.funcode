@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>优惠券</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+</head>
+<body>
+<div id="app">
+    <div waterfall-disabled="disabled" waterfall-offset="300" class="con team">
+        <div class="van-tabs van-tabs--line">
+            <div class="van-tabs__wrap van-hairline--top-bottom">
+                <div class="van-tabs__nav van-tabs__nav--line">
+                    <div class="van-tabs__line" style="width: 62.5px; transform: translateX(31.25px); transition-duration: 0.2s;"></div>
+                    <div class="van-tab " :class="{'van-tab--active':indexActive==0}" @click="indexActiveInit(0)">
+                        <div>
+                            <div class="nav_active">未使用</div>
+                        </div>
+                    </div>
+                    <div class="van-tab" :class="{'van-tab--active':indexActive==1}" @click="indexActiveInit(1)">
+                        <div>
+                            <div class="nav_active">已使用</div>
+                        </div>
+                    </div>
+                    <div class="van-tab" :class="{'van-tab--active':indexActive==2}" @click="indexActiveInit(2)">
+                        <div>
+                            <div class="nav_active">已过期</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="van-tabs__content">
+                <div class="van-tab__pane" style=""></div>
+                <div class="van-tab__pane" style="display: none;">
+
+                </div>
+                <div class="van-tab__pane" style="display: none;">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="coupon-select" v-if="indexActive==0">
+            <template v-for="(vo,index) in info.alist">
+                <div class="li dis-box bg-color-write p-r">
+                    <div class="left box-flex">
+                        <div class="dis-box">
+                            <div><h4 class="f-weight">{{vo.money}}</h4></div>
+                            <div class="box-flex p-l1 f-02"><p class="name m-top02">{{vo.name}}</p></div>
+                        </div>
+                        <div class="f-02 color-9">{{vo.send_start_time|timeParse}}至{{vo.send_end_time|timeParse}}</div>
+                        <b class="semi-circle"></b>
+                    </div>
+                    <a href="javascript:;" class="show right text-center f-04">立即<br>使用</a>
+                </div>
+            </template>
+        </div>
+        <div class="coupon-select" v-if="indexActive==1">
+            <template v-for="(vo,index) in info.blist">
+                <div class="li dis-box bg-color-write p-r">
+                    <div class="left box-flex">
+                        <div class="dis-box">
+                            <div><h4 class="f-weight">{{vo.money}}</h4></div>
+                            <div class="box-flex p-l1 f-02"><p class="name m-top02">{{vo.name}}</p></div>
+                        </div>
+                        <div class="f-02 color-9">{{vo.send_start_time|timeParse}}至{{vo.send_end_time|timeParse}}</div>
+                        <b class="semi-circle"></b>
+                    </div>
+                    <a href="javascript:;" class="show right text-center f-04">立即<br>使用</a>
+                </div>
+            </template>
+        </div>
+        <div class="coupon-select" v-if="indexActive==2">
+            <template v-for="(vo,index) in info.clist">
+                <div class="li dis-box bg-color-write p-r">
+                    <div class="left box-flex">
+                        <div class="dis-box">
+                            <div><h4 class="f-weight">{{vo.money}}</h4></div>
+                            <div class="box-flex p-l1 f-02"><p class="name m-top02">{{vo.name}}</p></div>
+                        </div>
+                        <div class="f-02 color-9">{{vo.send_start_time|timeParse}}至{{vo.send_end_time|timeParse}}</div>
+                        <b class="semi-circle"></b>
+                    </div>
+                    <a href="javascript:;" class="show right text-center f-04">立即<br>使用</a>
+                </div>
+            </template>
+        </div>
+        <div class="hide" id="nodata">
+            <div class="ectouch-notcont">
+                <div class="img">
+                    <img src="/public/wap/static/images/nodata.png" class="img"></div>
+                <span class="cont">亲，您还没有相关数据哦！</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var countdown = null;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            indexActive: 0,
+            info: {},
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                //return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+                return moment.unix(timestamp).format('YYYY-MM-DD');
+            }
+        },
+        methods: {
+            indexActiveInit:function(index){
+                $("#nodata").addClass('hide');
+                vm.indexActive = index;
+                if(index==0 && vm.info.alist.length==0){
+                    $("#nodata").removeClass('hide');
+                }
+                if(index==1 && vm.info.blist.length==0){
+                    $("#nodata").removeClass('hide');
+                }
+                if(index==2 && vm.info.clist.length==0){
+                    $("#nodata").removeClass('hide');
+                }
+            },
+            init: function () {
+                wxapp.ajax(config.mycoupon,{},1).then(function (ret) {
+                    if (ret) {
+                        vm.info = ret.data;
+                    }
+                    if(vm.indexActive==0 && vm.info.alist.length==0){
+                        $("#nodata").removeClass('hide');
+                    }
+                    if(vm.indexActive==1 && vm.info.blist.length==0){
+                        $("#nodata").removeClass('hide');
+                    }
+                    if(vm.indexActive==2 && vm.info.clist.length==0){
+                        $("#nodata").removeClass('hide');
+                    }
+                });
+            },
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

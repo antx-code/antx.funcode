@@ -1,0 +1,312 @@
+{include file="public/header"}
+
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">订单列表</a></li>
+    </ul>
+</div>
+<div id="app" v-cloak>
+    <div class="search-info">
+        <div class="search-form">
+            <form action="javascript:vm.getData()" name="searchForm">
+                <div class="lh">下单时间：</div>
+                <div class="text_time">
+                    <input name="start_date" id="start_date" v-model="start_date" class="easyui-datetimebox">
+                </div>
+                <div class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</div>
+                <div class="text_time mr10">
+                    <input name="end_date" id="end_date" v-model="end_date" class="easyui-datetimebox">
+                </div>
+                <input type="text" class="text w140 mr10" v-model="consignee" placeholder="收货人">
+                <input type="text" class="text w140 mr10" v-model="order_sn" value="" placeholder="订单号">
+                <div class="search-key">
+                    <input type="text" class="text w140" name="keywords" v-model="keywords" placeholder="商品编号/商品关键字">
+                    <input type="submit" class="submit" value=" 搜索 ">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+    <input type="hidden" id="order_id" value="{$Request.param.order_id}">
+    <div class="order_state_tab">
+        <a v-for="(vo,index) in flow" @click="flow_filter(index)" :class="{current:index==flow_index}">{{vo}}<span v-if="index==flow_index">({{count}})</span></a>
+    </div>
+
+    <section>
+        <div class="table_list" id="listDiv">
+            <table class="ecsc-default-table order">
+                <thead>
+                <tr>
+                    <th class="w50 frist" @click="orderby('order_id')">编号</th>
+                    <th class="w400 tl">商品信息</th>
+                    <th class="w100">到店提货</th>
+                    <th class="w100"><a @click="orderby('consignee')">收货人</a></th>
+                    <th class="w100"><a @click="orderby('order_amount')">应付金额</a></th>
+                    <th class="w100">订单总金额</th>
+                    <th class="w100">订单状态</th>
+                    <th class="w150">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <template v-for="(order,index) in list">
+                    <tr class="cut">
+                        <td colspan="8" class="sep-row">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <th colspan="8">
+                            <div class="order-sku">
+                                <div class="item"><span>订单号：</span><a :href="'/seller/order/order_detail.html?order_id='+order.order_id">{{order.order_sn}}</a></div>
+                                <div class="item"><span>下单时间：</span><span>{{order.add_time | timeParse}}</span></div>
+                            </div>
+                        </th>
+                    </tr>
+
+                    <tr>
+                        <td class="bdl frist trigger">
+                            <div class="checkbox-info">
+                                <input type="checkbox" class="ui-checkbox" :id="order.order_id" :value="order.order_id" v-model="checkboxes">
+                                <label :for="order.order_id" class="ui-label"><br>{{order.order_id}}</label>
+                            </div>
+                        </td>
+                        <td class="bdl order-goods-list">
+                            <div :class="['product_info',{last:idx==order.goods_list.length-1}]" v-for="(goods,idx) in order.goods_list">
+                                <div class="ecsc-goods-thumb"><a :href="'/home/goods/detail.html?id='+goods.goods_id" target="_blank"><img :src="goods.goods_img" @mouseover="showTip(goods.goods_img)" onmouseout="toolTip()"></a></div>
+                                <div class="goods-info">
+                                    <div class="goods-name"><a target="_blank" :href="'/home/goods/detail?id='+goods.goods_id">{{goods.goods_name}}</a></div>
+                                    <div class="price">￥{{goods.goods_price}}</div>
+                                    <div class="num">* {{goods.goods_num}}</div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="bdl" rowspan="1">
+                            <p v-if="order.self_pickup_time" class="red">预约时间:<br>{{order.self_pickup_time}}</p>
+                            <p v-else>否</p>
+                            <p v-if="order.self_pickup_time && order.write_off > 0" class="green mt10">提货时间:<br>{{order.write_off | timeParse}}</p>
+                        </td>
+                        <td class="bdl" rowspan="1">
+                            <div class="buyer">
+                                {{order.consignee}}
+                                <div class="buyer-info"><em></em>
+                                    <div class="con">
+                                        <h3><i></i><span>联系信息</span></h3>
+                                        <dl>
+                                            <dt>姓名：</dt>
+                                            <dd>{{order.consignee}}</dd>
+                                        </dl>
+                                        <dl>
+                                            <dt>电话：</dt>
+                                            <dd>{{order.mobile}}</dd>
+                                        </dl>
+                                        <dl>
+                                            <dt>地址：</dt>
+                                            <dd>{{order.address}}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="bdl" rowspan="1">
+                            <p class="ecsc-order-amount"><em>¥</em>{{order.order_amount}}</p>
+                            <div class="price-tag">
+                                <span>{{order._source}} 订单</span>
+                            </div>
+                        </td>
+                        <td class="bdl" rowspan="1">
+                            <p class="ecsc-order-amount"><em>¥</em>{{order.total_amount}}</p>
+                        </td>
+                        <td class="bdl bdr" rowspan="1">
+                            <p><span>{{order_status[order.order_status]}}<br>{{pay_status[order.pay_status]}}<br>{{shipping_status[order.shipping_status]}}</span></p>
+                        </td>
+                        <!-- 取消订单 -->
+                        <td class="bdl bdr" rowspan="1"><a :href="'/seller/order/order_detail?order_id='+order.order_id">订单详情</a></td>
+                    </tr>
+                    <tr>
+                        <th colspan="8">
+                            <div class="order-sku">
+                                <div class="item"><span>支付方式：</span><span class="ecsc-order-amount">{{order.pay_name}}</span></div>
+                            </div>
+                        </th>
+                    </tr>
+                </template>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="8"></td>
+                </tr>
+                <tr class="head">
+                    <td class="frist tc"><input type="checkbox" id="all" class="ui-checkbox" v-model="checkall" @change="selectAll()"><label for="all" class="ui-label"></label></td>
+                    <td class="batch-operation" colspan="20">
+                        <input name="confirm" type="submit" id="btnSubmit" value="确认" class="sc-btn btn_disabled" @click="handleOrder('')" v-if="flow_index==1">
+                        <input name="cancel" type="submit" id="btnSubmit2" value="取消" class="sc-btn btn_disabled" @click="handleOrder()" v-if="flow_index==1">
+                        <span>共{{count}}条记录</span>
+                        <span class="page page_3">
+                            <i>每页</i> <input type="text" size="3" id="pageSize" style=" border:1px solid #e5e5e5; background:#FFF; text-align:center; padding:3px; border-radius:4px;" v-model="pageSize" @change="getData()">
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8"><!----></td>
+                </tr>
+                </tfoot>
+            </table>
+            <div class="pagination">
+                <div id="page-bar"></div>
+            </div>
+        </div>
+    </section>
+
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            field: 'order_id',
+            sort: 'desc',
+            beforeRequest: false,
+            flow: JSON.parse('{:json_encode($flow)}'),
+            flow_index: 0,
+            start_date: '',
+            end_date: '',
+            consignee: '',
+            order_sn: '{$Request.param.order_sn}',
+            keywords: '',
+            checkboxes: [],//多选框
+            checkall: false,//全选状态
+            order_status: JSON.parse('{:json_encode($order_status)}'),
+            pay_status: JSON.parse('{:json_encode($pay_status)}'),
+            shipping_status: JSON.parse('{:json_encode($shipping_status)}'),
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        watch: {
+            checkboxes: function () {
+                if (this.checkboxes.length > 0 && (this.checkboxes.length == this.list.length)) {
+                    this.checkall = true;
+                } else {
+                    this.checkall = false;
+                }
+            }
+        },
+        methods: {
+            getData: function (instance) {
+                instance = instance ? instance : vm;
+                var param = {
+                    field: instance.field,
+                    sort: instance.sort,
+                    flow_index: instance.flow_index,
+                    consignee: instance.consignee,
+                    order_sn: instance.order_sn,
+                    keywords: instance.keywords,
+                    page: instance.page,
+                    pageSize: instance.pageSize,
+                };
+                if (instance.start_date) {
+                    param.start_date = moment(instance.start_date).unix();
+                }
+                if (instance.end_date) {
+                    param.end_date = moment(instance.end_date).unix();
+                }
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/order/order_list',
+                    data: param,
+                    success: function (data) {
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        instance.list = data.list;
+                        if (data.page == 1) instance.pagerender();
+                    },
+                    error: function (xhr, type) {
+                        console.log(xhr.responseJSON);//fixme 错误提示
+                    }
+                });
+            },
+            orderby: function (field) {
+                this.field = field;
+                this.sort = this.sort == 'desc' ? 'asc' : 'desc';
+                this.getData();
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            showTip: function (src) {
+                if (src.indexOf('http') < 0)
+                    toolTip('<img src="/public/static/' + src + '" >');
+                else
+                    toolTip('<img src="' + src + '" >');
+            },
+            flow_filter: function (index) {
+                this.flow_index = index;
+                this.getData();
+            },
+            selectAll: function () {
+                var _this = this;
+                if (_this.checkall) {
+                    _this.list.forEach(function (v, i) {
+                        if (_this.checkboxes.indexOf(v.order_id) < 0)
+                            _this.checkboxes.push(v.order_id);
+                    });
+                } else {
+                    _this.checkboxes = [];
+                }
+            },
+            handleOrder: function () {
+                if (event.currentTarget.classList.contains('btn_disabled')) {
+                    return;
+                }
+
+            }
+        },
+        created: function () {
+            this.getData(this);
+        },
+        mounted: function () {
+            var _this = this;
+            $('#start_date').datetimebox({
+                showSeconds: false,
+                onChange: function (date) {
+                    _this.start_date = date;
+                    _this.getData();
+                }
+            });
+            $('#end_date').datetimebox({
+                showSeconds: false,
+                onChange: function (date) {
+                    _this.end_date = date;
+                    _this.getData();
+                }
+            });
+        }
+    });
+
+
+</script>
+{include file="public/footer"}

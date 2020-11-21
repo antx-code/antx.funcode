@@ -1,0 +1,442 @@
+{include file="public/header"}
+<style>
+    .heading {
+        height: 40px;
+        line-height: 40px;
+        padding: 0 20px;
+        background-color: #139ff0;
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .left {
+        width: 75%;
+        height: 500px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+        margin-right: 10px;
+    }
+
+    .right {
+        width: 25%;
+        height: 478px;
+        padding: 10px 5px;
+        border: 1px solid #e7eaec;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
+    }
+
+    .right ul {
+        height: 100%;
+        overflow-y: scroll;
+    }
+
+    .right li {
+        display: flex;
+        height: 50px;
+        padding: 5px;
+        align-items: center;
+        cursor: pointer;
+        justify-content: space-between;
+    }
+
+    .right li:hover, .right li.curr {
+        background-color: #f2f2f2;
+    }
+
+    .right li .avatar {
+        width: 80%;
+        overflow: hidden;
+        margin-right: 7px;
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+
+    .right li .avatar img {
+        width: auto;
+        max-height: 100%;
+        border-radius: 50%;
+        filter: grayscale(100%);
+        margin-right: 7px;
+    }
+
+    .right li .avatar img.online {
+        filter: grayscale(0);
+    }
+
+    .left .msg-list {
+        padding: 10px;
+        height: 322px;
+    }
+
+    .left .msg-list ul {
+        padding: 0 5px;
+        height: 322px;
+        overflow-y: scroll;
+    }
+
+    .left .msg-list ul::-webkit-scrollbar, .right ul::-webkit-scrollbar {
+        width: 5px
+    }
+
+    .left .msg-list ul::-webkit-scrollbar-track, .right ul::-webkit-scrollbar-track {
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+        background-color: transparent
+    }
+
+    .left .msg-list ul::-webkit-scrollbar-thumb, .right ul::-webkit-scrollbar-thumb {
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+        background: #c2c2c3
+    }
+
+    .left .msg-list li {
+        margin-bottom: 5px;
+    }
+
+
+    .left .msg-input {
+        position: relative;
+        height: 137px;
+    }
+
+    .left .me {
+        text-align: right;
+    }
+
+    .left .username {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    .left .msg-time {
+        color: #cccccc;
+    }
+
+    .left .msg {
+        background: #1ab394;
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 0 5px 5px 5px;
+        color: #fff;
+    }
+
+    .left li .msg.image{
+        background: none;
+    }
+    .left .msg img {
+        max-width: 200px;
+    }
+
+    .left .me .msg {
+        background: #f3f3f4;
+        color: #707070;
+        border-radius: 5px 0 5px 5px;
+    }
+
+    .tool-bar {
+        border-top: 1px solid #cccccc;
+        padding-left: 10px;
+    }
+
+    .tool-bar * {
+        cursor: pointer;
+    }
+
+    #msg-text {
+        width: calc(100% - 10px);
+        height: calc(100% - 50px);
+        resize: none;
+        padding: 5px;
+        border: none;
+    }
+
+    #msg-text:hover {
+        border: 1px solid #139ff0
+    }
+
+    .send-btn {
+        position: absolute;
+        bottom: 5px;
+        right: 10px;
+    }
+
+    #show {
+        position: absolute;
+        width: auto;
+        min-width: 100%;
+        height: auto;
+        min-height: 100%;
+        z-index: 999;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, .5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #show img {
+        max-width: 100%;
+    }
+
+    .unread span {
+        padding: 3px;
+        border-radius: 50%;
+        background-color: #ffc107;
+        width: 16px;
+        height: 16px;
+        color: #fff;
+        display: inline-block;
+        text-align: center;
+        font-size: 13px;
+        line-height: 16px;
+    }
+
+    .unread span.double_width {
+        font-size: 12px;
+        width: 18px;
+        height: 18px
+    }
+</style>
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="/seller/sale/coupon_type">客服消息</a></li>
+    </ul>
+</div>
+
+<div class="ecsc-form-goods items-info" id="app" v-cloak>
+    <div class="wrapper-list" data-pos="top">
+        <div class="explanation clear mb20">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>温馨提示</h4></div>
+            <ul>
+                <li>数据隔离，店铺每个账号独立回复买家客服消息。</li>
+                <li>客服消息保留15天，如有交易纠纷请尽早反馈至平台</li>
+            </ul>
+        </div>
+    </div>
+    <div class="heading">在线客服</div>
+    <div class="flex">
+        <div class="left">
+            <div class="msg-list">
+                <ul v-if="list.length>current">
+                    <li v-for="(vo,index) in list[current].msg_history" :class="vo.__from == from_?'me':'you'">
+                        <div><span class="username">{{vo.__from==from_?'我':vo.__from}}</span><span class="msg-time">{{vo.add_time |timeParse}}</span></div>
+                        <div :class="['msg',{image:vo.is_contain_file}]" v-html="msgParse(vo.msg,vo.is_contain_file)"></div>
+                    </li>
+                </ul>
+            </div>
+            <div class="tool-bar">
+                <i class="icon icon-picture" @click="upload()"></i>
+            </div>
+            <div class="msg-input">
+                <textarea name="" id="msg-text" @keydown.enter="sendMsg('send_msg')"></textarea>
+                <button type="button" class="sc-btn sc-blue-btn send-btn" @click="sendMsg('send_msg')">发送</button>
+            </div>
+        </div>
+        <div class="right">
+            <ul>
+                <li v-for="(vo,index) in list" @click="change_to(index)" :class="{curr:current==index}">
+                    <div :class="['avatar',{online:vo.is_online}]">
+                        <img :src="vo.user_info.avatar || '/public/static/images/touxiang.jpg'" :alt="vo.user_info.nickname || vo.user_info.user_name" :class="{online:vo.is_online}">
+                        <div class="name">{{vo.user_info.nickname || vo.user_info.user_name}}</div>
+                    </div>
+                    <div class="unread">
+                        <span v-if="vo.unread" :class="{double_width:vo.unread>=10}">{{vo.unread}}</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let socket, wsServer = 'wss://enongmall.com:9502';
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            from_: 'seller-{$Think.session.seller.id}',
+            to_: '',
+            list: [],
+            current: 9999,
+            show: true,
+            token: {},
+            sueescc: false
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            sendMsg(type, data) {
+                if (!this.success) {
+                    layer.msg('服务器未连接,信息发送失败!~');
+                    return false;
+                }
+                if (!type) type = 'send_msg';
+                let param = {
+                    type: type,
+                    to: vm.to_,
+                    from: vm.from_,
+                    msg: document.getElementById('msg-text').value
+                };
+                if (type == 'send_img') {
+                    param.msg = data;
+                    param.type = 'send_msg';
+                    param.is_contain_file = 1;
+                } else if (type == 'read') {
+                    param.msg = data;
+                }
+                if (type == 'send_msg' && param.msg == '') {
+                    layer.msg('发送内容不能为空!~');
+                    return;
+                }
+                if (type == 'send_msg' && param.msg.length > 2000) {
+                    layer.msg('消息内容不得超过2000字符!~');
+                    return;
+                }
+                if (param.from == param.to) {
+                    layer.msg('无法给自已发信息哦~!');
+                    return;
+                }
+                socket.send(JSON.stringify(param));
+                if(type != 'read'){
+                    document.getElementById('msg-text').value = '';
+                }
+            },
+            msgParse: function (msg, type) {
+                return type ? '<img src="' + msg + '" onclick="showView(this)">' : msg;
+            },
+            init(instance) {
+                if (!instance) instance = vm;
+                socket = new WebSocket(wsServer, instance.from_);
+                socket.onopen = evt => {
+                    console.log("已连接...");
+                    instance.success = true;
+                };
+                socket.onclose = evt => {
+                    layer.msg('服务器连接失败。。');
+                    console.log("远程连接断开...");
+                    instance.success = false;
+                };
+                socket.onmessage = evt => {
+                    let res = JSON.parse(evt.data);
+                    if (res.status == 'success') {
+                        switch (res.type) {
+                            case 'init':
+                                //TODO 所有聊天对象列表
+                                if (res.data.length) {
+                                    res.data[0].msg_history = res.data[0].msg_history.reverse();
+                                    res.data[0].init = true;
+                                    instance.list = res.data;
+                                    instance.to_ = res.data[0].user;
+                                    instance.current = 0;
+                                }
+                                break;
+                            case 'get_msg':
+                                Vue.set(instance.list[instance.current], 'msg_history', res.data.reverse());
+                                instance.list[instance.current].unread = 0;
+                                instance.list[instance.current].init = true;//缓存标记
+                                break;
+                            case 'online_notice':
+                            case 'offline_user':
+                                instance.list.forEach(function (v, i) {
+                                    if (v.user == res.data) {
+                                        instance.list[i].is_online = !instance.list[i].is_online;
+                                    }
+                                });
+                                break;
+                            case 'send_msg':
+                                instance.list.forEach(function (v, i) {
+                                    if (v.user == res.data.__from || v.user == res.data.__to) {
+                                        instance.list[i].msg_history.push(res.data);
+                                        if (i != instance.current) {
+                                            instance.list[i].unread += 1;
+                                        } else if (res.data.is_read == 0) {
+                                            instance.sendMsg('read', res.data.id);
+                                        }
+                                    }
+                                });
+
+                                if (!instance.show) {
+                                    layer.msg('您有新消息,请打开聊天面板');
+                                }
+                                break;
+                        }
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                };
+                socket.onerror = evt => {
+                    console.log(evt);
+                    instance.current = 0;
+                    layer.msg('连接服务器错误：' + (evt.data || evt.type));
+                };
+            },
+            change_to(index) {
+                var user = this.list[index].user;
+                if (user == this.to_) return;
+                this.to_ = user;
+                this.current = index;
+                //没有缓存标记,或者有未读消息时,重新获取聊天记录
+                if (!this.list[this.current].init || this.list[this.current].unread > 0) {
+                    this.sendMsg('get_msg');
+                }
+            },
+            upload() {
+                var input = document.createElement('input');
+                input.type = 'file';
+                input.style.opacity = 0;
+                input.onchange = function () {
+                    if (moment().unix() > vm.token.expire) {
+                        this.getToken(this, true);
+                    }
+                    single_upload(this.files[0], function (res) {
+                        layer.closeAll();
+                        vm.sendMsg('send_img', res);
+                    }, null, vm.token);
+                    $(input).remove();
+                };
+                document.body.append(input);
+                $(input).trigger('click');
+            },
+            getToken: (instance, async) => {
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/api/uploadtoken',
+                    async: async,
+                    success: function (data) {
+                        instance.token = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+        },
+        created() {
+            this.init(this);
+            this.getToken(this);
+        },
+        updated(){
+            $('.msg-list ul').animate({scrollTop: document.querySelector('.msg-list ul').scrollHeight}, 0);
+        }
+    });
+
+    showView = obj => {
+        var show = document.createElement('div');
+        var img = document.createElement('img');
+        show.id = 'show';
+        show.addEventListener('click', function () {
+            this.remove();
+        });
+        img.src = obj.src;
+        show.appendChild(img);
+        document.body.appendChild(show);
+    };
+
+</script>
+{include file="public/footer"}

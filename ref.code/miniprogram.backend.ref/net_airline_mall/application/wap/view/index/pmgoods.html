@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>竞拍</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .swiper-container {width: 100%;}
+        .nav .list{padding: 15px 10px !important;width:20vw;padding-bottom:0!important;}
+        .nav .list .txt{font-size: 12px !important;height:24px;overflow:hidden}
+        .nav{display:flex; text-align: center;flex-wrap: wrap;}
+        .nav .list .txt{line-height:200%}
+        .nav .list img{max-width:100%;padding:0.5rem}
+        .title_index{text-align:center;height:5rem!important;line-height:5rem!important;}
+        .title_index h4{font-size:1.8rem!important;height:5rem!important;line-height:5rem!important;font-weight:bold}
+        .pro-img{width:calc(50vw - 0.9rem) !important;height:calc(50vw - 0.9rem) !important;overflow: hidden}
+        .margin-bp70{padding-bottom: 70px}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="" style="padding-bottom: 70px">
+    <div class="store-nav-list">
+        <div class="swiper-container box-flex swiper-container-horizontal swiper-container-ios">
+            <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;">
+                <div class="swiper-slide swiper-slide-visible swiper-slide-active">
+                    <a href="javascript:;"  :class="{'active':cat_id==0}" @click="catidInit(0)">
+                        <h5>所有分类</h5>
+                    </a>
+                </div>
+                <template v-for="(vo,index) in info.categoryList">
+                    <div class="swiper-slide swiper-slide-visible swiper-slide-next">
+                        <a href="javascript:void(0)" @click="catidInit(vo.cat_id)" :class="{'active':cat_id==vo.cat_id}">
+                            <h5>{{vo.cat_name}}</h5>
+                        </a>
+                    </div>
+                </template>
+                <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+            </div>
+        </div>
+    </div>
+    <div class="con seckill-box">
+        <div class="swipe van-swipe">
+            <div class="van-swipe__track">
+                <div class="van-swipe-item" style="width: 100% !important;">
+                    <img src="/public/wap/static/images/iconpaimai.png" class="img">
+                </div>
+            </div>
+        </div>
+        <div waterfall-disabled="disabled" waterfall-offset="300" class="goods-li">
+            <template v-for="(vo,index) in info.list">
+                <div class="show bg-color-write li" @click="openGoodsdetail(vo)">
+                    <div class="left"><img :src="vo.original_img" class="img"></div>
+                    <div class="right bg-color-write">
+                        <h4 class="f-04 color-3 twolist-hidden">{{vo.goods_name}}</h4>
+                        <div class="dis-box p-r">
+                            <div class="box-flex m-top08">
+                                <div class="color-red f-06"><span>¥{{vo.min_price}}</span>
+                                    <del class="f-02 color-9">¥{{vo.max_price}}</del>
+                                </div>
+                            </div>
+                            <div class="btn-right">
+                                <div class="box-flex">
+                                    <span class="btn-seckill tag-bg-color br-5 f-05 color-white p-a">马上拍</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+
+    <footer data-v-36897c18="" data-v-3aa553e3="" class="tab-down" style="position: fixed;">
+        <ul data-v-36897c18="">
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">首页</span></li>
+            <li data-v-36897c18="" class="active">
+                <a data-v-36897c18="" href="/wap/index/pmgoods" class="router-link-exact-active router-link-active"></a><i data-v-36897c18=""></i><span data-v-36897c18="">竞拍区</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/zggoods" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">直购区</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/cart" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">购物车</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/center" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">我的</span>
+            </li>
+        </ul>
+    </footer>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var countdown = null;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: {},
+            cat_id: 0,
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                //return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+                return moment.unix(timestamp).format('HH:mm');
+            }
+        },
+        methods: {
+            catidInit:function(cat_id){
+                vm.cat_id = cat_id;
+                vm.pageinit();
+            },
+            init: function () {
+                wxapp.ajax(config.paimaigoods,{cat_id: vm.cat_id},1).then(function (ret) {
+                    if (ret) {
+                        vm.info = ret.data;
+                        vm.$nextTick(function(){
+                            vm.swiperInit();
+                            //$("#app").addClass('margin-bp100');
+                        })
+                    }
+                });
+            },
+            pageinit:function(){
+                wxapp.ajax(config.paimaigoods, {
+                    cat_id: vm.cat_id,
+                },1).then(function (ret) {
+                    vm.info = ret.data;
+                })
+            },
+            swiperInit: function () {
+                setTimeout(function () {
+                    new Swiper('.swiper-container', {
+                        pagination: '.swiper-pagination',
+                        slidesPerView: 4,
+                        paginationClickable: true,
+                        spaceBetween: 20,
+                        freeMode: true
+                    });
+                },100);
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'pmdetail_win',
+                    url: 'widget://html/store/pmdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            }
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    }
+</script>

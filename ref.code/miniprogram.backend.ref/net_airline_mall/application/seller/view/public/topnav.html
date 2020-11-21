@@ -1,0 +1,46 @@
+<div class="ecsc-head-layout">
+    <div class="wrapper">
+        <div class="admin-logo">
+            <div class="t">
+                <a href="/">
+                    <img src="{$logo}" class="logo"/>
+                </a>
+            </div>
+        </div>
+        <div class="ecsc-nav">
+            <ul class="ecsc-nav-ul">
+                <li class="{if ($ctrl=='index')}current{/if}"><a href="/seller/index/index.html">首页</a>
+                    <div class="arrow"></div>
+                </li>
+                {volist name="menu" id="vo"}
+                {if ($vo['show'])}
+                <li class="{if ($ctrl==$key)}current{/if}"><a href="{php} $left=array_keys($vo['left']);echo url($key.'/'.reset($left));{/php}">{$vo.title}</a>
+                    <div class="arrow"></div>
+                </li>
+                {/if}
+                {/volist}
+            </ul>
+        </div>
+        <div class="ecsc-admin">
+            <div class="avatar">
+                <form runat="server">
+                    <input type="hidden" name="act" value="upload_store_img">
+                    <input type="file" name="img">
+                </form>
+                <a href="javascript:void(0);">
+                    <img src="{$Think.session.seller.avatar | default='/public/static/images/seller/default_avatar.png'}">
+                </a>
+            </div>
+            <dl>
+                <dt>
+                    <span>{$Think.session.seller.username}</span>
+                </dt>
+                <dd>
+                    <span><i class="sc_icon sc_icon_seller"></i><a class="navbar-brand" href="{:url('home/store/index',['id'=>$Think.session.seller.store_id])}" target="_blank">店铺</a></span>
+                    <span><i class="sc_icon sc_icon_set"></i><a class="navbar-brand navbar-right" href="javascript:;" onclick="clearCache()">清缓存</a></span>
+                    <span><i class="sc_icon sc_icon_out"></i><a class="navbar-brand navbar-right" href="/seller/login/logout">退出</a></span>
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>

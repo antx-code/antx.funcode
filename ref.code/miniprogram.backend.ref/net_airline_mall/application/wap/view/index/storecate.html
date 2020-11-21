@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>店铺分类</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .list_store_cate{border-radius: 6px;padding:10px; background: #fff;overflow:hidden;margin:10px;}
+        .list_store_cate h1{font-weight:bold;border-left:2px solid #dd0000;padding-left:10px;display:block;overflow:hidden}
+        .list_store_cate h1 .van-icon{float:right;}
+        .list_store_cate h1 i{font-size:1rem!important;color:#ccc}
+        .list_store_cates{width:100%}
+        .list_store_cates li{width: calc(50% - 10px);margin:10px 5px 0 5px;background: #f1f1f1;float:left;display:inline-block;border-radius:6px;padding:10px;font-size: 1.4rem;}
+        /*.list_store_cates li{ background: #f1f1f1;overflow:hidden;border-radius:6px;padding:10px;box-sizing: border-box;margin-top:10px 5px 0 5px;flex:1}*/
+    </style>
+</head>
+
+<body>
+<div id="app" v-cloak="">
+    <div class="home">
+        <template v-for="(vo,index) in list">
+            <div class="list_store_cate">
+                <h1 @click="openStoreGoodslist(vo.cat_id)">{{vo.cat_name}}<i class="van-icon van-icon-arrow van-cell__right-icon"></i></h1>
+                <ul class="list_store_cates">
+                    <template v-for="(vo2,index2) in vo.children">
+                        <li @click="openStoreGoodslist(vo2.cat_id)">{{vo2.cat_name}}</li>
+                    </template>
+                </ul>
+            </div>
+        </template>
+        <footer data-v-128aefcc="" class="shop-menu">
+            <ul data-v-128aefcc="" class="">
+                <li data-v-128aefcc="" @click="openStoreindex()">
+                    <div data-v-128aefcc="" class="info"><i data-v-128aefcc="" class="iconfont icon-home"></i>
+                        <p data-v-128aefcc="">首页</p>
+                    </div>
+                </li>
+                <li data-v-128aefcc="" @click="openStoreGoodslist(0)">
+                    <div data-v-128aefcc="" class="info"><i data-v-128aefcc="" class="iconfont icon-dianpu1"></i>
+                        <p data-v-128aefcc="">商品</p>
+                    </div>
+                </li>
+                <li data-v-128aefcc="" :class="{'active':showCate==1}" @click="cateInit()">
+                    <div data-v-128aefcc="" class="info active">
+                        <i data-v-128aefcc="" class="iconfont icon-fenlei1"></i>
+                        <p data-v-128aefcc="">分类</p>
+                    </div>
+                </li>
+                <li data-v-128aefcc="" class="kf" onclick="open_meiQia()">
+                    <div data-v-128aefcc="" class="info">
+                        <i data-v-128aefcc="" class="iconfont icon-kefu"></i>
+                        <p data-v-128aefcc="">客服</p>
+                    </div>
+                </li>
+            </ul>
+        </footer>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            store_id: 33,
+            list: [],
+            showCate:0,
+            miniapp:0,
+        },
+        methods: {
+            openStoreindex: function () {
+                api.openWin({
+                    name: 'storeindex_win.html',
+                    url: 'widget://html/storeindex_win.html',
+
+                    pageParam: {
+                        store_id: vm.store_id,
+                        miniapp: vm.miniapp,
+                    }
+                });
+            },
+            openStoreGoodslist: function (cat_id) {
+                api.openWin({
+                    name: 'storegoods_win.html',
+                    url: 'widget://html/storegoods_win.html',
+
+                    pageParam: {
+                        store_id: vm.store_id,
+                        cat_id: cat_id,
+                        miniapp: vm.miniapp,
+                    }
+                });
+            },
+            openStoreCatelist: function (cat_id) {
+                api.openWin({
+                    name: 'storecate_win.html',
+                    url: 'widget://html/storecate_win.html',
+
+                    pageParam: {
+                        store_id: vm.store_id,
+                        miniapp: vm.miniapp,
+                    }
+                });
+            },
+            openGoodList:function (vo) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        cat_id: vo.cat_id,
+                        miniapp: vm.miniapp,
+                    }
+                });
+            },
+            openGoodsdetail: function (vo) {
+                if(vm.miniapp == 1){
+                    wx.miniProgram.navigateTo({
+                        url: '/pages/goods/index?goods_id='+vo.goods_id
+                    });
+                }else{
+                    api.openWin({
+                        name: 'goodsdetail_win',
+                        url: 'widget://html/goodsdetail_win.html',
+                        pageParam: {
+                            goods_id: vo.goods_id,
+                            miniapp: vm.miniapp,
+                        }
+                    });
+                }
+            },
+            cateInit:function(){
+                if(vm.showCate == 0){
+                    vm.showCate = 1;
+                }else{
+                    vm.showCate = 0;
+                }
+            },
+            openStoreinfo: function () {
+                api.openWin({
+                    name: 'storeinfo_win.html',
+                    url: 'widget://html/store/storeinfo_win.html',
+                    pageParam: {
+                        store_id: vm.store_id,
+                        miniapp: vm.miniapp,
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.storecatelist, {store_id: vm.store_id}).then(function (ret) {
+                    vm.list = ret.data;
+                });
+            },
+        }
+    });
+    window.onload = function () {
+        vm.store_id = api.pageParam.store_id ? api.pageParam.store_id : 0;
+        vm.miniapp = api.pageParam.miniapp ? api.pageParam.miniapp : 0;
+        vm.init();
+    };
+</script>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>商家管理中心</title>
+    <link type="text/css" href="/topjui/css/topjui.core.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/public/static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/seller/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/plugins/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/perfect-scrollbar.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/seller/general.css"/>
+
+    <script type="text/javascript" src="/public/static/plugins/jquery/jquery.min.js"></script>
+
+    <script type="text/javascript" src="/public/static/js/topjui.config.js"></script>
+    <script type="text/javascript" src="/topjui/js/topjui.core.min.js"></script>
+    <script type="text/javascript" src="/topjui/js/locale/topjui.lang.zh_CN.js"></script>
+
+    <script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+    <script type="text/javascript" src="/public/static/plugins/qiniu/qiniu.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/function.js"></script>
+    <script type="text/javascript" src="/public/static/js/seller.js"></script>
+    <script type="text/javascript" src="/public/static/js/perfect-scrollbar.min.js"></script>
+
+</head>
+<body>
+{include file='topnav'}
+
+<div class="ecsc-layout">
+    <div class="site wrapper">
+
+        <div class="ecsc-layout-right">
+            <div class="main-content" id="mainContent">
+
+                <div class="top-container">
+                    <div class="basic-info">
+                        <div class="ecsc-seller-info">
+                            <div class="store-logo"><img src="{$supplier.logo}"/></div>
+                            <div class="store-info">
+                                <div class="seller-name">{$supplier.name}</div>
+                                <div class="seller-desc">
+                                    <div class="item">
+                                        <span><em>用 户 名：</em><strong>{$Think.session.sr.username}</strong></span>
+                                        <span class="store-name"><em>供应商：</em><strong><a href="javascript:">{$supplier.name}</a></strong></span>
+                                    </div>
+                                    <div class="item">
+                                        <span><em>管理权限：</em><strong>{if $Think.session.sr.is_admin==1}管理员{else /}店长{/if}</strong></span>
+                                        <span><em>最后登录：</em>
+                                            <strong>{$Think.session.sr.last_login_time}</strong>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-items">
+                                <ul>
+                                    <li><a href="{:url('order/order_list')}">待处理订单<em>(888)})</em></a></li>
+                                    <!--<li><a href="{:url('service/message')}">提示信息<em>({999})</em></a></li>-->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="seller-cont">
+                    <div class="container_left">
+                        <div class="container type-a type-one">
+                            <div class="hd">
+                                <h3>店铺及商品提示</h3>
+                            </div>
+                            <div class="content">
+                                <ul>
+                                    <li><a href="{:url('goods/index')}">在线销售商品<em>({$goods_count['is_on_sale'][1]??0})</em></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="container type-a type-two">
+                            <div class="hd">
+                                <h3>交易提示</h3>
+                            </div>
+                            <div class="content">
+                                <ul>
+                                    <li><a href="{:url('order/index','flow_index=3')}" target="_blank">待发货<em>({$wait_send})</em></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container_right">
+                        <div class="container type-b type-b-one">
+                            <div class="hd">
+                                <h3>商家帮助</h3>
+                            </div>
+                            <div class="content">
+                                <ul>
+                                    <li><a href="#">结算说明</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="container type-b type-b-two">
+                            <div class="hd">
+                                <h3>联系方式</h3>
+                            </div>
+                            <div class="content">
+                                <ul>
+                                    <li>电话：{$supplier.mobile??''}</li>
+                                    <li>邮箱：{$supplier.email}</li>
+                                    <li>地址：{$supplier.store_address??''}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="seller-cont">
+                    <div class="hd">
+                        <h3>店铺数据
+                            <em style="font-size:12px; color:#7d7d7d">（已成交付款为准：已付款订单）</em>
+                        </h3>
+                    </div>
+                    <div class="main-left">
+
+                        <div class="container">
+                            <div class="container-left"><i class="shop-icon shop-icon-move"></i></div>
+                            <div class="container-right">
+
+                                <ul>
+                                    <li>今日PC成交额
+                                        <p>50</p>
+                                    </li>
+                                    <li>昨日mobile订单数
+                                        <p>30</p>
+                                    </li>
+                                    <li>今日客单价
+                                        <p>88.88</p>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="main-right">
+                        今日总成交额
+                        <p><em>¥</em>999.99</p>
+                        今日全店成交转化率
+                        <p>5.8 %</p>
+                    </div>
+                    <div class="clear"></div>
+
+
+                    {include file='footer'}

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>购物车</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .van-submit-bar {z-index: 10000;}
+        .van-submit-bar {bottom: 61px;}
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="con con_main_b5">
+        <header class="header-address hide">
+            <div class="address-box"><i class="iconfont icon-location"></i><span>上海市 上海市 黄浦区</span></div>
+            <div class="h-edit color-red">编辑</div>
+        </header>
+        <section class="card-goods" v-if="info.storeList.length>0">
+            <template v-for="(vo,index) in info.storeList">
+                <div class="card-goods-group">
+                    <div class="card-shop-head">
+                        <div class="card-goods__item">
+                            <div>
+                                <div class="van-checkbox">
+                                    <div class="van-checkbox__icon van-checkbox__icon--round"
+                                         @click="storeInit(index)"
+                                         :class="{'van-checkbox__icon--checked':vo.selected==1}">
+                                        <i class="van-icon van-icon-success"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="van-checkbox__con">
+                                <div class="store_name">
+                                    <strong>{{vo.store_name?vo.store_name:'自营'}}</strong>
+                                    <a href="javascript:;" class="fr color-red hide">领取优惠券</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="van-checkbox-group">
+                        <div class="card-shop-box">
+                            <div class="card-act-goods">
+                                <template v-for="(vo2,index2) in vo.goodsList">
+                                    <div class="card-goods__item">
+                                        <div class="van-checkbox">
+                                            <div class="van-checkbox__icon van-checkbox__icon--round"
+                                                 :class="{'van-checkbox__icon--checked':vo2.selected==1}"
+                                                 @click="init(true,index,index2)">
+                                                <i class="van-icon van-icon-success"></i>
+                                            </div>
+                                        </div>
+                                        <div class="van-checkbox__con">
+                                            <div class="cart-goods-info van-card" style="padding-left: 0px;">
+                                                <a href="javascript:void(0);" class="van-card__thumb"
+                                                   @click="openGoodsdetail(vo)">
+                                                    <a href="javascript:void(0);" class="">
+                                                        <img :src="vo2.original_img" style="width: 84px;height: 84px;">
+                                                    </a>
+                                                </a>
+                                                <div class="van-card__content">
+                                                    <div class="van-card__left">
+                                                        <div class="goods-title twolist-hidden" @click="openGoodsdetail(vo)"><a href="javascript:void(0);" class="">{{vo2.goods_name}}</a></div>
+                                                        <div class="goods-title twolist-hidden" @click="openGoodsdetail(vo)"><a href="javascript:void(0);" class="">{{vo2.tempvalue}}</a></div>
+                                                        <div class="goods-info dis-box">
+                                                            <div class="price box-flex">¥{{vo2.shop_price}}</div>
+                                                            <div class="oper">
+                                                                <div class="stepper">
+                                                                    <div class="van-stepper">
+                                                                        <button class="van-stepper__minus van-stepper__minus--disabled"
+                                                                                @click="cartUpdate('reduce',vo2.id)"></button>
+                                                                        <input type="number" class="van-stepper__input"
+                                                                               v-model="vo2.goods_num" readonly>
+                                                                        <button class="van-stepper__plus"
+                                                                                @click="cartUpdate('add',vo2.id)"></button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="oper-icon"
+                                                                     @click="cartUpdate('delete',vo2.id)"><i class="iconfont icon-delete"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="van-card__right"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </section>
+        <div class="flow-no-cart" v-else>
+            <span class="gwc-icon">
+                <img src="https://x.dscmall.cn/img/cart-empty.png" class="img">
+            </span>
+            <h3>您的购物车还是空空的，快去逛逛吧！</h3>
+            <div class="card-btn">
+                <button class="van-button van-button--default van-button--normal van-button--plain" @click="goindex()"><span class="van-button__text">去逛逛</span></button>
+                <button class="van-button van-button--default van-button--normal van-button--plain" onclick="openwind('','favorite_win',1)"><span class="van-button__text">看看关注</span></button>
+            </div>
+        </div>
+
+        <div class="cart-submit van-submit-bar" id="apicontent">
+            <div class="van-submit-bar__bar">
+                <div class="checkall">
+                    <div class="van-checkbox">
+                        <div class="van-checkbox__icon van-checkbox__icon--round van-checkbox__icon--checked">
+                            <i class="van-icon van-icon-success"></i>
+                        </div>
+                        <span class="van-checkbox__label">全选</span>
+                    </div>
+                </div>
+                <div class="van-submit-bar__text"><p><span>合计：</span><span class="van-submit-bar__price">¥{{info.selectGoodsTotal}}</span>
+                </div>
+                <button class="van-button van-button--danger van-button--normal" onclick="openwind('','confirmorder_win')" v-if="info.selectGoodsNum>0">
+                    <span class="van-button__text">去结算({{info.jiesuanNum}})</span>
+                </button>
+            </div>
+        </div>
+        <section class="goods-guess text-center mb55">
+            <h5 class="title-hrbg"><span>猜你喜欢</span>
+                <hr>
+            </h5>
+            <section class="product-list product-list-medium">
+                <div class="prolist">
+                    <template v-for="(vo,index) in info.guesslike">
+                        <div class="prolist-item" @click="openGoodsdetail(vo)">
+                            <div class="pro-img">
+                                <a href="javascript:void(0)" class="">
+                                    <img :src="vo.original_img" class="img" style="height: 150px;"></a>
+                            </div>
+                            <div class="pro-info">
+                                <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                                <div class="price">¥{{vo.shop_price}}</div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+        </section>
+    </div>
+
+    <footer data-v-36897c18="" data-v-3aa553e3="" class="tab-down" style="position: fixed;">
+        <ul data-v-36897c18="">
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">首页</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/category" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">分类</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/zgchange" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">积分</span></li>
+            <li data-v-36897c18="" class="active">
+                <a data-v-36897c18="" href="/wap/index/cart" class="router-link-exact-active router-link-active"></a><i data-v-36897c18=""></i><span data-v-36897c18="">购物车</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/center" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">我的</span>
+            </li>
+        </ul>
+    </footer>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            token: '',
+            info: {},
+        },
+        methods: {
+            goindex:function(){
+              window.location.href = "/wap"
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'goodsdetail_win',
+                    url: 'widget://html/goodsdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            confirmorderWin:function(){
+                api.openWin({
+                    name: 'confirmorder_win',
+                    url: 'widget://html/index/confirmorder_win.html',
+                });
+            },
+            init: function (update, index, index2) {
+                var param = {};
+                if (update) {
+                    var ckAll = 1;
+                    if (vm.info.storeList[index].goodsList[index2].selected == 0) {
+                        vm.info.storeList[index].goodsList[index2].selected = 1;
+                    } else {
+                        vm.info.storeList[index].goodsList[index2].selected = 0;
+                    }
+                    param = {select: {}, num: {}};
+
+                    vm.info.storeList.forEach(function (v, i) {
+                        v.goodsList.forEach(function (goods, index) {
+                            param.select[goods.id] = vm.info.storeList[i].goodsList[index].selected;
+                            param.num[goods.id] = goods.goods_num;
+                        });
+                    });
+                    //console.log(JSON.stringify(param));return false;
+                }
+                wxapp.ajax(config.cartList, param, 1).then(function (ret) {
+                    vm.info = ret.data;
+                    setTimeout(function () {
+                        $("#apicontent").addClass('mb55');
+                    }, 1000);
+                })
+            },
+            storeInit: function (index) {
+                var pageparm = {};
+                if (vm.info.storeList[index].select == 1) {
+                    pageparm = {
+                        store_id: vm.info.storeList[index].store_id ? vm.info.storeList[index].store_id : 0,
+                        selected: 0,
+                        act: 'storeInit'
+                    }
+                } else {
+                    pageparm = {
+                        store_id: vm.info.storeList[index].store_id ? vm.info.storeList[index].store_id : 0,
+                        selected: 1,
+                        act: 'storeInit'
+                    }
+                }
+                wxapp.ajax(config.cartUpdate, pageparm).then(function (ret) {
+                    if (ret.status == 1) {
+                        vm.init();
+                    } else {
+                        wxapp.alert('error', ret.msg);
+                    }
+                })
+            },
+            cartUpdate: function (act, id) {
+                wxapp.ajax(config.cartUpdate, {
+                    act: act,
+                    id: id
+                }).then(function (ret) {
+                    if (ret.status == 1) {
+                        vm.init();
+                    } else {
+                        wxapp.alert('error', ret.msg);
+                    }
+                })
+            }
+        },
+    });
+
+    window.onload = function () {
+        if ($api.getStorage('token')) {
+            vm.token = $api.getStorage('token');
+            vm.init();
+        }else{
+            window.location.href = base_url + "wap/index/weixinlogin";
+        }
+    };
+
+</script>

@@ -1,0 +1,250 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="Keywords" content=""/>
+    <meta name="Description" content=""/>
+    <title>注册-登录</title>
+    <link rel="shortcut icon" href="/favicon.ico"/>
+    <script type="text/javascript" src="/public/static/plugins/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.json.js"></script>
+    <script type="text/javascript" src="/public/static/js/transport_jquery.js"></script>
+    <script type="text/javascript" src="/public/static/js/utils.js"></script>
+    <script type="text/javascript" src="/public/static/js/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.nyroModal.js"></script>
+    <script type="text/javascript" src="/public/static/js/lib_ecmobanFunc.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+
+    <script type="text/javascript" src="/public/static/js/vue.js"></script>
+    <script type="text/javascript" src="/public/static/plugins/moment/moment.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/echarts.js"></script>
+    <script type="text/javascript" src="/public/static/js/walden.js"></script>
+    <script type="text/javascript" src="/public/static/js/function.js"></script>
+
+    <!--layui库引入开始-->
+    <link href="/public/static/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+    <!--layui库引入结束-->
+
+    <script type="text/javascript" src="/public/static/theme/js/user.js"></script>
+    <script type="text/javascript" src="/public/static/theme/js/sms.js"></script>
+    <script type="text/javascript" src="/public/static/theme/js/user_register.js"></script>
+    <script type="text/javascript" src="/public/static/theme/js/scroll_city.js"></script>
+    <script type="text/javascript" src="/public/static/theme/js/mall-common.js"></script>
+    <script type="text/javascript" src="/public/static/theme/js/language.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/purebox.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/theme/css/quickLinks.css"/>
+</head>
+<body class="bg-ligtGary">
+<div class="register">
+    <div class="loginRegister-header">
+        <div class="w w1200">
+            <div class="logo">
+                <div class="logoImg">
+                    <a href="/" class="logo">
+                        <img src="{$siteInfo.shop_logo}"/>
+                    </a>
+                </div>
+                <div class="logo-span"></div>
+            </div>
+            <div class="header-href">
+                <span>已注册可<a href="/home/member/login" class="jump">在此登录</a></span>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="w w1200">
+            <div class="register-wrap">
+                <div class="register-adv">
+                    <a href="javascript:void(0)">
+                        <img width="400" height="324" src="/public/static/images/1488939821671881226.jpg"/>
+                    </a>
+                </div>
+                <div class="register-form">
+                    <div class="form form-other">
+                        <form action="/home/login/register" method="post" name="formUser">
+                            <div class="item">
+                                <div class="item-label">用　户　名</div>
+                                <div class="item-info">
+                                    <input type="text" name="username" id="username" class="text" value=""/>
+                                </div>
+                                <div class="input-tip"></div>
+                            </div>
+                            <div class="item">
+                                <div class="item-label">设 置 密 码</div>
+                                <div class="item-info">
+                                    <input type="password" style="display:none"/>
+                                    <input type="password" name="password" id="pwd" class="text" value=""/>
+                                </div>
+                                <div class="input-tip"></div>
+                            </div>
+                            <div class="item">
+                                <div class="item-label">确 认 密 码</div>
+                                <div class="item-info">
+                                    <input type="password" style="display:none"/>
+                                    <input type="password" name="confirm_password" id="pwdRepeat" class="text" />
+                                </div>
+                                <div class="input-tip"></div>
+                            </div>
+                            <div class="item" id="phone_yz">
+                                <div class="item-label">手 机 号 码</div>
+                                <div class="item-info">
+                                    <input type="text" name="mobile_phone" id="mobile_phone" class="text" />
+                                </div>
+                                <div class="input-tip"></div>
+                            </div>
+                            {if $shop_config['sms_signin']}
+                            <div class="item" id="code_mobile">
+                                <div class="item-label">手机验证码</div>
+                                <div class="item-info">
+                                    <input type="text" id="sms" name="mobile_code" class="text text-2"  >
+                                    <a href="javascript:void(0);" onclick="sendSms()" id="zphone" class="sms-btn">获取验证码</a>
+                                </div>
+                                <div class="input-tip"><label id="phone_notice"></label></div>
+                            </div>
+                            {/if}
+
+                            {if $shop_config['reg_captcha']}
+                            <div class="item">
+                                <div class="item-label">验　证　码</div>
+                                <div class="item-info">
+                                    <input type="text" id="captcha" name="captcha" class="text text-2 fl">
+                                    <img src="/home/login/verify" class="captcha_img fl" onclick="this.src='/home/login/verify?time'+Math.random()">
+                                </div>
+                                <div class="input-tip"></div>
+                            </div>
+                            {/if}
+                            <div class="item item2">
+                                <div class="item-checkbox">
+                                    <input type="checkbox" id="clause2" class="ui-solid-checkbox" checked="checked" name="mobileagreement">
+                                    <label class="ui-solid-label" for="clause2">
+                                        我已阅读并同意
+                                        <a href="javascript:void(0)" class="ftx-05"
+                                           onclick="layerwin('用户协议','/home/login/agreement')">
+                                            《用户注册协议》
+                                        </a>
+                                    </label>
+                                </div>
+                                <div class="input-tip"></div>
+                            </div>
+                            <div class="item item2 item-button">
+                                <input type="hidden" name="flag" id="flag" value='register' />
+                                <input name="register_type" type="hidden" value="1" />
+                                <input type="hidden" name="seccode" id="seccode" value="" />
+                                <input name="act" type="hidden" value="act_register" >
+                                <input name="register_mode" type="hidden" value="1" >
+
+                                <input type="submit" id="registsubmit" name="submit" class="btn sc-redBg-btn" value="立即注册"/>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer user-footer">
+    <div class="shop-copyright">
+        <div class="w w1200">
+            <p class="footer-ecscinfo pb10">
+                <a href="/">首页</a>
+                |
+                <a href="/home/merchant/index.html=2">隐私保护</a>
+                |
+                <a href="/home/merchant/index.html=4">联系我们</a>
+                |
+                <a href="/home/merchant/index.html=1">免责条款</a>
+                |
+                <a href="/home/merchant/index.html=5">公司简介</a>
+                |
+                <a href="/home/merchant/index.html" target="_blank">商家入驻</a>
+            </p>
+            <p class="footer-otherlink">
+                <a href="http://www.taobao.com" target="_blank" title="淘宝">淘宝</a>
+                |
+
+                <a href="http://www.alibaba.com" target="_blank" title="阿里巴巴">阿里巴巴</a>
+            </p>
+            <p class="copyright_info">
+                ICP备案证书号:<a href="http://www.beian.miit.gov.cn" target="_blank">{$siteInfo.icp_number}</a>
+                POWERED BY<a href="/" target="_blank">{$siteInfo.shop_name}</a>
+                2.0
+            </p>
+        </div>
+    </div>
+    <div class="hidden">
+        <input type="hidden" name="seller_kf_IM" value="" rev="" ru_id=""/>
+        <input type="hidden" name="seller_kf_qq" value="11647006"/>
+        <input type="hidden" name="seller_kf_tel" value="400-1234-5678"/>
+        <input type="hidden" name="user_id" value="0"/>
+    </div>
+</div>
+</body>
+</html>
+<style>
+    .layui-timeline-item:before,hr{background-color:#ffffff}
+    .layui-layer-title{padding:0 80px 0 20px;height:42px;line-height:42px;border-bottom:1px solid #eee;font-size:14px;color:#333;overflow:hidden;background-color:#f3f3f3;border-radius:2px 2px 0 0}
+    .layui-layer-btn .layui-layer-btn0 {
+        border-color: #EF4F4F;
+        background-color: #EF4F4F;
+        color: #fff;
+    }
+</style>
+
+<script type="text/javascript">
+    $(function () {
+        if (document.getElementById("seccode")) {
+            $("#seccode").val(0);
+        }
+        //邮箱验证和手机验证切换
+        $("*[shoptype='meSwitch']").on("click", function () {
+            var type = $(this).data("type");
+
+            if (type == "phone") {
+                $("#email_yz,#code_email").show();
+                //邮箱验证 邮箱号和邮箱验证码显示
+                $("#phone_yz,#code_mobile").hide();
+                //邮箱验证 手机号码和短信隐藏
+
+                $("input[name='register_type']").val(0);
+                //邮箱验证标识
+                $("input[name='mobile_phone']").val("");
+                //手机号码清空
+                $("input[name='mobile_phone'],input[name='mobile_code']").addClass("ignore");
+                //邮箱验证 邮箱和邮箱验证码添加验证标识
+                $("input[name='email'],input[name='send_code']").removeClass("ignore");
+                //邮箱验证 手机号码和短信去除验证标识
+            } else {
+                $("#email_yz,#code_email").hide();
+                //手机验证 邮箱号和邮箱验证码隐藏
+                $("#phone_yz,#code_mobile").show();
+                //手机验证 手机号码和短信显示
+
+                $("input[name='register_type']").val(1);
+                //手机注册标识
+                $("input[name='mobile_phone'],input[name='mobile_code']").removeClass("ignore");
+                //手机验证 手机号码和短信验证标识
+                $("input[name='email'],input[name='send_code']").addClass("ignore");
+                //手机验证 邮箱和邮箱验证码去除验证标识
+            }
+        });
+
+    });
+    function layerwin(title, url) {
+        layer.open({
+            type: 2,
+            title: title,
+            area: ['50%', '50%'],
+            content: url,
+            btn: ['同意']
+            , yes: function (index, layero) {
+                layer.closeAll();
+            }
+        });
+    }
+</script>

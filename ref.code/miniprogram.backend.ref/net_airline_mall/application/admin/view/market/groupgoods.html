@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>活动规则：团购活动时间内，根据后台设置的价格阶梯，买家先支付保证金，根据商家评判标准决定活动是否成功，如果成功，买家根据阶梯价格支付尾款；如果失败，已支付保证金退回买家账户。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <div class="fbutton" @click="add()">
+                        <div class="add" title="添加团购活动">
+                            <span><i class="icon icon-plus"></i>添加团购活动</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" placeholder="商品名称" class="text nofocus" v-model="keywords">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%" class="sign">
+                                <div class="tDiv">
+                                    <input type="checkbox" name="all_list" class="checkbox" id="all_list"/>
+                                    <label for="all_list" class="checkbox_stars"></label>
+                                </div>
+                            </th>
+                            <th width="5%">
+                                <div class="tDiv">商品ID</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">商品名称</div>
+                            </th>
+                            <th width="20%">
+                                <div class="tDiv">结束时间</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">限购</div>
+                            </th>
+
+                            <th width="10%">
+                                <div class="tDiv">热销</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">新品</div>
+                            </th>
+                            <th width="15%">
+                                <div class="tDiv">审核状态</div>
+                            </th>
+                            <th width="15%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td class="sign">
+                                    <div class="tDiv">
+                                        <input type="checkbox" name="checkboxes[]" :value="vo.gid"
+                                               class="checkbox" :id="checkboxitem+vo.gid">
+                                        <label :for="checkboxitem+vo.gid" class="checkbox_stars"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.goods_id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.goods_name}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.end_time_cn}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.restrict_amount}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.is_hot==1}" title="是"
+                                             @click="doupdate_is_hot(vo)">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <input type="hidden" value="0" name="">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.is_new==1}" title="是"
+                                             @click="doupdate_is_new(vo)">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <input type="hidden" value="0" name="">
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="tlist">
+                                            <template v-if="vo.review_status==1">
+                                                <span class="">待审核</span>
+                                            </template>
+                                            <template v-if="vo.review_status==2">
+                                                <span class="green">已通过</span>
+                                            </template>
+                                            <template v-if="vo.review_status==3">
+                                                <span class="red2">拒绝</span>
+                                            </template>
+                                        </div>
+                                        <div class="tlist">
+                                            <button class="layui-btn layui-btn-xs" @click="doupdate(vo,2)">通过</button>
+                                            <button class="layui-btn layui-btn-danger layui-btn-xs"
+                                                    @click="doupdate(vo,3)">拒绝
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0)" title="编辑" class="btn_edit" @click="add(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="tfoot_btninfo">
+                                        <input type="submit" value="删除" id="btnSubmit"
+                                               name="btnSubmit" shoptype="btnSubmit" class="btn btn_disabled"
+                                               disabled="disabled" @click="doalldelete()">删除
+                                    </div>
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+
+        },
+        methods: {
+            add: function (vo = {}) {
+                if (vo.gid > 0) {
+                    layerOpenwinMid('编辑团购活动', '/admin/market/groupgoodsadd?gid=' + vo.gid);
+                } else {
+                    layerOpenwinMid('添加团购活动', '/admin/market/groupgoodsadd?gid=0');
+                }
+            },
+            doupdate: function (vo, review_status = 1) {
+                var pageparm = vo;
+                pageparm.review_status = review_status;
+                majax('/admin/market/doupdate', pageparm, 'group_goods')
+            },
+            doupdate_is_hot: function (vo) {
+                var is_hot = vo.is_hot == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_hot = is_hot;
+                majax('/admin/market/doupdate', pageparm, 'group_goods')
+            },
+            doupdate_is_new: function (vo) {
+                var is_new = vo.is_new == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_new = is_new;
+                majax('/admin/market/doupdate', pageparm, 'group_goods')
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/market/groupgoods', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/market/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'group_goods'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            doalldelete: function () {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/market/doalldelete', {
+                            ids: vm.ids,
+                            table: 'group_goods'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.log_ids = [];
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

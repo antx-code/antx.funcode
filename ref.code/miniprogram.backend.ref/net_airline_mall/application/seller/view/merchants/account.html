@@ -1,0 +1,92 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">店铺账户</a></li>
+        <li><a href="/seller/merchants/withdrawals">提现记录</a></li>
+        <li><a href="/seller/merchants/account_log">收支明细</a></li>
+    </ul>
+</div>
+
+<div class="ecsc-form-goods">
+    <form action="{:url('merchants/account')}" method="post" id="account_form">
+        <div class="wrapper-list">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;户名</dt>
+                <dd>
+                    <input name="account_name" value="{$store.account_name}" type="text" id="account_name" class="text">
+                    <div class="form_prompt"></div>
+                    <div class="notic">为确保您的账户安全，请填写您本人的实名认证信息,或基本账户名称</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;开户银行</dt>
+                <dd><input name="bank_name" value="{$store.bank_name}" type="text" id="bank_name" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;银行卡号</dt>
+                <dd><input name="bank_card" value="{$store.bank_card}" type="text" id="bank_card" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;手机号码</dt>
+                <dd>
+                    <input name="bank_mobile" value="{$store.bank_mobile}" type="text" id="bank_mobile" class="text valid">
+                    <div class="form_prompt"></div>
+                    <div class="notic">请填写该卡在银行预留的手机号码，验证该银行卡是否真实属于您本人,或公司基本账户</div>
+                </dd>
+            </dl>
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="submit" class="sc-btn sc-blueBg-btn btn35" id="query" value=" 确定 ">
+                    <input type="reset" class="sc-btn btn35 sc-blue-btn" value=" 重置 ">
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(function () {
+        $('#account_form').validate({
+            errorPlacement: function (error, element) {
+                var error_div = element.parents('dl').find('div.form_prompt');
+                error_div.append(error);
+            },
+            rules: {
+                account_name: {
+                    required: true
+                },
+                bank_name: {
+                    required: true
+                },
+                bank_card: {
+                    required: true
+                },
+                bank_mobile: {
+                    required: true,
+                    isMobile: true
+                },
+            },
+            messages: {
+                account_name: {
+                    required: '<i class="icon icon-exclamation-sign"></i>户名不能为空'
+                },
+                bank_name: {
+                    required: '<i class="icon icon-exclamation-sign"></i>开户银行不能为空'
+                },
+                bank_card: {
+                    required: '<i class="icon icon-exclamation-sign"></i>银行卡号不能为空'
+                },
+                bank_mobile: {
+                    required: '<i class="icon icon-exclamation-sign"></i>银行预留手机号码不能为空',
+                    isMobile: '<i class="icon icon-exclamation-sign"></i>银行预留手机号码不正确'
+                },
+            }
+        });
+    });
+</script>
+{include file="public/footer"}

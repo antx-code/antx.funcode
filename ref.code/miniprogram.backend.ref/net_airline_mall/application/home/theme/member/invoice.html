@@ -1,0 +1,367 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+
+
+        <div class="user-mod" style="min-height: 1047px;">
+            <div class="user-title">
+                <h2>我的发票</h2>
+                <ul class="tabs" shoptype="invoice-tabs">
+                    <li><a href="javascript:void(0)">订单发票状态</a></li>
+                    <li class="active"><a href="/home/member/invoice">增值发票信息</a></li>
+                </ul>
+            </div>
+            <div>
+
+                {if $info.id > 0}
+                <div class="increment_invoice_info" id="EDITFORM" style="display: none;">
+                    <form action="/home/member/invoice" method="post" name="inv_form" shoptype="inv_form" novalidate="novalidate">
+                        <div class="user-items">
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>单位名称：</div>
+                                <div class="value"><input type="text" value="{$info.company_name}" name="company_name" class="text"><div class="notic">请正确填写公司名称</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>注册地址：</div>
+                                <div class="value"><input type="text" value="{$info.company_address}" name="company_address" class="text"><div class="notic">请正确填写公司注册地址</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>纳税人识别码：</div>
+                                <div class="value"><input type="text" value="{$info.tax_id}" name="tax_id" class="text"><div class="notic">纳税人识别码一般是15到18位数字</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>注册电话：</div>
+                                <div class="value"><input type="text" value="{$info.company_telephone}" name="company_telephone" class="text"><div class="notic">请正确填写联系方式</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>开户银行：</div>
+                                <div class="value"><input type="text" value="{$info.bank_of_deposit}" name="bank_of_deposit" class="text"><div class="notic">开户行精确到某某支行</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>银行账户：</div>
+                                <div class="value"><input type="text" value="{$info.bank_account}" name="bank_account" shoptype="bank_card" class="text"><div class="notic">请正确银行账号</div><div class="form_prompt"><label class="error" shoptype="bname"></label></div></div>
+                            </div>
+                            <div class="item mb0">
+                                <div class="label">&nbsp;</div>
+                                <div class="value">
+                                    <div class="checkbox-item lh30">
+                                        <input type="checkbox" name="have_read" checked="checked" value="1" class="ui-checkbox" id="invoice_checkbox">
+                                        <label for="invoice_checkbox" class="ui-label">我已阅读并同意<a href="article.php?id=56" target="_blank">《增票资质确认书》</a></label>
+                                    </div>
+                                    <div class="form_prompt" id="have_read"></div>
+                                </div>
+                            </div>
+                            <div class="item item-button">
+                                <div class="label">&nbsp;</div>
+                                <div class="value">
+                                    <input type="submit" class="sc-btn sc-redBg-btn" name="submit" value="提交" shoptype="submitBtn">
+                                    <input type="reset" class="sc-btn" name="reset" value="重置" onclick="EDITSHOW(1)">
+                                    <input type="hidden" name="act" value="update">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="increment_invoice_info" id="DATAFORM">
+                    <div class="ii-section iis-state">
+                        <div class="iis-state-warp">
+                            {if $info.audit_status == 1}<i class="icon icon-iis-3"></i>{/if}
+                            {if $info.audit_status == 0}<i class="icon icon-iis-1"></i>{/if}
+                            {if $info.audit_status == 2}<i class="icon icon-iis-2"></i>{/if}
+
+                            <div class="iis-state-info">
+                                <div class="tit">
+                                    {if $info.audit_status == 1}您的增票资质已提交，审核通过。{/if}
+                                    {if $info.audit_status == 0}您的增票资质已提交，等待审核。{/if}
+                                    {if $info.audit_status == 2}您的增票资质已提交，已拒绝。{/if}
+                                </div>
+                                <div class="iis-btn">
+                                    <a href="javascript:void(0)" class="sc-btn" onclick="EDITSHOW(0)">修改</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ii-section iis-aptitude">
+                        <div class="title">增票资质信息</div>
+                        <div class="info">
+                            <p>单位名称：{$info.company_name}</p>
+                            <p>纳税人识别码：{$info.company_address}</p>
+                            <p>注册电话：{$info.company_telephone}</p>
+                            <p>开户银行：{$info.bank_of_deposit}</p>
+                            <p>银行账户：{$info.bank_account}</p>
+                        </div>
+                    </div>
+                    <div class="ii-section iis-ticket last-child" id="formupdate" style="display: none;">
+                        <div class="title">票据收件信息</div>
+                        <div class="info">
+                            <form action="/home/member/invoice" method="post" name="vat_form" id="vat_form">
+                                <div class="user-items">
+                                    <div class="item">
+                                        <div class="label">收票人姓名：</div>
+                                        <div class="value">
+                                            <input type="text" value="{$info.consignee_name}" name="consignee_name" class="text"></div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="label">收票人手机号：</div>
+                                        <div class="value">
+                                            <input type="text" value="{$info.consignee_mobile_phone}" name="consignee_mobile_phone" class="text">
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="label">收票人省份：</div>
+                                        <div class="form-value" shoptype="regionLinkage">
+                                            <dl class="mod-select mod-select-small" shoptype="smartdropdown">
+                                                <dt>
+                                                    <span class="txt" shoptype="txt">请选择</span>
+                                                    <input type="hidden" value="{$info.country}" name="country">
+                                                </dt>
+                                                <dd shoptype="layer">
+                                                    <div class="option" data-value="1" data-text="中国" shoptype="ragionItem" data-type="1">中国</div>
+                                                </dd>
+                                            </dl>
+                                            <dl class="mod-select mod-select-small" shoptype="smartdropdown" style="display: none;">
+                                                <dt><span class="txt" shoptype="txt">请选择</span>
+                                                    <input type="hidden" value="{$info.province}" shoptype="ragionItem" name="province"></dt>
+                                                <dd shoptype="layer" class="ps-container" style="">
+                                                    <div class="ps-scrollbar-x-rail" style="width: 118px; display: none; left: 0px; bottom: 3px;">
+                                                        <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                                                    </div>
+                                                    <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; display: none; right: 0px;">
+                                                        <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                                                    </div>
+                                                </dd>
+                                            </dl>
+                                            <dl class="mod-select mod-select-small" shoptype="smartdropdown" style="display: none;">
+                                                <dt><span class="txt" shoptype="txt">请选择</span>
+                                                    <input type="hidden" value="{$info.city}" name="city"></dt>
+                                                <dd shoptype="layer" class="ps-container" style="">
+                                                    <div class="ps-scrollbar-x-rail" style="width: 118px; display: none; left: 0px; bottom: 3px;">
+                                                        <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                                                    </div>
+                                                    <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; display: none; right: 0px;">
+                                                        <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                                                    </div>
+                                                </dd>
+                                            </dl>
+                                            <dl class="mod-select mod-select-small" shoptype="smartdropdown" style="display:none">
+                                                <dt><span class="txt" shoptype="txt">请选择</span>
+                                                    <input type="hidden" value="{$info.district}" name="district">
+                                                </dt>
+                                                <dd shoptype="layer" class="ps-container" style="">
+                                                    <div class="ps-scrollbar-x-rail" style="width: 118px; display: none; left: 0px; bottom: 3px;">
+                                                        <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                                                    </div>
+                                                    <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; display: none; right: 0px;">
+                                                        <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                                                    </div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="label">收票人地址：</div>
+                                        <div class="value">
+                                            <input type="text" value="{$info.consignee_address}" name="consignee_address" class="text">
+                                        </div>
+                                    </div>
+                                    <div class="item item-button">
+                                        <div class="label">&nbsp;</div>
+                                        <div class="value">
+                                            <input type="submit" class="sc-btn sc-redBg-btn" name="submit" value="提交">
+                                            <input type="button" class="sc-btn" name="cannel" value="取消" onclick="formupdateShow(1)">
+                                            <input type="hidden" name="act" value="vat_consignee">
+                                            <input type="hidden" name="act" value="{if $info.id >0}update{else /}add{/if}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="ii-section iis-ticket last-child" id="formshow">
+                        <div class="title">票据收件信息
+                            <a href="javascript:void(0)" class="ftx-01" onclick="formupdateShow(0)">修改</a>
+                        </div>
+                        <div class="info">
+                            <p>收票人姓名：{$info.consignee_name}</p>
+                            <p>收票人手机号：{$info.consignee_mobile_phone}</p>
+                            <p>收票人省份：{$info.detailaddress}</p>
+                            <p>收票人地址：{$info.consignee_address}</p>
+                        </div>
+                    </div>
+                    <div class="user-prompt mt50">
+                        <div class="tit"><span>注意事项</span><i class="iconfont icon-down"></i></div>
+                        <div class="info">
+                            <p>1、我们会在一个工作日内完成审核工作。</p>
+                            <p>2、注意有效增值税发票开票资质仅为一个。</p>
+                            <p>3、发票常见问题查看<a href="#" class="ftx-05">增票资质帮助</a>。</p>
+                            <p>4、本页面信息仅供增值税专用发票-资质审核使用，切勿进行支付相关业务，谨防上当受骗。</p></div>
+                    </div>
+                </div>
+                {else /}
+                <div class="increment_invoice_info">
+                    <form action="/home/member/invoice" method="post" name="inv_form" shoptype="inv_form" novalidate="novalidate">
+                        <div class="user-items">
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>单位名称：</div>
+                                <div class="value"><input type="text" value="{$info.company_name}" name="company_name" class="text"><div class="notic">请正确填写公司名称</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>注册地址：</div>
+                                <div class="value"><input type="text" value="{$info.company_address}" name="company_address" class="text"><div class="notic">请正确填写公司注册地址</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>纳税人识别码：</div>
+                                <div class="value"><input type="text" value="{$info.tax_id}" name="tax_id" class="text"><div class="notic">纳税人识别码一般是15到18位数字</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>注册电话：</div>
+                                <div class="value"><input type="text" value="{$info.company_telephone}" name="company_telephone" class="text"><div class="notic">请正确填写联系方式</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>开户银行：</div>
+                                <div class="value"><input type="text" value="{$info.bank_of_deposit}" name="bank_of_deposit" class="text"><div class="notic">开户行精确到某某支行</div><div class="form_prompt"></div></div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="red">*</em>银行账户：</div>
+                                <div class="value"><input type="text" value="{$info.bank_account}" name="bank_account" shoptype="bank_card" class="text"><div class="notic">请正确银行账号</div><div class="form_prompt"><label class="error" shoptype="bname"></label></div></div>
+                            </div>
+                            <div class="item mb0">
+                                <div class="label">&nbsp;</div>
+                                <div class="value">
+                                    <div class="checkbox-item lh30">
+                                        <input type="checkbox" name="have_read" checked="checked" value="1" class="ui-checkbox" id="invoice_checkbox">
+                                        <label for="invoice_checkbox" class="ui-label">我已阅读并同意<a href="article.php?id=56" target="_blank">《增票资质确认书》</a></label>
+                                    </div>
+                                    <div class="form_prompt" id="have_read"></div>
+                                </div>
+                            </div>
+                            <div class="item item-button">
+                                <div class="label">&nbsp;</div>
+                                <div class="value">
+                                    <input type="submit" class="sc-btn sc-redBg-btn" name="submit" value="提交" shoptype="submitBtn">
+                                    <input type="reset" class="sc-btn" name="reset" value="重置">
+                                    <input type="hidden" name="act" value="add">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {/if}
+            </div>
+        </div>
+
+    </div>
+</div>
+{include file="public:footer"}
+
+<script type="text/javascript" src="/public/static/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="/public/static/theme/js/region.js"></script>
+
+<script type="application/javascript">
+    var vid = '{$info.id}';
+    $(function () {
+        if(vid > 0){
+            $.levelLink(0);
+            setTimeout(function () {
+                $.levelLink(0);
+            },300);
+        }else{
+            $.levelLink(1);
+        }
+    });
+    function formupdateShow(cancel = 0) {
+        if(cancel == 0){
+            $("#formupdate").css('display','block');
+            $("#formshow").css('display','none');
+        }else{
+            $("#formupdate").css('display','none');
+            $("#formshow").css('display','block');
+        }
+        $.levelLink(0);
+        setTimeout(function () {
+            $.levelLink(0);
+        },300);
+    }
+    function EDITSHOW(cancel=0){
+        if(cancel == 0){
+            $("#EDITFORM").css('display','block');
+            $("#DATAFORM").css('display','none');
+        }else{
+            $("#EDITFORM").css('display','none');
+            $("#DATAFORM").css('display','block');
+        }
+    }
+
+    $("*[shoptype='submitBtn']").click(function(){
+        frm  = document.forms['inv_form'];
+        if(!frm.elements['have_read'].checked){
+            $("#have_read").html("<i>请阅读并同意《增票资质确认书》</i>");
+            return false;
+        };
+
+        if($("*[shoptype='inv_form']").valid()){
+            $("*[shoptype='inv_form']").submit();
+        }
+    });
+    $("*[shoptype='inv_form']").validate({
+        errorPlacement:function(error, element){
+            var error_div = element.parents('div.value').find('div.form_prompt');
+            element.parents('div.value').find(".notic").hide();
+            error_div.append(error);
+        },
+        ignore : "",
+        rules : {
+            company_name : {
+                required : true
+            },
+            tax_id : {
+                required : true,
+                minlength : 15
+            },
+            company_address : {
+                required : true
+            },
+            company_telephone : {
+                required : true
+            },
+            bank_of_deposit : {
+                required : true
+            },
+            bank_account : {
+                required : true,
+                bankCardNum : true
+            }
+        },
+        messages : {
+            company_name : {
+                required : json_languages.company_name_null
+            },
+            tax_id : {
+                required : json_languages.tax_id_null,
+                minlength: json_languages.tax_id_error
+            },
+            company_address : {
+                required : json_languages.company_address_null
+            },
+            company_telephone : {
+                required : json_languages.company_telephone_null
+            },
+            bank_of_deposit : {
+                required : json_languages.bank_of_deposit_null
+            },
+            bank_account : {
+                required : json_languages.bank_account_null,
+                bankCardNum : json_languages.bank_account_error
+            }
+        }
+    });
+</script>

@@ -1,0 +1,241 @@
+<div class="categorys site-mast">
+    <div class="categorys-type"><a href="{:url('category/all')}" target="_blank">全部商品分类</a></div>
+    <div class="categorys-tab-content">
+        <div class="categorys-items">
+            {foreach $category as $key=>$top}
+            <div class="categorys-item" shoptype="cateItem" data-id="{$top.cat_id}" data-eveval="0">
+                <div class="item item-content">
+                    <i class="iconfont icon-{$top.style_icon}"></i>
+                    <div class="categorys-title">
+                        <strong>
+                            <a href="{:url('category/index',['id'=>$top.cat_id])}" target="_blank">{$top.cat_name}</a>
+                        </strong>
+                        <span>
+                            {if isset($top.children)}
+                            {volist name="$top.children" id="vo" offset="0" length='2'}
+                            <a href="{:url('category/index',['id'=>$vo.cat_id])}" target="_blank">{$vo.cat_name}</a>
+                            {/volist}
+                            {/if}
+                         </span>
+                    </div>
+                </div>
+                <div class="categorys-items-layer" shoptype="cateLayer">
+                    <div class="cate-layer-con clearfix" shoptype="cateLayerCon_{$top.cat_id}" id="cateLayerCon_{$top.cat_id}">
+                        <div class="cate-layer-left">
+                            <div class="cate_detail">
+                                {if isset($top.children)}
+                                {foreach $top.children as $key2=>$sec}
+                                <dl class="dl_fore1">
+                                    <dt><a href="{:url('category/index',['id'=>$sec.cat_id])}" target="_blank">{$sec.cat_name}</a></dt>
+                                    <dd>
+                                        {if isset($sec.children)}
+                                        {foreach $sec.children as $key3=>$third}
+                                        <a href="{:url('category/index',['id'=>$third.cat_id])}" target="_blank">{$third.cat_name}</a>
+                                        {/foreach}
+                                        {/if}
+                                    </dd>
+                                </dl>
+                                {/foreach}
+                                {/if}
+                            </div>
+                        </div>
+                        <div class="cate-layer-rihgt">
+                            <div class="cate-brand">
+                                {if isset($top['brands'])}
+                                {foreach $top.brands as $brand}
+                                <div class="img">
+                                    <a href="{:url('category/index',['brand_id'=>$brand.brand_id])}" target="_blank" title="{$brand.brand_name}">
+                                        <img src="{$brand.brand_logo}">
+                                    </a>
+                                </div>
+                                {/foreach}
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            {/foreach}
+        </div>
+    </div>
+</div>
+
+<script>
+    // $(document).ready(function () {
+    //     //导航栏全部分类展开
+    //     var activeRow, activeTimer, mouseInSub = false;
+    //
+    //     // 记录鼠标的位置
+    //     var mouseTrack = [];
+    //
+    //     function moveHandler(e) {
+    //         mouseTrack.push({
+    //             x: e.pageX,
+    //             y: e.pageY
+    //         });
+    //
+    //         // 只需要当前点和上一个点
+    //         if (mouseTrack.length > 3) {
+    //             mouseTrack.shift();
+    //         }
+    //     }
+    //
+    //     // 鼠标是否在子菜单里
+    //     $("*[shoptype='shopNav'] *[shoptype='cateLayer']").on('mouseenter', function () {
+    //         mouseInSub = true;
+    //     }).on('mouseleave', function () {
+    //         mouseInSub = false;
+    //     });
+    //
+    //     $("*[shoptype='shopNav'] .categorys-items").on('mouseenter', function () {
+    //         $(document).bind("mousemove", moveHandler);// 用于记录鼠标位置
+    //     }).on('mouseleave', function () {
+    //         if (activeRow) {
+    //             activeRow.removeClass("selected");
+    //             activeRow = null;
+    //         }
+    //         $(document).unbind("mousemove", moveHandler);
+    //     });
+    //
+    //     $("*[shoptype='shopNav'] .categorys-items .categorys-item").on('mouseenter', function (e) {
+    //         if (!activeRow) {
+    //             active(e.currentTarget);
+    //             return;
+    //         }
+    //         if (activeTimer) {
+    //             clearTimeout(activeTimer);
+    //         }
+    //         var sub = $(this).parent().find('.cate-layer-con:visible');
+    //         if (sub.length == 0) {
+    //             return;
+    //         }
+    //         var curMouse = mouseTrack[mouseTrack.length - 1]; // 鼠标当前坐标
+    //         var prevMouse = mouseTrack[mouseTrack.length - 2]; // 鼠标上一次坐标
+    //         var delay = needDelay(sub, curMouse, prevMouse);
+    //
+    //         if (delay) {
+    //             activeTimer = setTimeout(function () {
+    //                 if (mouseInSub) {
+    //                     return;
+    //                 }
+    //                 if (activeRow != null) {
+    //                     activeRow.removeClass("selected");
+    //                 }
+    //                 active(e.currentTarget);
+    //                 activeTimer = null;
+    //             }, 300);
+    //         } else {
+    //             activeRow.removeClass("selected");
+    //             active(e.currentTarget);
+    //         }
+    //     });
+    //
+    //     // TOP NAV;
+    //     $("*[shoptype='suspColumn'] *[shoptype='cateLayer']").on('mouseenter', function () {
+    //         mouseInSub = true;
+    //     }).on('mouseleave', function () {
+    //         mouseInSub = false;
+    //     });
+    //
+    //     $("*[shoptype='suspColumn'] .categorys-items").on('mouseenter', function () {
+    //         $(document).bind("mousemove", moveHandler);// 用于记录鼠标位置
+    //     }).on('mouseleave', function () {
+    //         if (activeRow) {
+    //             activeRow.removeClass("selected");
+    //             activeRow = null;
+    //         }
+    //         $(document).unbind("mousemove", moveHandler);
+    //     });
+    //
+    //     $("*[shoptype='suspColumn'] .categorys-items .categorys-item").on('mouseenter' ,function (e) {
+    //         if (!activeRow) {
+    //             active(e.currentTarget);
+    //             return;
+    //         }
+    //         if (activeTimer) {
+    //             clearTimeout(activeTimer);
+    //         }
+    //         var sub = $(this).parent().find('.cate-layer-con:visible');
+    //         if (sub.length == 0) {
+    //             return;
+    //         }
+    //         var curMouse = mouseTrack[mouseTrack.length - 1]; // 鼠标当前坐标
+    //         var prevMouse = mouseTrack[mouseTrack.length - 2]; // 鼠标上一次坐标
+    //         var delay = needDelay(sub, curMouse, prevMouse);
+    //
+    //         if (delay) {
+    //             activeTimer = setTimeout(function () {
+    //                 if (mouseInSub) {
+    //                     return;
+    //                 }
+    //                 if (activeRow != null) {
+    //                     activeRow.removeClass("selected");
+    //                 }
+    //                 active(e.currentTarget);
+    //
+    //                 activeTimer = null;
+    //             }, 300);
+    //         } else {
+    //             activeRow.removeClass("selected");
+    //             active(e.currentTarget);
+    //         }
+    //     });
+    //
+    //     function active(target) {
+    //         activeRow = $(target);
+    //         activeRow.addClass("selected");
+    //     }
+    // });
+
+    // 向量是终点坐标减去起点坐标
+    function vector(a, b) {
+        return {
+            x: b.x - a.x,
+            y: b.y - a.y
+        };
+    }
+
+    // 向量的叉乘
+    function vectorPro(v1, v2) {
+        return v1.x * v2.y - v1.y * v2.x;
+    }
+
+    // 用位运算高效判断符号相同
+    function sameSign(a, b) {
+        return (a ^ b) >= 0;
+    }
+
+    // 判断点是否在三角形内
+    function isPointInTranjgle(p, a, b, c) {
+        var pa = vector(p, a);
+        var pb = vector(p, b);
+        var pc = vector(p, c);
+
+        var t1 = vectorPro(pa, pb);
+        var t2 = vectorPro(pb, pc);
+        var t3 = vectorPro(pc, pa);
+
+        return sameSign(t1, t2) && sameSign(t2, t3);
+    }
+
+    // 是否需要延迟
+    function needDelay(ele, curMouse, prevMouse) {
+        if (!curMouse || !prevMouse) {
+            return;
+        }
+        var offset = ele.offset();
+        // 左上点
+        var topleft = {
+            x: offset.left,
+            y: offset.top
+        };
+        // 左下点
+        var leftbottom = {
+            x: offset.left,
+            y: offset.top + ele.height()
+        };
+
+        return isPointInTranjgle(curMouse, prevMouse, topleft, leftbottom);
+    }
+</script>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport"/>
+    <title>{$siteInfo.shop_title}{$store.store_name ?? ''}</title>
+    <style>
+        * {
+            font-family: "Microsoft YaHei", "Hiragino Sans GB";
+        }
+
+        html, body {
+            position: relative;
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+
+        .warp {
+            position: absolute;
+            background-color: rgba(0, 0, 0, .4);
+            top: 0;
+            left: 0;
+            z-index: 10;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .warp img {
+            max-width: 100%;
+        }
+
+        .back-btn {
+            color: #fff;
+            font-size: 16px;
+            border: 1px solid #fff;
+            border-radius: 4px;
+            padding: 2px 20px;
+            margin: 3rem auto;
+        }
+    </style>
+</head>
+<body>
+<div class="warp" onclick="">
+    <img src="/public/static/images/lead.png">
+    <span onclick="history.back()" class="back-btn">返 回</span>
+</div>
+</body>
+</html>

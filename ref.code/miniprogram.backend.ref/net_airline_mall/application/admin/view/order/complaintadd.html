@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>在订单确认收货15天内货已付款，买家可对订单进行投诉。</li>
+                <li>可对商家提交申请进行操作。</li>
+                <li>可进行投诉审核。审核完成后，被投诉店铺可进行申诉。申诉成功后，投诉双方进行对话，最后由后台管理员进行仲裁操作。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info">
+                    <div class="item">
+                        <div class="label">订单ID：</div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.order_id" value='' class="text" disabled/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">订单号：</div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.order_sn" value='' class="text" disabled/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">投诉店铺：</div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.store_name" value='' class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">投诉内容：</div>
+                        <div class="label_value">
+                            <textarea name="description" class="textarea" v-model="info.complaint_content"></textarea>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">处理结果：</div>
+                        <div class="label_value">
+                            <textarea name="description" class="textarea" v-model="info.apply_conten"></textarea>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">是否显示：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.is_show" id="sex_5" value="1"
+                                           class="ui-radio">
+                                    <label for="sex_5" class="ui-radio-label">显示</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.is_show" id="sex_6" value="0"
+                                           class="ui-radio">
+                                    <label for="sex_6" class="ui-radio-label">不显示</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                majax('/admin/order/complaintadd', vm.info, 'complaint');
+            }
+        }
+    });
+</script>

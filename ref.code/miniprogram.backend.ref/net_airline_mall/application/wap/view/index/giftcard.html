@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>礼品卡列表</title>
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1192061_3oorxkn66wi.css">
+    <style>
+        @media (min-width:560px){html{font-size:54px}}html{font-size:calc(100vw / 3.75);box-sizing:border-box}
+        body{font-size:.14rem;background-color:#f5f5f5}
+        *,*:before,*:after{margin:0;padding:0;box-sizing:inherit}
+        h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:400}
+        ol,ul{list-style:none}
+        address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:400}
+        fieldset,img{border:0}
+        textarea{resize:none}
+        a{color:#000;text-decoration:none;-webkit-tap-highlight-color:rgba(255,255,255,0)}
+        img{border:0;vertical-align:middle}
+        input[type="radio"]{position:relative;width:.2rem;height:.2rem;border:0;outline:none;appearance:none;-webkit-appearance:none;-moz-appearance:none;vertical-align:bottom}
+        input[type="radio"]:before{content:"";position:absolute;width:.16rem;height:.16rem;border:1px solid #999;border-radius:50%}
+        input[type="radio"]:checked:before{border:1px solid transparent;background-color:#d73131}
+        input[type="radio"]:checked:after{content:"";position:absolute;top:.03rem;left:.03rem;width:.08rem;height:.08rem;border:1px solid #fff;border-radius:50%}
+        input[type=checkbox]{display:inline-block;vertical-align:middle;width:.2rem;height:.2rem;margin-left:.05rem;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-color:transparent;border:0;outline:0 !important;line-height:.2rem;color:#d8d8d8}
+        input[type=checkbox]:after{content:"";display:block;width:.16rem;height:.16rem;text-align:center;line-height:.14rem;color:#fff;border:.02rem solid #ddd;background-color:#fff;box-sizing:border-box;border-radius:100%}
+        input[type=checkbox]:checked:after{content:"\2713";border-color:#d73131;background-color:#d73131;font-size:.12rem;line-height:.13rem}
+        .e-cart-wrap{padding:.15rem;position:fixed;bottom:0;left:0;z-index:2;width:100%;background-color:#fff;padding-top:0;padding-bottom:.3rem;border-radius:.05rem .05rem 0 0}
+        .e-card-scroll{width:100%;overflow-y:scroll;height:4rem}
+        .e-cart-list{background-color:#fff;margin:.15rem 0;display:flex;align-items:center}
+        .e-cart-list>input{margin-right:.1rem}
+        .e-card-info{border:1px solid #EEA7BD;border-radius:.05rem;width:100%}
+        .card-head{height:.65rem;background-image:url(/public/static/images/card_few.png);background-size:100% 100%;padding:.1rem .17rem .09rem .15rem;color:#fff}
+        .card-top,.card-center{width:100%;display:flex;justify-content:space-between;align-items:center}
+        .card-center{margin-top:.05rem}
+        .card-top{height:.3rem}
+        .card-top div:nth-of-type(2){opacity:.7;font-size:.12rem}
+        .card-center div:nth-of-type(1){font-size:.12rem;opacity:.7}
+        .card-center div:nth-of-type(2){font-size:.1rem}
+        .card-balance{padding:.1rem 0 .1rem .15rem}
+        .card-balance span:nth-of-type(1){color:#F2217D;font-size:.12rem}
+        .card-balance span:nth-of-type(2){color:#F2217D;font-size:.18rem;font-weight:700}
+        .card-balance em{color:#F2217D;font-weight:700;font-size:.12rem}
+        .e-card-mask{position:absolute;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.1);z-index:1}
+        .card-binding-tit{height:.5rem;line-height:.5rem;color:#333;border-bottom:1px solid #E9E9E9}
+        .card-binding-tit span>a,.card-binding-tit span>i{color:#999;vertical-align:middle}
+        .card-binding-tit span>a{margin-right:.05rem}
+        .iconfont{font-size:.18rem;vertical-align:middle}
+        .e-card-btn{width:3.45rem;height:.45rem;background-color:#D73130;text-align:center;line-height:.45rem;color:#fff;border-radius:.05rem;margin-top:.05rem;font-size:.16rem}
+        [v-cloak] {display: none;}
+    </style>
+</head>
+
+<body>
+<div class="e-card-mask" id="app" v-cloak>
+    <div class="e-cart-wrap">
+        <div class="card-binding-tit">
+            选择礼品卡
+            <span style="float: right; font-size: .12rem;">
+                <a href="javascript:void(0)" @click="opengiftcard()">绑定礼品卡</a>
+                <i class="iconfont icon-close" @click="closeGiftcardwin()"></i>
+            </span>
+        </div>
+        <div class="e-card-scroll">
+            <template v-for="(vo,index) in list">
+                <div class="e-cart-list">
+                    <input type="checkbox" v-model="vo.active">
+                    <div class="e-card-info">
+                        <div class="card-head">
+                            <div class="card-top">
+                                <div>益农E卡</div>
+                                <div>全场通用</div>
+                            </div>
+                            <div class="card-center">
+                                <div>面额 ￥{{vo.price}}元</div>
+                                <div>有效期：{{vo.over_time|timeParse}}</div>
+                            </div>
+                        </div>
+                        <div class="card-balance">
+                            <span>余额</span>
+                            <em>￥</em>
+                            <span>{{vo.cash}}</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+        </div>
+        <div class="e-card-btn" @click="giftcardListInit()">确定</div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<!--layui库引入开始-->
+<link href="/public/static/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+<!--layui库引入结束-->
+<script>
+    var vm = new Vue({
+            el: '#app',
+            data: {
+                list: []
+            },
+            filters: {
+                timeParse: function (timestamp) {
+                    return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+                }
+            },
+            methods: {
+                opengiftcard:function(){
+                    layer.open({
+                        type: 2,
+                        title: false,
+                        closeBtn: 0, //不显示关闭按钮
+                        shade: [0],
+                        area: ['100%', '50%'],
+                        offset: 'rb', //右下角弹出
+                        time: 0, //2秒后自动关闭
+                        anim: 2,
+                        resize: false,
+                        move: false,
+                        content: ['/wap/index/bindcard', 'no'],//iframe的url，no代表不显示滚动条
+                        resizing: function(layero){
+                            return false;
+                        }
+
+                    });
+                },
+                init: function () {
+                    wxapp.ajax(config.giftcardBindList,{},1).then(function (ret) {
+                        if(ret.status == 1){
+                            vm.list = ret.data.list;
+                        }
+                    })
+                },
+                giftcardListInit:function(){
+                    let giftcardList = [];
+                    for (let i=0;i<vm.list.length;i++){
+                        if(vm.list[i].active){
+                            giftcardList.push(vm.list[i]);
+                        }
+                    };
+                    window.parent.vm.giftcardListInit(giftcardList);
+                },
+                closeGiftcardwin:function () {
+                    window.parent.layer.closeAll();
+                    //window.parent.vm.closeAllwin();
+                }
+            },
+        });
+    window.onload = function () {
+        vm.init();
+    };
+
+
+</script>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>在新增一级地区点击管理进入下一级地区，可进行删除和编辑。</li>
+                <li>地区用于商城定位，请根据商城实际情况谨慎设置。</li>
+                <li>生成地区首字母是方便根据地区首字母搜索相对应的地区。</li>
+                <li>地区层级关系必须为中国→省/直辖市→市→县，地区暂只支持到四级地区其后不显示，暂不支持国外。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl mt2">
+                    <a href="javascript:void(0)" @click="setinitials()">
+                        <div class="fbutton">
+                            <div class="add_region" title="生成地区首字母">
+                                <span>
+                                    <i class="icon icon-plus"></i>
+                                    生成地区首字母
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0);" class="restore_btn" @click="pageFreash()">
+                        <div class="fbutton">
+                            <div class="cog" title="恢复默认设置">
+                                <span>
+                                    <i class="icon icon-cog"></i>
+                                    恢复默认设置
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="add_area fr">
+                    <input type="text" name="region_name" v-model="infoColumn.region_name"
+                           class="text" placeholder="请输入地区名称" autocomplete="off"/>
+                    <a href="javascript:void(0);" @click="doadd()" class="btn btn30 red_btn">新增地区</a>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="10%"><div class="tDiv">编号</div></th>
+                            <th width="20%"><div class="tDiv">地区名称</div></th>
+                            <th width="10%"><div class="tDiv">首字母</div></th>
+                            <th width="20%"><div class="tDiv">所在层级</div></th>
+                            <th width="20%"><div class="tDiv">所属地区</div></th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td><div class="tDiv">{{vo.region_id}}</div></td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input type="text" name="measure_unit" class="text w100" value=""
+                                               v-model="vo.region_name" v-model="vo.region_name"
+                                               @keyup.enter="doupdate(vo)"/>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input name="sort_order" class="text w100" value="4" type="text"
+                                               v-model="vo.region_first_char" @keyup.enter="doupdate(vo)">
+                                    </div>
+                                </td>
+                                <td><div class="tDiv">{{vo.region_type}}级地区</div></td>
+                                <td><div class="tDiv">-</div></td>
+                                <td class="handle">
+                                    <div class="tDiv a1">
+                                        <a href="javascript:void(0);" title="管理" class="btn_see"
+                                           @click="secrchInit(vo)">
+                                            <i class="sc_icon sc_icon_see"></i>
+                                            管理
+                                        </a>
+                                        <a href="javascript:void(0);" title="删除" class="btn_trash"
+                                           @click="dodelete(index)">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="12">
+                                    <div class="tDiv">
+                                        <div class="list-page">
+                                            <div id="turn-page"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            infoColumn: infoColumn,
+
+            parent_id: 0,
+            region_type: 0,
+
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+
+        },
+        methods: {
+            doadd: function () {
+                vm.infoColumn.region_type = vm.region_type;
+                vm.infoColumn.parent_id = vm.parent_id;
+                majax('/admin/website/doadd', vm.infoColumn, 'region')
+            },
+            doupdate: function (vo) {
+                majax('/admin/website/doupdate', vo, 'region')
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.parent_id = 0;
+                vm.region_type = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function (vo) {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.parent_id = vo.region_id;
+                vm.region_type += 1;
+                vm.list = [];
+                vm.init();
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/website/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'region'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            init: function () {
+                $.post('/admin/website/region', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    parent_id: vm.parent_id,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            doalldelete: function () {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/website/doalldelete', {
+                            ids: vm.ids,
+                            table: 'region'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.log_ids = [];
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            setinitials:function () {
+                $.iMessager.progress({text: '批量更新中，请等待'});
+                $.post('/admin/website/setinitials', {
+                    pageparm: ''
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 200000, showType: 'slide'});
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

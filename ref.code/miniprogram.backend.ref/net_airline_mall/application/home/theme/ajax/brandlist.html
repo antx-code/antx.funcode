@@ -1,0 +1,24 @@
+{volist name="blist" id="vo"}
+<li>
+    <a href="{:url('category/seagoodslist',['brand_id'=>$vo.brand_id])}" class="img" target="_blank">
+        <img src="{$vo.brand_logo}" alt="">
+        <div class="brand_desc brand_desc_notic">
+            <div class="tit">品牌描述</div>
+            {if $vo.brand_desc}
+            <div class="info"><p>{$vo.brand_desc}</p></div>
+            {else /}
+            <div class="info"><p>暂无描述</p></div>
+            {/if}
+        </div>
+        <div class="mask"></div>
+    </a>
+    <div class="b-logo">
+        <a href="javascript:void(0);" class="follow" data-bid="{$vo.brand_id}" shoptype="coll_brand">
+            <i class="iconfont icon-zan-alt"></i>
+            <span shoptype="follow_span" class="hidden">关注</span>
+        </a>
+        <img src="{$vo.brand_logo}" alt="{$vo.brand_name}">
+    </div>
+    <div class="slogan">{$vo.brand_name}</div>
+</li>
+{/volist}

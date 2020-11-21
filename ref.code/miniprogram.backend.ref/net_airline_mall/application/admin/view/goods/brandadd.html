@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>标识“<em>*</em>”的选项为必填项，其余为选填项。</li>
+                <li>请按提示文案填写信息，以免出错。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info">
+                        <div class="item">
+                            <div class="label">
+                                <span class="require-field">*</span>品牌中文名称：
+                            </div>
+                            <div class="label_value">
+                                <input type="text" name="brand_name" maxlength="60" value="" class="text" autocomplete="off" v-model="info.brand_name"/>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">品牌英文名称：</div>
+                            <div class="label_value">
+                                <input type="text" name="brand_letter" maxlength="60" value="" class="text" autocomplete="off" v-model="info.brand_letter"/>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">品牌首字母：</div>
+                            <div class="label_value">
+                                <input type="text" name="brand_first_char" maxlength="60" value="" class="text" autocomplete="off" v-model="info.brand_first_char"/>
+                                <div class="form_prompt"></div>
+                                <div class="notic">用于解决某些生僻字无法正确生成品牌首字母的情况。</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">品牌网址：</div>
+                            <div class="label_value">
+                                <input type="text" name="site_url" size="40" value="" class="text" autocomplete="off" v-model="info.site_url"/>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">
+                                <span class="require-field">*</span>
+                                品牌LOGO：
+                            </div>
+                            <div class="label_value">
+                                <div class="type-file-box">
+                                    <input type="button" name="button" id="button" class="type-file-button" value="" clase="brand_logo">
+                                    <input type="text" name="textfile" class="type-file-text" id="textfield" value=""
+                                           autocomplete="off" readonly v-model="info.brand_logo">
+                                </div>
+                                <div class="form_prompt"></div>
+                                <div class="notic" id="warn_brandlogo">请上传图片，做为品牌的LOGO！标准尺寸200*88										                                        </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">品牌描述：</div>
+                            <div class="label_value">
+                                <textarea name="brand_desc" cols="60" rows="4" class="textarea" v-model="info.brand_desc"></textarea>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">排序：</div>
+                            <div class="label_value">
+                                <input type="text" name="sort_order" maxlength="40" size="15" value="50" class="text text_5" autocomplete="off" v-model="info.sort_order"/>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">是否显示：</div>
+                            <div class="label_value">
+                                <div class="checkbox_items" style="width:auto;">
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="is_show" id="is_show_1" value="1" checked="true" v-model="info.is_show"/>
+                                        <label for="is_show_1" class="ui-radio-label">是</label>
+                                    </div>
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="is_show" id="is_show_0" value="0" v-model="info.is_show"/>
+                                        <label for="is_show_0" class="ui-radio-label">否</label>
+                                    </div>
+                                </div>
+                                <div class="notic">(当品牌下还没有商品的时候，首页及分类页的品牌区将不会显示该品牌。)</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">加入推荐：</div>
+                            <div class="label_value">
+                                <div class="checkbox_items">
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="is_recommend" id="is_recommend_1" value="1" v-model="info.is_recommend"/>
+                                        <label for="is_recommend_1" class="ui-radio-label">是</label>
+                                    </div>
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="is_recommend" id="is_recommend_0" value="0" checked="true" v-model="info.is_recommend"/>
+                                        <label for="is_recommend_0" class="ui-radio-label">否</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">&nbsp;</div>
+                            <div class="label_value info_btn">
+                                <input type="button" class="button" value=" 确定 " id="submitBtn" @click="init()"/>
+                                <input type="reset" class="button button_reset" value="重置" @click="infoReset()"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = {$info|raw};
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            infoReset:function(){
+                vm.info = infoColumn;
+            },
+            init: function () {
+                if(!vm.info.brand_name || !vm.info.brand_logo){
+                    $.messager.alert('提示', imgtips, 'warning');
+                    return false;
+                }
+                majax('/admin/goods/brandadd',vm.info);
+            }
+        }
+    });
+
+    layui.use('upload', function(){
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#button',
+            url: '/admin/uploader/alioss_upload', //上传接口
+            data:{
+                upload: 1
+            },
+            accept: 'file', //允许上传的文件类型
+            done: function(ret){
+                vm.info.brand_logo = ret.url;
+                if(ret.state == 'SUCCESS'){
+                    $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                }else{
+                    $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                }
+
+            },
+        });
+    });
+</script>

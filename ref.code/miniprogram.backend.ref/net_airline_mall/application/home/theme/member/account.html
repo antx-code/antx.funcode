@@ -1,0 +1,82 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault" id="app" v-cloak="">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <div class="user-mod" style="min-height: 1150px;">
+            <div class="user-title">
+                <h2>账户安全</h2>
+                <div class="user-safe-level level-3">
+                    <div class="level-word">低级</div>
+                    <div class="level-progress"></div>
+                    <div class="level-tip" id="promptInfo">建议您启动全部安全设置，以保障账户及资金安全。</div>
+                </div>
+            </div>
+            <div class="user-safe-list">
+                <div class="item">
+                    <div class="item-icon"><i class="iconfont icon-password-alt"></i></div>
+                    <div class="item-info">
+                        <div class="info-name">登录密码</div>
+                        <p><span class="ftx-01">互联网账号存在被盗风险，建议您定期更改密码以保护账户安全。</span></p>
+                    </div>
+                    <div class="item-handle"><a href="/home/member/updatepwd" class="handle-btn">修改</a></div>
+                </div>
+                <div class="item">
+                    <div class="item-icon item-icon-green"><i class="iconfont icon-mobile-phone"></i></div>
+                    <div class="item-info">
+                        <div class="info-name">手机验证</div>
+                        <p>您的手机已验证，若已丢失或停用，请立即更换，避免账户被盗</p>
+                    </div>
+                    <div class="item-handle"><a href="/home/member/updatemob" class="handle-btn handle-btn-red">修改</a></div>
+                </div>
+                <div class="item">
+                    <div class="item-icon item-icon-red"><i class="iconfont icon-password-alt"></i></div>
+                    <div class="item-info">
+                        <div class="info-name">支付密码</div>
+                        <p>安全认证</p>
+                    </div>
+                    <div class="item-handle">
+                        <a href="/home/member/updatepay" class="handle-btn {if !$user.pay_password}handle-btn-red{/if}">立即启用</a></div>
+                </div>
+                <div class="item">
+                    <div class="item-icon item-icon-red"><i class="iconfont icon-identity"></i></div>
+                    <div class="item-info">
+                        <div class="info-name">实名认证</div>
+                        <p>您还未实名认证该账户，立即实名认证可加快提现速度。</p>
+                    </div>
+                    <div class="item-handle"><a href="/home/member/updateicard" class="handle-btn {if !$user.id_card}handle-btn-red{/if}">立即认证</a></div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+{include file="public:footer"}
+
+
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                fajax('/home/member/profile', vm.info);
+            }
+        },
+    });
+    $(function () {
+        fmoreUploadFile("avatar");
+    })
+</script>
+

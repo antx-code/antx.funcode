@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>
+                    标识“<em>*</em>”的选项为必填项，其余为选填项。
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info">
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            模板名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.transport_name" value='' class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">运费标题：</div>
+                        <div class="label_value">
+                            <input name="description" class="textarea" v-model="info.transport_title" />
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">计算方式：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.type" id="sex_3" value="0" class="ui-radio">
+                                    <label for="sex_3" class="ui-radio-label">固定运费</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.type" id="sex_4" value="1" class="ui-radio">
+                                    <label for="sex_4" class="ui-radio-label">按商品件数</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.type" id="sex_5" value="2" class="ui-radio">
+                                    <label for="sex_5" class="ui-radio-label">按重量</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <template v-if="info.type==0">
+                        <div class="item">
+                            <div class="label">固定费用：</div>
+                            <div class="label_value">
+                                <input type="text" name='link_name' v-model="info.transport_price" value=''
+                                       class="text"/>
+                                <div class="notic">（固定费用）</div>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-if="info.type==1">
+                        <div class="item">
+                            <div class="label">按件计算：</div>
+                            <div class="label_value">
+                                <input type="text" name='link_name' v-model="info.unit_price" placeholder="金额/件"
+                                       class="text"/>
+                                <div class="notic">（金额/件）</div>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-if="info.type==2">
+                        <div class="item">
+                            <div class="label">按重量计算：</div>
+                            <div class="label_value">
+                                <input type="text" name='link_name' v-model="info.kg_price" placeholder="金额/kg" class="text"/>
+                                <div class="notic">（金额/kg ）</div>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="item">
+                        <div class="label">免费额度：</div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.free_money" value='' class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>物流：</div>
+                        <div class="label_value">
+                            <div class="date-item year">
+                                <div id="position_id_div" class="imitate_select select_w320">
+                                    <div class="cite"><span>选择发货物流</span></div>
+                                    <ul style="display: none;">
+                                        <template v-for="(vo,index) in shippingList">
+                                            <li @click="info.shipping_id=vo.shipping_id">
+                                                <a href="javascript:void(0)" :data-value="vo.shipping_id" class="ftx-01">
+                                                    {{vo.shipping_name}}
+                                                </a>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                    <input type="hidden" :value="info.shipping_id">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var shippingList = JSON.parse('{$shippingList|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+            shippingList: shippingList,
+        },
+        methods: {
+            init: function () {
+                majax('/admin/website/transportadd', vm.info, 'transport');
+            }
+        }
+    });
+</script>

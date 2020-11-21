@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="cboxContent">
+        <div class="pb-bd">
+            <div class="pb-ct">
+                <div class="sku_goods_info">
+                    <div class="warehouse_item">
+                        <span class="item">
+                            <span class="tit"></span>
+                            <div class="search mt0">
+                                <div class="input">
+                                    <input v-model="keywords" class="text nofocus w200" placeholder="商品名称" type="text">
+                                    <button type="button" class="btn pro_btn" name="secrch_btn"
+                                            @click="secrchInit()"></button>
+                                </div>
+                                <div class="refresh" @click="pageFreash()">
+                                     <div title="刷新数据" class="refresh_tit"><i class="icon icon-refresh"></i></div>
+                                     <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+                    <div class="common-content">
+                        <div class="list-div" id="listDiv">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th width="40%">商品名称</th>
+                                    <th width="20%">专场图片</th>
+                                    <th width="8%">专题价格</th>
+                                    <th width="8%">数量</th>
+                                    <th width="8%">购买限制</th>
+                                    <th width="8%">排序</th>
+                                    <th width="8%">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="(vo,index) in list">
+                                    <tr>
+                                        <td>{{vo.goods_name}}</td>
+                                        <td>
+                                            <div class="type-file-box">
+                                                <input type="button" name="button" class="type-file-button" value="" :data-index="index">
+                                                <input type="text" name="textfile" class="type-file-text" id="textfield2" value=""
+                                                       autocomplete="off" readonly v-model="vo.venue_thumb">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input class="text w100 tc fn" v-model="vo.venue_price" type="text">
+                                        </td>
+                                        <td>
+                                            <input class="text w100 tc fn" v-model="vo.venue_num" type="text">
+                                        </td>
+                                        <td>
+                                            <input class="text w100 tc fn" v-model="vo.venue_limit" type="text">
+                                        </td>
+                                        <td>
+                                            <input class="text w100 tc fn" v-model="vo.sort" type="text" placeholder="升序排列">
+                                        </td>
+                                        <td>
+                                            <template v-if="vo.eid>0">
+                                                <a href="javascript:void(0)" class="btn_trash" @click="doupdate(index)">
+                                                    <i class="icon icon-save"></i>
+                                                    提交
+                                                </a>
+                                            </template>
+                                            <template v-else>
+                                                <a href="javascript:void(0)" class="btn_trash" @click="doadd(index)">
+                                                    <i class="icon icon-plus"></i>
+                                                    添加
+                                                </a>
+                                            </template>
+
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="list-page">
+                                            <div id="turn-page"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var venue_id = '{$venue_id}';
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            venue_id: venue_id,
+            page: 1,
+            rows: 5,
+            count: 0,
+            keywords: '',
+            list: []
+        },
+        methods: {
+            doupdate:function(index){
+                majax('/admin/market/doupdate', vm.list[index],'venue_goods')
+            },
+            doupdate_is_exchange: function (index) {
+                var is_exchange = vm.list[index].is_exchange  ? 0 : 1;
+                vm.list[index].is_exchange = is_exchange;
+            },
+            doupdate_is_hot: function (index) {
+                var is_hot = vm.list[index].is_hot ? 0 : 1;
+                vm.list[index].is_hot = is_hot;
+            },
+            doupdate_is_best: function (index) {
+                var is_best = vm.list[index].is_best ? 0 : 1;
+                vm.list[index].is_best = is_best;
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 5;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 5;
+                vm.count = 0;
+                vm.init();
+            },
+            doadd:function(index){
+                vm.list[index].venue_id = venue_id;
+                vm.list[index].venue_price = vm.list[index].venue_price ? vm.list[index].venue_price : 0;
+                vm.list[index].venue_num = vm.list[index].venue_num ? vm.list[index].venue_num : 0;
+                vm.list[index].venue_limit = vm.list[index].venue_limit ? vm.list[index].venue_limit : 0;
+                vm.list[index].sort = vm.list[index].sort ? vm.list[index].sort : 50;
+                console.log(vm.list[index]);
+                $.post('/admin/market/doadd', {
+                    pageparm: JSON.stringify(vm.list[index]),
+                    table: 'venue_goods'
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.pageFreash();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            init: function () {
+                $.post('/admin/market/venuegoodsadd', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    venue_id: vm.venue_id,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                        setTimeout(uploadInit,200);
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+    function uploadInit(){
+        layui.use('upload', function(){
+            var upload = layui.upload;
+
+            //执行实例
+            var uploadInst = upload.render({
+                elem: '.type-file-button',
+                url: '/admin/uploader/alioss_upload', //上传接口
+                data:{
+                    upload: 1
+                },
+                accept: 'file', //允许上传的文件类型
+                done: function (ret) {
+                    vm.list[this.item[0].dataset.index].venue_thumb = ret.url;
+                    if(ret.state == 'SUCCESS'){
+                        $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                    }else{
+                        $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                    }
+                },
+            });
+        });
+    }
+</script>
+
+
+
+
+
+

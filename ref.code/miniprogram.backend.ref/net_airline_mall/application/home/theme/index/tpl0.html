@@ -1,0 +1,430 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<link rel="stylesheet" type="text/css" href="__THEME__/css/index.css">
+<link rel="stylesheet" type="text/css" href="__THEME__/css/color.css">
+
+<div class="homeindex" shoptype="homeWrap">
+
+    <div class="content">
+        <!--轮播图-->
+        <div class="visual-item" data-mode="lunbo" data-purebox="banner" data-li="1" data-length="5" shoptype="visualItme" style="display: block;" data-diff="0">
+            <div class="view">
+                <div class="banner home-banner">
+                    <div class="bd">
+                        {if count($carcousel)}
+                        <ul data-type="range" data-slide="fold">
+                            {volist name="carcousel" id="vo"}
+                            <li style="background: url('{$vo.ad_img}') center center no-repeat; background-size: {$vo.ad_width}px {$vo.ad_height}px;">
+                                <div class="banner-width"><a href="{$vo.ad_link}" target="_blank"></a></div>
+                            </li>
+                            {/volist}
+                        </ul>
+                        {/if}
+                        <div class="spec" data-spec=""></div>
+                    </div>
+                    <div class="hd">
+                        <ul></ul>
+                    </div>
+                    <div class="vip-outcon">
+                        <div class="vip-con">
+                            <div class="insertVipEdit" data-mode="insertVipEdit">
+                                <div shoptype="user_info">
+                                    <div class="avatar">
+                                        <a href="{:url('member/index')}"><img src="{$user.avatar |default='__STATIC__/images/avatar.png'}"></a>
+                                    </div>
+                                    <div class="login-info">
+                                        <span>Hi，{$user.user_name | default='欢迎来到'.$siteInfo.shop_name}</span>
+                                        {if ($user.user_id)}
+                                        <a href="{:url('member/index')}" class="login-button login-success">进入会员中心</a>
+                                        {else}
+                                        <a href="{:url('member/index')}" class="login-button">请登录</a>
+                                        <a href="{:url('merchant/index')}" target="_blank" class="register_button">我要开店</a>
+                                        {/if}
+                                    </div>
+                                </div>
+
+                                <div class="vip-item">
+                                    <div class="tit">
+                                        <a href="javascript:void(0);" class="tab_head_item">公告</a>
+                                    </div>
+                                    <div class="con">
+                                        <ul>
+                                            {volist name="note" id="vo"}
+                                            <li><a href="{:url('article/content',['article_id'=>$key])}" target="_blank">{$vo}</a></li>
+                                            {/volist}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="vip-item">
+                                    <div class="tit">快捷入口</div>
+                                    <div class="kj_con">
+                                        <div class="item item_1">
+                                            <a href="{:url('index/history')}" target="_blank">
+                                                <i class="iconfont icon-browse"></i>
+                                                <span>我的浏览</span>
+                                            </a>
+                                        </div>
+                                        <div class="item item_2">
+                                            <a href="{:url('member/favorite')}" target="_blank">
+                                                <i class="iconfont icon-zan-alt"></i>
+                                                <span>我的收藏</span>
+                                            </a>
+                                        </div>
+                                        <div class="item item_3">
+                                            <a href="{:url('member/order')}" target="_blank">
+                                                <i class="iconfont icon-order"></i>
+                                                <span>我的订单</span>
+                                            </a>
+                                        </div>
+                                        <div class="item item_4">
+                                            <a href="{:url('member/account')}" target="_blank">
+                                                <i class="iconfont icon-password-alt"></i>
+                                                <span>账号安全</span>
+                                            </a>
+                                        </div>
+                                        <div class="item item_5">
+                                            <a href="{:url('member/share')}" target="_blank">
+                                                <i class="iconfont icon-share-alt"></i>
+                                                <span>我要分享</span>
+                                            </a>
+                                        </div>
+                                        <div class="item item_6">
+                                            <a href="{:url('merchant/index')}" target="_blank">
+                                                <i class="iconfont icon-settled"></i>
+                                                <span>商家入驻</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="spec" data-spec=""></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--品牌-->
+        <div class="visual-item w1200 brandList" data-mode="h-brand" data-purebox="homeAdv" data-li="1" shoptype="visualItme" data-diff="0">
+            <div class="view">
+                <div class="brand-channel clearfix" id="h-brand_0" data-type="range" data-lift="品牌">
+
+                    <div class="home-brand-adv slide_lr_info">
+                        <a href="{:url('category/catgoodslist',['brand_id'=>key($brands['list'])])}" data-id="{:key($brands['list'])}" target="_blank"><img src="{:reset($brands.list)['index_img']}" class="slide_lr_img"></a>
+                    </div>
+                    <div shoptype="homeBrand">
+                        <div class="brand-list" id="recommend_brands" data-value="">
+                            {include file="ajax/change_brands" len="18"}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--楼层开始-->
+        {volist name="$floor" id="vo" key="idx"}
+        <div class="visual-item w1200" data-mode="homeFloor" data-purebox="homeFloor" data-li="1" shoptype="visualItme" data-diff="{$idx}">
+            <div class="view">
+                <div class="floor-content" data-type="range" id="homeFloor_{$idx}" data-lift="{$vo.title}">
+
+                    <div class="floor-line-con floorOne {$vo.style}" data-idx="1" id="floor_{$idx}" shoptype="floorItem">
+                        <div class="floor-hd" shoptype="floorTit">
+                            <i class="box_hd_arrow"></i>
+                            <i class="box_hd_dec"></i>
+                            <div class="hd-tit">{$vo.subtitle}</div>
+                            <div class="hd-tags">
+                                <ul>
+                                    <li class="first current">
+                                        <span>{$vo.first_tab_title}</span>
+                                        <i class="arrowImg"></i>
+                                    </li>
+                                    {foreach $vo.tabs as $cid=>$cname}
+                                    <li data-catgoods="" class="first" shoptype="floor_cat_content" data-flooreveval="0" data-visualhome="1" data-floornum="6" data-id="{$cid}">
+                                        <span>{$cname}</span>
+                                        <i class="arrowImg"></i>
+                                    </li>
+                                    {/foreach}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="floor-bd bd-mode-0{$vo.floor_mode}">
+                            <div class="bd-left">
+                                {if ($vo.floor_mode==4)}
+                                <div class="floor-left-adv">
+                                    {volist name="$vo.adv.floor_normal_bg" id="normal_bg"}
+                                    <a href="{$normal_bg.ad_link}" target="_blank"><img src="{$normal_bg.ad_img}"></a>
+                                    {/volist}
+                                </div>
+                                {/if}
+                                {if ($vo.floor_mode!=3)}
+                                <div class="floor-left-slide">
+                                    <div class="bd">
+                                        <div class="tempWrap">
+                                            <ul>
+                                                {volist name="$vo.adv.floor_carousel" id="carousel"}
+                                                <li><a href="{$carousel.ad_link}"><img src="{$carousel.ad_img}"></a></li>
+                                                {/volist}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="hd">
+                                        <ul></ul>
+                                    </div>
+                                </div>
+                                {/if}
+                                {if ($vo.floor_mode!=4)}
+                                <div class="floor-left-adv">
+                                    {volist name="$vo.adv.floor_normal_bg" id="normal_bg"}
+                                    <a href="{$normal_bg.ad_link}" target="_blank"><img src="{$normal_bg.ad_img}"></a>
+                                    {/volist}
+                                </div>
+                                {/if}
+                            </div>
+                            <div class="bd-right">
+                                <div class="floor-tabs-content clearfix">
+                                    <div class="f-r-main f-r-m-adv">
+                                        {foreach $vo.adv.floor_normal as $index=>$ad}
+                                        {if ($vo.floor_mode==2 && $index==0) || ($vo.floor_mode==3 && $index==1)}
+                                        <div class="f-r-m-item f-r-m-i-double">
+                                            <a href="{$vo.adv['floor_double'][0]['ad_link']}" target="_blank">
+                                                <div class="title">
+                                                    <h3>{$vo.adv['floor_double'][0]['b_title']}</h3>
+                                                    <span>{$vo.adv['floor_double'][0]['s_title']}</span>
+                                                </div>
+                                                <img src="{$vo.adv['floor_double'][0]['ad_img']}">
+                                            </a>
+                                        </div>
+                                        {/if}
+                                        <div class="f-r-m-item">
+                                            <a href="{$ad.ad_link}" target="_blank">
+                                                <div class="title">
+                                                    <h3>{$ad.b_title}</h3>
+                                                    <span>{$ad.s_title}</span>
+                                                </div>
+                                                <img src="{$ad.ad_img}">
+                                            </a>
+                                        </div>
+                                        {if ($vo.floor_mode==1 && $index==3) || ($vo.floor_mode==4 && $index==2)}
+                                        <div class="f-r-m-item f-r-m-i-double">
+                                            <a href="{$vo.adv['floor_double'][0]['ad_link']}" target="_blank">
+                                                <div class="title">
+                                                    <h3>{$vo.adv['floor_double'][0]['b_title']}</h3>
+                                                    <span>{$vo.adv['floor_double'][0]['s_title']}</span>
+                                                </div>
+                                                <img src="{$vo.adv['floor_double'][0]['ad_img']}">
+                                            </a>
+                                        </div>
+                                        {/if}
+                                        {/foreach}
+                                    </div>
+                                    {foreach $vo.tabs as $cid=>$cname}
+                                    <div class="f-r-main" shoptype="floor_cat_{$cid}" style="display: none;"></div>
+                                    {/foreach}
+                                </div>
+                            </div>
+                        </div>
+                        {if count($vo.brands) > 0}
+                        <div class="floor-fd">
+                            <div class="floor-fd-brand clearfix">
+                                {volist name="$vo.brands" id="brand" length='10'}
+                                <div class="item">
+                                    <a href="{:url('goods/search',['brand_id'=>$key])}" target="_blank">
+                                        <div class="link-l"></div>
+                                        <div class="img"><img src="{$brand.brand_logo}" title="{$brand.brand_name}"></div>
+                                        <div class="link"></div>
+                                    </a>
+                                </div>
+                                {/volist}
+                            </div>
+                        </div>
+                        {/if}
+                    </div>
+                    <div class="spec" data-spec="" data-title="undefined"></div>
+                </div>
+            </div>
+        </div>
+        {/volist}
+
+        <!--店铺-->
+        <div class="visual-item w1200" data-mode="h-storeRec" data-purebox="homeAdv" data-li="1" shoptype="visualItme" data-diff="0">
+
+            <div class="view">
+                <div class="store-channel" id="h-storeRec_0" data-type="range" data-lift="店铺">
+
+                    <div class="ftit"><h3>店铺</h3></div>
+                    <div class="rec-store-list">
+                        {volist name="$store" id="vo"}
+                        <div class="rec-store-item opacity_img">
+                            <a href="{:url('store/index',['id'=>$vo.store_id])}" target="_blank">
+                                <div class="p-img"><img src="{$vo.banner_mobile}"></div>
+                                <div class="info">
+                                    <div class="s-logo">
+                                        <div class="img"><img src="{$vo.logo}"></div>
+                                    </div>
+                                    <div class="s-title">
+                                        <div class="tit">{$vo.store_name}</div>
+                                        <div class="ui-tit">{$vo.store_subtitle}</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {/volist}
+                    </div>
+                    <div class="spec" data-spec="" data-title="店铺"></div>
+                </div>
+            </div>
+        </div>
+        <!--猜你喜欢-->
+        <div class="visual-item w1200" data-mode="guessYouLike" data-purebox="goods" shoptype="visualItme" data-diff="0" data-goodsid="">
+            <div class="view">
+                <div class="lift-channel clearfix" id="guessYouLike" data-type="range" data-lift="商品">
+                    <div data-goodstitle="title">
+                        <div class="ftit"><h3>还没逛够</h3></div>
+                    </div>
+                    <ul></ul>
+                    <div class="spec" data-spec=""></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--顶部浮栏-->
+    <div class="attached-search-container" shoptype="suspColumn">
+        <div class="w w1200">
+            {include file="public/categorys"}
+            <div class="mall-search">
+                <div class="shop-search">
+                    <div class="form">
+                        <form id="searchForm" name="searchForm" method="get" action="/home/category/catgoodslist" onsubmit="return checkSearchForm(this)" class="search-form">
+                            <input autocomplete="off" onkeyup="lookup(this.value);" name="keywords" type="text" id="keyword" value="" class="search-text">
+                            <button type="submit" class="button button-goods" onclick="checkstore_search_cmt(0)">搜商品</button>
+                            <button type="submit" class="button button-store" onclick="checkstore_search_cmt(1)">搜店铺</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="suspend-login">
+                {if ($Think.session.user)}
+                <a href="{:url('user/index')}" class="nick_name">{$Think.session.user.user_name}</a>
+                {else}
+                <a href="{:url('login/index')}">登录</a> | <a href="{:url('login/register')}">注册</a>
+                {/if}
+            </div>
+
+            <div class="shopCart" id="ECS_CARTINFO">
+                <div class="shopCart-con shop-cm">
+                    <a href="{:url('cart/index')}">
+                        <i class="iconfont icon-carts"></i>
+                        <span></span>
+                        <em class="count cart_num">{$Think.session.cart_num|default=0}</em>
+                    </a>
+                </div>
+                <div class="dorpdown-layer" shoptype="dorpdownLayer">
+                    <div class="prompt">
+                        <div class="nogoods"><b></b><span>购物车中还没有商品，赶紧选购吧！</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--左侧导航条-->
+    <div class="lift lift-mode-one lift-hide" shoptype="lift" data-type="one" style="z-index:100001">
+        <div class="lift-list" shoptype="liftList"></div>
+    </div>
+
+</div>
+{include file='public/right_bar'}
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__THEME__/js/asyLoadfloor.js"></script>
+<script>
+    /*首页轮播*/
+    $(".nav .site-mast .categorys-tab-content").show();
+
+    var length = $(".banner .bd").find("li").length;
+    if (length > 1) {
+        $(".banner").slide({
+            titCell: ".hd ul", mainCell: ".bd ul", effect: "fold", interTime: 3500, delayTime: 500, autoPlay: true, autoPage: true, trigger: "click", endFun: function (i, c, s) {
+                $(window).resize(function () {
+                    var width = $(window).width();
+                    s.find(".bd li").css("width", width);
+                });
+            }
+        });
+    } else {
+        $(".banner .hd").hide();
+    }
+    //楼层轮播图广告
+    $("*[data-purebox='homeFloor']").each(function (index, element) {
+        var f_slide_length = $(this).find(".floor-left-slide .bd li").length;
+        if (f_slide_length > 1) {
+            $(element).find(".floor-left-slide").slide({titCell: ".hd ul", mainCell: ".bd ul", effect: "left", interTime: 3500, delayTime: 500, autoPlay: true, autoPage: true});
+        } else {
+            $(element).find(".floor-left-slide .hd").hide();
+        }
+    });
+    //楼层分类商品切换
+    $("*[shoptype='floorItem']").slide({titCell: ".hd-tags li", mainCell: ".floor-tabs-content", titOnClassName: "current"});
+
+    function getYouLike() {
+        $.ajax({
+            type: 'POST',
+            url: '/home/index/ajaxGuessYouLike',
+            success: function (data) {
+                $("#guessYouLike ul").html(data);
+            }
+        });
+    }
+
+    function readyLoad() {
+        var homeWrap = $("*[shoptype='homeWrap']");
+        var homeitem = homeWrap.find("*[shoptype='visualItme']");
+        var mode = "";
+        var range = "";
+        var lift = "";
+        var id = "";
+        var floorItem = "";
+        var liftObj = $("*[shoptype='lift']");
+        var returnTop = "";
+
+        if (liftObj.data("type") == "one") {
+            returnTop = '<div class="lift-item lift-item-top" shoptype="liftItem"><i class="iconfont icon-returntop"></i></div>';
+        } else {
+            returnTop = '<div class="lift-item lift-item-top" shoptype="liftItem">TOP<i class="iconfont icon-top-alt"></i></div>';
+        }
+
+        homeitem.each(function (k, v) {
+            mode = $(this).data("mode");
+            if (mode != "lunbo" && mode != "h-streamer") {
+                range = $(this).find("*[data-type='range']");
+                lift = range.data("lift");
+                id = range.attr("id");
+
+                var _div = '<div class="lift-item" shoptype="liftItem" data-target="#' + id + '" title="' + lift + '"><span>' + lift + '</span><i class="lift-arrow"></i></div>';
+
+                $("*[shoptype='liftList']").append(_div);
+            }
+        });
+
+        $("*[shoptype='liftList']").append(returnTop);
+    }
+
+    $(function () {
+        getYouLike();
+        $(window).scroll(function () {
+            var scrollTop = $(document).scrollTop();
+            var navTop = $("*[shoptype='shopNav']").offset().top;
+
+            if (scrollTop > navTop) {
+                $("*[shoptype='suspColumn']").addClass("show");
+            } else {
+                $("*[shoptype='suspColumn']").removeClass("show");
+            }
+        });
+    });
+    //楼层左侧栏悬浮框
+    readyLoad();
+    $.catetopLift();
+</script>
+{include file='public/footer'}

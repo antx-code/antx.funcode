@@ -1,0 +1,193 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+{include file='public/right_bar'}
+<style>
+    .store-list > li {
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 20px;
+        padding-top: 20px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .store-info {
+        width: 38%;
+        display: flex;
+        cursor: pointer;
+    }
+
+    .store-info:hover {
+        color: #333;
+    }
+
+    .store-info > div {
+        width: calc(100% - 115px);
+    }
+
+    .store-info > div p {
+        line-height: 30px;
+    }
+
+    .store-info .store-logo {
+        width: 100px;
+        height: 100px;
+        margin-right: 15px;
+    }
+
+    .store-name {
+        color: #0063DC;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .seller-name, .store-desc {
+        padding-top: 3px;
+        display: flex;
+        align-items: center;
+    }
+
+    .seller-name span, .store-desc span {
+        margin-left: 5px;
+        width: calc(100% - 80px);
+        color: #0063DC;
+        display: inline-block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .store-goods {
+        width: 60%;
+        display: flex;
+    }
+
+    .store-goods li {
+        margin-right: 2%;
+        width: 31.3%;
+    }
+
+    .store-goods li:last-child {
+        margin-right: 0;
+    }
+
+    .store-goods li a.goods img {
+        width: 100%;
+    }
+
+    .goods-price {
+        color: #f50000;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .market-price {
+        text-decoration: line-through;
+        color: #999;
+        margin-left: 10px;
+    }
+
+    #pages_ajax {
+        margin-top: 30px;
+        text-align: center;
+    }
+</style>
+<div class="content" id="app" v-cloak>
+    <div class="banner brand-banner" shoptype="brandMain">
+        <div class="w w1200 relative">
+            <div class="brand-banner-wp">
+                <a href="javascript:">
+                    <img src="{$banner}" width="1920" height="300">
+                </a>
+            </div>
+
+            <div shoptype="store_shop_list" id="store_shop_list" style="margin-top: 20px;">
+                <ul class="store-list">
+                    <li v-for="(vo,index) in list">
+                        <a class="store-info" :href="'/home/store/index/id/'+vo.store_id">
+                            <img class="store-logo" :src="vo.logo" :alt="vo.store_name">
+                            <div>
+                                <p class="store-name">{{vo.store_name}}</p>
+                                <p class="seller-name">卖家: <span>{{vo.company}}</span></p>
+                                <p class="store-desc">主营: <span>{{vo.store_keyword}}</span></p>
+                            </div>
+                        </a>
+                        <ul class="store-goods">
+                            <li v-for="(goods,idx) in vo.goods_list">
+                                <a :href="'/home/goods/detail/id/'+goods.goods_id" class="goods">
+                                    <img :src="goods.original_img" :alt="goods.goods_name">
+                                    <span class="goods-price">￥{{goods.shop_price}}</span>
+                                    <span class="market-price">￥{{goods.market_price}}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="clearfix" id="pages_ajax"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="rTop" shoptype="rTop" style="right: 321.5px; top: 804px;">
+    <img src="/public/static/theme/images/returnTop.png"></div>
+{include file='public/footer'}
+
+<script type="text/javascript" src="__THEME__/js/asyLoadfloor.js"></script>
+<script type="text/javascript" src="__THEME__/js/shopping_flow.js"></script>
+<script type="text/javascript" src="__THEME__/js/imagesloaded.pkgd.js"></script>
+<script type="text/javascript">
+
+    var kw = '{$Think.get.keywords}';
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            keywords: kw,
+            page: 1,
+            rows: 10,
+            count: 0,
+            list: [],
+
+            store_service_score: 'desc'
+
+        },
+        methods: {
+            init: function () {
+                $.post('/home/index/store_street', {
+                    keywords: vm.keywords,
+                    page: vm.page,
+                    rows: vm.rows,
+                    province: vm.province,
+                    store_service_score: vm.store_service_score,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit('pages_ajax', '#EF4F4F');
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+        if (kw) {
+            $("#searchForm").find('#keyword').val(kw);
+        }
+        $('.rTop').on('click', function () {
+            document.body.scrollIntoView();
+        });
+
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 300) {
+                $('.rTop').show();
+            } else {
+                $('.rTop').hide();
+            }
+        });
+    });
+
+
+</script>

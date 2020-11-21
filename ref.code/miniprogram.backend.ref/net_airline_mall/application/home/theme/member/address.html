@@ -1,0 +1,97 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<style>.tag{cursor: pointer;}</style>
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault" id="app" v-cloak>
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <div class="user-mod" style="min-height: 1150px;">
+            <div class="user-title">
+                <h2>收货地址</h2>
+                <h3>您已创建<span class="red">{{list.length}}</span>个收货地址，最多可创建<span class="red">10</span>个</h3>
+            </div>
+            <ul class="cosignee-list">
+                <li>
+                    <div class="consignee-inner">
+                        <a href="/home/member/addrupdate" class="consignee-add" data-dialog="dialog"
+                           data-divid="newAddress" data-id="" data-name="新增收货人信息">
+                            <i class="iconfont icon-add-quer"></i>
+                            <p>新增收货人信息</p>
+                        </a>
+                    </div>
+                </li>
+                <template v-for="(vo,index) in list">
+                    <li class="consignee_list_23">
+                        <div class="consignee-inner">
+                            <div class="head">
+                                <div class="handle">
+                                    <a :href="'/home/member/addrupdate?address_id='+vo.address_id">修改</a>
+                                    <a href="javascript:void (0);" @click="deladdress(vo)">删除</a>
+                                </div>
+                                <div class="title">
+                                    <span class="name">{{vo.consignee}}</span>
+                                    <span class="province">{{vo.city_name}}</span>
+                                    <template v-if="vo.is_default==0">
+                                        <span style="cursor: pointer;" @click="addrupdate(vo)">设置默认</span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="tag">默认地址</span>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="body">
+                                <p>{{vo.mobile}}</p>
+                                <p>{{vo.region_name}} &nbsp;{{vo.address}}</p>
+                            </div>
+                        </div>
+                    </li>
+                </template>
+
+            </ul>
+        </div>
+
+
+    </div>
+</div>
+{include file="public:footer"}
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: []
+        },
+        methods: {
+            init:function () {
+                $.post('/home/member/address', {
+                }, function (ret) {
+                    vm.list = ret.data;
+                }, 'json');
+            },
+            deladdress:function (vo) {
+                fajax('/home/member/deladdress',vo,true);
+            },
+            addrupdate:function (vo) {
+                vo.is_default = 1;
+                $.post('/home/member/addrdefault', {
+                    pageparm: JSON.stringify(vo),
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        vm.init();
+                    } else {
+                        layer.msg(ret.msg, {icon: 2});
+                    }
+                }, 'json');
+            },
+        }
+    });
+    $(function () {
+        vm.init();
+    })
+</script>
+

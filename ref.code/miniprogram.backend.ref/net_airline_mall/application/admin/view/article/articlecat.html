@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>该页面展示所有文章分类。</li>
+                <li>可添加子分类以及编辑修改、删除分类。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="doadd({cat_id:0})">
+                        <div class="fbutton">
+                            <div class="add" title="添加">
+                                <span><i class="icon icon-plus"></i>
+                                    添加
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%">
+                                <div class="tDiv">编号</div>
+                            </th>
+                            <th width="15%">
+                                <div class="tDiv">文章分类名称</div>
+                            </th>
+                            <th width="28%">
+                                <div class="tDiv">描述</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">排序</div>
+                            </th>
+                            <th width="10%" class="layui-hide">
+                                <div class="tDiv">显示在导航栏</div>
+                            </th>
+                            <th width="12%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td class="layui-hide">
+                                    <div class="tDiv first_setup">
+                                        <div class="setup_span">
+                                            <em>
+                                                <i class="icon icon-cog"></i>
+                                                设置<i class="arrow"></i>
+                                            </em>
+                                            <ul>
+                                                <li>
+                                                    <a href="javascript:void(0)" @click="doaddson(vo)">新增下一级</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:void(0)"
+                                                       @click="pageFreash(vo.cat_id)">查看下一级</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.cat_id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <a href="javascript:void(0)" class="ftx-05">
+                                            <strong>{{vo.cat_name}}</strong>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.cat_desc}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input name="sort_order" class="text w100" @keyup.enter="doupdate(vo)"
+                                               v-model="vo.sort_order" type="text">
+                                    </div>
+                                </td>
+                                <td class="layui-hide">
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.show_in_nav==1}"
+                                             @click="showinnav(index)">
+                                            <div class="circle"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a2">
+                                        <a href="javascript:void(0);" class="btn_edit" @click="doadd(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <a href="javascript:void(0);" title="移除" class="btn_trash"
+                                           @click="dodelete(index)">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="list-page">
+                                    <div id="turn-page"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            cat_id: 0,
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: []
+        },
+        methods: {
+            showinnav: function (index) {
+                if (vm.list[index].show_in_nav == 0) {
+                    vm.list[index].show_in_nav = 1;
+                } else {
+                    vm.list[index].show_in_nav = 0;
+                }
+                vm.doupdate(vm.list[index]);
+            },
+            pageFreash: function (cat_id = 0, is_delete = 0) {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.cat_id = cat_id;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            doupdate: function (vo) {
+                majax('/admin/article/doupdate', vo, 'article_cat');
+            },
+            doaddson: function (vo) {
+                layerOpenwin('添加', '/admin/article/articlecatadd?parent_id=' + vo.cat_id);
+            },
+            doadd: function (vo) {
+                layerOpenwin('编辑', '/admin/article/articlecatadd?cat_id=' + vo.cat_id);
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/article/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'article_cat'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            init: function () {
+                $.post('/admin/article/articlecat', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    cat_id: vm.cat_id,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

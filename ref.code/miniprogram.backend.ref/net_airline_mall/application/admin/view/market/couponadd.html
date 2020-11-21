@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>
+                    标识“<em>*</em>”的选项为必填项，其余为选填项。
+                </li>
+                <li>1. 面额模板，一般用在商品优惠活动中赠送给完成订单的会员</li>
+                <li>2. 指定发放，则是属于不公开的优惠券,商家可以指定关注店铺会员发放</li>
+                <li>3. 免费领取，该类型的优惠券在店铺首页会员可以直接领取</li>
+                <li>4.  线下发放，则表示通过打印成实体券，并且生成验证劵码，用户凭借券码消费</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info">
+                        <div class="items">
+                            <div class="item">
+                                <div class="label">
+                                    <span class="require-field">*</span>
+                                    优惠券名称：
+                                </div>
+                                <div class="label_value">
+                                    <input type="text"  class="text" value="" v-model="info.name"/>
+                                    <div class="notic"></div>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">
+                                    <span class="require-field">*</span>
+                                    优惠券面额：
+                                </div>
+                                <div class="label_value">
+                                    <input type="text"  class="text" value="" v-model="info.money"/>
+                                    <div class="notic"></div>
+                                    <div class="form_prompt">此优惠券可以抵销的金额</div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">
+                                    <span class="require-field">*</span>
+                                    数量：
+                                </div>
+                                <div class="label_value">
+                                    <input type="text"  class="text" value="" v-model="info.num"/>
+                                    <div class="notic"></div>
+                                    <div class="form_prompt">此优惠券可以抵销的金额</div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">
+                                    <span class="require-field">*</span>
+                                    最小订单金额：
+                                </div>
+                                <div class="label_value">
+                                    <input type="text"  class="text" value="" v-model="info.min_goods_amount"/>
+                                    <div class="notic"></div>
+                                    <div class="form_prompt">只有商品总金额达到这个数的订单才能使用此优惠券</div>
+
+                                </div>
+                            </div>
+
+                            <div class="item">
+                                <div class="label"><span class="require-field">*</span>发放起止日期：</div>
+                                <div class="label_value">
+                                    <div class="text_time">
+                                        <input type="text" name="start_time" id="send_start_time_cn" value="" class="text mr0">
+                                    </div>
+                                    <span class="bolang">~</span>
+                                    <div class="text_time">
+                                        <input type="text" name="end_time" id="send_end_time_cn" value=""class="text">
+                                    </div>
+                                    <div class="notic"></div>
+                                    <div class="form_prompt" style="padding-left: 10px;">
+                                        只有当前时间介于起始日期和截止日期之间时，此类型的优惠券才可以发放
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="item">
+                                <div class="label"><span class="require-field">*</span>使用起止日期：</div>
+                                <div class="label_value">
+                                    <div class="text_time" >
+                                        <input type="text" name="start_time" id="use_start_time_cn" value="" class="text mr0">
+                                    </div>
+                                    <span class="bolang">~</span>
+                                    <div class="text_time" >
+                                        <input type="text" name="end_time" id="use_end_time_cn" value=""class="text">
+                                    </div>
+
+                                    <div class="notic"></div>
+                                    <div class="form_prompt" style="padding-left: 10px;">
+                                        只有当前时间介于起始日期和截止日期之间时，此类型的优惠券才可以使用
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">发放类型：</div>
+                                <div class="label_value">
+                                    <div class="checkbox_items">
+                                        <div class="checkbox_item">
+                                            <input name="is_putaway" type="radio" class="ui-radio" value="0" id="is_putaway_0" v-model="info.send_type"/>
+                                            <label for="is_putaway_0" class="ui-radio-label">面额模板</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input name="is_putaway" type="radio" class="ui-radio" value="1" id="is_putaway_1" v-model="info.send_type"/>
+                                            <label for="is_putaway_1" class="ui-radio-label">指定用户发放</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input name="is_putaway" type="radio" class="ui-radio" value="2" id="is_putaway_2" v-model="info.send_type"/>
+                                            <label for="is_putaway_2" class="ui-radio-label">免费领取</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input name="is_putaway" type="radio" class="ui-radio" value="3" id="is_putaway_3" v-model="info.send_type"/>
+                                            <label for="is_putaway_3" class="ui-radio-label">线下发放</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">&nbsp;</div>
+                                <div class="label_value info_btn">
+                                    <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                vm.info.send_start_time = $('#send_start_time_cn').datetimebox('getValue');
+                vm.info.send_end_time = $('#send_end_time_cn').datetimebox('getValue');
+                vm.info.use_start_time = $('#use_start_time_cn').datetimebox('getValue');
+                vm.info.use_end_time = $('#use_end_time_cn').datetimebox('getValue');
+                majax('/admin/market/couponadd',vm.info,'coupon');
+            }
+        }
+    });
+    $(function () {
+        $('#send_start_time_cn').datetimebox({
+            value: info.send_start_time_cn?info.send_start_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+        $('#send_end_time_cn').datetimebox({
+            value: info.send_end_time_cn?info.send_end_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+        $('#use_start_time_cn').datetimebox({
+            value: info.use_start_time_cn?info.use_start_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+        $('#use_end_time_cn').datetimebox({
+            value: info.use_end_time_cn?info.use_end_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+    });
+
+</script>

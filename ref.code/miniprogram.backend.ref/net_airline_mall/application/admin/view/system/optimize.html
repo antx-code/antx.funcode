@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>手动清理数据表碎片。</li>
+                <li>定期清理数据表碎片可以提升数据库的查询速度。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="form-div">
+                    <input type="submit" value="开始进行数据表优化" class="btn btn30 red_btn" @click="repairTable()"/>
+                    <label class="ml10">总表数：</label>
+                    <label class="red">{{list.length}}</label>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellspacing='0' cellpadding='0' id='listTable'>
+                        <tr>
+                            <th width="25%">
+                                <div class="tDiv">数据表</div>
+                            </th>
+                            <th width="20%">
+                                <div class="tDiv">数据表类型</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">记录数</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">碎片</div>
+                            </th>
+                            <th width="15%">
+                                <div class="tDiv">字符集</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">状态</div>
+                            </th>
+                        </tr>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td>
+                                    <div class="tDiv">{{vo.Name}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.Engine}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.Rows}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.Data_free}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.Collation}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">OK</div>
+                                </td>
+                            </tr>
+                        </template>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            cat_id: 0,
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            is_read: 0,
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+
+        },
+        methods: {
+            repairTable: function () {
+                $.iMessager.progress({text: '数据表优化中，请等待'});
+                $.post('/admin/system/repairTable', {
+                    pageparm: '',
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        $.iMessager.progress('close');
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            init: function () {
+                $.post('/admin/system/optimize', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

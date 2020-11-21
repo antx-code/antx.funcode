@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="cboxContent">
+        <div class="pb-bd">
+            <div class="pb-ct">
+                <div class="sku_goods_info">
+                    <div class="warehouse_item">
+                        <span class="item">
+                            <span class="tit"></span>
+                            <div class="search mt0">
+                                <div class="input">
+                                    <input v-model="keywords" class="text nofocus w200" placeholder="商品名称" type="text">
+                                    <button type="button" class="btn pro_btn" name="secrch_btn"
+                                            @click="secrchInit()"></button>
+                                </div>
+                                <div class="refresh" @click="pageFreash()">
+                                     <div title="刷新数据" class="refresh_tit"><i class="icon icon-refresh"></i></div>
+                                     <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+                    <div class="common-content">
+                        <div class="list-div" id="listDiv">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th width="40%">商品名称</th>
+                                    <th width="10%">秒杀价格</th>
+                                    <th width="10%">数量</th>
+                                    <th width="10%">购买限制</th>
+                                    <th width="20%">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="(vo,index) in list">
+                                    <tr>
+                                        <td>{{vo.goods_name}}</td>
+                                        <td>
+                                            <input class="text w100 tc fn" v-model="vo.sec_price" type="text">
+                                        </td>
+                                        <td>
+                                            <input class="text w100 tc fn" v-model="vo.sec_num" type="text">
+                                        </td>
+                                        <td>
+                                            <input class="text w100 tc fn" v-model="vo.sec_limit" type="text">
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn_trash" @click="doupdate(index)">
+                                                <i class="icon icon-save"></i>
+                                                更新
+                                            </a>
+                                            <a href="javascript:void(0)" class="btn_trash" @click="dodelete(index)">
+                                                <i class="icon icon-trash"></i>
+                                                删除
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="list-page">
+                                            <div id="turn-page"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var sec_id = '{$sec_id}';
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            sec_id: sec_id,
+            page: 1,
+            rows: 5,
+            count: 0,
+            keywords: '',
+            list: []
+        },
+        methods: {
+            doupdate:function(index){
+                majax('/admin/market/doupdate', vm.list[index],'seckill_goods')
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/market/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'seckill_goods'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 5;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 5;
+                vm.count = 0;
+                vm.init();
+            },
+            doadd:function(index){
+                vm.list[index].sec_id = sec_id;
+                $.post('/admin/market/doadd', {
+                    pageparm: JSON.stringify(vm.list[index]),
+                    table: 'seckill_goods'
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.pageFreash();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            init: function () {
+                $.post('/admin/market/seckillgoodslist', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    sec_id: vm.sec_id,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+
+
+
+
+
+

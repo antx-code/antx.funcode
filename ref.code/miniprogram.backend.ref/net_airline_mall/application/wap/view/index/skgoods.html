@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>秒杀</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="con seckill-box">
+        <div class="tab-common seckill-tab f-05 bg-color-write text-center tag-bg-color  van-row">
+            <template v-for="(vo,index) in list">
+                <div class="van-col van-col--6" @click="changeInit(index)">
+                    <div class="item" :class="{'active':activeIndex==index}">
+                        <h4>{{vo.start_time|timeParse}}</h4>
+                        <div class="f-02 title">
+                            <template v-if="activeIndex==index">抢购进行中</template>
+                            <template v-else>即将开始</template>
+
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+        <div class="swipe van-swipe" style="margin-top: 5.2rem;">
+            <div class="van-swipe__track">
+                <div class="van-swipe-item" style="width: 100% !important;">
+                    <img src="https://x.dscmall.cn/storage/data/afficheimg/1509663779787829146.jpg" class="img">
+                </div>
+            </div>
+        </div>
+        <div class="dis-box seckill-heaer f-03">
+            <div class="header-left color-3 box-flex f-weight f-06">更多爆款，限时抢购</div>
+            <div class="text-right">
+                <div class="dis-box m-top02"><span>距结束</span>
+                    <div endtime="1564538400" callback="function(){}" endtext="活动结束" class="seckill-time">
+                        <p><span>{{c_h}}</span><i>:</i><span>{{c_m}}</span><i>:</i><span>{{c_s}}</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div waterfall-disabled="disabled" waterfall-offset="300" class="goods-li">
+            <template v-for="(vo,index) in list" v-if="activeIndex==index">
+                <template v-for="(vo2,index2) in vo.goods_list">
+                    <div class="show bg-color-write li" @click="openGoodsdetail(vo2)">
+                        <div class="left"><img :src="vo2.original_img" class="img"></div>
+                        <div class="right bg-color-write">
+                            <h4 class="f-04 color-3 twolist-hidden">{{vo2.goods_name}}</h4>
+                            <div class="plan-box m-top08 dis-box">
+                                <div class="box-flex">
+                                    <div class="dis-box">
+                                        <div class="left-title ">
+                                            <span class="color" v-bind:style="{ width: vo2.saleper+'%'}"></span>
+                                        </div>
+                                        <em class="f-01 color-7">{{vo2.saleper}}%</em></div>
+                                </div>
+                                <div class="right-title f-03 color-9 p-l05">已抢{{vo2.sold_num}}件</div>
+                            </div>
+                            <div class="dis-box p-r">
+                                <div class="box-flex m-top08">
+                                    <div class="color-red f-06"><span>¥{{vo2.sec_price}}</span>
+                                        <del class="f-02 color-9">¥{{vo2.shop_price}}</del>
+                                    </div>
+                                </div>
+                                <div class="btn-right">
+                                    <div class="box-flex">
+                                        <span class="btn-seckill tag-bg-color br-5 f-05 color-white p-a">马上抢</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var countdown = null;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            c_h: 0,//时
+            c_m: 0,//分
+            c_s: 0,//秒
+            activeIndex: 0,
+            list: [],
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                //return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+                return moment.unix(timestamp).format('HH:mm');
+            }
+        },
+        methods: {
+            changeInit: function (index) {
+                clearInterval(countdown);
+                vm.activeIndex = index;
+                countdown = setInterval(function () {
+                    vm.cutdowntime(vm.activeIndex);
+                }, 1000);
+            },
+            cutdowntime: function (index) {
+                var end_time = vm.list[index].end_time;
+                var curr_time = parseInt(Date.parse(new Date()) / 1000);
+                var diff_time = parseInt(end_time - curr_time);// 倒计时时间差
+                vm.c_h = wxapp.fillzero(Math.floor(diff_time / 3600));
+                vm.c_m = wxapp.fillzero(Math.floor((diff_time / 60 % 60)));
+                vm.c_s = wxapp.fillzero(Math.floor((diff_time % 60)));
+                if (diff_time <= 0) {
+                    vm.c_h = '00';
+                    vm.c_m = '00';
+                    vm.c_s = '00';
+                }
+            },
+            init: function () {
+                wxapp.ajax(config.skgoods, {},1).then(function (ret) {
+                    if (ret) {
+                        vm.list = ret.data.list;
+                        vm.clist = ret.data.clist;
+                    }
+                    countdown = setInterval(function () {
+                        vm.cutdowntime(vm.activeIndex);
+                    }, 1000);
+                });
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'skdetail_win',
+                    url: 'widget://html/store/skdetail_win.html',
+                    pageParam: {
+                        id: vo.goods_id
+                    }
+                });
+            }
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

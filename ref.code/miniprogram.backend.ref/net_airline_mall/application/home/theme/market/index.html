@@ -1,0 +1,203 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+{include file='public/right_bar'}
+<style>
+    .readme {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        height: 60px;
+    }
+
+    .readme a {
+        margin-left: 20px;
+    }
+    .readme a:hover{
+        color: #555;
+    }
+    .readme a span {
+        color: #3799ef;
+    }
+
+    .sc_icon {
+        position: absolute;
+        background: url(/public/static/images/admin-icon.png) no-repeat;
+        background-position: -84px -328px;
+        width: 20px;
+        height: 20px;
+    }
+</style>
+<div class="content">
+    <div class="banner exchange-banner">
+        <div class="w w1200 relative">
+            <div class="banner">
+                <div class="w w1200 relative">
+                    <div class="act-banner-wp">
+                        <a href="">
+                            <img src="{$banner}" style="max-width:1920px; max-height:500px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {if $user}
+            <div class="exchange-score">
+                <div class="u-info">
+                    <a href="/home/member/order.html" class="u-avatar"><img src="{if $user.avatar !=''}{$user.avatar}{else /}/public/static/images/touxiang.jpg{/if}" alt=""></a>
+                    <div class="u-name"><a href="/home/member/order.html">{$user.user_name}</a></div>
+                </div>
+                <div class="score-info">
+                    <div class="item">
+                        <p>可用积分</p>
+                        <div class="num">{$user.points}</div>
+                    </div>
+                    <div class="item">
+                        <p>余额（元）</p>
+                        <div class="num">{$user.user_money}</div>
+                    </div>
+                </div>
+            </div>
+            {else /}
+            <div class="exchange-score">
+                <div class="u-info">
+                    <a href="/home/member/index.html" class="u-avatar"><img src="/public/static/theme/images/touxiang.jpg" alt=""></a>
+                    <div class="u-name"><strong>Hi,欢迎来到{$siteInfo.shop_name}</strong></div>
+                </div>
+                <div class="score-info">
+                    <a href="/home/login/index" class="login-button">请登录</a>
+                    <a href="/home/login/register" class="register_button">立即注册</a>
+                </div>
+            </div>
+            {/if}
+        </div>
+    </div>
+    <div id="app">
+        <div class="exchange-cate">
+            <div class="w w1200 relative readme">
+                <i class="sc_icon"></i>
+                <a href="/home/article/content?article_id=85">什么是积分？积分如何获取？<span>查看详情</span></a>
+            </div>
+            <div class="w w1200">
+                <a href="/home/market/index" class="curr">全部</a><i class="point">·</i>
+                <template v-for="(vo,index) in categoryList">
+                    <a class="curr" href="javascript:void(0)" @click="cateInit(vo)">
+                        {{vo.cat_name}}
+                    </a>
+                    <i class="point">·</i>
+                </template>
+            </div>
+
+        </div>
+        <div class="exchange-main" shoptype="exchange-main">
+            <div class="w w1200">
+                <div class="mod-list-sort">
+                    <div class="sort-t">排序：</div>
+                    <div class="sort-l">
+                        <a href="javascript:void(0)" @click="goodsfilter('default')"
+                           class="sort-item" :class="{'curr':sort=='default'}">默认
+                            <i class="iconfont" :class="{'icon-down1':order=='desc'&&sort=='default','icon-up1':order=='asc'&&sort=='default'}"></i>
+                        </a>
+                        <a href="javascript:void(0)" @click="goodsfilter('sale_num')"
+                           class="sort-item" :class="{'curr':sort=='sale_num'}">兑换量
+                            <i class="iconfont" :class="{'icon-down1':order=='desc'&&sort=='sale_num','icon-up1':order=='asc'&&sort=='sale_num'}"></i>
+                        </a>
+                        <a href="javascript:void(0)" @click="goodsfilter('exchange_integral')"
+                           class="sort-item" :class="{'curr':sort=='exchange_integral'}">积分值
+                            <i class="iconfont" :class="{'icon-down1':order=='desc'&&sort=='exchange_integral','icon-up1':order=='asc'&&sort=='exchange_integral'}"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="exchange-list" id="exchange-list" shoptype="exchange-list">
+                    <ul class="clearfix" shoptype="items">
+                        <transition-group name="list" tag="p">
+                            <template v-for="(vo,index) in goodsList">
+                                <li class="mod-shadow-card" :key="index">
+                                    <a :href="'/home/market/exdetail?id='+vo.goods_id" target="_blank" class="img">
+                                        <img :src="vo.original_img" :alt="vo.goods_name">
+                                    </a>
+                                    <div class="clearfix">
+                                        <div class="score">积分 {{vo.exchange_integral}}</div>
+                                        <div class="market" v-if="vo.market_integral"><em>¥</em>{{vo.market_integral}}</div>
+                                    </div>
+                                    <a href="" target="_blank" class="name" :title="vo.goods_name">{{vo.goods_name}}</a>
+                                    <div class="already">
+                                        <i class="iconfont icon-package"></i>{{vo.sale_num}}人兑换
+                                    </div>
+                                    <a :href="'/home/market/exdetail?id='+vo.goods_id" class="ex-btn" target="_blank">立即兑换</a>
+                                </li>
+                            </template>
+                        </transition-group>
+                    </ul>
+                    <div class="clearfix" id="pages_ajax"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{include file='public/footer'}
+
+<script type="text/javascript" src="/public/static/js/jquery.SuperSlide.2.1.1.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            goodsList: [],
+            categoryList: [],
+            page: 1,
+            rows: 15,
+            count: 0,
+            cat_id: 0,
+            sort: 'default',
+            order: 'desc',
+        },
+        methods: {
+            init: function () {
+                $.post('/home/market/index', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    cat_id: vm.cat_id,
+                    sort: vm.sort,
+                    order: vm.order,
+                }, function (ret) {
+                    vm.goodsList = ret.data.goodsList;
+                    vm.categoryList = ret.data.categoryList;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit('pages_ajax', '#EF4F4F');
+                    }
+                }, 'json');
+            },
+            cateInit: function (vo) {
+                vm.cat_id = vo.cat_id;
+                vm.page = 1;
+                vm.rows = 10;
+                vm.init();
+            },
+            goodsfilter: function (sort = 'default') {
+                vm.sort = sort;
+                switch (sort) {
+                    case 'default':
+                        vm.order = vm.order == 'desc' ? 'asc' : 'desc';
+                        break;
+                    case 'sale_num':
+                        vm.order = vm.order == 'desc' ? 'asc' : 'desc';
+                        break;
+                    case 'exchange_integral':
+                        vm.order = vm.order == 'desc' ? 'asc' : 'desc';
+                        break;
+                }
+                vm.page = 1;
+                vm.rows = 15;
+                vm.init();
+            }
+
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+
+

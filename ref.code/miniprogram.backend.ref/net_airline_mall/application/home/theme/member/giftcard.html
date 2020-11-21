@@ -1,0 +1,248 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<style>
+    .card-list {
+        width: 100%;
+        line-height: 38px;
+    }
+
+    .card-list thead {
+        background-color: #f5f5f5;
+    }
+
+    .card-list tbody button {
+        height: 24px;
+        line-height: 24px;
+    }
+
+    .card-list tbody tr:nth-child(even) {
+        border-top: 1px solid #e7eaec;
+    }
+
+    .card-list tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .more {
+        cursor: pointer;
+    }
+
+    .more:hover {
+        color: red;
+    }
+</style>
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault" id="app" v-cloak="">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+
+
+        <div class="user-main" shoptype="userMain" data-action="noDefault">
+            <div class="user-crumbs hide"><span><a href="/">首页</a></span><span class="arrow">&gt;</span> <span class="finish">进入会员中心</span></div>
+            <div class="user-mod" shoptype="tabSection" style="min-height: 1047px;">
+                <div class="user-title">
+                    <h2>我的礼品卡</h2>
+                    <ul class="tabs" shoptype="tabs">
+                        <li :class="{active:bound}"><a href="javascript:void(0);" @click="init(true)">可使用</a></li>
+                        <li :class="{active:!bound}"><a href="javascript:void(0);" @click="init(false)">购卡记录</a></li>
+                    </ul>
+                    <a @click="preBonding()" class="more">绑定礼品卡</a>
+                </div>
+                <div class="user-coupons-warp" shoptype="tabContent">
+                    <div id="coupons_list0" v-show="bound" class="coupons_content_list">
+                        <div class="coupons-items ps-container ps-active-y">
+
+                            <template v-if="list.length>0">
+                                <div class="coupons-item " v-for="(vo,index) in list">
+                                    <div class="c-type">
+                                        <i class="i-left"></i>
+                                        <div class="c-t-cont">
+                                            <div class="c-t-c-top">
+                                                <strong><em>￥</em>{{vo.price}}</strong> <span>{{vo.cash}}可用</span>
+                                            </div>
+                                            <div class="c-t-c-bot">
+                                                <p>平台限制：自营</p>
+                                                <p>范 围：[全场券][全品类通用]</p>
+                                                <p>{{vo.start_time|timeParse}}~{{vo.over_time|timeParse}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="c-msg">
+                                        <a href="/">
+                                            <span class="lj">立即使用</span>
+                                            <i class="iconfont icon-down"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <div class="ps-scrollbar-x-rail" style="width: 880px; display: none; left: 0px; bottom: 3px;">
+                                    <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                                </div>
+                                <div class="ps-scrollbar-y-rail" style="top: 0px; height: 320px; display: inherit; right: 0px;">
+                                    <div class="ps-scrollbar-y" style="top: 0px; height: 294px;"></div>
+                                </div>
+
+                                <div class="no_records">
+                                    <i class="no_icon_two"></i>
+                                    <div class="no_info"><h3>主人，您还没有绑定礼品卡~</h3></div>
+                                </div>
+                                <div class="ps-scrollbar-x-rail"
+                                     style="width: 880px; display: none; left: 0px; bottom: 3px;">
+                                    <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                                </div>
+                                <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; display: none; right: 0px;">
+                                    <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                                </div>
+                            </template>
+
+
+                        </div>
+                    </div>
+                    <div id="coupons_list1" v-show="!bound" class="coupons_content_list">
+                        <table class="card-list">
+                            <thead>
+                            <tr>
+                                <th>面额</th>
+                                <th>卡号</th>
+                                <th>卡密</th>
+                                <th>有效期</th>
+                                <th>卡状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(vo,index) in orderlist">
+                                <td>￥{{vo.price}}</td>
+                                <td>{{vo.card_no}}</td>
+                                <td>{{vo.password}}</td>
+                                <td>{{vo.start_time | timeParse}} ~ {{vo.over_time |timeParse}}</td>
+                                <td>
+                                    <span v-if="vo.user_id>0">已绑定</span>
+                                    <span v-else class="text-success">待绑定</span>
+                                </td>
+                                <td>
+                                    <button type="button" class="sc-btn" @click="copyme(vo.password)">复制卡密</button>
+                                    <button type="button" class="sc-btn" @click="bonding(index)" v-if="!vo.user_id">绑定当前账号</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="clearfix text-center" id="pages_ajax"></div>
+                    <textarea id="copytext" style="position: absolute;top:0;left:0;z-index: 0;width: 0;height: 0"></textarea>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{include file="public:footer"}
+<script type="text/javascript" src="/public/static/js/jquery.SuperSlide.2.1.1.js"></script>
+<script>
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 12,
+            count: 0,
+            keywords: '',
+            list: [],
+            orderlist: [],
+            bound: true
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 12;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            init: function (switchTab) {
+                if (typeof switchTab == 'boolean') {
+                    vm.bound = switchTab;
+                }
+                $.post('/home/member/giftcard', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    bound: vm.bound
+                }, function (ret) {
+                    if (typeof switchTab == 'boolean') {
+                        vm.orderlist = ret.data.list;
+                    } else {
+                        vm.list = ret.data.list;
+                    }
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit('pages_ajax', '#EF4F4F');
+                    }
+                }, 'json');
+            },
+            preBonding: function () {
+                layer.open({
+                    title: '绑定礼品卡'
+                    , content: '<div class="layui-form-item"><label class="layui-form-label">卡密</label> <div class="layui-input-inline"><input id="pwd" type="text" maxlength="16" class="layui-input" placeholder="请输入卡密"></div></div>',
+                    yes: function (index) {
+                        let pwd = $.trim($('#pwd').val());
+                        if (pwd.length != 16) {
+                            layer.msg('卡密错误');
+                            return false;
+                        }
+                        vm.bonding({password: pwd});
+                        layer.close(index);
+                    }
+                });
+            },
+            copyme: function (pwd) {
+                let copytext = document.getElementById('copytext');
+                copytext.value = pwd;
+                copytext.select();
+                document.execCommand("copy");
+                layer.msg('已复制!', {time: 1200});
+            },
+            bonding: function (index) {
+                let param;
+                if (typeof index == 'object') {
+                    param = index;
+                } else {
+                    param = {id: vm.orderlist[index].id};
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/home/member/bondCard',
+                    data: param,
+                    success: function (data) {
+                        if (param.id) {
+                            vm.orderlist[index].user_id = data.uid;
+                            vm.init();
+                        } else {
+                            layer.closeAll();
+                            location.reload();
+                        }
+                    },
+                    error: function (xhr, type) {
+                        layer.msg(xhr.responseJSON);
+                    }
+                });
+            },
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+
+</script>
+

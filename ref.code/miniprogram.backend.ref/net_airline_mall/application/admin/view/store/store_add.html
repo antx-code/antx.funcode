@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>标识“<em>*</em>”的选项为必填项，其余为选填项。</li>
+                <li>请先选择商城已设置的店铺账号进行添加店铺操作。</li>
+                <li>请根据提示信息准确无误填写店铺信息。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info business_info">
+                        <div class="step">
+                            <div class="tit"><h4>请选择店铺账号</h4></div>
+                            <div class="items">
+                                <div class="item">
+                                    <div class="label"><em class="require-field">*</em>会员名称</div>
+                                    <div class="value nt_value">
+                                        <div class="selection_select">
+                                            <div class="selection">
+                                                <input type="text" name="user_name" id="user_name"
+                                                       class="text w140 valid" readonly>
+                                                <input type="hidden" name="user_id" id="user_id" value="">
+                                            </div>
+                                            <div class="select-container" style="display:none;">
+                                                <div class="select-top2">
+                                                    <div class="s_search">
+                                                        <input name="userName" v-model="keywords" id="userName"
+                                                               type="text" class="s_text" placeholder="请输入用户名">
+                                                        <a href="javascript:void(0);" @click="getSellerList(keywords)"
+                                                           class="btn-mini"><i class="icon icon-search"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="select-list2" id="user_list">
+                                                    <ul>
+                                                        <template v-for="(vo,index) in userlist">
+                                                            <li :data-name="vo.user_name" :data-id="vo.user_id" v-if="!vo.id">
+                                                                {{vo.user_name}}
+                                                            </li>
+                                                        </template>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="form_prompt"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label"><em class="require-field">*</em>店铺名称：</div>
+                                <div class="value">
+                                    <input class="text" type="text" size="20" v-model="info.store_name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step">
+                            <div class="tit"><h4>卖家入驻联系人信息</h4></div>
+                            <div class="items">
+                                <div class="item">
+                                    <div class="label">性别：</div>
+                                    <div class="value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input name="contactsex" type="radio" class="ui-radio" value="男"
+                                                       id="contactXinbie_男" v-model="info.contactsex">
+                                                <label for="contactXinbie_男" class="ui-radio-label">男</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input name="contactsex" type="radio" class="ui-radio" value="女"
+                                                       id="contactXinbie_女" v-model="info.contactsex">
+                                                <label for="contactXinbie_女" class="ui-radio-label">女</label>
+                                            </div>
+                                        </div>
+                                        <div class="fl org"></div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">联系人姓名：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.contactname">
+                                        <div class="fl org"></div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">联系人手机：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.contactphone">
+                                        <div class="fl org"></div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">联系人电子邮箱：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.contactemail">
+                                        <div class="fl org"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="tit"><h4>经营信息</h4></div>
+                            <div class="items">
+                                <div class="item">
+                                    <div class="label">公司官网地址：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20"
+                                               v-model="info.company_website">
+                                        <div class="fl org"><span>形如 www.baidu.com</span></div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">最近一年销售额：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.company_sale">
+                                        <div class="fl org"><font>万元</font><span>仅输入不得超过9位数的正整数</span></div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">同类电子商务网站经验：</div>
+                                    <div class="value">
+
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input name="have_experience" v-model="info.have_experience"
+                                                       type="radio" class="ui-radio" value="无"
+                                                       id="shop_seller_have_experience_无" checked="checked">
+                                                <label for="shop_seller_have_experience_无"
+                                                       class="ui-radio-label">无</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input name="have_experience" v-model="info.have_experience"
+                                                       type="radio" class="ui-radio" value="有"
+                                                       id="shop_seller_have_experience_有">
+                                                <label for="shop_seller_have_experience_有"
+                                                       class="ui-radio-label">有</label>
+                                            </div>
+                                        </div>
+                                        <div class="fl org"></div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">网店地址：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.store_website">
+                                        <div class="fl org"><span>形如www.baidu.com</span></div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">网店运营人数：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.employee_num">
+                                        <div class="fl org"><font>人</font></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="tit"><h4>公司信息</h4></div>
+                            <div class="items">
+                                <div class="item">
+                                    <div class="label">公司名称：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.company_name">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">公司所在地：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20"
+                                               v-model="info.company_located">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">公司详细地址：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20"
+                                               v-model="info.company_adress">
+                                    </div>
+                                </div>
+
+                                <div class="item">
+                                    <div class="label">法人：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.legal_person">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">法人身份证号：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.personalNo">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">营业执照注册号：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20"
+                                               v-model="info.business_license_id">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">营业执照详细地址：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20"
+                                               v-model="info.license_adress">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">营业期限：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.business_term">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">营业范围：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.busines_scope">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">纳税人识别号：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.taxpayer_id">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">纳税人类型：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.taxs_type">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">纳税类型税码：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.taxs_num">
+                                    </div>
+                                </div>
+
+                                <div class="item">
+                                    <div class="label">公司收款账户：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20"
+                                               v-model="info.account_number">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">开户支行：</div>
+                                    <div class="value">
+                                        <input class="text" type="text" value="" size="20" v-model="info.bank_name">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="tit"><h4>管理员操作</h4></div>
+                            <div class="items items_w60">
+                                <div class="item">
+                                    <div class="label">设置是否审核其商品：</div>
+                                    <div class="value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input name="review_goods" v-model="info.review_goods" type="radio"
+                                                       value="0" class="ui-radio" id="review_no">
+                                                <label for="review_no" class="ui-radio-label">否</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input name="review_goods" v-model="info.review_goods" type="radio"
+                                                       value="1" class="ui-radio" id="review_yes" checked="checked">
+                                                <label for="review_yes" class="ui-radio-label">是</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">是否为自营店铺：</div>
+                                    <div class="value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input name="self_run" v-model="info.self_run" type="radio" value="0"
+                                                       class="ui-radio" id="self_run_no" checked="checked">
+                                                <label for="self_run_no" class="ui-radio-label">否</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input name="self_run" v-model="info.self_run" type="radio" value="1"
+                                                       class="ui-radio" id="self_run_yes">
+                                                <label for="self_run_yes" class="ui-radio-label">是</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="item">
+                                    <div class="label">是否关闭店铺：</div>
+                                    <div class="value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input v-model="info.store_close" type="radio" value="0"
+                                                       class="ui-radio" id="shop_close_yes" checked="checked">
+                                                <label for="shop_close_yes" class="ui-radio-label">关闭</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input v-model="info.store_close" type="radio" value="1"
+                                                       class="ui-radio" id="shop_close_no">
+                                                <label for="shop_close_no" class="ui-radio-label">开启</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="item">
+                                    <div class="label">店铺信息审核：</div>
+                                    <div class="value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input type="radio" v-model="info.store_audit" value="0"
+                                                       id="shopname_audit_0" class="ui-radio" checked="checked">
+                                                <label for="shopname_audit_0" class="ui-radio-label">未审核</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="radio" v-model="info.store_audit" value="1"
+                                                       id="shopname_audit_1" class="ui-radio">
+                                                <label for="shopname_audit_1" class="ui-radio-label">已审核</label>
+                                            </div>
+                                            <font class="red">（店铺申请使用店铺名称类型：入驻品牌店铺名称）</font>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="items">
+                                <div class="item">
+                                    <div class="label">&nbsp;</div>
+                                    <div class="value info_btn">
+                                        <input name="numAdd" value="1" id="numAdd" type="hidden">
+                                        <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+            userlist: [],
+            keywords: ''
+        },
+        methods: {
+            init: function () {
+                if (!vm.info.seller_id) {
+                    if ($("input[name='user_id']").val()) {
+                        vm.info.user_id = $("input[name='user_id']").val();
+                    } else {
+                        $.messager.alert('提示', '请选择会员', 'warning');
+                        return false;
+                    }
+                }
+                majax('/admin/store/store_add', vm.info);
+            },
+            getSellerList: function (keywords = '') {
+                $.post('/admin/store/getSellerList', {
+                    keywords: keywords,
+                }, function (ret) {
+                    vm.userlist = ret.data;
+                    if (ret.data.length == 0) {
+                        $.messager.show({title: '提示', msg: '无检索结果', timeout: 1000, showType: 'slide'});
+                    }
+                }, 'json');
+            }
+        }
+    });
+
+    $(function () {
+        layui.use('upload', function () {
+            var upload = layui.upload;
+
+            //执行实例
+            var uploadInst = upload.render({
+                elem: '#button',
+                url: '/admin/uploader/alioss_upload', //上传接口
+                data: {
+                    upload: 1
+                },
+                accept: 'file', //允许上传的文件类型
+                done: function (ret) {
+                    vm.info.avatar = ret.url;
+                    if (ret.state == 'SUCCESS') {
+                        $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                    } else {
+                        $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                    }
+
+                },
+            });
+        });
+    });
+</script>

@@ -1,0 +1,44 @@
+<div class="tbar-panel-main" shoptype="tbpl-main" style="height: 662px;">
+    <div class="tbar-panel-content" data-height="48" shoptype="tbpl-content" style="height: 652px;">
+        <div class="coupon-wrap">
+            <div class="coupon-type sku_conpon_title">可领取的券</div>
+            {foreach $coupon.free as $cid=>$vo}
+            <div class="coupon-item sku_coupon_item" id="sc_1">
+                <div class="item-wrap">
+                    <div class="coupon-price">
+                        <span class="token">￥</span>{$vo.money}
+                    </div>
+                    <div class="coupon-info">
+                        <span class="tit">{$vo.store_name}</span>
+                        <span class="condition" title="{$vo.name}">满{$vo.min_goods_amount}元可用</span>
+                    </div>
+                    <a class="btn-get q-btn get-coupon" href="javascript:;" cid="{$cid}">立即领取</a>
+                    <p class="coupon-time">有效期{$vo.use_start_time | date='Y-m-d'}至{$vo.use_end_time | date='Y-m-d'}</p>
+                </div>
+            </div>
+            {/foreach}
+            <a href="{:url('market/coupons')}" class="follow-bottom-more">查看更多&gt;&gt;</a>
+
+            <div class="coupon-type user_conpon_title">已领取的券</div>
+            {foreach $coupon.user as $cid=>$vo}
+            <div class="coupon-item uc">
+                <div class="item-wrap">
+                    <div class="coupon-price"><span class="token">￥</span>{$vo.money}</div>
+                    <div class="coupon-info"><span class="tit" title="{$vo.name}">{$vo.name}</span><span class="condition">满{$vo.min_goods_amount}元可用</span></div>
+                    <p class="coupon-time">{$vo.use_start_time | date='Y-m-d'}至{$vo.use_end_time | date='Y-m-d'}</p>
+                </div>
+            </div>
+            {/foreach}
+            <a href="{:url('member/coupon')}" class="follow-bottom-more">查看更多&gt;&gt;</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(".get-coupon").click(function (e) {
+        var cid = $(this).attr('cid');
+        receiveCoupon(cid);
+    });
+
+
+</script>

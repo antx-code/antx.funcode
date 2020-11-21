@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>请认真填写链接名称、链接地址等信息。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info user_basic">
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            支付代码：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.pay_code" value='' class="text" />
+
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            支付名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.pay_name" value='' class="text" />
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            支付费率：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.pay_fee" value='' class="text" />
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            类型：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.type" value='' class="text" />
+                            <div class="notic m20">0 APP支付，1手机H5支付，2公众号及小程序支付，3PC支付</div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            描述：
+                        </div>
+                        <div class="label_value">
+                             <textarea cols="100" rows="4" class="textarea w500" v-model="info.pay_desc"></textarea>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            配置：
+                        </div>
+                        <div class="label_value">
+                            <textarea cols="100" rows="10" class="textarea w500" v-model="info.pay_config"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="item shop_logo">
+                        <div class="label">电脑LOGO：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="pc_logo" class="type-file-button" value="">
+                                <input type="text" name="textfile" class="type-file-text" value=""
+                                        readonly v-model="info.pc_logo">
+                            </div>
+                            <div class="notic m20">电脑LOGO图片尺寸</div>
+                        </div>
+                    </div>
+                    <div class="item shop_logo">
+                        <div class="label">移动LOGO：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="mobile_logo" class="type-file-button" value="">
+                                <input type="text" name="textfile" class="type-file-text" value=""
+                                        readonly v-model="info.mobile_logo">
+                            </div>
+                            <div class="notic m20">移动LOGO图片尺寸</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = {$info|raw};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                majax('/admin/website/paymadd',vm.info,'payment');
+            }
+        }
+    });
+    $(function () {
+        moreUploadFile('pc_logo');//初始化图片文件操作
+        moreUploadFile('mobile_logo');//初始化图片文件操作
+    });
+</script>

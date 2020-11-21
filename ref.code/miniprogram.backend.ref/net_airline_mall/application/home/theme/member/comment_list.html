@@ -1,0 +1,163 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<style>.tag {
+    cursor: pointer;
+}
+
+[v-cloak] {
+    display: none
+}
+</style>
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <div class="user-mod" style="min-height: 1047px;" id="app" v-cloak>
+            <div class="user-title">
+                <h2>评论/晒单</h2>
+                <ul class="tabs">
+                    <li :class="{active:status==0}">
+                        <a href="javascript:void(0)" @click="changeTab(0)">
+                            待评价商品({{wait_comment}})
+                        </a>
+                    </li>
+                    <li class="user-count1 " href="javascript:void(0)" @click="changeTab(1)" :class="{active:status==1}">
+                        <a href="javascript:void(0);">
+                            已评价({{commented}})
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="comment-list-warp clearfix">
+                <div class="user-order-list">
+                    <dl class="item" v-for="(vo,index) in list">
+                        <dt class="item-t">
+                            <div class="t-statu">
+                                <span v-if="status==0">待评价</span>
+                                <span v-else>已评价</span>
+                            </div>
+                            <div class="t-info">
+                                <span class="info-item">订单号：{{vo.order_sn}}</span>
+                                <span class="info-item">{{vo.add_time|timeParse}}</span>
+                                <span class="info-item"></span>
+                            </div>
+                            <div class="t-price"><em>¥</em>{{vo.goods_price*vo.goods_num}}</div>
+                        </dt>
+                        <dd class="item-c">
+                            <div class="c-left">
+                                <div class="c-goods">
+                                    <div class="c-img"><a :href="'/home/goods/detail.html?id='+vo.goods_id" :title="vo.goods_name"><img :src="vo.goods_img"></a></div>
+                                    <div class="c-info">
+                                        <div class="info-name"><a :href="'/home/goods/detail.html?id='+vo.goods_id" :title="vo.goods_name">{{vo.goods_name}}</a></div>
+                                        <div class="info-price"><b><em>¥</em>{{vo.goods_price}}</b><i>×</i><span>{{vo.goods_num}}</span></div>
+                                        <div class="info-attr" v-if="vo.tempvalue">{{vo.tempvalue}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="c-handle">
+                                <a href="javascript:" class="sc-btn" data-foot="true" v-if="vo.is_comment==0" @click="comment(index)">点击评论</a>
+                                <a href="javascript:" class="sc-btn" data-foot="true" v-else @click="showComment(vo.rec_id)">查看评论</a>
+                                <a :href="'/home/member/orderdetail?order_id='+vo.order_id" class="sc-btn">订单详情</a>
+                            </div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="clearfix" id="pages_ajax"></div>
+        </div>
+    </div>
+</div>
+{include file="public:footer"}
+<script>
+    let vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 10,
+            list: [],
+            status: 0,
+            commented: 0,
+            wait_comment: 0
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            changeTab: function (s) {
+                this.status = s;
+                this.page = 1;
+                this.init();
+            },
+            init: function () {
+                $.post('/home/member/comment_list', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    status: vm.status,
+                }, function (res) {
+                    vm.list = res.list;
+                    vm.commented = res.commented;
+                    vm.wait_comment = res.wait_comment;
+                    vm.count = vm.status ? res.commented : res.wait_comment;
+                    if (vm.page == 1) {
+                        pageinit('pages_ajax', '#EF4F4F');
+                    }
+                }, 'json');
+            },
+            showComment: function (rec_id) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/home/member/showComment',
+                    data: {rec_id: rec_id},
+                    success: function (data) {
+                        pb({
+                            id: 'commentDialog',
+                            title: '评论商品',
+                            content: data,
+                            ok_title: '确定',
+                            cl_title: '取消',
+                            drag: false,
+                            foot: false,
+                            onOk: function () {
+                                return false;
+                            }
+                        });
+                    },
+                    error: function (xhr, type) {
+                        layer.msg(xhr.responseJSON);
+                    }
+                });
+
+            },
+            comment: function (index) {
+                layer.open({
+                    type: 2,
+                    title: '发布评论',
+                    area: ['50%', '60%'],
+                    content: '/home/member/comments_form?rec_id=' + vm.list[index].rec_id,
+                    cancel: function (index, layero) {
+                        updateStatus(false);
+                    }
+                });
+            }
+        },
+    });
+
+    $(function () {
+        vm.init();
+    });
+
+    function updateStatus(flag) {
+        if (flag) {
+            vm.init();
+        }
+    }
+</script>
+

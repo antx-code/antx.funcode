@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>商品详情</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .goods_desc img {max-width: 100% !important;}
+        .swiper-slide{height:100vw!important;overflow:hidden}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="con">
+        <div class="con_main goods">
+            <div class="swipe van-swipe">
+                <div class="goods_photo d_jump">
+                    <div id='slider' class='swipe'>
+                        <div class='swiper-wrapper'>
+                            <template v-for="(vo,index) in info.gallery">
+                                <div class="swiper-slide aui-text-center"><img :src="vo.img_original"/></div>
+                            </template>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="cont-box">
+                <div class="dis-box price-box">
+                    <div class="left box-flex">
+                        <h4 class="color-white">
+                            <div class="f-weight">¥{{info.market_goods.min_price}}</div>
+                            <div class="tag-price dis-box">
+                                <div class="box-flex">
+                                    <label class="">市场价:
+                                        <del>{{info.shop_price}}</del>
+                                    </label>
+                                </div>
+                            </div>
+                        </h4>
+                    </div>
+                </div>
+                <div class="title bg-color-write f-06 color-3 padding-all">
+                    <span class="m-r05 f-03 van-tag" style="background-color: rgb(255, 68, 68);">自营</span>
+                    <span class="f-05 color-3 f-weight">{{info.goods_name}}</span>
+                    <div class="color-red f-03 m-top04"></div>
+                    <div class="dis-box color-9 f-03 m-top08">
+                        <div class="box-flex">销量 {{info.total_sale_num}}</div>
+                        <div class="box-flex text-center">库存 {{info.goods_number}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="padding-all bg-color-write">
+                <template v-for="(vo,index) in info.paimai_house">
+                    <div class="dis-box group-list-box m-top12">
+                        <div class="left-box">
+                            <div class="left-img">
+                                <img :src="vo.avatar?vo.avatar:'https://x.dscmall.cn/storage/images/errorImg.png'"
+                                     class="img">
+                            </div>
+                        </div>
+                        <div class="box-flex list-two">
+                            <ul class="goods-time-box">
+                                <li><h4 class="f-05 color-3 onelist-hidden"></h4></li>
+                                <li>
+                                    <div class="box-flex f-04 list-cont onelist-hidden text-center">
+                                        <template v-if="vo.status==1">
+                                            <em class="color-red">竞拍中</em>
+                                        </template>
+                                        <template v-if="vo.status==2">
+                                            已结束
+                                        </template>
+                                        <template v-if="vo.status==3">
+                                            距离开拍
+                                        </template>
+                                        <template v-if="vo.status==0">
+                                            已流拍
+                                        </template>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="dis-box color-9 m-top02 f-02" v-if="vo.status==3">
+                                <div style="padding-left: 12%;">
+                                    <p>{{vo.nexttime}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="right-btn btn-submit f-05" @click="openHouse(vo)">进房间
+                            <i class="iconfont icon-more f-06"></i>
+                        </p>
+                    </div>
+                </template>
+            </div>
+            <div class="m-top08 van-tabs van-tabs--line">
+                <div class="van-tabs__wrap van-hairline--top-bottom">
+                    <div class="van-tabs__nav van-tabs__nav--line">
+                        <div class="van-tabs__line"
+                             style="width: 94px; transform: translateX(47px); transition-duration: 0.2s;"></div>
+                        <div class="van-tab van-tab--active"><span class="van-ellipsis">商品详情</span></div>
+                        <div class="van-tab"><span class="van-ellipsis">规格参数</span></div>
+                    </div>
+                </div>
+                <div class="van-tabs__content">
+                    <div class="van-tab__pane" style="">
+                        <div class="goods_desc" v-html="info.goods_desc"></div>
+                    </div>
+                    <div class="van-tab__pane" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="van-goods-action">
+                <div class="van-hairline van-goods-action-mini-btn" onclick="open_meiQia()">
+                    <i class="van-icon van-icon-chat van-goods-action-mini-btn__icon"></i>客服
+                </div>
+                <div class="van-hairline van-goods-action-mini-btn" :class="{'curr':info.iscollect==1}"
+                     @click="collectupdate(info.iscollect)">
+                    <i class="van-icon van-icon-like-o van-goods-action-mini-btn__icon" v-if="info.iscollect==0"></i>
+                    <i class="van-icon van-icon-like van-goods-action-mini-btn__icon" v-if="info.iscollect==1"></i>
+                    收藏
+                </div>
+                <template v-if="info.myhouse.id>0">
+                    <button class="van-button van-button--danger van-button--large van-button--square van-goods-action-big-btn"
+                            @click="openHouse(vo)">
+                        <span class="van-button__text">我的房间</span>
+                    </button>
+                </template>
+                <template v-else>
+                    <button class="van-button van-button--danger van-button--large van-button--square van-goods-action-big-btn"
+                            @click="createHouse()">
+                        <span class="van-button__text">创建房间</span>
+                    </button>
+                </template>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var countdown = null;
+    var pageTimer = {};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            token: '',
+            goods_id: 25760,
+            number: 1,
+            c_h: '00',//时
+            c_m: '00',//分
+            c_s: '00',//秒
+            info: [],
+
+            buyNow: 'from_gpgoods_detail',
+            promtype: 'seckill_goods',
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('HH:mm');
+            }
+        },
+        methods: {
+            createHouse: function () {
+                if (!vm.token) {
+                    api.openWin({
+                        name: 'login_win',
+                        url: 'widget://html/login_win.html',
+                    });
+                } else {
+                    api.openWin({
+                        name: 'crhouse_win',
+                        url: 'widget://html/store/crhouse_win.html',
+                        pageParam: {
+                            goods_id: vm.goods_id,
+                        }
+                    });
+                }
+            },
+            openHouse: function (vo) {
+                if ($api.getStorage('token')) {
+                    api.openWin({
+                        name: 'pmhouse_frm',
+                        url: 'widget://html/store/pmhouse_frm.html',
+                        pageParam: {
+                            id: vo.id,
+                        }
+                    });
+                } else {
+                    api.openWin({
+                        name: 'login_win',
+                        url: 'widget://html/login_win.html',
+                    });
+                }
+            },
+            collectupdate: function (iscollect) {
+                if (!$api.getStorage('token')) {
+                    wxapp.alert('fail', '未登录');
+                    setTimeout(function () {
+                        longinwin();
+                    });
+                    return false;
+                }
+                wxapp.ajax(config.collectupdate, {
+                    act: iscollect==0?'add':'delete',
+                    goods_id: vm.info.goods_id,
+                }).then(function (ret) {
+                    wxapp.alert('success', ret.msg);
+                    vm.init();
+                })
+            },
+            init: function () {
+                wxapp.ajax(config.pmdetail, {goods_id: vm.goods_id}, 0).then(function (ret) {
+                    if (ret) {
+                        vm.info = ret.data;
+                        var paimai_house = JSON.parse(JSON.stringify(ret.data.paimai_house));
+                        paimai_house.map(function (item) {
+                            var nexttime = item.nexttime - item.uptime;
+                            item.nexttime = wxapp.timedown(nexttime);
+                            pageTimer[item.id] = setInterval(function () {
+                                nexttime--;
+                                var timeArr = wxapp.timedown(nexttime);
+                                item.nexttime = timeArr;
+                                vm.info.paimai_house = paimai_house;
+                            }, 1000);
+                        });
+
+                        setTimeout(function () {
+                            var slider = new Swiper('#slider', {
+                                autoplay: 3000,
+                                visibilityFullFit: true,
+                                loop: true,
+                                pagination: '.swiper-pagination',
+                                paginationClickable: true
+                            });
+                        });
+                    }
+                });
+            },
+        }
+    });
+    window.onload = function () {
+        vm.goods_id = api.pageParam.goods_id ? api.pageParam.goods_id : 0;
+        vm.token = $api.getStorage('token') ? $api.getStorage('token') : '';
+        vm.init();
+    };
+</script>

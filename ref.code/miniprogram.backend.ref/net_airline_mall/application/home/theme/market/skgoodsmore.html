@@ -1,0 +1,22 @@
+<div class="track_warp">
+    <div class="track-tit"><h3>看了又看</h3><span></span></div>
+    <div class="track-con">
+        <div class="tempWrap">
+            <ul>
+                {foreach $goodsList as $index=>$goods}
+                <li style="height: 180px;">
+                    <div class="p-img"><a href="{:url('market/skdetail',['id'=>$goods.goods_id])}" target="_blank" title="{$goods.goods_name}"><img src="{$goods.original_img}" width="140" height="140"></a></div>
+                    <div class="p-name"><a href="{:url('market/skdetail',['id'=>$goods.goods_id])}" target="_blank" title="{$goods.goods_name}">{$goods.goods_name}</a></div>
+                    <div class="price">
+                        <em>¥</em>{$goods.shop_price}
+                    </div>
+                </li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+    <div class="track-more">
+        <a href="javascript:void(0);" class="sprite-up prevStop"><i class="iconfont icon-up"></i></a>
+        <a href="javascript:void(0);" class="sprite-down"><i class="iconfont icon-down"></i></a>
+    </div>
+</div>

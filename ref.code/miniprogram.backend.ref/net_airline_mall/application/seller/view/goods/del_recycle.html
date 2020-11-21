@@ -1,0 +1,206 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li><a href="/seller/goods/goods_list">商品列表</a></li>
+        <li><a href="/seller/goods/goods_list.html?act=virtual_goods_list">虚拟商品列表</a></li>
+        <li class="active"><a href="javascript:">商品回收站</a></li>
+    </ul>
+</div>
+
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/goods/goods_list"><i class="icon-reply"></i>商品列表</a>
+</div>
+
+<div id="app" v-cloak>
+    <div class="search-info">
+        <div class="search-form">
+            <form method="get" action="javascript:vm.getData()" name="searchFormList">
+                <div class="search-key">
+                    <input type="text" class="text" id="keywords" value="" placeholder="商品ID/商品关键字">
+                    <input type="submit" class="submit" id="search-btn" value=" 搜索 ">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <form method="post" action="" name="listForm">
+        <div id="listDiv">
+            <table class="ecsc-default-table">
+                <thead>
+                <tr shoptype="table_header">
+                    <th width="10%" class="frist"><a @click="orderby('goods_id');">编号</a><img class="sort-desc-img" :src="'/public/static/images/sort_'+sort+'.gif'"/></th>
+                    <th width="45%" class="tl">商品名称</th>
+                    <th width="10%">商品类型</th>
+                    <th width="15%">货号</th>
+                    <th width="10%"><a @click="orderby('sort_order'); ">价格</a>
+                        <div class="img"></div>
+                    </th>
+                    <th width="10%">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(vo,index) in list">
+                    <td class="frist trigger">
+                        <div class="checkbox-info">
+                            <input type="checkbox" class="ui-checkbox" value="776" id="checkbox_776" name="checkboxes[]"><label for="checkbox_776" class="ui-label"></label>
+                        </div>
+                        <div class="number">{{vo.goods_id}}</div>
+                    </td>
+                    <td class="tl">
+                        <div class="goods-info">
+                            <div class="goods-img"><a :href="'/home/goods/detail.html?id='+vo.goods_id" target="_blank"><img :src="vo.original_img.indexOf('http')<0?'/public/static/'+vo.original_img:vo.original_img" @mouseover="showTip(vo.original_img)" onmouseout="toolTip()"></a></div>
+                            <div class="goods-desc">
+                                <div class="name">
+                                    <em @click="edit('goods_name', index)" :title="vo.goods_name">{{vo.goods_name}}</em>
+                                    <em class="green">[ {{brand[vo.brand_id]}} ]</em>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{vo.is_real?'实物':'虚拟商品'}}</td>
+                    <td>{{vo.goods_sn}}</td>
+                    <td>{{vo.shop_price}}</td>
+                    <td class="ecsc-table-handle tr">
+                        <span><a @click="del_recycle(index)" target="_blank" class="btn-orange"><i class="sc_icon_see"></i><p>还原</p></a></span>
+                        <span><a @click="del_recycle(index,'real_del')" class="btn-red"><i class="icon-trash"></i><p>删除</p></a></span>
+                        <br/>
+                    </td>
+                </tr>
+                <tr v-if="list.length<1">
+                    <td colspan="20" class="no-records">没有找到任何记录</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <div id="page-bar"></div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            is_real: 1,
+            field: 'goods_id',
+            sort: 'desc',
+            list: [],
+            brand: {},
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            beforeRequest: false,
+            act: 'act=goods_list'
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            getData: function (is_virtual) {
+                var keywords = document.getElementById('keywords').value;
+                var param = {
+                    page: vm.page,
+                    pageSize: vm.pageSize,
+                    field: vm.field,
+                    sort: vm.sort
+                };
+                if (keywords) {
+                    param.keywords = keywords;
+                    param.page = 1;
+                }
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/goods/del_recycle.html?' + vm.act,
+                    data: param,
+                    success: function (data) {
+                        vm.count = data.count;
+                        vm.page = data.page;
+                        vm.list = data.list;
+                        vm.brand = data.brand;
+                        if (data.page == 1) vm.pagerender();
+                    },
+                    error: function (xhr, type) {
+                        console.log(xhr.responseJSON);//fixme 错误提示
+                    }
+                });
+            },
+            orderby: function (field) {
+                this.field = field;
+                this.sort = this.sort == 'desc' ? 'asc' : 'desc';
+                this.getData();
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            showTip: function (src) {
+                if (src.indexOf('http') < 0)
+                    toolTip('<img src="/public/static/' + src + '" >');
+                else
+                    toolTip('<img src="' + src + '" >');
+            },
+            del_recycle: function (index, real_del) {
+                if (real_del) {
+                    if (!window.confirm('此次删除将无法恢复,继续删除吗？')) {
+                        return;
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/del_recycle',
+                    data: {goods_id: vm.list[index]['goods_id'], act: real_del},
+                    success: function (data) {
+                        vm.list.splice(index, 1);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            modify: function (param, callback) {
+                if (vm.beforeRequest) {
+                    return;
+                }
+                vm.beforeRequest = true;
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/goods/add_edit.html?operate=modify",
+                    data: param,
+                    success: function (data) {
+                        vm.beforeRequest = false;
+                        callback(data);
+                    },
+                    error: function (xhr, type) {
+                        vm.beforeRequest = false;
+                        callback(xhr.responseJSON);
+                    }
+                });
+            }
+        }
+    });
+
+    $(function () {
+        vm.getData();
+    });
+</script>
+{include file="public/footer"}

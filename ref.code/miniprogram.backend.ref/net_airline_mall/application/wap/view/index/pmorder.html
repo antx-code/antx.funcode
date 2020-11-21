@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" href="/public/wap/css/ydui.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1192061_41ogfcgufzg.css">
+    <script src="/public/wap/script/ydui.flexible.js"></script>
+    <title>历史竞拍</title>
+    <style>
+        .fl{float:left}
+        .fr{float:right}
+        .navbar-center .navbar-title{font-size:.34rem}
+        .m-cell{margin-top:.15rem;margin-bottom:0}
+        .icon-close{font-size:.36rem}
+        .cell-left{color:#999;font-size:.30rem}
+        .cell-right{color:#3EBA73;font-size:.3rem}
+        .list-price-color{color:#A4A4A4;font-size:.3rem}
+        .list-price{font-weight:700}
+        .list-theme4{padding:0 10px}
+        .list-theme4 .list-item .list-mes .list-title{font-weight:500;color:#000;font-size:.28rem;padding-left:.1rem}
+        .list-theme4 .list-item{padding-bottom:0}
+        .list-item{border-top:none;border-bottom:.001rem solid #eee}
+        .list-mes-item p{margin:.2rem 0}
+        .list-mes-item p span:nth-of-type(1){display:inline-block;width:1.2rem;text-align:right}
+        .small-list{width:100%;height:1.5rem;padding:.25rem 0;background-color:#fff}
+        .small-list-img{width:80%}
+        .small-list-img p{line-height:0.5rem;color:#696969;font-size:.3rem}
+        .small-list-img img{display:inline-block;width:1rem;height:1rem;margin:auto .2rem auto 0;border-radius:50%}
+        .small-list-info p{line-height:0.5rem;font-size:.28rem}
+        .g-scrollview:after{display:none}
+        .g-scrollview{margin-bottom:.2rem}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <template v-for="(vo,index) in list">
+        <div class="item-list">
+            <div class="m-cell">
+                <div class="cell-item">
+                    <div class="cell-left">场次：{{vo.order_prom_id}}</div>
+                    <div class="cell-right cell-arrow" @click="orderinfoWin(vo)" v-if="vo.pay_status==0">立即付款</div>
+                    <div class="cell-right cell-arrow" v-if="vo.pay_status==1">已支付</div>
+                </div>
+            </div>
+            <section class="g-scrollview">
+                <template v-for="(vo2,index2) in vo.goodslist">
+                    <article class="m-list list-theme4">
+                        <a href="javascript:void(0);" class="list-item" @click="openGoodsdetail(vo2)">
+                            <div class="list-img">
+                                <img :src="vo2.goods_img">
+                            </div>
+                            <div class="list-mes">
+                                <h3 class="list-title">{{vo2.goods_name}}</h3>
+                                <div class="list-mes-item">
+                                    <div>
+                                        <p>
+                                            <span class="list-price-color">成交价:&nbsp;</span>
+                                            <span class="list-price">¥&nbsp;{{vo.total_amount}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="small-list" @click="houseinfowin(vo)">
+                            <div class="small-list-img fl">
+                                <img :src="vo.avatar?vo.avatar:'https://app2019.zhanhuomall.com/Public/UserM/images/room-mod2-noface.png'" class="fl">
+                                <p>{{vo.user_name}}</p>
+                                <p style="color: #AAA;">成功竞拍 {{vo.add_time|timeParse}}</p>
+                            </div>
+                            <div class="small-list-info fr">
+                                <p><em style="color: #5FA8E2">{{vo.join_num}}人</em>参与</p>
+                                <p><em style="color: #E75A19">{{vo.join_num}}人</em>围观</p>
+                            </div>
+                        </div>
+                    </article>
+                </template>
+            </section>
+        </div>
+    </template>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: []
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.orderpailist,{},1).then(function (ret) {
+                    vm.list = ret.data.list;
+                });
+            },
+            orderinfoWin:function (vo) {
+                api.openWin({
+                    name: 'orderinfo_win',
+                    url: 'widget://html/orderinfo_win.html',
+                    pageParam: {
+                        order_id: vo.order_id,
+                    }
+                });
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'goodsdetail_win',
+                    url: 'widget://html/goodsdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            paywin:function (vo) {
+                api.openWin({
+                    name: 'payorder_win',
+                    url: 'widget://html/payorder_win.html',
+                    pageParam: {
+                        order_sn: vo.order_sn,
+                    }
+                });
+            },
+            houseinfowin:function (vo) {
+                api.openWin({
+                    name: 'houseinfo_win',
+                    url: 'widget://html/store/houseinfo_win.html',
+                    pageParam: {
+                        id: vo.order_prom_id,
+                    }
+                });
+            }
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

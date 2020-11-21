@@ -1,0 +1,42 @@
+<div class="tbar-panel-main" shoptype="tbpl-main" style="height: 406px;">
+    <div class="ibar_plugin_content">
+        <div class="tbar-panel-content" data-height="128" shoptype="tbpl-content" style="height: 316px;">
+            <div class="ibar_cart_group ibar_cart_product">
+                {if count($data.cartList)}
+                <ul>
+                    {foreach $data.cartList as $index=>$vo}
+                    <li class="cart_item ">
+                        <div class="cart_item_pic">
+                            <a href="{:url('goods/detail',['id'=>$vo.goods_id])}"><img src="{$vo.original_img}"></a>
+                        </div>
+                        <div class="cart_item_desc">
+                            <a class="cart_item_name" href="{:url('goods/detail',['id'=>$vo.goods_id])}">{$vo.goods_name}</a>
+                            <div class="cart_item_price"><span class="cart_price"><em>¥</em>{$vo.goods_price}</span>×{$vo.goods_num}</div>
+                            <div class="delete_cart"><a onclick="deleteCartGoods('{$vo.id}',this);">删除</a></div>
+                        </div>
+                    </li>
+                    {/foreach}
+                </ul>
+                {else}
+                <div class="ecs-tbar-tipbox2">
+                    <div class="tip-inner">
+                        <b class="b-face-fd"></b>
+                        <div class="tip-text">购物车空空的，赶快去挑选心仪的商品吧~<br><a href="/">去首页看看</a></div>
+                    </div>
+                </div>
+                {/if}
+            </div>
+        </div>
+
+        <div class="cart_handler">
+            <div class="cart_handler_header">
+                <span class="cart_handler_left">共<span class="cart_price">{$data.total_price.num}</span>件商品</span>
+                <span class="cart_handler_right"><em>¥</em>{$data.total_price.total_fee}</span>
+            </div>
+            <a target="_blank" class="cart_go_btn" href="{:url('cart/index')}">去购物车结算</a>
+        </div>
+    </div>
+</div>
+<script>
+    $('.cart_num').html('{$data.cart_num}');
+</script>

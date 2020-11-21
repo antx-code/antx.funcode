@@ -1,0 +1,271 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">申请品牌</a></li>
+    </ul>
+</div>
+
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/goods/brand_apply"><i class="icon-reply"></i>品牌申请记录</a>
+</div>
+
+<div class="ecsc-form-goods" id="app">
+
+    <div class="wrapper-list border1">
+        <dl>
+            <dt><span class="require-field">*</span>&nbsp;选择已有品牌：</dt>
+            <dd class="relative">
+                <div class="selection">
+                    <input type="text" name="" id="brand_name" class="text w120 valid" value="请选择品牌" autocomplete="off" readonly="" data-filter="brand_name">
+                    <input type="hidden" id="brand_id" value="" data-filter="brand_id">
+                    <div class="form_prompt"></div>
+                </div>
+                <div class="brand-select-container hidden">
+                    <div class="brand-top">
+                        <div class="letter">
+                            <ul>
+                                <li @click="getBrandList()">
+                                    <a href="javascript:" data-letter="">全部品牌</a>
+                                </li>
+                                <li v-for="(vo,index) in brandfirstcharList" @click="getBrandList(vo)"><a href="javascript:">{{vo}}</a></li>
+                            </ul>
+                        </div>
+                        <div class="b_search">
+                            <input type="text" class="b_text" v-model="brand_name" autocomplete="off" @keyup.enter="getBrandList()">
+                            <a href="javascript:" class="btn-mini" @click="getBrandList()">
+                                <i class="icon icon-search"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="brand-list">
+                        <ul>
+                            <li data-brand_id="0" data-brand_name="请选择品牌" class="blue" @click="brandSelect()">取消选择 手工填写</li>
+                            <li v-for="(vo,index) in brandList" :data-id="vo.brand_id" :data-name="vo.brand_name" @click="brandSelect(vo)">
+                                <em>{{vo.brand_first_char}}</em>
+                                {{vo.brand_name}}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div :class="['notic m20',{red:select_mode}]">** 优先从平台已有品牌中选择，如平台不存在该品牌时，再填写下方信息申请 **</div>
+            </dd>
+        </dl>
+        <form id="brand-form">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;品牌名称：</dt>
+                <dd>
+                    <input type="text" name="brand_name" id="fill_brand_name" maxlength="60" value="{$apply.brand_name|default=''}" class="text" :disabled="select_mode" @blur="checkname">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;品牌拼音/英文：</dt>
+                <dd>
+                    <input type="text" name="brand_letter" id="brand_letter" maxlength="60" value="{$apply.brand_letter|default=''}" class="text" :disabled="select_mode">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>品牌网址：</dt>
+                <dd><input type="text" name="site_url" maxlength="60" size="40" value="{$apply.site_url|default=''}" class="text" :disabled="select_mode"></dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;品牌LOGO：</dt>
+                <dd>
+
+                    <div class="type-file-box">
+                        <div class="border_ccc mb10 relative">
+                            <img id="logo-img" class="cate_icon" src="{$apply.brand_logo | default='/public/static/images/update_images.jpg'}">
+                            <input type="file" class="type-file-file" data-state="imgfile" size="30" id="upload" :disabled="select_mode">
+                            <input type="hidden" name="brand_logo" class="type-file-text" id="brand_logo" value="{$apply.brand_logo|default=''}" autocomplete="off" readonly="">
+                        </div>
+                    </div>
+
+                    <div class="form_prompt"></div>
+                    <div class="notic m20" id="AdCodeFlash">请上传图片，做为品牌的LOGO！标准尺寸200*88，平台有权随时修改LOGO样式</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>品牌描述：</dt>
+                <dd><textarea name="brand_desc" cols="60" rows="4" class="textarea" :disabled="select_mode"></textarea></dd>
+            </dl>
+
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="button" class="sc-btn sc-blueBg-btn btn35" value=" 确定 " @click="subform">
+                    <input type="reset" class="sc-btn btn35 sc-blue-btn" value=" 重置 ">
+                    <input type="hidden" name="apply_id" value="{$apply.apply_id|default=0}">
+                    <input type="hidden" name="brand_id" value="{$apply.brand_id|default=0}">
+                </dd>
+            </dl>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            brand_name: '',
+            brandList: [],
+            brandfirstcharList: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
+            brand: {},
+            select_mode: true
+        },
+        methods: {
+            getBrandList: function (char, instance) {
+                instance = instance ? instance : vm;
+                var param = {};
+                if (char) {
+                    param.brand_first_char = char;
+                }
+                if (trim(instance.brand_name)) {
+                    param.brand_name = instance.brand_name;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/api/brandListAjax',
+                    data: param,
+                    dataType: 'json',
+                    success: function (data) {
+                        instance.brandList = data;
+                        //品牌首字母
+                        // data.data.forEach(function (v, i) {
+                        //     if (instance.brandfirstcharList.indexOf(v.brand_first_char) < 0)
+                        //         instance.brandfirstcharList.push(v.brand_first_char);
+                        // });
+                        // instance.brandfirstcharList.sort();
+                    },
+                    error: function (xhr, type) {
+                        easyshow('获取品牌列表失败');
+                    }
+                });
+            },
+            brandSelect: function (vo) {
+                this.error_div(document.getElementById('brand_id'));
+                if (!vo) {
+                    vo = {};
+                    var data = event.currentTarget.dataset;
+                    vo.brand_id = data.brand_id;
+                    vo.brand_name = data.brand_name;
+                    this.select_mode = false;
+                } else {
+                    this.select_mode = true;
+                }
+                vm.brand.brand_id = vo.brand_id;
+                vm.brand.brand_name = vo.brand_name;
+                document.getElementById('brand_name').value = vo.brand_name;
+            },
+            checkname: function () {
+                var obj = event.currentTarget;
+                if (!trim(brand_name)) this.error_div();
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/api/check_brand_name',
+                    data: {brand_name: obj.value},
+                    success: function (data) {
+                        vm.error_div(obj);
+                    },
+                    error: function (xhr, type) {
+                        vm.error_div(obj, xhr.responseJSON);
+                    }
+                });
+            },
+            //错误提示
+            error_div: function (obj, error) {
+                var error_div = $(obj).parents('dd').find('div.form_prompt');
+
+                error_div.find("label").remove();
+                if (!error) {
+                    $(obj).removeClass("error");
+                    return;
+                } else {
+                    $(obj).addClass("error");
+                }
+
+                $(obj).focus();
+                $(obj).bind('change', function () {
+                    vm.error_div(this);
+                    $(this).unbind('change');
+                });
+                error_div.find("label").remove();
+                error_div.append("<label class='error'><i class='icon icon-exclamation-sign'></i>" + error + "</label>");
+            },
+            subform: function () {
+                var param;
+                if (this.select_mode) {
+                    if (!this.brand.brand_id || this.brand.brand_id <= 0) {
+                        obj = document.getElementById('brand_name');
+                        this.error_div(obj, '请选择品牌');
+                        return;
+                    }
+                    param = this.brand;
+                } else {
+                    var obj = document.getElementById('fill_brand_name');
+                    if (!trim(obj.value)) {
+                        this.error_div(obj, '请填写品牌名称');
+                        return;
+                    }
+                    obj = document.getElementById('brand_letter');
+                    if (!trim(obj.value)) {
+                        this.error_div(obj, '请填写品牌拼音/英文');
+                        return;
+                    }
+                    obj = document.getElementById('brand_logo');
+                    if (!trim(obj.value) && obj.value) {
+                        this.error_div(obj, '请上传品牌LOGO');
+                        return;
+                    }
+                    param = $('#brand-form').serialize();
+                }
+                var index = layer.load(1);
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/add_brand_apply',
+                    data: {param: param},
+                    success: function (data) {
+                        layer.close(index);
+                        location.href = "/seller/goods/brand_apply";
+                    },
+                    error: function (xhr, type) {
+                        layer.close(index);
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        },
+        created: function () {
+            this.getBrandList('', this);
+            if ('{$apply.apply_id}') {
+                this.brand.apply_id = '{$apply.apply_id}';
+                this.select_mode = false;
+            }
+        }
+    });
+
+    var token;
+
+    $.ajax({
+        type: 'POST',
+        url: '/seller/api/uploadtoken',
+        success: function (data) {
+            token = data;
+        },
+        error: function (xhr, type) {
+            easyshow(xhr.responseJSON);
+        }
+    });
+
+    $("#upload").on("change").bind('change', function () {
+        single_upload(this.files[0], function (res) {
+            layer.closeAll();
+            document.getElementById('logo-img').src = res;
+            document.getElementById('brand_logo').value = res;
+        }, null, token);
+    });
+</script>
+{include file="public/footer"}

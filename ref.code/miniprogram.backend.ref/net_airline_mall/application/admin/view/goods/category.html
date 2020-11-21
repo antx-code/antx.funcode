@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak="">
+    <div class="content">
+        <div class="tabs_info">
+            <ul>
+                <li class="curr">
+                    <a href="javascript:void(0)"
+                       onclick="parent.addParentTab({title: '商品分类', href: '/admin/goods/category'})">商品分类</a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)"
+                       onclick="parent.addParentTab({title: '店铺分类', href: '/admin/goods/storecategory'})">店铺分类</a>
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="upinit()" v-if="parent_id>0">
+                        <div class="fbutton">
+                            <div class="add" title="返回上一级">
+                                <span><i class="icon icon-reply" aria-hidden="true"></i>返回上一级</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0)" @click="pageFreash(0,1)">
+                        <div class="fbutton">
+                            <div class="add" title="重置">
+                                <span><i class="icon icon-trash" aria-hidden="true"></i>回收站</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0)" @click="dadd()">
+                        <div class="fbutton">
+                            <div class="add" title="添加分类">
+                                <span>
+                                    <i class="icon icon-plus" aria-hidden="true"></i>
+                                    添加分类
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div title="刷新数据" class="refresh_tit" @click="pageFreash()"><i class="icon icon-refresh"></i></div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="10%"><div class="tDiv">级别({{level}}级)</div></th>
+                            <th width="5%"><div class="tDiv">ID</div></th>
+                            <th width="10%"><div class="tDiv">分类名称</div></th>
+
+                            <th width="10%"><div class="tDiv">是否显示</div></th>
+                            <th width="10%"><div class="tDiv">排序</div></th>
+                            <th width="12%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td>
+                                    <div class="tDiv first_setup">
+                                        <div class="setup_span">
+                                            <em>
+                                                <i class="fa fa-cog" aria-hidden="true"></i>
+                                                设置<i class="arrow"></i>
+                                            </em>
+                                            <ul>
+                                                <li>
+                                                    <a href="javascript:void(0)"
+                                                       @click="pageFreash(vo.cat_id)">查看下一级</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><div class="tDiv">{{vo.cat_id}}</div></td>
+                                <td>
+                                    <div class="tDiv">
+                                        <a href="goods.php?act=list&cat_id=3" class="ftx-01">{{vo.cat_name}}</a>
+                                    </div>
+                                </td>
+
+                                <td class="hide">
+                                    <div class="tDiv">
+                                        <input type="text" name="measure_unit" class="text w100" disabled
+                                               v-model="vo.template_file"
+                                               @keyup.enter="categoryupdate_info(vo)"/>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.is_show==1}" title="是"
+                                             @click="categoryupdate_is_show(vo)">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <input type="hidden" value="0" name="">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input type="text" name="sort_order" class="text w40" v-model="vo.sort_order"
+                                               @keyup.enter="categoryupdate_info(vo)"/>
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a2">
+                                        <a href="javascript:void(0)" class="btn_edit" @click="dadd(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <template v-if="vo.is_delete==0">
+                                            <a href="javascript:void(0)" class="btn_trash"
+                                               @click="categoryupdate_delete(index)">
+                                                <i class="icon icon-trash"></i>
+                                                删除
+                                            </a>
+                                        </template>
+                                        <template v-else>
+                                            <a href="javascript:void(0)" class="btn_trash"
+                                               @click="categoryupdate_recycle(vo)">
+                                                <i class="fa fa-recycle"></i>
+                                                还原
+                                            </a>
+                                        </template>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        <template v-if="count===0">
+                            <tr class="">
+                                <td colspan="12" class="no_record"><div class="tDiv">没有找到任何记录</div></td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="list-page">
+                                    <div id="turn-page"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+    var pid = 0;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            parent_id: 0,
+            level: 1,
+            is_delete: 0,
+            list: []
+        },
+        methods: {
+            upinit: function () {
+                vm.parent_id = pid;
+                vm.level = JSON.parse(JSON.stringify(vm.level-1));
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+
+            dadd: function (vo = {}) {
+                var title = '', url = '';
+                if (vo.cat_id > 0) {
+                    title = '编辑分类';
+                    url = '/admin/goods/categoryadd?cat_id=' + vo.cat_id;
+                } else {
+                    title = '添加分类';
+                    url = '/admin/goods/categoryadd';
+                }
+                layer.open({
+                    type: 2,
+                    title: title,
+                    area: ['100%', '98%'],
+                    content: url,
+                    cancel: function (index, layero) {
+                        vm.init();
+                        layer.closeAll();
+                    }
+                });
+            },
+            pageFreash: function (parent_id = 0, is_delete = 0) {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.is_delete = is_delete;
+                vm.parent_id = parent_id;
+                if(parent_id == 0){
+                    vm.level = 1;
+                }else{
+                    vm.level = JSON.parse(JSON.stringify(vm.level+1));
+                }
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/goods/category', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    is_delete: vm.is_delete,
+                    parent_id: vm.parent_id,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    pid = JSON.parse(JSON.stringify(ret.data.pid));
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+
+            categoryupdate_info: function (vo) {
+                var pageparm = vo;
+                majax('/admin/goods/doupdate', pageparm, 'category')
+            },
+            categoryupdate_is_show: function (vo) {
+                var is_show = vo.is_show == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_show = is_show;
+                majax('/admin/goods/doupdate', pageparm, 'category')
+            },
+            categoryupdate_recycle: function (vo) {
+                var pageparm = vo;
+                pageparm.is_delete = 0;
+                majax('/admin/goods/doupdate', pageparm, 'category')
+            },
+            categoryupdate_delete: function (index) {
+                var pageparm = vm.list[index];
+                pageparm.is_delete = 1;
+                $.iMessager.confirm('提示', '确定要删除吗?', function (r) {
+                    if (r) {
+                        $.post('/admin/goods/doupdate', {
+                            pageparm: JSON.stringify(pageparm),
+                            table: 'category'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

@@ -1,0 +1,73 @@
+<div class="shop-header">
+    <div class="top">
+        <div class="w w1200 relative">
+            <div class="g-d-store-info">
+                <div class="item">
+                    <a href="{:url('store/index',['id'=>$store.store_id])}" class="s-name" target="_blank">{$store.store_name}</a>
+                    {if $store.kf_type==1}
+                    <a id="IM" onclick="openWin(this)" href="javascript:;" ru_id="{$store.store_id}" class="s-a-kefu">
+                        <i class="icon i-kefu"></i>
+                    </a>
+                    {else}
+                    <a href="javascript:" class="s-a-kefu" target="_blank">
+                        <i class="icon i-kefu"></i>
+                    </a>
+                    {/if}
+                </div>
+                <div class="item shop-store-item">
+                    <div class="s-score">
+                        <span class="score-icon"><span class="score-icon-bg" style="width:100%;"></span></span>
+                        <span>{$store.store_average_score}</span>
+                        <i class="iconfont icon-down"></i>
+                    </div>
+                    <div class="s-score-info">
+                        <div class="s-cover"></div>
+                        <div class="g-s-parts">
+                            <div class="parts-tit">
+                                <span class="col1">评分详细</span>
+                                <span class="col2">&nbsp;</span>
+                                <span class="col3">行业相比</span>
+                            </div>
+                            <div class="parts-item parts-goods">
+                                <span class="col1">商品评价</span>
+                                <span class="col2 {if $store.store_desc_score < $avg.store_desc_score}ftx-02{elseif abs($store.store_desc_score - $avg.store_desc_score)<0.2}average{else}ftx-01{/if}">{$store.store_desc_score}<i class="iconfont icon-arrow-{if $store.store_desc_score > $avg.store_desc_score}up{elseif abs($store.store_desc_score - $avg.store_desc_score)<0.2}average{else}down{/if}"></i></span>
+                                <span class="col3">{:ceil($store.store_desc_score/$avg.store_desc_score*100)}%</span>
+                            </div>
+                            <div class="parts-item parts-goods">
+                                <span class="col1">服务态度</span>
+                                <span class="col2 {if $store.store_service_score < $avg.store_service_score}ftx-02{elseif abs($store.store_service_score - $avg.store_service_score)<0.2}average{else}ftx-01{/if}">{$store.store_service_score}<i class="iconfont icon-arrow-{if $store.store_service_score > $avg.store_service_score}up{elseif abs($store.store_service_score - $avg.store_service_score)<0.2}average{else}down{/if}"></i></span>
+                                <span class="col3">{:ceil($store.store_service_score/$avg.store_service_score*100)}%</span>
+                            </div>
+                            <div class="parts-item parts-goods">
+                                <span class="col1">发货速度</span>
+                                <span class="col2 {if $store.store_delivery_score < $avg.store_delivery_score}ftx-02{elseif abs($store.store_delivery_score - $avg.store_delivery_score)<0.2}average{else}ftx-01{/if}">{$store.store_delivery_score}<i class="iconfont icon-arrow-{if $store.store_delivery_score > $avg.store_delivery_score}up{elseif abs($store.store_delivery_score - $avg.store_delivery_score)<0.2}average{else}down{/if}"></i></span>
+                                <span class="col3">{:ceil($store.store_delivery_score/$avg.store_delivery_score*100)}%</span>
+                            </div>
+                        </div>
+                        <div class="g-s-other">
+                            <div class="lie">
+                                <div class="label">{客服电话}：</div>
+                                <div class="value">{$store.kf_tel | default='暂无'}</div>
+                            </div>
+                        </div>
+                        <div class="store-href">
+                            <a href="{:url('store/index',['id'=>$store.store_id])}" class="store-home"><i class="iconfont icon-home-store"></i>店铺首页</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <a href="javascript:void(0);" shoptype="collect_store" data-type="store" data-store_id='{$store.store_id}' class="s-follow{if $store.collect_store gt 0} selected{/if}">
+                        <span>{if $store.collect_store gt 0}已关注{else}关注店铺{/if}</span>
+                        <i class="iconfont{if $store.collect_store gt 0} icon-zan-alts{else} icon-zan-alt{/if}"></i>
+                    </a>
+                </div>
+                <div class="item gd-shop-qrcode">
+                    <div class="mobile_txt">手机商城</div>
+                    <div class="mobile_pop">
+                        <div class="mobile_pop_item"><img src="{:url('/api/common/qrcode',['no_logo'=>1])}?str={:url('index/qrcode_jump','',true,true)}" alt="" class="img"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

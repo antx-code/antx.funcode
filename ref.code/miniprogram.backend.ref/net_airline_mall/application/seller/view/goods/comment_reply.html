@@ -1,0 +1,147 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">评论详情</a></li>
+    </ul>
+</div>
+
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="{:url('goods/comment')}"><i class="icon-reply"></i>用户评论</a>
+</div>
+
+<div class="common-reply border1">
+    <div class="reply_item user_reply_item">
+        <div class="reply_item_div mt5">
+            <div class="reply_label">&nbsp;</div>
+            <div class="reply_value">
+                <a href="javascript:" class="blue"><b>{$comment.user_name}</b></a>
+                <span>评论</span>
+                <a href="/home/goods/detail.html?id={$comment.goods_id}" target="_blank" class="blue"><b>{$comment.goods_name}</b></a>
+            </div>
+        </div>
+        <div class="reply_item_div">
+            <div class="reply_label">评论内容：</div>
+            <div class="reply_value">
+                <div class="msg_info">
+                    <div class="msg_desc">{$comment.content}</div>
+                    <ul class="msg_img">
+                        {foreach $comment.imgs as $img}
+                        <li><img src="{$img}" height="60"></li>
+                        {/foreach}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="reply_item_div">
+            <div class="reply_label">评论日期：</div>
+            <div class="reply_value" style="line-height:28px;">
+                <span class="time">{$comment.create_time | date='Y-m-d H:i:s'}</span>
+                <span class="dengji">评论等级:&nbsp;&nbsp;{$comment.comment_rank}</span>
+                <span class="ip">IP地址:&nbsp;&nbsp;{$comment.ip_address}</span>
+            </div>
+        </div>
+    </div>
+    {if $reply}
+    <div class="reply_item admin_reply_item">
+        <div class="reply_item_div">
+            <div class="reply_label">&nbsp;</div>
+            <div class="reply_value">
+                管理员 <a href="javascript:" class="blue"><b>{$reply.user_name}</b></a>
+                <span>回复</span>
+                <a href="javascript:" class="blue"><b>{$comment.user_name}</b></a>
+            </div>
+        </div>
+        <div class="reply_item_div">
+            <div class="reply_label">回复内容：</div>
+            <div class="reply_value">
+                <div class="msg_info">
+                    <div class="msg_desc">{$reply.content}</div>
+                </div>
+            </div>
+        </div>
+        <div class="reply_item_div">
+            <div class="reply_label">回复日期：</div>
+            <div class="reply_value" style="line-height:28px;">
+                <span class="time">{$reply.create_time | date='Y-m-d H:i:s'}</span>
+                <span class="ip">IP地址:&nbsp;&nbsp;{$reply.ip_address}</span>
+            </div>
+        </div>
+    </div>
+    {/if}
+</div>
+
+<div class="ecsc-form-goods">
+    <form id="comment_manage_form">
+        <div class="wrapper-list wrapper-list-bjq">
+            <dl>
+                <dt>用户名：</dt>
+                <dd>
+                    <input name="user_name" type="text" class="text text_disabled" value="{$store.store_name}" size="30" readonly>
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;回复内容：</dt>
+                <dd>
+                    <textarea name="content" cols="50" rows="4" class="textarea" placeholder="请输入回复内容">{if $reply}{$reply.content}{/if}</textarea>
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            {if $reply}
+            <dl>
+                <dt>&nbsp;</dt>
+                <dd>提示: 此条评论已有回复, 如果继续回复将更新原来回复的内容!</dd>
+            </dl>
+            {/if}
+            <dl class="button_info m0">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="submit" value=" 确定 " class="sc-btn sc-blueBg-btn btn35">
+                    <input type="reset" value=" 重置 " class="sc-btn sc-blue-btn btn35">
+                    <input type="hidden" name="comment_id" value="{$comment.comment_id}">
+                    <input type="hidden" name="reply_id" value="{$reply.comment_id??0}">
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+
+<script>
+    $('#comment_manage_form').validate({
+        errorPlacement: function (error, element) {
+            var error_div = element.parents('dl').find('div.form_prompt');
+            element.parents('.formText').find(".notic").hide();
+            error_div.append(error);
+        },
+        rules: {
+            content: {
+                required: true
+            },
+            user_name: {
+                required: true,
+            },
+        },
+        messages: {
+            content: {
+                required: '<i class="icon icon-exclamation-sign"></i>回复的评论内容不能为空'
+            },
+            user_name: {
+                required: '<i class="icon icon-exclamation-sign"></i>用户名不能为空',
+            },
+        },
+        submitHandler: function (form) {
+            $.ajax({
+                type: 'POST',
+                url: '/seller/goods/comment_reply',
+                data: $(form).serialize(),
+                success: function (data) {
+                    location.href = '/seller/goods/comment';
+                },
+                error: function (xhr, type) {
+                    easyshow(xhr.responseJSON);
+                }
+            });
+        }
+    });
+</script>
+{include file="public/footer"}

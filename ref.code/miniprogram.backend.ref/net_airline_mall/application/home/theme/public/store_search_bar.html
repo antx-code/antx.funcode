@@ -1,0 +1,55 @@
+<div class="header">
+    <div class="w w1200">
+        <div class="logo">
+            <div class="logoImg"><a href="/"><img src="{$siteInfo.shop_logo}"></a></div>
+            <div class="logoAdv"><a href="{:url('merchant/index')}"><img src="__STATIC__/images/ecsc-join.gif"></a></div>
+        </div>
+        <div class="shop-search">
+            <div class="form">
+                <input type="hidden" name="store_id" value="{$store.store_id}">
+                <form id="searchForm" name="searchForm" method="get" action="/home/category/catgoodslist" onsubmit="return checkSearchForm(this)" class="search-form">
+                    <input autocomplete="off" onkeyup="lookup(this.value);" name="keywords" type="text" id="keyword" value="" class="search-text">
+                    <button type="submit" class="button button-goods">搜全站</button>
+                    <button type="button" onclick="searchInStore(this)" class="button button-store">搜本店</button>
+                </form>
+                <ul class="keyword">
+                    {volist name="$siteInfo.search_keywords" id="vo"}
+                    <li><a href="{:url('search/index',['keywords'=>$vo])}" target="_blank">{$vo}</a></li>
+                    {/volist}
+                </ul>
+                <div class="suggestions_box" id="suggestions" style="display:none;">
+                    <div class="suggestions_list" id="auto_suggestions_list">
+                        &nbsp;
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="shopCart" data-shoptype="dorpdown" id="ECS_CARTINFO" data-carteveval="0">
+            <div class="shopCart-con shop-cm">
+                <a href="{:url('cart/index')}">
+                    <i class="iconfont icon-carts"></i>
+                    <span>我的购物车</span>
+                    <em class="count cart_num">{$Think.session.cart_num | default=0}</em>
+                </a>
+            </div>
+            <div class="dorpdown-layer" shoptype="dorpdownLayer"><img src="__THEME__/images/loadGoods.gif" class="load"></div>
+        </div>
+    </div>
+</div>
+<script>
+    function deleteCartGoods(id,is_right) {
+        $.ajax({
+            type: 'POST',
+            url: '/home/cart/topBarDelete',
+            data: {id: id},
+            success: function (data) {
+                $("#ECS_CARTINFO").html(data.content);
+                $('.mui-mbar-tabs #shopCart .cart_num').text(data.cart_num);
+                if (is_right) {
+                    $(is_right).parents('li.cart_item').remove();
+                }
+            }
+        });
+    }
+</script>

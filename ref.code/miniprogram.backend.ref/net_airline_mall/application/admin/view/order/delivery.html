@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="tabs_info">
+            <ul>
+                <li :class="{'curr':store_id==0}" @click="storeListInit(0)">
+                    <a href="javascript:void(0);" shoptype="tabs_info">自营</a>
+                </li>
+                <li :class="{'curr':store_id==1}" @click="storeListInit(1)">
+                    <a href="javascript:void(0);" shoptype="tabs_info">店铺</a>
+                </li>
+            </ul>
+        </div>
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>商城和平台所有已发货的订单列表管理。</li>
+                <li>可通过订单号进行查询，侧边栏进行高级搜索。</li>
+                <li>可进入查看取消发货。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" v-model.trim="consignee" @keyup.enter="secrchInit()" class="text nofocus" placeholder="收货人姓名" autocomplete="off">
+                    </div>
+                    <div class="input">
+                        <input type="text" v-model.trim="mobile" @keyup.enter="secrchInit()" class="text nofocus" placeholder="收货人手机号" autocomplete="off">
+                    </div>
+                    <div class="input">
+                        <input type="text" v-model.trim="keywords" @keyup.enter="secrchInit()" class="text nofocus" placeholder="订单号" autocomplete="off">
+                        <input type="submit" shoptype="secrch_btn" value="" class="btn" @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%" class="sign">
+                                <div class="tDiv">
+                                    <input type="checkbox" name="all_list" class="checkbox" id="all_list"/>
+                                    <label for="all_list" class="checkbox_stars"></label>
+                                </div>
+                            </th>
+                            <th width="5%">
+                                <div class="tDiv">ID</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">发货单流水号</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">订单号</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">商家名称</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">下单时间</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">收货人</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">收货电话</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">发货时间</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">状态</div>
+                            </th>
+
+                            <th width="10%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td class="sign">
+                                    <div class="tDiv">
+                                        <input type="checkbox" name="checkboxes[]" :value="vo.delivery_id"
+                                               class="checkbox" :id="checkboxitem+vo.delivery_id">
+                                        <label :for="checkboxitem+vo.delivery_id" class="checkbox_stars"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.delivery_id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.delivery_sn}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.order_sn}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.store_name}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.order_time|timeParse}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.consignee}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.mobile}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.add_time|timeParse}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <span class="blue2" v-if="vo.status==0">出库中</span>
+                                        <span class="green" v-else-if="vo.status==1">已发货</span>
+                                        <span class="red" v-else-if="vo.status==2">退货</span>
+                                        <span class="navy2" v-else-if="vo.status==3">已签收</span>
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0)" class="btn-tb btn-tb-blue" @click="add(vo)">
+                                            查看
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash" v-if="vo.status==0">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="tfoot_btninfo">
+                                        <input type="submit" value="删除" v-if="page==-1"
+                                               name="btnSubmit" shoptype="btnSubmit"
+                                               class="btn btn_disabled"
+                                               disabled="disabled" @click="doalldelete()">删除
+
+                                        <input type="submit" value="批量发货" v-if="page==-1"
+                                               name="btnSubmit" shoptype="btnSubmit"
+                                               class="btn btn_disabled"
+                                               disabled="disabled" @click="deliveryUpdate()">批量发货
+                                    </div>
+
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            mobile: '',
+            consignee: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+            store_id: 0,
+
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            add: function (vo = {}) {
+                if (vo.delivery_id) {
+                    window.parent.addParentTab(
+                        {
+                            title: '发货单操作-' + vo.delivery_sn,
+                            href: '/admin/order/deliverydetail?order_id=' + vo.order_id + '&&delivery_id=' + vo.delivery_id
+                        }
+                    );
+                }
+            },
+            deliveryUpdate: function (vo) {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/order/deliveryUpdate', {
+                            ids: vm.ids,
+                            act: 'updateStatusAll'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            storeListInit: function (store_id = 0) {
+                vm.store_id = store_id;
+                vm.pageFreash();
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+
+            init: function () {
+                $.post('/admin/order/delivery', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    store_id: vm.store_id,
+                    keywords: vm.keywords,
+                    mobile: vm.mobile,
+                    consignee: vm.consignee,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/order/delivery_del', {delivery_id: vm.list[index].delivery_id}
+                            , function (ret) {
+                                if (ret.status == 1) {
+                                    vm.list.splice(index, 1);
+                                    $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                                } else {
+                                    $.messager.alert('提示', ret.msg, 'warning');
+                                }
+                            }, 'json');
+                    }
+                });
+            },
+            doalldelete: function () {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/order/doalldelete', {
+                            ids: vm.ids,
+                            table: 'delivery_order'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.log_ids = [];
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        }
+    });
+    $(function () {
+        let keywords = getQueryString('order_sn');
+        let store_id = getQueryString('store_id');
+        if (keywords) {
+            vm.keywords = keywords;
+        }
+        if (parseInt(store_id) > 0) {
+            vm.store_id = 1;
+        }
+        vm.init();
+        window.addEventListener("storage", function (e) {
+            if (e.key == 'refreshDelivery') {
+                vm.init(vm);
+                localStorage.removeItem('refreshDelivery');
+            }
+        });
+    });
+
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+</script>
+</body>
+</html>

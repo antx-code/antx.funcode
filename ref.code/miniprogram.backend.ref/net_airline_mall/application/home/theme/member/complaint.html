@@ -1,0 +1,184 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault" id="app" v-cloak>
+        <div class="user-crumbs hide">
+            <span><a href=".">首页</a></span><span class="arrow">&gt;</span> <span class="finish">进入会员中心</span></div>
+
+
+        <div class="user-mod" style="min-height: 1047px;">
+            <div class="user-title">
+                <h2>交易纠纷</h2>
+                <ul class="tabs" shoptype="dispute-tabs">
+                    <li :class="{'active':is_complaint==0}"><a href="javascript:void(0)" @click="complaintInit(0)">可申请订单</a></li>
+                    <li :class="{'active':is_complaint==1}"><a href="javascript:void(0)" @click="complaintInit(1)">已申请订单</a></li>
+                </ul>
+            </div>
+            <div class="dispute-content" shoptype="dispute-content">
+                <div class="user-order-list user-dispute-list">
+                    <template v-for="(vo,index) in list">
+                    <dl class="item">
+                        <dt class="item-t">
+                            <div class="t-statu">
+                                <div class="t-statu-name" id="ss_received_20">
+                                    <template v-if="vo.order_status==0">待确认</template>
+                                    <template v-if="vo.order_status==1">已确认</template>
+                                    <template v-if="vo.order_status==2">待评价</template>
+                                    <template v-if="vo.order_status==3">已取消</template>
+                                    <template v-if="vo.order_status==4">已完成</template>
+
+                                </div>
+                            </div>
+                            <div class="t-info">
+                                <span class="info-item">订单号：{{vo.order_sn}}</span>
+                                <span class="info-item">{{vo.add_time|timeParse}}</span>
+                                <span class="info-item"></span>
+                                <span class="info-item"><a :href="'/home/store/index?id='+vo.store_id" class="user-shop-link"> {{vo.store_name}}</a></span>
+                            </div>
+                            <div class="t-price"><em>¥</em>{{vo.order_amount}}</div>
+                        </dt>
+                        <dd class="item-c">
+                            <div class="c-left">
+                                <template v-for="(vo2,index2) in vo.goodslist">
+                                    <div class="c-goods" shoptype="c-goods">
+                                        <div class="c-img">
+                                            <a :href="'/home/goods/detail?id='+vo2.goods_id">
+                                                <img :src="vo2.original_img" :alt="vo2.goods_name">
+                                            </a>
+                                        </div>
+                                        <div class="c-info">
+                                            <div class="o-info-lm">
+                                                <a :href="'/home/goods/detail?id='+vo2.goods_id"
+                                                   class="info-name" target="_blank" :title="vo2.goods_name">
+                                                    {{vo2.goods_name}}
+                                                </a>
+                                            </div>
+                                            <div class="fl">
+                                                <div class="info-price mr10" style="width: auto;">
+                                                    <b><em>¥</em>{{vo2.goods_price}}</b>
+                                                    <i>×</i>
+                                                    <span>{{vo2.goods_num}}</span>
+                                                </div>
+                                            </div>
+                                            <div class="info-attr" v-if="vo2.tempvalue">
+                                                规格：{{vo2.tempvalue}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                            </div>
+                            <div class="c-handle">
+                                <template v-if="vo.is_complaint==0">
+                                    <a href="javascript:void(0)" class="sc-btn" @click="openForm(vo.order_id)">申请交易纠纷</a>
+                                </template>
+                                <template v-if="vo.is_complaint==1">
+                                    <a href="javascript:void(0)" class="sc-btn" @click="openForm(vo.order_id)">查看</a>
+                                </template>
+                            </div>
+                        </dd>
+                    </dl>
+                    </template>
+                    <div class="user-order-list user-order-list-special">
+                        <div class="no_records" id="no_records" style="display: none">
+                            <i class="no_icon"></i>
+                            <div class="no_info"><h3>主人，您还没有购买任何商品哟~</h3></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="clearfix" id="pages_ajax"></div>
+        </div>
+    </div>
+</div>
+{include file="public:footer"}
+
+
+<script>
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 12,
+            count: 0,
+            keywords: '',
+            is_complaint: 0,
+            list: []
+
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            complaintInit:function(flag = 0){
+                vm.is_complaint = flag;
+                vm.page = 1;
+                vm.rows = 12;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            openForm:function(order_id=0){
+                layer.open({
+                    type: 2,
+                    title: '申请纠纷单',
+                    area: ['50%', '60%'],
+                    content: '/home/member/complaint_form?order_id='+order_id,
+                    cancel: function (index, layero) {
+
+                    }
+                });
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 12;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            init: function () {
+                $.post('/home/member/complaint', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    is_complaint: vm.is_complaint,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1 && vm.count > 0) {
+                        pageinit('pages_ajax', '#EF4F4F');
+                    }
+                    if(!vm.count){
+                        $("#no_records").css('display','block');
+                    }else{
+                        $("#no_records").css('display','none');
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.post('/home/member/dodelete', {
+                    pageparm: JSON.stringify(vm.list[index]),
+                    table: 'goods_collect'
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        vm.list.splice(index, 1);
+                        pbDialog(ret.msg, '', 1, '', '', '', false);
+                    } else {
+                        pbDialog(ret.msg, '', 0, '', '', '', false);
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+	<div class="content">
+		<div class="explanation" id="explanation">
+			<div class="ex_tit">
+				<i class="sc_icon"></i>
+				<h4>操作提示</h4>
+				<span class="explanationZoom" title="收起提示"></span>
+			</div>
+			<ul>
+				<li>请认真填写链接名称、链接地址等信息。</li>
+				<li>
+					标识“<em>*</em>
+					”的选项为必填项，其余为选填项。
+				</li>
+			</ul>
+		</div>
+		<div class="flexilist">
+			<div class="mian-info">
+				<div class="switch_info user_basic">
+					<div class="item">
+						<div class="label">
+							<span class="require-field">*</span>
+							链接名称：
+						</div>
+						<div class="label_value">
+							<input type="text" name='link_name' v-model="info.link_name" value='' class="text" autocomplete="off"/>
+							<div class="notic m20">当你添加文字链接时, 链接LOGO为你的链接名称.</div>
+							<div class="form_prompt"></div>
+						</div>
+					</div>
+					<div class="item">
+						<div class="label">
+							<span class="require-field">*</span>
+							链接地址：
+						</div>
+						<div class="label_value">
+							<input type="text" name='link_url' v-model="info.link_url" value='' class="text" autocomplete="off"/>
+							<div class="form_prompt"></div>
+						</div>
+					</div>
+					<div class="item">
+						<div class="label">显示顺序：</div>
+						<div class="label_value">
+							<input type="text" name='show_order' v-model="info.sort_order" value="0" class="text" autocomplete="off"/>
+						</div>
+					</div>
+					<div class="item shop_logo">
+						<div class="label">链接LOGO：</div>
+						<div class="label_value">
+							<div class="type-file-box">
+								<input type="button" name="button" id="link_logo" class="type-file-button" value="">
+								<input type="text" name="textfile" class="type-file-text" id="textfield" value=""
+									   autocomplete="off" readonly v-model="info.link_logo">
+							</div>
+							<div class="notic m20">友情链接的图片尺寸110*30</div>
+						</div>
+					</div>
+					<div class="item">
+						<div class="label">&nbsp;</div>
+						<div class="label_value info_btn">
+							<input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
+<script>
+	var info = JSON.parse('{$info|raw}');
+	var infoColumn = JSON.parse('{$infoColumn|raw}');
+	var vm = new Vue({
+		el: '#app',
+		data: {
+			info: info,
+		},
+		methods: {
+			init: function () {
+				majax('/admin/website/friendlinkadd',vm.info);
+			}
+		}
+	});
+	$(function () {
+		moreUploadFile('link_logo');//初始化图片文件操作
+	});
+</script>

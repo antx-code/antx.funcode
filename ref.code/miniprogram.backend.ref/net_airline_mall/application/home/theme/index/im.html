@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{$siteInfo.shop_title}客服</title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/modules/layer/default/layer.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/iconfont.css">
+    <script type="text/javascript" src="__STATIC__/js/jquery.min.js"></script>
+    <style>
+        html, body, h3, p {
+            padding: 0;
+            margin: 0;
+            font-size: 12px;
+        }
+
+        body {
+            position: relative;
+        }
+
+        [v-cloak] {
+            display: none
+        }
+
+        .flex {
+            display: flex;
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-start {
+            justify-content: flex-start;
+        }
+
+        .align-start {
+            align-items: flex-start;
+        }
+
+        .bg-white {
+            background-color: #fff;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .flex-flow {
+            flex-flow: row wrap;
+        }
+
+        .content {
+            margin: 4px;
+        }
+
+        .kf-box img {
+            width: 148px;
+            height: 148px;
+        }
+
+        .radius-4 {
+            border-radius: 4px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .info-box {
+            width: 150px;
+            margin-right: 5px;
+            height: 492px;
+        }
+
+        .user {
+            padding: 5px;
+            background-color: #58adf1;
+        }
+
+        .user img {
+            width: 22px;
+            height: 22px;
+            margin-right: 5px;
+        }
+
+        .user.offline img {
+            filter: grayscale(100%);
+        }
+
+        .user h3 {
+            color: #fff;
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+        .user-info {
+            margin-bottom: 5px;
+        }
+
+        #tool-box {
+            height: 299px;
+        }
+
+        .tab {
+            width: 100%;
+            height: 30px;
+            background: #f6f6f6;
+            line-height: 30px;
+            text-align: center;
+            color: #dc2a2e;
+            font-size: 12px;
+        }
+
+        .quick-tool {
+            padding: 10px;
+        }
+
+        .quick-tool .item {
+            width: 50%;
+            margin-bottom: 15px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .item p {
+            transition: background-color 0.3s;
+        }
+
+        .item:hover p {
+            background-color: #fdd6d7;
+        }
+
+        .quick-tool .item .icon {
+            width: 50px;
+            height: 50px;
+            margin: 5px auto;
+            border-radius: 50%;
+            background-color: #f9f3f3;
+        }
+
+        .quick-tool .item i {
+            color: #ff6d71;
+            line-height: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+
+        .chat-warp {
+            width: calc(100% - 150px);
+            height: auto;
+            min-height: 490px;
+        }
+
+        #bar {
+            background-color: #f6f6f6;
+            padding: 2px 0;
+        }
+
+        #bar i {
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        #warp {
+            position: relative;
+        }
+
+        .send-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            border: 1px solid #d7d7d7;
+            width: 60px;
+            height: 30px;
+            background: #fff;
+            color: #404040;
+            border-radius: 4px;
+            outline: 0;
+            cursor: pointer;
+        }
+
+        .send-btn:hover {
+            color: #4a4a4a;
+            background: #dbedfc;
+            border-color: #dbedfc;
+        }
+
+        #msg-text {
+            width: calc(100% - 10px);
+            resize: none;
+            padding: 5px;
+            border: none;
+        }
+
+        textarea:focus {
+            outline-style: none;
+        }
+
+        #msg-list ul {
+            height: 100%;
+            overflow-y: scroll;
+        }
+
+        #msg-list ul::-webkit-scrollbar {
+            width: 5px
+        }
+
+        #msg-list ul::-webkit-scrollbar-track {
+            -webkit-border-radius: 6px;
+            border-radius: 6px;
+            background-color: transparent
+        }
+
+        #msg-list ul::-webkit-scrollbar-thumb {
+            -webkit-border-radius: 6px;
+            border-radius: 6px;
+            background: #c2c2c3
+        }
+
+        #msg-list ul li {
+            margin-bottom: 5px;
+            list-style: none;
+        }
+
+        #msg-list .username {
+            font-weight: bold;
+            margin-right: 5px;
+            color: #333;
+        }
+
+        #msg-list .msg-time {
+            color: #cccccc;
+        }
+
+        #msg-list .msg {
+            background: #1ab394;
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 0 5px 5px 5px;
+            color: #fff;
+        }
+
+        #msg-list li .msg.image {
+            background: none;
+        }
+
+        #msg-list .msg img {
+            max-width: 200px;
+        }
+
+        #msg-list .me {
+            text-align: right;
+        }
+
+        #msg-list .me .msg {
+            background-color: #f3f3f4;
+            color: #707070;
+            border-radius: 5px 0 5px 5px;
+        }
+
+        #show {
+            position: absolute;
+            width: auto;
+            min-width: 100%;
+            height: auto;
+            min-height: 100%;
+            z-index: 999;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, .5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #show img {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="content flex justify-between align-start" id="app" v-cloak>
+    <div class="info-box">
+        <div class="user-info bg-white radius-4">
+            <div class="user flex justify-start offline">
+                <img src="{$kf.logo | default='http://shangxing.heimicms.com/FtSx5YxvMrcPQKsnRGbpR38_uk0O'}" alt="{$kf.store_name}">
+                <h3>{$kf.store_name}</h3>
+            </div>
+            <div class="kf-box bg-white">
+                <img src="__THEME__/images/kf.jpg">
+            </div>
+        </div>
+        <div class="radius-4 bg-white" id="tool-box">
+            <div class="tab text-center">
+                快捷工具
+            </div>
+            <div class="quick-tool flex flex-flow">
+                <div class="item text-center" data-url="/home/member/favorite.html">
+                    <div class="icon text-center">
+                        <i class="iconfont icon-zan-alt"></i>
+                    </div>
+                    <p>我的收藏</p>
+                </div>
+                <div class="item text-center" data-url="/home/member/order.html">
+                    <div class="icon">
+                        <i class="iconfont icon-order"></i>
+                    </div>
+                    <p>我的订单</p>
+                </div>
+                <div class="item text-center" data-url="/home/member/coupon.html">
+                    <div class="icon">
+                        <i class="iconfont icon-money"></i>
+                    </div>
+                    <p>我的优惠</p>
+                </div>
+                <div class="item text-center" data-url="home/article/content/article_id/35.html">
+                    <div class="icon">
+                        <i class="iconfont icon-coll"></i>
+                    </div>
+                    <p>帮助中心</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="chat-warp radius-4">
+        <div class="msg-list" id="msg-list">
+            <ul v-if="list.length>current">
+                <li v-for="(vo,index) in list[current].msg_history" :class="vo.__from == from_?'me':'you'">
+                    <div><span class="username">{{vo.__from==from_?'我':vo.__from}}</span><span class="msg-time">{{vo.add_time |timeParse}}</span></div>
+                    <div :class="['msg',{image:vo.is_contain_file}]" v-html="msgParse(vo.msg,vo.is_contain_file)"></div>
+                </li>
+            </ul>
+        </div>
+        <div class="msg-input" id="msg-input">
+            <div id="bar">
+                <i class="iconfont icon-image" @click="upload()"></i>
+            </div>
+            <div id="warp">
+                <textarea id="msg-text" placeholder="说点什么吧..." @keydown.enter="sendMsg('send_msg')"></textarea>
+                <button type="button" class="send-btn" @click="sendMsg('send_msg')">发送</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="/public/static/js/function.js"></script>
+<script type="text/javascript" src="/public/static/plugins/moment/moment.min.js"></script>
+<script type="text/javascript" src="/public/static/plugins/layui/lay/modules/layer.js"></script>
+<script type="text/javascript" src="__STATIC__/js/vue.js"></script>
+<script>
+    let socket, wsServer = 'wss://enongmall.com:9502';
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            from_: 'user-{$user.user_id}',
+            to_: '{$kf.to}',
+            list: [],
+            current: 9999,
+            show: true,
+            token: {},
+            sueescc: false
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            sendMsg(type, data) {
+                if (!this.success) {
+                    layer.msg('服务器未连接,信息发送失败!~');
+                    return false;
+                }
+                if (!type) type = 'send_msg';
+                let param = {
+                    type: type,
+                    to: vm.to_,
+                    from: vm.from_,
+                    msg: document.getElementById('msg-text').value
+                };
+                if (type == 'send_img') {
+                    param.msg = data;
+                    param.type = 'send_msg';
+                    param.is_contain_file = 1;
+                } else if (type == 'read') {
+                    param.msg = data;
+                }
+                if (type == 'send_msg' && param.msg == '') {
+                    layer.msg('发送内容不能为空!~');
+                    return;
+                }
+                if (type == 'send_msg' && param.msg.length > 2000) {
+                    layer.msg('消息内容不得超过2000字符!~');
+                    return;
+                }
+                if (param.from == param.to) {
+                    layer.msg('无法给自已发信息哦~!');
+                    return;
+                }
+                socket.send(JSON.stringify(param));
+                if (type != 'read') {
+                    document.getElementById('msg-text').value = '';
+                }
+            },
+            msgParse: function (msg, type) {
+                return type ? '<img src="' + msg + '" onclick="showView(this)">' : msg;
+            },
+            init(instance) {
+                if (!instance) instance = vm;
+                socket = new WebSocket(wsServer, instance.from_ + '_' + instance.to_);
+                socket.onopen = evt => {
+                    console.log("已连接...");
+                    instance.success = true;
+                };
+                socket.onclose = evt => {
+                    layer.msg('服务器连接失败。。');
+                    console.log("远程连接断开...");
+                    instance.success = false;
+                };
+                socket.onmessage = evt => {
+                    let res = JSON.parse(evt.data);
+                    if (res.status == 'success') {
+                        switch (res.type) {
+                            case 'init':
+                                //TODO 所有聊天对象列表
+                                if (res.data.length) {
+                                    res.data[0].msg_history = res.data[0].msg_history.reverse();
+                                    res.data[0].init = true;
+                                    instance.list = res.data;
+                                    instance.to_ = res.data[0].user;
+                                    instance.current = 0;
+                                    if (res.data[0].is_online) {
+                                        document.querySelector('.user.offline').classList.remove('offline');
+                                    }
+                                }
+                                break;
+                            case 'get_msg':
+                                Vue.set(instance.list[instance.current], 'msg_history', res.data.reverse());
+                                instance.list[instance.current].unread = 0;
+                                instance.list[instance.current].init = true;//缓存标记
+                                break;
+                            case 'online_notice':
+                                instance.list.forEach(function (v, i) {
+                                    if (v.user == res.data) {
+                                        instance.list[i].is_online = !instance.list[i].is_online;
+                                    }
+                                });
+                                document.querySelector('.user').classList.remove('offline');
+                                break;
+                            case 'offline_user':
+                                instance.list.forEach(function (v, i) {
+                                    if (v.user == res.data) {
+                                        instance.list[i].is_online = !instance.list[i].is_online;
+                                    }
+                                });
+                                document.querySelector('.user').classList.add('offline');
+                                break;
+                            case 'send_msg':
+                                instance.list.forEach(function (v, i) {
+                                    if (v.user == res.data.__from || v.user == res.data.__to) {
+                                        instance.list[i].msg_history.push(res.data);
+                                        if (i != instance.current) {
+                                            instance.list[i].unread += 1;
+                                        } else if (res.data.is_read == 0) {
+                                            instance.sendMsg('read', res.data.id);
+                                        }
+                                    }
+                                });
+
+                                if (!instance.show) {
+                                    layer.msg('您有新消息,请打开聊天面板');
+                                }
+                                break;
+                        }
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                };
+                socket.onerror = evt => {
+                    console.log(evt);
+                    instance.current = 0;
+                    layer.msg('连接服务器错误：' + (evt.data || evt.type));
+                };
+            },
+            change_to(index) {
+                var user = this.list[index].user;
+                if (user == this.to_) return;
+                this.to_ = user;
+                this.current = index;
+                //没有缓存标记,或者有未读消息时,重新获取聊天记录
+                if (!this.list[this.current].init || this.list[this.current].unread > 0) {
+                    this.sendMsg('get_msg');
+                }
+            },
+            upload() {
+                var input = document.createElement('input');
+                input.type = 'file';
+                input.style.opacity = 0;
+                input.onchange = function () {
+                    if (moment().unix() > vm.token.expire) {
+                        this.getToken(this, true);
+                    }
+                    single_upload(this.files[0], function (res) {
+                        vm.sendMsg('send_img', res);
+                    }, null, vm.token);
+                    $(input).remove();
+                };
+                document.body.append(input);
+                $(input).trigger('click');
+            },
+            getToken: (instance, async) => {
+                $.ajax({
+                    type: 'POST',
+                    url: '/home/member/uploadToken',
+                    async: async,
+                    success: function (data) {
+                        instance.token = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+        },
+        created() {
+            this.init(this);
+            this.getToken(this);
+        },
+        updated() {
+            $('.msg-list ul').animate({scrollTop: document.querySelector('.msg-list ul').scrollHeight}, 0);
+        }
+    });
+
+    showView = obj => {
+        var show = document.createElement('div');
+        var img = document.createElement('img');
+        show.id = 'show';
+        show.addEventListener('click', function () {
+            this.remove();
+        });
+        img.src = obj.src;
+        show.appendChild(img);
+        document.body.appendChild(show);
+    };
+
+    var thead = document.querySelector('.user-info').offsetHeight + 5;
+    var h = window.innerHeight;
+    var chatH = document.querySelector('.chat-warp').offsetHeight - 8;
+    document.getElementById('msg-list').style.height = (chatH * 0.75) + 'px';
+    document.getElementById('msg-input').style.height = (chatH * 0.25) + 'px';
+    document.getElementById('msg-text').style.height = (chatH * 0.25 - 35) + 'px';
+
+    window.onresize = function () {
+        h = window.innerHeight;
+        var lh = h - thead;
+        var rh = h - 8;
+        document.getElementById('tool-box').style.height = parseInt(lh) + 'px';
+        document.getElementById('msg-list').style.height = parseInt(rh * 0.75) + 'px';
+        document.getElementById('msg-input').style.height = parseInt(rh * 0.25) + 'px';
+    };
+
+    document.querySelectorAll('.quick-tool .item').forEach(function (v) {
+        v.onclick = function () {
+            window.open(this.dataset.url);
+        };
+    });
+</script>
+</body>
+</html>

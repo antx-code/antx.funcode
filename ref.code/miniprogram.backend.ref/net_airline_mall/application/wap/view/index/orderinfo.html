@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>查看订单</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        #app .order-detail-submit .van-submit-bar .van-button {
+            width: 30%;
+            -webkit-box-flex: 0;
+            -ms-flex: none;
+            flex: none;
+        }
+        #app .order-detail-submit .van-submit-bar {
+            width: 100%;
+            float: left;
+            border-top: 1px solid #f3f3f3;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="con con_main">
+        <div class="flow-checkout">
+            <section class="flow-checkout-item flow-checkout-adr m-b10" @click="addeditwin(0)">
+                <div class="van-cell-group van-hairline--top-bottom">
+                    <div class="van-cell van-cell--clickable"><i
+                            class="van-icon van-icon-location van-cell__left-icon"></i>
+                        <template v-if="useraddress.mobile">
+                            <div class="van-cell__title">
+                                <span>{{useraddress.consignee}} {{useraddress.mobile}}</span>
+                                <div class="van-cell__label">{{useraddress.region_name}} {{useraddress.address}}</div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div class="van-cell__title"><span>设置收货地址</span></div>
+                        </template>
+                        <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                    </div>
+                </div>
+            </section>
+            <section class="flow-checkout-item user-item">
+                <div class="item-hd">
+                    <div class="head">
+                        <h3>{{info.order.store_name?info.order.store_name:'平台自营'}}</h3>
+                        <span class="kefu"><a href="javascript:void(0);">联系客服 <i class="iconfont icon-kefu color-red"></i></a></span>
+                    </div>
+                </div>
+                <div class="item-bd">
+                    <div class="subHead">
+                        <h4><label>订单号：</label><span>{{info.order.order_sn}}</span></h4>
+                        <p><span>下单时间：{{info.order.add_time|timeParse}} </span>
+                        </p>
+                    </div>
+                    <div class="list-bd-box dis-box">
+                        <div class="product-list dis-box">
+                            <ul class="box-flex">
+                                <template v-for="(vo2,index2) in info.goodslist">
+                                    <li @click="openGoodsdetail(vo2)">
+                                        <div class="product-div">
+                                            <div class="product-list-img">
+                                                <img :src="vo2.original_img" class="img">
+                                            </div>
+                                            <div class="product-info">
+                                                <h4>
+                                                    <em class="em-promotion hide">秒杀</em>
+                                                    {{vo2.goods_name}}
+                                                </h4>
+                                                <div class="price">
+                                                    <em>¥{{vo2.goods_price}}</em><span>x{{vo2.goods_num}}</span></div>
+                                                <div class="p-attr hide">￥{{vo2.market_price}}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                        <div class="align-items">
+                            <span class="user-more" style="font-size: 1.4rem;display: flex;align-items: center">
+                                <em>共{{info.goodslist.length}} 件</em>
+                                <i class="iconfont icon-more"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="flow-checkout-item m-top10 hide">
+                <ul>
+                    <li>
+                        <section class="dis-box padding-all"><label class="t-remark g-t-temark">配送方式</label>
+                            <div class="box-flex text-right f-04">
+                                <span>顺丰速运</span>&nbsp;
+                                <em class="color-red">¥22.20</em>
+                            </div>
+                        </section>
+                    </li>
+                </ul>
+            </section>
+            <section class="flow-checkout-item m-top10">
+                <ul>
+                    <li class="dis-box padding-all"><label class="t-remark g-t-temark">支付方式</label>
+                        <div class="box-flex text-right f-04">
+                            <span>
+                                <template v-if="info.order.order_amount==0&&info.order.pay_status==1&&info.order.order_prom_type==6">
+                                    积分兑换
+                                </template>
+                                <template v-if="info.order.order_amount==0&&info.order.pay_status==1&&info.order.order_prom_type==0">
+                                    礼品卡支付
+                                </template>
+                                <template v-if="info.order.order_amount>0&&info.order.pay_status==1&&info.order.order_prom_type==0">
+                                    在线支付
+                                </template>
+                            </span>
+                        </div>
+                    </li>
+                    <li class="padding-all border-t-common">
+                        <div class="dis-box"><label class="t-remark g-t-temark">发票信息</label>
+                            <div class="box-flex text-right f-04"><span>不开发票</span></div>
+                        </div>
+                        <div class="box-flex t-remark m-top08">
+                            <p>发票类型：普通发票</p>
+                            <p>发票抬头：个人</p>
+                            <p>发票内容：不开发票</p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+            <section class="flow-checkout-item m-top10">
+                <div class="van-cell-group van-hairline--top-bottom">
+                    <div class="van-cell-title b-min b-min-b van-cell">
+                        <div class="van-cell__title"><span>商品金额</span>
+                        </div>
+                        <div class="van-cell__value">
+                            <div><em class="color-red">¥{{info.order.goods_price}}</em></div>
+                        </div>
+                    </div>
+                    <div class="van-cell hide">
+                        <div class="van-cell__title">
+                            <ul>
+                                <li class="of-hidden m-top10">
+                                    <label class="t-remark g-t-temark fl">配送运费</label>
+                                    <span class="color-red fr">+¥22.20</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="order-detail-submit" v-if="info.order.order_status!=3">
+                <div class="van-submit-bar van-order-submit-bar">
+                    <div class="van-submit-bar__bar">
+                        <div class="van-submit-bar__text van-submit-bar__text_left">
+                            <span>实付：</span>
+                            <span class="van-submit-bar__price">¥{{info.order.order_amount}}</span>
+                        </div>
+                        <button class="van-button van-button--danger van-button--large" @click="paywin()" v-if="info.order.pay_status==0&&info.order.order_status==0">
+                            <span class="van-button__text">立即付款</span>
+                        </button>
+                        <button class="van-button van-button--warning van-button--large van-button--square van-goods-action-big-btn"
+                                @click="orderCancel(info.order.order_id)"  v-if="info.order.pay_status==0&&info.order.order_status==0">
+                            <span class="van-button__text">取消订单</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            order_id: 59,
+            info: {},
+            useraddress: {
+                mobile: '',
+                consignee: '',
+                address: '',
+            },
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            orderCancel:function(order_id){
+                wxapp.ajax(config.orderCancel,{order_id: order_id},0).then(function (ret) {
+                    if(ret.status == 1){
+                        wxapp.alert('success', ret.msg);
+                        api.closeWin();
+                    }else{
+                        wxapp.alert('fail', ret.msg);
+                    }
+                })
+            },
+            addeditwin: function () {
+                api.openWin({
+                    name: 'addselect_win',
+                    url: 'widget://html/addselect_win.html',
+                    pageParam: {
+                        order_id: vm.order_id
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.orderinfo,{order_id:vm.order_id}).then(function (ret) {
+                    vm.info = ret.data;
+                    vm.useraddress = {
+                        mobile: ret.data.order.mobile,
+                        consignee: ret.data.order.consignee,
+                        address: ret.data.order.address,
+                    };
+                    console.log(JSON.stringify(vm.useraddress));
+                })
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'goodsdetail_win',
+                    url: 'widget://html/goodsdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            paywin:function () {
+                if(!vm.useraddress.mobile){
+                    wxapp.alert(无收货地址);
+                    vm.addeditwin();
+
+                }else{
+                    api.openWin({
+                        name: 'payorder_win',
+                        url: 'widget://html/payorder_win.html',
+                        pageParam: {
+                            order_sn: vm.info.order.order_sn,
+                        }
+                    });
+                }
+            }
+        },
+    });
+    window.onload = function () {
+        vm.order_id = api.pageParam.order_id > 0 ? api.pageParam.order_id : 0;
+        vm.init();
+    };
+</script>

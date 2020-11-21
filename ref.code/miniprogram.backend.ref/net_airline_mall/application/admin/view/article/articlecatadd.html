@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>请注意选择上级分类。</li>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info">
+                        <div class="step">
+                            <div class="step_content">
+                                <div class="item">
+                                    <div class="step_label">
+                                        <span class="require-field">*</span>
+                                        文章分类名称：
+                                    </div>
+                                    <div class="step_value">
+                                        <input type="text" class="text" v-model="info.cat_name"/>
+                                        <div class="form_prompt"></div>
+                                    </div>
+                                </div>
+<!--文章分类聚合选择开始-->
+<div class="item">
+    <div class="step_label">上级分类：</div>
+    <div class="step_value">
+        <div class="search_select">
+            <div class="categorySelect">
+                <div class="selection">
+                    <input type="text" name="category_name" id="category_name" class="text w290 valid"
+                           v-model="category_name" readonly/>
+                </div>
+                <div class="select-container w319" style="display:none;">
+                    <div class="select-top">
+                        <a href="javascript:;" class="categoryTop"
+                           @click="getcategoryListInitReset()">重选</a>
+                        &gt<span>{{category_tip}}</span>
+                    </div>
+                    <div class="select-list">
+                        <ul>
+                            <template v-for="(vo,index) in categoryList">
+                                <li @click="getcategoryListInit(vo.cat_id,vo.cat_name)">
+                                    <em>
+                                        <template v-if="catlevel==1">Ⅰ</template>
+                                        <template v-if="catlevel==2">Ⅱ</template>
+                                        <template v-if="catlevel==3">Ⅲ</template>
+                                        <template v-if="catlevel==4">Ⅳ</template>
+                                    </em>
+                                    {{vo.cat_name}}
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="notic">不选择分类默认为顶级分类</div>
+    </div>
+</div>
+<!--文章分类聚合选择结束-->
+
+                                <div class="item">
+                                    <div class="step_label">排序：</div>
+                                    <div class="step_value">
+                                        <input type="text" name="sort_order" class="text" v-model="info.sort_order"/>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">显示在导航栏：</div>
+                                    <div class="step_value">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input type="radio" class="ui-radio" name="show_in_nav" id="sex_1"
+                                                       value="1" v-model="info.show_in_nav"/>
+                                                <label for="sex_1" class="ui-radio-label">是</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="radio" class="ui-radio" name="show_in_nav" id="sex_2"
+                                                       value="0" v-model="info.show_in_nav"/>
+                                                <label for="sex_2" class="ui-radio-label">否</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">关键字：</div>
+                                    <div class="step_value">
+                                        <input type="text" name="keywords" class="text" v-model="info.keywords"/>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">描述：</div>
+                                    <div class="step_value">
+                                        <textarea cols="60" rows="4" class="textarea"
+                                                  v-model="info.cat_desc"></textarea>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">&nbsp;</div>
+                                    <div class="step_value info_btn" @click="init()">
+                                        <a href="javascript:void(0);" class="button" id="submitBtn">确定 </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var category_name = '{$category_name}';
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+
+            //文章分类聚合选择开始
+            categoryList: [],
+            catlevel: 0,
+            category_name: category_name?category_name:'顶级分类',
+            category_tip: '请选择分类',
+            parent_id: info.parent_id>0?info.parent_id:0,
+            //文章分类聚合选择结束
+
+        },
+        methods: {
+            //商品分类聚合选择开始
+            getcategoryListInit: function (parent_id, cat_name) {
+                if (cat_name) {
+                    vm.category_name = cat_name;
+                }
+                vm.parent_id = parent_id;
+                vm.info.parent_id = parent_id;
+                $.post('/admin/article/catListInitAjax', {
+                    parent_id: parent_id
+                }, function (ret) {
+                    if (ret.data.length > 0) {
+                        vm.categoryList = ret.data;
+                        vm.catlevel++;
+                    } else {
+                        $(".select-container").hide();
+                    }
+                }, 'json');
+            },
+            getcategoryListInitReset: function () {
+                vm.catlevel = 0;
+                vm.category_name = '顶级分类';
+                vm.category_tip = '请选择分类';
+                vm.parent_id = 0;
+                vm.getcategoryListInit(vm.parent_id, '');
+            },
+            //商品分类聚合选择结束
+
+            init: function () {
+                majax('/admin/article/articlecatadd',vm.info);
+            }
+        },
+    });
+    $(function () {
+        vm.getcategoryListInit(vm.parent_id, '');
+    });
+</script>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>搜索结果</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>.img150{height: 150px;}</style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div waterfall-disabled="disabled" waterfall-offset="300" class="con">
+        <div class="header-list-goods">
+            <section class="secrch">
+                <div class="secrch-warp dis-box">
+                    <div class="input-text box-flex" onclick="openwind('store','search_win')">
+                        <input name="keyword" placeholder="搜索商品" class="j-input-text" v-model="keywords" readonly>
+                        <label class="search-check"><i class="iconfont icon-search"></i></label>
+                    </div>
+                    <div class="mode-switch" @click="productlistmediumInit()">
+                        <i class="iconfont icon-viewlist"
+                           :class="{'icon-pailie':productlistmedium==1}">
+                        </i>
+                    </div>
+                </div>
+            </section>
+            <section class="filter_tab">
+                <div class="pro_filter_items dis-box">
+                    <div class="item" :class="{'active':sort=='goods_id','a-change':xiaoliang==1}" @click="sortInit('goods_id')">
+                        <span>综合</span><i class="iconfont icon-xiajiantou"></i>
+                    </div>
+                    <div class="item" :class="{'active':sort=='is_new'}" @click="sortInit('is_new')"><span>新品</span></div>
+                    <div class="item" :class="{'active':sort=='is_hot'}" @click="sortInit('is_hot')"><span>销量</span></div>
+                    <div class="item" :class="{'active':sort=='shop_price','a-change':shopprcie==1}" @click="sortInit('shop_price')">
+                        <span>价格</span><i class="iconfont icon-xiajiantou"></i>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <section class="product-list" :class="{'product-list-medium':productlistmedium==1}">
+            <div class="prolist">
+                <template v-for="(vo,index) in list">
+                    <div class="prolist-item" @click="openGoodsdetail(vo)">
+                        <div class="pro-img">
+                            <a href="javascript:void(0)" class="">
+                                <img :src="vo.original_img" class="img" :class="{'img150':productlistmedium==1}"></a>
+                        </div>
+                        <div class="pro-info">
+                            <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                            <div class="price">¥{{vo.shop_price}}</div>
+                            <div class="outer"><em class="tag">自营</em><span>0人已购买</span></div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    let bottom = 0;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            productlistmedium:1,
+            page: 1,
+            rows: 20,
+            cat_id: 0,
+            keywords: '',
+            area: '',
+
+            xiaoliang: 0,
+            shopprcie: 0,
+            sort: 'goods_id',
+            order: 'desc',
+            list: []
+        },
+        methods: {
+            sortInit:function(val){
+                vm.sort = val;
+                switch (val) {
+                    case 'goods_id':
+                        if(vm.order == 'desc'){
+                            vm.order = 'asc';
+                            vm.xiaoliang = 1;
+                        }else{
+                            vm.order = 'desc';
+                            vm.xiaoliang = 0;
+                        }
+                        break;
+                    case 'is_new':
+                        break;
+                    case 'is_hot':
+                        break;
+                    case 'shop_price':
+                        if(vm.order == 'desc'){
+                            vm.order = 'asc';
+                            vm.shopprcie = 1;
+                        }else{
+                            vm.order = 'desc';
+                            vm.shopprcie = 0;
+                        }
+                        break;
+                }
+                vm.searchInit();
+            },
+            productlistmediumInit:function(){
+                if(vm.productlistmedium == 1){
+                    vm.productlistmedium =0;
+                }else{
+                    vm.productlistmedium = 1;
+                }
+            },
+            searchInit: function () {
+                vm.page = 1;
+                vm.rows = 20;
+                vm.keywords = '';
+                vm.list = [];
+                vm.init();
+            },
+            init: function () {
+                wxapp.ajax(config.catgoodslist, {
+                    keywords: vm.keywords,
+                    cat_id: vm.cat_id,
+                    brand_id: vm.brand_id,
+                    area: vm.area,
+                    sort: vm.sort,
+                    order: vm.order,
+                    page: vm.page,
+                    rows: vm.rows,
+                },1).then(function (ret) {
+                    if (vm.page == 1) {
+                        if (ret.data.length > 0) {
+                            vm.list = ret.data;
+                        } else {
+                            vm.list = [];
+                        }
+                    } else {
+                        if (ret.data.length > 0) {
+                            for (var i = 0; i < ret.data.length; i++) {
+                                vm.list.push(ret.data[i]);
+                            }
+                        } else {
+                            return false;
+                        }
+                    }
+                    vm.page++;
+                    bottom = 0;
+                });
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'goodsdetail_win',
+                    url: 'widget://html/goodsdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            }
+        }
+    });
+    window.onload = function () {
+        vm.cat_id = api.pageParam.cat_id ? api.pageParam.cat_id : 0;
+        vm.brand_id = api.pageParam.brand_id ? api.pageParam.brand_id : 0;
+        vm.keywords = api.pageParam.keywords ? api.pageParam.keywords : '';
+        vm.area = api.pageParam.area ? api.pageParam.area : '';
+        vm.init();
+    };
+</script>

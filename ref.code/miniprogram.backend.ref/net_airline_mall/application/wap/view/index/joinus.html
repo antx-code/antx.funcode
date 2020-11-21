@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>产品合作</title>
+    <link rel="stylesheet" type="text/css" href="/public/wap/css/mobileSelect.css"/>
+    <style>
+        @media (min-width:560px){html{font-size:54px}
+        }html{font-size:calc(100vw / 3.75);box-sizing:border-box}
+        body{font-size:.14rem;font-family:"Helvetica Neue",Helvetica,"Nimbus Sans L",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft JhengHei","Source Han Sans CN","Source Han Sans SC","Wenquanyi Micro Hei","WenQuanYi Zen Hei",sans-serif}
+        *,*:before,*:after{margin:0;padding:0;box-sizing:inherit}
+        h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:400}
+        ol,ul{list-style:none}
+        address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:400}
+        fieldset,img{border:0}
+        textarea{resize:none}
+        a{color:#000;text-decoration:none}
+        .wrapper{clear:both;overflow:hidden}
+        img{border:0;vertical-align:middle}
+        .index-wrap{position:fixed;left:0;right:0;top:0;bottom:0;z-index:-1;background-image:url(http://pcdn.mikecrm.com/images/formTemplate/82_Bg.png);background-repeat:repeat;background-position:center center;transform:translate3d(0,0,-1px);overflow:scroll}
+        .wrapper{z-index:20;position:relative;width:100%;padding:0 0 15px 0}
+        .header{padding:15px 20px;text-align:center;color:#fff;background:#0c4067;z-index:21;background-color:rgba(255,255,255,0.898);zoom:1;height:1rem;
+            background:url(http://shangxing.heimicms.com/ruzhu.png) no-repeat;background-size:100% 100%}
+        .index-body{background-color:rgba(253,253,254,0.898);zoom:1;overflow:hidden}
+        .body-wrap{padding-bottom:.4rem}
+        .info-list{position:relative;padding:.05rem .1rem}
+        .info-list h3{font-size:.17rem;line-height:1.5999999999999999;font-weight:normal;color:#244630;margin-top:.04rem}
+        .info-list input{margin-top:.06rem;height:.37rem;line-height:1.4;color:#000;background:#fff;padding:0;border:1px solid #d3d3d3;width:100%;outline:none;padding:0 .05rem;font-size:.14rem}
+        .icon-select{position:absolute;right:.2rem;bottom:.2rem;display:inline-block;width:.1rem;height:.1rem;border-top:2px solid #666;border-right:2px solid #666;transform:rotate(135deg)}
+        .iterative-counter li{display:flex;position:relative;align-items:center;margin-top:.1rem;counter-increment:index 1}
+        .iterative-counter input{overflow:hidden;position:absolute;width:0;height:0}
+        .iterative-counter input:checked+label::before{color:green;content:"\2713"}
+        .iterative-counter label{display:flex;align-items:center;height:.2rem}
+        .iterative-counter label::before{box-sizing:border-box;margin-right:.05rem;border:1px solid #c5c5c6;width:.15rem;height:.15rem;cursor:pointer;line-height:.15rem;text-align:center;color:transparent;content:"";transition:all 300ms}
+        .iterative-counter ul{display:flex;justify-content:flex-start;flex-wrap:wrap}
+        .iterative-counter ul li{margin-right:.1rem}
+        .submitWrapper{width:80%;margin:.2rem auto}
+        .submitBtn{display:inline-block;width:100%;line-height:1.2;font-size:.14rem;text-align:center;border-radius:2px;height:.36rem;padding-top:.1rem;padding-bottom:.1rem;padding-left:.2rem;padding-right:.2rem;color:#FFFFFF;background:#3EAC2E}
+        .copyright{margin-top:.15rem;text-align:center}
+        .copyright span{font-size:.1rem;color:#fff}
+    </style>
+</head>
+
+<body>
+<div class="index-wrap" id="app" v-cloak>
+    <div class="wrapper">
+        <div class="main">
+            <div class="header">
+
+            </div>
+            <div class="index-body">
+                <div class="body-wrap">
+                    <div class="info-list">
+                        <h3>公司名称</h3>
+                        <input type="text" v-model="pageparm.companyname">
+                    </div>
+                    <div class="info-list">
+                        <h3>联系人</h3>
+                        <input type="text" v-model="pageparm.username">
+                    </div>
+                    <div class="info-list">
+                        <h3>联系电话</h3>
+                        <input type="number" v-model="pageparm.mobile">
+                    </div>
+                    <div class="info-list">
+                        <h3>公司所在地<span style="margin-left: .05rem;color: #da2824;">*</span></h3>
+                        <input type="text" value="  🇨🇳   中国" disabled style="color: #666;">
+                        <div id="region">
+                            <input type="text" disabled placeholder="请选择地址" v-model="regionname">
+                            <label class="icon-select"></label>
+                        </div>
+                    </div>
+                    <div class="info-list">
+                        <h3>详细地址</h3>
+                        <input type="text" v-model="pageparm.address">
+                    </div>
+                    <div class="info-list">
+                        <h3>拟入驻商城产品类别</h3>
+                        <div class="iterative-counter">
+                            <ul>
+                                <li>
+                                    <input type="checkbox" id="slsg" value="时令水果" v-model="pageparm.cateinfo">
+                                    <label for="slsg">时令水果</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="sxsc" value="生鲜蔬菜" v-model="pageparm.cateinfo">
+                                    <label for="sxsc">生鲜蔬菜</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="csyl" value="茶水饮料" v-model="pageparm.cateinfo">
+                                    <label for="csyl">茶水饮料</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="qrdn" value="禽肉蛋奶" v-model="pageparm.cateinfo">
+                                    <label for="qrdn">禽肉蛋奶</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="gggh" value="干果干货" v-model="pageparm.cateinfo">
+                                    <label for="gggh">干果干货</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="mmly" value="米面粮油" v-model="pageparm.cateinfo">
+                                    <label for="mmly">米面粮油</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="xxsp" value="休闲食品" v-model="pageparm.cateinfo">
+                                    <label for="xxsp">休闲食品</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="qt" value="其他" v-model="pageparm.cateinfo">
+                                    <label for="qt">其他</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="submitWrapper">
+                    <a href="javascript:void(0)" class="submitBtn" @click="init()">提交</a>
+                </div>
+            </div>
+            <div class="copyright">
+                <span>由益农商城提供技术支持</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+
+<script>
+var vm = new Vue({
+        el: '#app',
+        data: {
+            pageparm:{
+                companyname: '',
+                username: '',
+                mobile: '',
+                province: '',
+                city: '',
+                district: '',
+                address: '',
+                cateinfo: [],
+            },
+            regionname: ''
+        },
+        methods: {
+            regionListInit: function () {
+                wxapp.ajax(config.regionList).then(function (ret) {
+                    vm.regionList = ret.data;
+                    mobileSelect2 = new MobileSelect({
+                        trigger: '#region',
+                        title: '请选择',
+                        wheels: [
+                            {
+                                data: vm.regionList
+                            },
+                        ],
+                        position: [0], //初始化定位 打开时默认选中的哪个 如果不填默认为0
+                        triggerDisplayData: false,//不回显数据，便于控制
+                        callback: function (indexArr, data) {
+
+                            vm.regionname = data[0].value + " "+ data[1].value + " " + data[2].value;
+                            vm.pageparm.province = data[0]['id'];
+                            vm.pageparm.city = data[1]['id'];
+                            vm.pageparm.district = data[2]['id'];
+                        }
+                    });
+                })
+            },
+            init: function () {
+                if(!vm.pageparm.companyname || !vm.pageparm.username || !vm.pageparm.mobile || !vm.pageparm.province || !vm.pageparm.cateinfo){
+                    layer.open({
+                        content: '数据不完整',skin: 'footer'
+                    });
+                    return false;
+                }
+                if(!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(vm.pageparm.mobile))){
+                    layer.open({
+                        content: '手机号码有误，请重填',
+                        skin: 'msg',time: 2 //2秒后自动关闭
+                    });
+                    return false;
+                }
+                var pageparm = JSON.parse(JSON.stringify(vm.pageparm));
+                var cateinfo = JSON.parse(JSON.stringify(pageparm.cateinfo));
+                pageparm.cateinfo = cateinfo.join();
+                wxapp.ajax(config.addjoinus,pageparm,1).then(function (ret) {
+                    if(ret.status == 1){
+                        layer.open({
+                            content: ret.msg,
+                            skin: 'msg',time: 2 //2秒后自动关闭
+                        });
+                        setTimeout(function () {
+                            window.history.go(-1);
+                        },1000)
+                    }else{
+                        layer.open({
+                            content: ret.msg,skin: 'footer'
+                        });
+                    }
+                })
+            }
+        }
+    });
+window.onload = function(){
+    vm.regionListInit();
+};
+</script>

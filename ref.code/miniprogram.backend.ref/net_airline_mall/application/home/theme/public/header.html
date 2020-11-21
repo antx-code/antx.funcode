@@ -1,0 +1,18 @@
+<div class="nav shop-zoom" shoptype="shopNav">
+    <div class="w w1200">
+        {include file="public/categorys"}
+        <div class="nav-main" id="nav">
+            <ul class="navitems">
+                <li><a href="/" class="{if $currenturl=='/'}curr{/if}">首页</a></li>
+                {foreach $siteInfo['nav'] as $nav}
+                <li>
+                    <a href="{$nav.url}" class="{if $currenturl==$nav.url}curr{/if}"
+                       target="{if $nav.is_newwin==1}_blank{else /}_self{/if}">
+                    {$nav.name}
+                    </a>
+                </li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+</div>

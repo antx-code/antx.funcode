@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>统计图可根据所选时间段、主营类目、店铺类型展示新增店铺数量走势。</li>
+            </ul>
+        </div>
+        <div class="flexilist mt30">
+            <div class="mian-info">
+                <div class="switch_info" style="display:block;">
+                    <div class="query_result">
+                        <div class="common-content">
+                            <div class="stat_order_search stat_order_search2 hide">
+                                <form action="" method="post" id="" name="selectForm">
+                                    <div class="search_item">
+                                        <strong class="label_txt">时间：</strong>
+                                        <div class="label_value">
+                                            <div class="text_time" id="text_time_start">
+                                                <input type="text" name="start_time" id="start_time" class="text mr0">
+                                            </div>
+                                            <span class="bolang">~~</span>
+                                            <div class="text_time" id="text_time_end">
+                                                <input type="text" name="end_time" id="end_time" class="text">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="search_item search_item">
+                                        <strong class="label_txt">主营类目：</strong>
+                                        <div class="imitate_select select_w145">
+                                            <div class="cite">请选择</div>
+                                            <ul>
+                                                <li>
+                                                    <a href="javascript:;" data-value="0" class="ftx-01">请选择</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="858" class="ftx-01">家用电器</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="3" class="ftx-01">手机、数码、通信</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="4" class="ftx-01">电脑、办公</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="5" class="ftx-01">家居、家具、家装、厨具</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="6" class="ftx-01">男装、女装、内衣</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="8"
+                                                       class="ftx-01">鞋靴、箱包、钟表、奢侈品</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="860" class="ftx-01">个人化妆、清洁用品</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="11" class="ftx-01">母婴、玩具乐器</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="1" class="ftx-01">图书、音像、电子书</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="866"
+                                                       class="ftx-01">休闲、运动、户外健身</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="864"
+                                                       class="ftx-01">腕表、珠宝配饰、眼镜</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="861" class="ftx-01">汽车、汽车用品</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="12"
+                                                       class="ftx-01">食品、酒类、生鲜、特产</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="865"
+                                                       class="ftx-01">保健滋补、医药、成人</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="867"
+                                                       class="ftx-01">礼品、卡、旅游、充值</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="1476" class="ftx-01">房屋租售</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="1477" class="ftx-01">饮食娱乐</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="1546" class="ftx-01">爱生活</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="1568" class="ftx-01">爱学习</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="1582" class="ftx-01">爱工作</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="1586" class="ftx-01">爱购物</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="1587" class="ftx-01">家门口</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:;" data-value="1588" class="ftx-01">逛超市</a>
+                                                </li>
+                                            </ul>
+                                            <input name="shop_categoryMain" type="hidden" value="0"
+                                                   id="shop_categoryMain">
+                                        </div>
+                                    </div>
+                                    <div class="search_item">
+                                        <strong class="label_txt">&nbsp</strong>
+                                        <a href="javascript:void(0);" class="btn btn30 blue_btn ml0"
+                                           shoptype="searchButton">
+                                            <i class="icon icon-search"></i>
+                                            查询
+                                        </a>
+                                    </div>
+                                    <input type="hidden" name="act" value="get_chart_data">
+                                </form>
+                            </div>
+                            <div class="query_result mt30">
+                                <div class="section-module">
+                                    <div class="title_head section_order_count">
+                                        <h3>新增店铺统计</h3>
+                                        <div class="filter_date" style="margin-right: 20px;">
+                                            <a href="javascript:;"
+                                               onclick="set_statistical_chart(this, 'order', 'week')">七天</a>
+                                            <a href="javascript:;"
+                                               onclick="set_statistical_chart(this, 'order', 'month')">一月</a>
+                                            <a href="javascript:;"
+                                               onclick="set_statistical_chart(this, 'order', 'year')">半年</a>
+                                        </div>
+                                    </div>
+                                    <div class="module-content" id="chart_view" style="height:378px;"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="switch_info" style="display:none">
+                    <div class="item2">
+                        店铺销售统计
+                    </div>
+                </div>
+                <div class="switch_info" style="display:none">
+                    <div class="item2">
+                        店铺地区分布
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script type="text/javascript" src="/public/static/js/echarts-all.js"></script>
+<script>
+    $(function () {
+        let opt = {
+            title: {
+                text: ''
+            },
+            tooltip: {},
+            legend: {
+                data: ['新增店铺']
+            },
+            xAxis: {
+                data: ["03-20", "03-21", "03-22", "03-23", "03-24", "03-25", "03-26"]
+            },
+            yAxis: {
+                show: true,
+                type: 'value'
+            },
+            series: [{
+                name: '新增店铺',
+                type: 'line',
+                data: [5, 20, 36, 10, 10, 20, 10]
+            }]
+        };
+        //echartsInit('chart_view',opt);
+
+        $('#start_time').datetimebox({
+            value: getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            value: getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+        tabsinfoinit();
+        set_statistical_chart(".section_order_count .filter_date a:first","order", "week"); //初始设置
+
+
+    });
+
+    function set_statistical_chart(obj, type, date) {
+
+        var obj = $(obj);
+        obj.addClass("active");
+        obj.siblings().removeClass("active");
+
+        $.post('/admin/finance/store', {
+            type: type,
+            date: date
+        }, function (ret) {
+            var myChart = echarts.init(document.getElementById("chart_view"));
+            myChart.setOption(ret);
+        }, 'json');
+    }
+
+
+</script>

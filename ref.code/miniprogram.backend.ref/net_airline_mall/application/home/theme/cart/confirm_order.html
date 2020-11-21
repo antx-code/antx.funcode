@@ -1,0 +1,494 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+<div class="header header-cart">
+    <div class="w w1200">
+        <div class="logo">
+            <div class="logoImg"><a href="/"><img src="{$siteInfo.shop_logo}"></a></div>
+            <div class="tit">结算页</div>
+        </div>
+        <div class="cart-stepflex">
+            <div class="cart-step-item cur">
+                <span>1.我的购物车</span>
+                <i class="iconfont icon-arrow-right-alt"></i>
+            </div>
+            <div class="cart-step-item curr">
+                <span>2.填写订单信息</span>
+                <i class="iconfont icon-arrow-right-alt"></i>
+            </div>
+            <div class="cart-step-item ">
+                <span>3.成功提交订单</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="w w1200" id="app" v-cloak>
+        <div class="checkout-warp">
+
+            <!--收货人信息-->
+            <div class="ck-step" id="consignee_list">
+                <div class="ck-step-tit">
+                    <h3>收货人信息</h3>
+                    <a href="/home/member/address" class="extra-r" target="_blank">管理收货人地址</a>
+                </div>
+                <div class="ck-step-cont" id="consignee-addr">
+                    <div class="consignee-warp">
+
+                        <div v-for="(vo,index) in address" :class="['cs-w-item',{'cs-selected':vo.address_id==sel_addr.address_id}]" @click="selectedAddr(index)">
+                            <div class="item-tit">
+                                <h3 class="username">{{vo.consignee}}</h3>
+                            </div>
+                            <div class="item-tel">
+                                <span class="contact">{{vo.mobile}}</span>
+                            </div>
+                            <div class="item-address">{{region[vo.province]}} {{region[vo.city]}} {{region[vo.district]}} &nbsp; {{vo.address}}</div>
+                            <i class="icon"></i>
+                            <a href="javascript:void(0);" class="edit" shoptype="dialog_checkout" data-type="edit_address" :data-value="vo.address_id">修改</a>
+                            <a href="javascript:void(0);" class="delete" shoptype="dialog_checkout" data-type="del_address" :data-value="vo.address_id">删除</a>
+                            <input type="radio" checked="checked" class="ui-radio" name="consignee_radio" value="15" id="radio_15">
+                        </div>
+
+                        <div class="cs-w-item">
+                            <a href="javascript:void(0);" class="add-new-address" shoptype="dialog_checkout" data-type="new_address" data-value="">
+                                <i class="iconfont icon-add-quer"></i><span>添加新地址</span>
+                            </a>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!--支付方式-->
+            <div class="ck-step checkout" v-if="orderInfo.support_cod>0">
+                <div class="ck-step-tit">
+                    <h3>支付方式</h3>
+                </div>
+                <div class="ck-step-cont">
+                    <div class="payment-warp">
+                        <div class="payment-list" shoptype="paymentType">
+                            <div :class="['p-radio-item', 'payment-item', {'item-selected':pay_type=='cod'}]" @click="pay_type='cod'">
+                                <span>
+                                    <input type="radio" name="pay_code" class="ui-radio" value="cod" v-model="pay_type">
+                                    货到付款
+                                </span>
+                                <b></b>
+                            </div>
+                            <div :class="['p-radio-item', 'payment-item', {'item-selected':pay_type=='online'}]" @click="pay_type='online'">
+                                <span>
+                                    <input type="radio" name="pay_code" class="ui-radio" value="online" v-model="pay_type">
+                                    在线支付
+                                </span>
+                                <b></b>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--礼品卡-->
+            <div class="ck-step checkout" v-if="card.length">
+                <div class="ck-step-tit">
+                    <h3>礼品卡 <small class="sub-tit" v-show="orderInfo.card_price>0">本次扣抵：￥{{orderInfo.card_price}}</small></h3>
+                </div>
+                <div class="ck-step-cont">
+                    <ul class="card-wrap">
+                        <li v-for="(vo,index) in card" @click="selectGift(index)" :class="{active:gift_index==index}">
+                            <div class="card-logo">
+                                <img src="/favicon.ico">
+                                益农E卡
+                            </div>
+                            <div class="price">
+                                余 <strong>￥{{vo.cash}}</strong>
+                                <span>面值：￥{{vo.price}}</span>
+                            </div>
+                            <div class="card-note">
+                                <span>限自营商品</span>
+                                <em>|</em>
+                                <span>有效期至{{vo.over_time | timeparse}}</span>
+                            </div>
+                            <b></b>
+                            <i @click.stop="cancelGift()">取消勾选</i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!--商品信息-->
+            <div class="ck-step">
+                <div class="ck-step-tit">
+                    <h3>商品信息</h3>
+                    <a href="{:url('cart/index')}" class="extra-r">返回购物车</a>
+                </div>
+                <div class="ck-step-cont">
+                    <div class="ck-goods-warp" id="goods_inventory">
+                        <div class="ck-goods-list">
+
+                            <div class="ck-goods-item" shoptype="shoppingList" v-for="(vo,store_id) in orderInfo.data">
+                                <div class="ck-goods-tit">
+                                    <div class="ck-store">
+                                        <a href="javascript:;" class="shop-name">{{vo.store.store_name}}</a>
+                                        <a href="javascript:;" id="IM" onclick="openWin(this)" class="p-kefu  p-c-violet" :data-mobile="vo.store.mobile"><i class="iconfont icon-kefu"></i></a>
+                                    </div>
+                                </div>
+                                <div class="ck-goods-cont">
+                                    <div :class="['cg-item',{last:idx==vo.goods.length-1}]" v-for="(goods,idx) in vo.goods">
+                                        <div class="c-col cg-name">
+                                            <a :href="'/home/goods/detail.html?id='+goods.goods_id" target="_blank">
+                                                <div class="p-img"><img :src="goods.original_img" width="48" height="48"></div>
+                                                <div class="p-info">
+                                                    <div class="p-name">{{goods.goods_name}}</div>
+                                                    <div class="p-attr" v-if="goods.tempvalue">{{goods.tempvalue}} <br></div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="c-col cg-price">
+                                            <span class="fr cl"><em>¥</em>{{goods.goods_price}}</span>
+                                        </div>
+                                        <div class="c-col cg-number">x{{goods.goods_num}}</div>
+                                        <div class="c-col cg-sum"><em>¥</em>{{goods.sum_fee}}</div>
+                                        <div class="cg-item-line"></div>
+                                        <i class="dian"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="ck-order-remark">
+                        <input name="user_note" type="text" maxlength="45" size="15" class="text" placeholder="订单备注 限60个字" autocomplete="off" onblur="if(this.value==''||this.value=='订单备注 限60个字'){this.value='订单备注 限60个字';this.style.color='#cccccc'}" onfocus="if(this.value=='订单备注 限60个字') {this.value='';};this.style.color='#666';">
+                        <span class="prompt">提示：请勿填写有关支付、收货、发票方面的信息</span>
+                    </div>
+                </div>
+            </div>
+
+            <!--发票信息-->
+            <div class="ck-step">
+                <div class="ck-step-tit">
+                    <h3>发票信息</h3>
+                    <a href="javascript:void(0);" class="i-edit fl ml20 mr20 btn" shoptype="invEdit" data-value='{"divid":"edit_invoice","url":"/home/cart/ajaxInvoince","title":"发票信息"}'>编辑</a>
+                    <div class="tips-new-white">
+                        <b></b><span><i></i>开企业抬头发票须填写纳税人识别号，以免影响报销</span>
+                    </div>
+                </div>
+                <div class="ck-step-cont hide" id="inv_content">
+                    <div class="invoice-warp fl">
+                        <div class="invoice-part">
+                            <span>
+                                <em class="invoice_type" title="发票类型">普通发票（纸质）</em>
+
+                            </span>
+                            <div class="normal hide">
+                                <div>发票抬头：<em class="inv_payee" title="发票抬头">个人</em></div>
+                                <div>发票内容：<em class="inv_content" title="发票内容"></em></div>
+                            </div>
+                            <div class=" vat hide">
+                                <div>公司名称：<em class="company_name"></em></div>
+                                <div>电话：<em class="company_telephone"></em></div>
+                                <div>税号：<em class="tax_id"></em></div>
+                                <div>收票人：<em class="consignee_name"></em></div>
+                                <div>收票人电话：<em class="consignee_mobile_phone"></em></div>
+                                <div>收票人地址：<em class="consignee_address"></em></div>
+                            </div>
+                            <input type="hidden" name="inv_payee" value="个人">
+                            <input type="hidden" name="inv_content" value="">
+                            <input type="hidden" name="invoice_type" value="0">
+                            <input type="hidden" name="tax_id" value="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--优惠券/红包-->
+            <div class="ck-step ck-step-other" v-if="Object.keys(coupon).length">
+                <div class="ck-step-tit ck-toggle ck-toggle-off" shoptype="ck-toggle">
+                    <h3>优惠券/我的红包</h3>
+                    <i class="iconfont icon-down"></i>
+                    <span class="tag" v-if="coupon.valid">有可用</span></div>
+                <div class="ck-step-cont" style="display:none;">
+                    <div class="order-virtual-tabs">
+                        <ul>
+                            <li class="curr"><span>优惠券</span><b></b></li>
+                        </ul>
+                    </div>
+                    <div class="toggle-panel-main">
+                        <div class="toggle-panl-warp panl-coupon" shoptype="order_coupoms_list" style="display: block;">
+
+                            <div class="panl-top" v-if="coupon.valid">
+                                <div class="panl-items ps-container" v-for="(vs,store_id) in coupon.valid">
+                                    <div class="shop-name">商家:{{orderInfo.data[store_id].store.store_name}}</div>
+                                    <div class="panl-item" data-ucid="94" data-type="coupons" v-for="(vo,index) in vs" @click="calcPrice('coupon',store_id,vo.list_id)">
+                                        <i class="i-left"></i>
+                                        <div class="panl-item-warp">
+                                            <div class="panl-item-top">
+                                                <strong>￥{{vo.money}}</strong> <span>满{{vo.min_goods_amount}}</span>
+                                            </div>
+                                            <div class="panl-item-bot">
+                                                <p>名 称：{{vo.name}}</p>
+                                                <p>商家：{{orderInfo.data[vo.store_id]['store']['store_name']}}</p>
+                                                <p>有效期至{{vo.use_end_time}}</p>
+                                            </div>
+                                        </div>
+                                        <i class="i-right"></i>
+                                        <b></b>
+                                    </div>
+
+                                    <div class="ps-scrollbar-x-rail" style="width: 1120px; display: none; left: 0px; bottom: 3px;">
+                                        <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                                    </div>
+                                    <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; display: none; right: 0px;">
+                                        <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panl-bot" v-if="coupon.invalid">
+                                <div class="panl-items ps-container">
+
+                                    <div class="panl-item panl-item-disabled" v-for="(vo,idx) in coupon.invalid">
+                                        <i class="i-left"></i>
+                                        <div class="panl-item-warp">
+                                            <div class="panl-item-top">
+                                                <strong>￥{{vo.money}}</strong> <span>满{{vo.min_goods_amount}}</span>
+                                            </div>
+                                            <div class="panl-item-bot">
+                                                <p>名 称：{{vo.name}}</p>
+                                                <p>商家：{{orderInfo.data[vo.store_id]['store']['store_name']}}</p>
+                                                <p>有效期至：{{vo.use_end_time}}</p>
+                                            </div>
+                                        </div>
+                                        <i class="i-right"></i>
+                                    </div>
+
+
+                                    <div class="ps-scrollbar-x-rail" style="width: 1120px; display: none; left: 0px; bottom: 3px;">
+                                        <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                                    </div>
+                                    <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; display: none; right: 0px;">
+                                        <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="ECS_ORDERTOTAL">
+            <div class="order-summary">
+                <div class="statistic">
+                    <div class="list">
+                        <span><em>{{orderInfo.goods_count}}</em> 件商品，总商品金额：</span>
+                        <em class="price" id="warePriceId"><em>¥</em>{{orderInfo.goods_price}}</em>
+                    </div>
+                    <div class="list" v-if="orderInfo.shipping_price>0">
+                        <span>配送费用：</span>
+                        <em class="price" id="freightPriceId">+<em>¥</em>{{orderInfo.shipping_price}}</em>
+                    </div>
+                    <div class="list" v-if="orderInfo.coupon_price>0">
+                        <span>我的优惠券：</span>
+                        <em class="price" id="cachBackId"> -<em>¥</em>{{orderInfo.coupon_price}}</em>
+                    </div>
+                    <div class="list" v-if="orderInfo.card_price>0">
+                        <span>礼品卡抵扣：</span>
+                        <em class="price" id="gift-card-id"> -<em>¥</em>{{orderInfo.card_price}}</em>
+                    </div>
+                    <div class="list">
+                        <span>应付总额：</span>
+                        <em class="price-total"><em>¥</em>{{orderInfo.order_amount}}</em>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-foot" shoptype="tfoot-toolbar">
+                <div class="w w1200">
+                    <div class="btn-area"><input type="button" class="submit-btn" @click="calcPrice('submit')" value="提交订单"></div>
+                    <div class="d-address">
+                        <span id="sendAddr">寄送至：{{region[sel_addr.province]}} {{region[sel_addr.city]}} {{region[sel_addr.district]}} &nbsp; {{sel_addr.address}}</span>
+                        <span id="sendMobile">收货人：{{sel_addr.consignee}}</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <input type="hidden" id="buyNow" value="{$buyNow}">
+    <input type="hidden" id="buyNowParam" value="{$buyNowParam}">
+</div>
+
+
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            siteInfo: JSON.parse('{:json_encode($siteInfo)}'),
+            address: JSON.parse('{:json_encode($address)}'),
+            region: JSON.parse('{:json_encode($region)}'),
+            orderInfo: JSON.parse('{:addslashes(json_encode($orderInfo))}'),
+            coupon: JSON.parse('{:json_encode($coupon)}'),
+            use_coupon: {},
+            pay_type: 'online',
+            sel_addr: 0,
+            card: JSON.parse('{:json_encode($card)}'),
+            page: 1,
+            pageSize: 3,
+            gift_index: -1
+        },
+        filters: {
+            timeparse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD');
+            }
+        },
+        methods: {
+            calcPrice: function (action, store_id, coupon_id) {
+                var param = {sub: action}, sub = false;
+                if (action == 'submit') {
+                    var inv = $("#inv_content");
+                    if (typeof vm.sel_addr != 'object') {
+                        pbDialog('', '请填写收货地址');
+                        return;
+                    }
+
+                    param = {
+                        sub: action,
+                        address_id: vm.sel_addr.address_id,
+                        pay_type: vm.pay_type,
+                        user_note: $('input[name="user_note"]').val(),
+                        invoice_type: inv.find("input[name=invoice_type]").val(),
+                        invoice_title: inv.find("input[name=inv_payee]").val(),
+                        invoice_content: inv.find("input[name=inv_content]").val(),
+                        invoice_no: inv.find("input[name=tax_id]").val(),
+                        coupon: vm.use_coupon
+                    };
+                    if (vm.gift_index > -1) {
+                        param.gift_card = vm.card[vm.gift_index].id;
+                    }
+                    sub = true;
+                } else if (action == 'coupon') {
+                    sub = false;
+                    var dom = $(event.currentTarget);
+                    if (dom.hasClass("selected")) {
+                        dom.removeClass("selected").siblings().removeClass("selected");
+                        delete this.use_coupon[store_id];
+                    } else {
+                        dom.addClass("selected").siblings().removeClass("selected");
+                        this.use_coupon[store_id] = coupon_id;
+                    }
+                    param.coupon = vm.use_coupon;
+                } else if (action == 'gift_card') {
+                    if (eval(vm.orderInfo.store_ids.join("+"))) {
+                        layer.msg('礼品卡仅可购买' + vm.siteInfo.shop_title + '自营商品');
+                        return;
+                    }
+                    param.gift_card = this.card[this.gift_index].id;
+                }
+                if ($('#buyNow').val() == 'from_goods_detail') {
+                    param.buyNow = 'confirmOrder';
+                    param.buyNowParam = $('#buyNowParam').val();
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/home/cart/confirmOrder.html',
+                    data: param,
+                    success: function (data) {
+                        if (sub) {
+                            location.href = data.url;
+                        } else {
+                            vm.orderInfo = data;
+                        }
+                    },
+                    error: function (xhr) {
+                        pbDialog(xhr.responseJSON, '', 0);
+                    }
+                });
+            },
+            selectedAddr: function (index) {
+                var dom = event.currentTarget;
+                $(dom).addClass("cs-selected").siblings().removeClass("cs-selected");
+                this.sel_addr = this.address[index];
+                // $('#sendAddr').html('寄送至：' + $(dom).find('.item-address').html());
+                // $('#sendMobile').html('收货人：' + $(dom).find('.item-tel').html());
+            },
+            selectGift: function (index) {
+                if (eval(vm.orderInfo.store_ids.join("+"))) {
+                    layer.msg('仅可购买' + vm.siteInfo.shop_title + '自营商品');
+                    return;
+                }
+                vm.gift_index = index;
+                this.calcPrice('gift_card');
+            },
+            cancelGift: function () {
+                vm.gift_index = -1;
+                this.calcPrice();
+            }
+        },
+        created: function () {
+            var _this = this;
+            _this.address.forEach(function (v, i) {
+                if (v.is_default > 0) {
+                    _this.sel_addr = v;
+                }
+            });
+        }
+    });
+
+    function addUpdate_ConsigneeResponse(result) {
+        vm.address = result.address;
+        vm.region = result.region;
+        if (vm.address.length == 1) {
+            vm.sel_addr = result.address[0];
+        }
+    }
+
+    function del_ConsigneeResponse(id) {
+        vm.address.forEach(function (v, i) {
+            if (v.address_id == id) vm.address.splice(i, 1);
+        });
+        if (vm.sel_addr.address_id == id) {
+            vm.sel_addr = [];
+        }
+    }
+
+    function gotoInvoiceResponse(result) {
+        var inv = $("#inv_content");
+        inv.removeClass('hide');
+        inv.find("input[name=invoice_type]").val(result.type);
+        if (result.type) {
+            $("#inv_content .inv_payee").html('');
+            $("#inv_content .inv_content").html('');
+            inv.find("input[name=inv_payee]").val('');
+            inv.find("input[name=inv_content]").val('');
+            inv.find("input[name=tax_id]").val('');
+            $("#inv_content .invoice_type").html('增值税发票');
+            inv.find('.company_name').html(result.data.company_name);
+            inv.find('.company_telephone').html(result.data.company_telephone);
+            inv.find('.tax_id').html(result.data.tax_id);
+            inv.find('.consignee_name').html(result.data.consignee_name);
+            inv.find('.consignee_mobile_phone').html(result.data.consignee_mobile_phone);
+            inv.find('.consignee_address').html(result.data.province_text + ' ' + result.data.city_text + ' ' + result.data.district_text + ' ' + result.data.consignee_address);
+            inv.find('.vat').removeClass('hide');
+            inv.find('.normal').addClass('hide');
+        } else {
+            $("#inv_content .inv_payee").html(result.inv_payee);
+            $("#inv_content .inv_content").html(result.inv_content);
+            $("#inv_content .invoice_type").html(result.invoice_type);
+            inv.find("input[name=inv_payee]").val(result.inv_payee);
+            inv.find("input[name=inv_content]").val(result.inv_content);
+            inv.find("input[name=tax_id]").val(result.tax_id);
+            inv.find('.normal').removeClass('hide');
+            inv.find('.vat').addClass('hide');
+        }
+
+    }
+
+    $(function () {
+        tfootScroll();
+    });
+</script>
+{include file='public/footer'}

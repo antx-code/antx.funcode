@@ -1,0 +1,297 @@
+{include file="header"}
+<div id="app">
+    <div class="tabmenu">
+        <ul class="tab">
+            <li class="active"><a @click="getData()">商品列表</a></li>
+            <li><a href="javascript:">商品回收站</a></li>
+        </ul>
+    </div>
+    <div class="btn-info">
+        <a class="sc-btn sc-blue-btn" @click="add_goods()"><i class="icon-plus"></i>添加新商品</a>
+    </div>
+    <div class="explanation clear mb20 hide" id="explanation">
+        <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4></div>
+        <ul>
+            <li>设置商品运费模板：平台-&gt;地区&amp;配送-&gt;<a href="javascript:">运费管理</a></li>
+        </ul>
+    </div>
+    <div class="search-info">
+        <div class="search-form">
+            <form method="get" action="javascript:vm.getData()" name="searchFormList">
+                <div class="search-key">
+                    <input type="text" class="text" id="keywords" value="{$Request.param.id}" placeholder="商品ID/商品关键字" @change="page=1">
+                    <input type="submit" class="submit" id="search-btn" value=" 搜索 ">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="listDiv" v-cloak>
+        <table class="ecsc-default-table goods-default-table">
+            <thead>
+            <tr shoptype="table_header">
+                <th width="6%" class="frist"><a @click="orderby('goods_id');" class="orange">编号</a><img v-show="field=='goods_id'" class="sort-desc-img" :src="'/public/static/images/sort_'+sort+'.gif'"/></th>
+                <th width="34%" class="tl">商品名称</th>
+                <th width="6%">上架</th>
+                <th width="9%"><a @click="orderby('shop_price');" class="orange">价格</a><img v-show="field=='shop_price'" class="sort-desc-img" :src="'/public/static/images/sort_'+sort+'.gif'"/></th>
+                <th width="7%">库存</th>
+                <th width="6%"><a @click="orderby('store_hot');" class="orange">热卖</a><img v-show="field=='store_hot'" class="sort-desc-img" :src="'/public/static/images/sort_'+sort+'.gif'"/></th>
+                <th width="6%"><a @click="orderby('store_new');" class="orange">新品</a><img v-show="field=='store_new'" class="sort-desc-img" :src="'/public/static/images/sort_'+sort+'.gif'"/></th>
+                <th width="6%"><a @click="orderby('store_best');" class="orange">推荐</a><img v-show="field=='store_best'" class="sort-desc-img" :src="'/public/static/images/sort_'+sort+'.gif'"/></th>
+                <th width="6%"><a @click="orderby('review_status');" class="orange">审核状态</a><img v-show="field=='review_status'" class="sort-desc-img" :src="'/public/static/images/sort_'+sort+'.gif'"/></th>
+                <th width="14%">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(vo,index) in list">
+                <td class="frist trigger">
+                    <div class="checkbox-info">
+                        <input type="checkbox" class="ui-checkbox" value="776" id="checkbox_776" name="checkboxes[]"><label for="checkbox_776" class="ui-label"></label>
+                    </div>
+                    <div class="number">{{vo.goods_id}}</div>
+                </td>
+                <td class="tl">
+                    <div class="goods-info">
+                        <div class="goods-sku">
+                            <span class="sku">商品货号：{{vo.goods_sn}}</span>
+                            <span class="time">发布时间：{{vo.add_time | timeParse}}</span>
+                        </div>
+                        <div class="goods-img"><a :href="'/home/goods/detail.html?id='+vo.goods_id" target="_blank"><img :src="vo.original_img.indexOf('http')<0?'/public/static/'+vo.original_img:vo.original_img" @mouseover="showTip(vo.original_img)" onmouseout="toolTip()"></a></div>
+                        <div class="goods-desc">
+                            <div class="name">
+                                <em @click="edit('goods_name', index)" :title="vo.goods_name">{{vo.goods_name}}</em>
+                                <em class="green">[ {{brand[vo.brand_id]}} ]</em>
+                            </div>
+                            <div class="goods-tag">
+                                <em class="free" v-if="vo.is_shipping">包邮</em>
+                                <em class="byStage" v-if="vo.stages">分期</em>
+                                <em class="parts" v-if="!vo.is_alone_sale">配件</em>
+                                <em class="saleEnd" v-if="vo.is_promote">促销日期</em>
+                                <em class="purchaseEnd" v-if="vo.is_xiangou">限购</em>
+                            </div>
+                        </div>
+                        <div class="goods-lie">
+                            <span>商品运费：</span>
+                            <span class="red" v-if="vo.freight==1">按固定运费</span>
+
+                            <a href="#" target="_blank" v-else-if="vo.freight==2">
+                                <span>按运费模板</span>
+                            </a>
+                            <span class="red" v-else>按地区运费</span>&nbsp;<em class="red">(配送方式)</em>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div :class="['switch',{active:vo.is_on_sale}]" :title="vo.is_on_sale?'是':'否'" @click="toggle('is_on_sale', index)">
+                        <div class="circle"></div>
+                    </div>
+                </td>
+                <td>
+                    <p @click="edit('shop_price', index)">{{parseFloat(vo.shop_price)}}</p>
+                </td>
+                <td>
+                    <p @click="edit('goods_number', index)">{{vo.goods_number}}</p>
+                </td>
+                <td>
+                    <div :class="['switch',{active:vo.store_hot}]" :title="vo.store_hot?'是':'否'" @click="toggle('store_hot', index)">
+                        <div class="circle"></div>
+                    </div>
+                </td>
+                <td>
+                    <div :class="['switch',{active:vo.store_new}]" :title="vo.store_new?'是':'否'" @click="toggle('store_new', index)">
+                        <div class="circle"></div>
+                    </div>
+                </td>
+                <td>
+                    <div :class="['switch',{active:vo.store_best}]" :title="vo.store_best?'是':'否'" @click="toggle('store_best', index)">
+                        <div class="circle"></div>
+                    </div>
+                </td>
+                <td class="audit_status">
+                    <em class="org2" v-if="vo.review_status==1">待审核</em>
+                    <template v-else-if="vo.review_status==3">
+                        <em class="red">未通过</em>
+                        <i class="tip yellow" :title="vo.review_content">提示</i>
+                    </template>
+                    <em class="green" v-else>正常</em>
+                </td>
+                <td class="ecsc-table-handle tr">
+                    <span><a :href="'/home/goods/detail.html?id='+vo.goods_id" target="_blank" class="btn-orange"><i class="sc_icon_see"></i><p>查看</p></a></span>
+                </td>
+            </tr>
+            <tr v-if="list.length<1">
+                <td colspan="20" class="no-records">没有找到任何记录</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th class="frist tc"><input type="checkbox" id="tfoot-all" name="checkboxes[]" class="ui-checkbox"><label for="tfoot-all" class="ui-label"></label></th>
+                <th class="batch-operation" colspan="20">
+                    <span>共{{count}}条记录，</span>
+                    <span class="page page_3">
+                            <i>每页</i> <input type="text" size="3" style=" border:1px solid #e5e5e5; text-align:center; padding:3px; border-radius:4px;" v-model="pageSize" @change="getData()">
+                        </span>
+                </th>
+            </tr>
+            </tfoot>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            is_real: 1,
+            field: 'goods_id',
+            sort: 'desc',
+            list: [],
+            brand: {},
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            beforeRequest: false,
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            getData: function () {
+                var keywords = document.getElementById('keywords').value;
+                var param = {
+                    page: vm.page,
+                    pageSize: vm.pageSize,
+                    field: vm.field,
+                    sort: vm.sort,
+                    cat_id: '{$Request.get.cat_id}'
+                };
+                if (keywords) {
+                    param.keywords = keywords;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/sr/goods/index',
+                    data: param,
+                    success: function (data) {
+                        vm.count = data.count;
+                        vm.page = data.page;
+                        vm.list = data.list;
+                        vm.brand = data.brand;
+                        if (data.page == 1) vm.pagerender();
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            orderby: function (field) {
+                this.field = field;
+                this.sort = this.sort == 'desc' ? 'asc' : 'desc';
+                this.getData();
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            showTip: function (src) {
+                if (src.indexOf('http') < 0)
+                    toolTip('<img src="/public/static/' + src + '" >');
+                else
+                    toolTip('<img src="' + src + '" >');
+            },
+            edit: function (field, index) {
+                var obj = event.currentTarget;
+                var param = {
+                    goods_id: vm.list[index]['goods_id'],
+                    field: field
+                };
+                clickEdit(obj, param, vm.modify);
+            },
+            del: function (index) {
+                if (alert) {
+                    if (!window.confirm('您确实要把该商品放入回收站吗？')) {
+                        return;
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/del_recycle.html?is_delete=1',
+                    data: {goods_id: vm.list[index]['goods_id']},
+                    success: function (data) {
+                        vm.list.splice(index, 1);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            toggle: function (field, index) {
+
+                var param = {
+                    goods_id: vm.list[index]['goods_id'],
+                    field: field,
+                    value: parseInt(vm.list[index][field]) ? 0 : 1
+                };
+                this.modify(param, function (res) {
+                    if (res.msg) {
+                        easyshow(res.msg);
+                    } else {
+                        vm.list[index][field] = parseInt(res.content);
+                    }
+                });
+            },
+            modify: function (param, callback) {
+                if (vm.beforeRequest) {
+                    return;
+                }
+                vm.beforeRequest = true;
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/goods/add_edit.html?operate=modify",
+                    data: param,
+                    success: function (data) {
+                        vm.beforeRequest = false;
+                        callback(data);
+                    },
+                    error: function (xhr, type) {
+                        vm.beforeRequest = false;
+                        callback(xhr.responseJSON);
+                    }
+                });
+            },
+            add_goods: function () {
+                layer.msg('待开发');
+                return;
+                location.href = "/sr/goods/add_edit.html&" + vm.act;
+            }
+        }
+    });
+
+    $(function () {
+        vm.getData();
+    });
+
+</script>
+{include file="footer"}

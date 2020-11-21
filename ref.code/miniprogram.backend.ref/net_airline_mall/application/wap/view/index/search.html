@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>搜索</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .search-warp{padding:1rem;display:flex; justify-content: space-between; align-items: center}
+        .search-warp .search-input-text{padding:0.8rem 0.8rem!important;border:1px solid #eee;border-radius:3rem;font-size:1.4rem;color:#666;height:3.2rem;}
+        .search-warp .search-btn{padding:0.6rem 0 0.6rem 0.6rem;font-size:1.4rem;width:4.6rem;text-align:center;}
+        .search-warp .icon-search{font-size:1.4rem;color:#666}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="search-page">
+        <section class="search">
+            <div class="search-warp dis-box">
+                <div class="search-input-text box-flex">
+                    <label class="search-check"><i class="iconfont icon-search"></i></label>
+                    <input name="keyword" placeholder="搜索商品" class="j-input-text" v-model="keywords">
+                </div>
+                <a href="javascript:void(0);" class="btn-submit search-btn" @click="add()">搜索</a>
+            </div>
+        </section>
+        <div class="ms-search-wraper">
+            <div class="recent-search">
+                <div class="ms-search-head clearfix">
+                    <p>最近搜索</p><i class="iconfont icon-delete" @click="hotkeyworddel()"></i>
+                </div>
+                <div class="ms-search-tags">
+                    <template v-for="(vo,index) in info.list">
+                        <span><a href="javascript:void(0)" @click="goodswin(vo)">{{vo}}</a></span>
+                    </template>
+                </div>
+            </div>
+            <div class="hot-search">
+                <div class="ms-search-head clearfix">
+                    <p>热门搜索</p>
+                </div>
+                <div class="ms-search-tags">
+                    <template v-for="(vo,index) in info.hot">
+                        <span><a href="javascript:void(0)" @click="goodswin(vo)">{{vo}}</a></span>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            keywords: '',
+            info: []
+        },
+        methods: {
+            add:function(){
+                if(!vm.keywords){
+                    return false;
+                }
+                wxapp.ajax(config.hotkeywordadd,{keywords: vm.keywords}).then(function (ret) {
+                    api.openWin({
+                        name: 'goodslist_win',
+                        url: 'widget://html/goodslist_win.html',
+                        pageParam: {
+                            keywords: vm.keywords
+                        }
+                    });
+                })
+            },
+            goodswin:function(keywords){
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        keywords: keywords
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.hotkeywordadd).then(function (ret) {
+                    vm.info = ret.data;
+                })
+            },
+            hotkeyworddel:function () {
+                wxapp.ajax(config.hotkeyworddel).then(function (ret) {
+
+                    console.log(JSON.stringify(ret.data));
+                    vm.info = ret.data;
+                })
+            }
+        },
+        mounted:function () {
+            inputFocus();
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

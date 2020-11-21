@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>
+    .order_total .section dl {
+        width: 20%;
+    }
+
+    #order_goods_layer {
+        background-color: #fff;
+        position: absolute;
+        z-index: 9;
+        left: 100px;
+        top: -12.5px
+    }
+
+    .flex {
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .flex-lable {
+        width: 20%;
+    }
+
+    .copy-handle {
+        margin-left: 5px;
+        padding: 2px 5px;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .is_appeal {
+        background-color: #ffc1c8;
+    }
+
+    .operation_record p {
+        line-height: 24px;
+    }
+
+    .user_money {
+        margin-left: 20px;
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="content">
+        <div class="flexilist order_info">
+            <div class="common-content">
+                <!--基本信息-->
+                <div class="step">
+                    <div class="step_title">
+                        <i class="ui-step"></i>
+                        <h3>基本信息</h3>
+                    </div>
+                    <div class="section">
+                        <dl>
+                            <dt>退货单状态：</dt>
+                            <dd class="red">{{info.show_status}}</dd>
+                            <dt>申请退货时间：</dt>
+                            <dd>{{info.addtime}}</dd>
+
+                        </dl>
+                        <dl>
+                            <dt>订单编号：</dt>
+                            <dd>{{info.order_sn}} <span class="copy-handle" @click="copyme(info.order_sn)">复制</span></dd>
+                            <dt>
+                                商品状态：
+                            </dt>
+                            <dd>
+                                {{info.goods_status}}
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>退货类型：</dt>
+                            <dd><span v-if="info.type">退货退款</span><span v-else>仅退款</span></dd>
+                            <dt>申请退款金额：</dt>
+                            <dd><span class="red">￥{{info.refund}}</span></dd>
+                        </dl>
+                        <dl>
+                            <dt>用户：</dt>
+                            <dd>{{info.consignee}}</dd>
+                            <dt>联系电话：</dt>
+                            <dd>{{info.mobile}}</span></dd>
+                        </dl>
+                        <dl style="width:30%">
+                            <dt>用户退货说明：</dt>
+                            <dd>{{info.user_note}}</dd>
+                            <dt>商家审核说明：</dt>
+                            <dd>{{info.remark}}</span></dd>
+                        </dl>
+                    </div>
+                </div>
+                <!--商品信息-->
+                <div class="step">
+                    <div class="step_title">
+                        <i class="ui-step"></i>
+                        <h3>商品信息</h3>
+                    </div>
+                    <div class="step_info">
+                        <div class="order_goods_fr">
+                            <table class="table" border="0" cellpadding="0" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th width="20%" class="first">商品名称</th>
+                                    <th width="10%">货号</th>
+
+
+                                    <th width="10%">价格</th>
+                                    <th width="5%">购买数量</th>
+                                    <th width="10%">退货数量</th>
+
+                                    <th width="5%">小计</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="(vo2,index) in info.goods">
+                                    <td>
+                                        <div class="order_goods_div">
+                                            <div class="img">
+                                                <a :href="'/home/goods/detail?id='+vo2.goods_id" target="_blank">
+                                                    <img :src="vo2.goods_img" width="72" height="72"/>
+                                                </a>
+                                            </div>
+                                            <div class="name ml10">
+                                                <a :href="'/home/goods/detail?id='+vo2.goods_id" target="_blank">
+                                                    {{vo2.goods_name}}
+                                                    <template v-if="vo2.tempvalue"><br><span>{{vo2.tempvalue}}</span></template>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{vo2.goods_sn}}</td>
+                                    <td><em>¥</em>{{vo2.goods_price}}</td>
+                                    <td>{{vo2.goods_num}}</td>
+                                    <td>{{vo2.return_num}}</td>
+                                    <td>
+                                        <em>¥</em>
+                                        {{vo2.goods_price*vo2.return_num}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="order_total_fr">
+                                            <strong>申请退款金额：</strong>
+                                            <span class="red">
+                                            <em>¥</em>
+                                            {{info.refund}}
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!--操作信息-->
+                <div class="step order_total">
+                    <div class="step_title">
+                        <i class="ui-step"></i>
+                        <h3>操作信息</h3>
+                    </div>
+                    <div class="step_info">
+                        <div class="order_operation order_operation100">
+                            <div class="item mt10">
+                                <div class="label">此订单所有商品总价：</div>
+                                <div class="value">
+                                    ￥{{info.order && info.order.goods_price}}
+                                </div>
+                            </div>
+                            <div class="item mt10">
+                                <div class="label">物流费用：</div>
+                                <div class="value">
+                                    ￥{{info.order && info.order.shipping_price}}
+                                </div>
+                            </div>
+                            <div class="item mt10">
+                                <div class="label">订单总价：</div>
+                                <div class="value">
+                                    ￥{{info.order&&info.order.total_amount}}
+                                </div>
+                            </div>
+
+                            <div class="item mt10">
+                                <div class="label">申请退款金额：</div>
+                                <div class="value">
+                                    ￥<strong>{{info.refund}}</strong>
+                                </div>
+                            </div>
+                            <div class="item mt10">
+                                <div class="label">商家调整金额：</div>
+                                <div class="value">
+                                    <input type="number" class="text" v-model="info.gap" @change="fixAmount()" :disabled="dis">
+                                    <div class="notic">正数增加退款金额，负数为减少退款金额。整单退货时，不可修改</div>
+                                </div>
+                            </div>
+                            <div class="item mt10">
+                                <div class="label">实际应退金额：</div>
+                                <div class="value">
+                                    <strong class="red">￥{{parseFloat(info.refund) + parseFloat(info.gap)}}</strong>
+                                </div>
+                            </div>
+                            <div class="item mt10">
+                                <div class="label">退款方式：</div>
+                                <div class="value">
+                                    <div class="checkbox_items" style="width: auto">
+                                        <div class="checkbox_item"><input type="radio" name="fupin" id="is_fupin_1" value="0" class="ui-radio" v-model="refund_way"> <label for="is_fupin_1" class="ui-radio-label">退回用户余额</label></div>
+                                        <div class="checkbox_item" v-if="info.is_entire && info.order && info.order.pay_code!='usemoney'"><input type="radio" name="fupin" id="is_fupin_2" value="1" class="ui-radio" v-model="refund_way"> <label for="is_fupin_2" class="ui-radio-label">支付原路退回</label></div>
+                                        <div class="form_prompt"></div>
+                                    </div>
+                                    <div class="notic">
+                                        <span class="red">(注)</span>
+                                        此订单支付方式为：<strong v-if="info.order">{{info.order.pay_name}}</strong>
+                                        <span class="user_money" v-if="info.order && info.order.user_money>0">
+                                            抵扣金额：￥<strong>{{info.order.user_money}}</strong>
+                                        </span>
+                                        <span class="user_money" v-if="info.order && info.order.card_price>0">
+                                            抵扣金额：￥<strong>{{info.order.card_price}}</strong>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">操作备注：</div>
+                                <div class="value">
+                                    <div class="bf100 fl">
+                                        <textarea name="action_note" class="textarea" v-model="admin_remark"></textarea>
+                                    </div>
+
+                                    <div class="order_operation_btn" v-if="info.status!=-2 && info.status!=4 && info.status!=5">
+                                        <template v-if="info.store_id>0">
+                                            <input type="button" class="btn btn25" v-if="into.status==6" value="仲裁判定" @click="refund(6)">
+                                            <input type="button" class="btn btn25 red_btn" v-if="into.status==1" value="确认退款" @click="refund(5)">
+                                        </template>
+                                        <template v-else>
+                                            <input type="button" class="btn btn25 blue_btn" value="拒绝退款" @click="refund(-1)" v-if="info.status!=-1">
+                                            <input type="button" class="btn btn25 red_btn" value="确认退款" @click="refund(5)">
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="operation_record">
+                            <table cellpadding="0" cellspacing="0">
+                                <thead>
+                                <th width="15%">日志时间</th>
+                                <th width="15%">简要信息</th>
+                                <th width="30%">内容</th>
+                                <th width="15%">特殊说明</th>
+                                </thead>
+                                <tbody>
+                                <tr v-for="(vo,index) in info.log" :class="{is_appeal:vo.is_appeal>0}">
+                                    <td>{{vo.add_time}}</td>
+                                    <td>{{vo.title}}</td>
+                                    <td>
+                                        <p v-for="(vc,idx) in vo.content">{{idx}}：{{vc}}</p>
+                                    </td>
+
+                                    <td><span v-if="vo.user_type==0&&vo.is_appeal">用户投诉</span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="userinfo" class="hide">
+        <div class="layui-card">
+            <div class="layui-card-header">用户基本信息</div>
+            <div class="layui-card-body">
+                <table class="layui-table" lay-size="sm">
+                    <thead>
+                    <tr>
+                        <th>联系电话</th>
+                        <th>用户名</th>
+                        <th>用户昵称</th>
+                        <th>账户余额</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{info.user}}</td>
+                        <td>{{info.user}}</td>
+                        <td>{{info.user}}</td>
+                        <td>{{info.user}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="layui-card">
+            <div class="layui-card-header">收货地址基本信息</div>
+            <div class="layui-card-body">
+                <table class="layui-table" lay-size="sm">
+                    <thead>
+                    <tr>
+                        <th>收货人</th>
+                        <th>邮编</th>
+                        <th>电话</th>
+                        <th>地址</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{info.order}}</td>
+                        <td>{{info.order}}</td>
+                        <td>{{info.order}}</td>
+                        <td>{{info.order}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<textarea id="copytext" style="position: absolute;top:0;left:0;z-index: 0;width:0;height:0"></textarea>
+<script>
+    var copytext = document.getElementById('copytext');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: {},
+            admin_remark: '',
+            refund_way: 0
+        },
+        computed: {
+            dis: function () {
+                return Boolean(this.info.store_id > 0 || (this.info.status == -2 || this.info.status == 4 || this.info.status == 5 || this.info.is_entire));
+            }
+        },
+        methods: {
+            init: function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '/admin/order/refund_detail',
+                    data: {return_id: '{$Request.param.return_id}'},
+                    dataType: 'json',
+                    success: function (data) {
+                        vm.info = data;
+                    },
+                });
+            },
+            copyme: function (str) {
+                copytext.value = str;
+                copytext.select();
+                document.execCommand("copy");
+                layer.msg('已复制!', {time: 1200});
+            },
+            fixAmount: function () {
+                if (isNaN(parseFloat(this.info.gap))) {
+                    this.info.gap = 0;
+                }
+            },
+            refund: function (status) {
+                if ((status == 6 || status == -1) && !vm.admin_remark) {
+                    layer.msg('请填写操作备注');
+                    return;
+                }
+                if (status == 5) {
+                    let r = confirm("提醒：退款操作立即到账");
+                    if (r != true) {
+                        return;
+                    }
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/order/refund_detail',
+                    data: {
+                        return_id: vm.info.return_id,
+                        gap: vm.info.gap,
+                        admin_remark: vm.admin_remark,
+                        status: status,
+                        refund_way: vm.refund_way
+                    },
+                    success: function (data) {
+                        vm.init();
+                        localStorage.setItem('refreshRefund', 'true');
+                        $.messager.show({title: '提示', msg: '操作完成', timeout: 3000, showType: 'slide'});
+                        return false;
+                    },
+                    error: function (xhr, type) {
+                        $.messager.alert('提示', xhr.responseJSON, 'warning');
+                    }
+                });
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+</body>
+</html>

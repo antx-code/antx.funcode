@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>积分商城</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+
+    <style>
+        .nav .list{padding: 15px 10px !important;width:25vw;padding-bottom:0!important;}
+        .nav .list .txt{font-size: 12px !important;height:24px;overflow:hidden}
+        .nav{display:flex; text-align: center;flex-wrap: wrap;}
+        .nav .list .txt{line-height:200%}
+        .nav .list img{max-width:100%;padding:1rem}
+        .title_index{text-align:center;height:5rem!important;line-height:5rem!important;}
+        .title_index h4{font-size:1.8rem!important;height:5rem!important;line-height:5rem!important;font-weight:bold}
+        .pro-img{width:calc(50vw - 0.9rem) !important;height:calc(50vw - 0.9rem) !important;overflow: hidden}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <section class="goods_info">
+        <div class="goods_photo d_jump">
+            <div id="slider" class="swipe">
+                <div class="swiper-wrapper">
+                    <template v-for="(vo,index) in info.adlist">
+                        <div class="swiper-slide aui-text-center">
+                            <img :src="vo.ad_img" />
+                        </div>
+                    </template>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+    <div class="home">
+        <nav class="nav list-style2 whole-margin all-padding" modules-index="2">
+            <section class="list" onclick="openwind('store','exchange_win',0)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_fenlei.png">
+                <div class="txt">积分分类</div>
+            </section>
+            <section class="list" onclick="openwind('store','changeph_win',0)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_jifen.png">
+                <div class="txt">兑换排行</div>
+            </section>
+            <section class="list" onclick="openwind('store','mypoint_win',1)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_paihang.png">
+                <div class="txt">我的积分</div>
+            </section>
+            <section class="list" onclick="openwind('store','moneyinfo_win',1)">
+                <a href="javascript:void(0)"></a>
+                <img src="/public/wap/static/images/icon_zhanghu.png">
+                <div class="txt">我的账户</div>
+            </section>
+        </nav>
+        <div class="title_index">
+            <h4>热门兑换</h4>
+        </div>
+        <section class="product-list product-list-medium">
+            <div class="prolist">
+                <template v-for="(vo,index) in info.goodsList">
+                    <div class="prolist-item" @click="openGoodsdetail(vo)">
+                        <div class="pro-img">
+                            <a href="javascript:void(0)" class=""> <img :src="vo.original_img" class="img" /></a>
+                        </div>
+                        <div class="pro-info">
+                            <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                            <div class="price">
+                                积分：{{vo.exchange_integral}}
+                            </div>
+                            <div class="outer">
+                                市场价：{{vo.shop_price}}
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+        <div class="title_index hide">
+            <h4>为你兑换</h4>
+        </div>
+        <section class="product-list product-list-medium hide">
+            <div class="prolist">
+                <template v-for="(vo,index) in info.tuijianList">
+                    <div class="prolist-item" @click="openGoodsdetail(vo)">
+                        <div class="pro-img">
+                            <a href="javascript:void(0)" class=""> <img :src="vo.original_img" class="img" /></a>
+                        </div>
+                        <div class="pro-info">
+                            <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                            <div class="price">
+                                积分：{{vo.exchange_integral}}
+                            </div>
+                            <div class="outer">
+                                市场价：{{vo.shop_price}}
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </div>
+
+    <footer data-v-36897c18="" data-v-3aa553e3="" class="tab-down" style="position: fixed;">
+        <ul data-v-36897c18="">
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">首页</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/category" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">分类</span></li>
+            <li data-v-36897c18="" class="active">
+                <a data-v-36897c18="" href="/wap/index/zgchange" class="router-link-exact-active router-link-active"></a><i data-v-36897c18=""></i><span data-v-36897c18="">积分</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/cart" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">购物车</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/center" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">我的</span>
+            </li>
+        </ul>
+    </footer>
+</div>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            token: '',
+            info: {},
+
+            c_h: 0,//时
+            c_m: 0,//分
+            c_s: 0,//秒
+
+            page: 0,
+
+            keywords: '',
+        },
+        methods: {
+            openGoodswin: function (vo) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        cat_id: vo.cat_id
+                    }
+                });
+            },
+            openStoreindex: function (vo) {
+                api.openWin({
+                    name: 'index_win.html',
+                    url: 'widget://html/store/index_win.html',
+                    pageParam: {
+                        store_id: vo.store_id
+                    }
+                });
+            },
+            init: function () {
+                //api.showProgress();
+                $.post(config.exchange, {}, function (ret) {
+                    if (ret) {
+                        vm.info = ret.data;
+                        vm.$nextTick(function(){
+                            vm.swiperInit();
+                        })
+                    }
+                }, 'json');
+                setTimeout(function () {
+                    //api.hideProgress();
+                },1500);
+
+            },
+            swiperInit: function () {
+                setTimeout(function () {
+                    new Swiper('#slider', {
+                        autoplay: 3000,
+                        visibilityFullFit: true,
+                        loop: true,
+                        pagination: '.swiper-pagination',
+                        paginationClickable: true
+                    });
+                }, 200);
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'exdetail_win',
+                    url: 'widget://html/exdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            searchInit:function () {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        keywords: vm.keywords
+                    }
+                });
+            }
+        },
+    });
+    window.onload = function () {
+        if ($api.getStorage('token')) {
+            vm.token = $api.getStorage('token');
+            vm.init();
+        }else{
+            window.location.href = base_url + "wap/index/weixinlogin";
+        }
+    };
+</script>

@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>管理中心</title>
+    <meta name="robots" content="noindex, nofollow"/>
+    <!-- jQuery相关引用 -->
+    <script type="text/javascript" src="/public/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.json.js"></script>
+    <script type="text/javascript" src="/public/static/js/transport_jquery.js"></script>
+    <script type="text/javascript" src="/public/static/js/utils.js"></script>
+    <script type="text/javascript" src="/public/static/js/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.form.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.nyroModal.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/public/static/js/lib_ecmobanFunc.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/listtable.js"></script>
+    <script type="text/javascript" src="/public/static/js/listtable_pb.js"></script>
+    <script type="text/javascript" src="/public/static/js/admin.js"></script>
+
+    <!--layui库引入开始-->
+    <link href="/public/static/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+    <!--layui库引入结束-->
+
+    <script type="text/javascript" src="/public/static/js/vue.js"></script>
+    <!-- TopJUI框架样式 -->
+    <link type="text/css" href="/topjui/css/topjui.core.min.css" rel="stylesheet">
+    <link type="text/css" href="/topjui/themes/default/topjui.blue.css" rel="stylesheet" id="dynamicTheme"/>
+    <link type="text/css" href="/public/static/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+    <script type="text/javascript" src="/public/static/plugins/jquery/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/public/static/js/topjui.config.js"></script>
+    <script type="text/javascript" src="/topjui/js/topjui.core.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/topjui.index.js"></script>
+    <script type="text/javascript" src="/topjui/js/locale/topjui.lang.zh_CN.js"></script>
+    <script type="text/javascript" src="/public/static/js/adminindex.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.bgColorSelector.js"></script>
+    <script type="text/javascript" src="/public/static/js/function.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="/public/static/css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/purebox.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/order-new.css?v=2"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/jquery-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/spectrum.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/perfect-scrollbar.min.css"/>
+    <style>
+        .navLeftTab{height:auto;}
+        .admin-main{height:auto;min-height:calc(100% - 48px)}
+        .admin-main-left .admincj_nav .current .tit {background-image: none;background-color: #1890ff;}
+        .blue {color: rgb(0, 12, 23) !important;}
+        .tabs-wrap {margin-left: 5px !important;}
+        .tabs li a.tabs-inner {-moz-border-radius: 0;-webkit-border-radius: 0;border-radius: 0;}
+        .admin-main-left .admincj_nav .current .tit, .fold .admin-main-left .admincj_nav .item:hover .tit {background-image: none;background-color: #1890ff;}
+    </style>
+</head>
+<body>
+<div class="admin-header clearfix" style="min-width:1280px;" id="app">
+    <div class="bgSelector"></div>
+    <div class="admin-logo">
+        <a href="javascript:void(0);" data-param="home">
+            <img src="{$logo?$logo:'/public/static/images/logo.png'}" style="height: 48px;"/>
+        </a>
+        <div class="foldsider" style="line-height: 30px;color: #FFFFFF;">
+            <i class="icon icon-indent-left"></i>
+        </div>
+    </div>
+    <div class="module-menu">
+        <ul>
+            <li data-param="menuplatform">
+                <a href="javascript:void(0);">平台</a>
+            </li>
+            <li data-param="menushopping">
+                <a href="javascript:void(0);">商城</a>
+            </li>
+            <li data-param="finance">
+                <a href="javascript:void(0);">财务</a>
+            </li>
+            <li data-param="third_party">
+                <a href="javascript:void(0);">第三方服务</a>
+            </li>
+        </ul>
+    </div>
+    <div class="admin-header-right">
+        <div class="manager">
+            <dl>
+                <dt class="name">{{admin_user.username}}</dt>
+                <template v-if="admin_user.id==1">
+                    <dd class="group">超级管理员</dd>
+                </template>
+                <template v-else>
+                    <dd class="group">普通用户</dd>
+                </template>
+
+            </dl>
+            <span class="avatar" style="cursor:pointer;">
+                <img id="admin_avatar"
+                     :src="admin_user.admin_avatar?admin_user.admin_avatar:'/public/static/images/admin.png'"/>
+             </span>
+            <div id="admin-manager-btn" class="admin-manager-btn">
+                <i class="arrow"></i>
+            </div>
+            <div class="manager-menu">
+                <div class="title">
+                    <h4>最后登录</h4>
+                    <a href="javascript:void(0)" class="edit_pwd" @click="updatePwd()">修改密码</a>
+                </div>
+                <div class="login-date">
+                    <strong>{{admin_user.lastlogintime}}</strong>
+                    <span>(IP:{{admin_user.lastloginip}})</span>
+                </div>
+            </div>
+        </div>
+        <div class="operate">
+            <li>
+                <a href="/" target="_blank" class="home" title="新窗口打开商城首页">&nbsp;</a>
+            </li>
+            <i></i>
+            <li style="position: relative;" shoptype="oper_msg">
+                <a href="javascript:void(0);" class="msg" title="管理员留言">&nbsp;</a>
+                <s id="total">
+                    {$statisticinfo['order']['con0']+$statisticinfo['order']['scon1']+$statisticinfo.merchant_apply_Count}
+                </s>
+                <div id="msg_Container" style="display: none;">
+                        <div class="item">
+                            <h3 class="order_msg" shoptype="msg_tit">自营订单提示<em class="iconfont icon-down"></em></h3>
+                            <s>{$statisticinfo['order']['con0']+$statisticinfo['order']['scon1']}</s>
+                            <div class="msg_content" shoptype="orderMsg" style="display: none;">
+                                <p>
+                                    <a href="javascript:void(0);" data-url="/admin/order/index" data-param="menushopping|02_order_list" class="message">您有新订单</a>
+                                    <span class="tiptool">（<em id="new_orders">{$statisticinfo['order']['con0']}</em>）</span>
+                                </p>
+                                <p>
+                                    <a href="javascript:void(0);" data-url="/admin/order/index" data-param="menushopping|02_order_list" class="message">待发货订单</a>
+                                    <span class="tiptool">（<em id="no_paid">{$statisticinfo['order']['scon1']}</em>）</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <h3 class="shop_msg" shoptype="msg_tit">商家审核提示<em class="iconfont icon-down"></em></h3>
+                            <s>{$statisticinfo.merchant_apply_Count}</s>
+                            <div class="msg_content" shoptype="sellerMsg" style="display: none;">
+                                <p>
+                                    <a href="javascript:void(0);" data-url="/admin/store/storeapply" data-param="menushopping|12_seller_apply" class="message">未审核商家</a>
+                                    <span class="tiptool">（<em id="shop_account">{$statisticinfo.merchant_apply_Count}</em>）</span>
+                                </p>
+                            </div>
+                        </div>
+                </div>
+            </li>
+            <i></i>
+            <li>
+                <a href="javascript:void(0)" id="mb2" data-toggle="topjui-menubutton"
+                   data-options="menu:'#mm2',iconCls:'fa fa-book',hasDownArrow:false"
+                   style="color:#fff;" class="style-color">
+                </a>
+                <div id="mm2" style="width:180px;">
+                    <div data-options="iconCls:'fa fa-tree blue'" onclick="changeTheme('blue')">默认主题</div>
+                    <div data-options="iconCls:'fa fa-tree'" onclick="changeTheme('black')">黑色主题</div>
+                    <div data-options="iconCls:'fa fa-tree'" onclick="changeTheme('blacklight')">黑色主题-亮</div>
+                    <div data-options="iconCls:'fa fa-tree red'" onclick="changeTheme('red')">红色主题</div>
+                    <div data-options="iconCls:'fa fa-tree red'" onclick="changeTheme('redlight')">红色主题-亮</div>
+                    <div data-options="iconCls:'fa fa-tree green'" onclick="changeTheme('green')">绿色主题</div>
+                    <div data-options="iconCls:'fa fa-tree green'" onclick="changeTheme('greenlight')">绿色主题-亮</div>
+                    <div data-options="iconCls:'fa fa-tree purple'" onclick="changeTheme('purple')">紫色主题</div>
+                    <div data-options="iconCls:'fa fa-tree purple'" onclick="changeTheme('purplelight')">紫色主题-亮</div>
+                    <div data-options="iconCls:'fa fa-tree blue'" onclick="changeTheme('blue')">蓝色主题</div>
+                    <div data-options="iconCls:'fa fa-tree blue'" onclick="changeTheme('bluelight')">蓝色主题-亮</div>
+                    <div data-options="iconCls:'fa fa-tree orange'" onclick="changeTheme('yellow')">橙色主题</div>
+                    <div data-options="iconCls:'fa fa-tree orange'" onclick="changeTheme('yellowlight')">橙色主题-亮</div>
+                </div>
+            </li>
+            <i></i>
+            <li>
+                <a href="javascript:void(0)" class="clear" title="清除缓存" onclick="removeRuntime()">&nbsp;</a>
+            </li>
+            <i></i>
+            <li>
+                <a href="javascript:void(0)" onclick="logout()" class="prompt" title="安全退出管理中心">&nbsp;</a>
+            </li>
+        </div>
+    </div>
+</div>
+<div class="admin-main" id="center">
+    <div class="admin-main-left">
+        <div class="admincj_nav">
+            <div class="navLeftTab" id="adminNavTabs_home" style="display:block;">
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_00_home"></i>
+                            <h4>首页</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu" style="display:block;">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/index/index"
+                                   data-param="home|01_admin_core">管理中心</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/index/workflow"
+                                   data-param="home|02_operation_flow">业务流程</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/index/noviceguide"
+                                   data-param="home|03_novice_guide">新手向导</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/index/joinus"
+                                   data-param="home|03_novice_joinus">产品入驻</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navLeftTab" id="adminNavTabs_menuplatform" style="display:none;">
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_01_system"></i>
+                            <h4>设置</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/shopconfig"
+                                   data-param="menuplatform|01_shop_config">平台设置</a>
+                            </li>
+                            <li class="">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/payment"
+                                   data-param="menuplatform|01_payment_list">
+                                    支付方式
+                                </a>
+                            </li>
+                            <li class="">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/navlist"
+                                   data-param="menuplatform|01_navlist">
+                                    导航设置
+                                </a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/region"
+                                   data-param="menuplatform|01_region">地区列表</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/adminregion"
+                                   data-param="menuplatform|01_adminregion">区域管理</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/shipping"
+                                   data-param="menuplatform|01_shipping">物流配送</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/transport"
+                                   data-param="menuplatform|01_transport">运费模板</a>
+                            </li>
+                            <li style="display:none;">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/transport_fee"
+                                   data-param="menuplatform|01_transport">运费模板(新)</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/friendlink"
+                                   data-param="menuplatform|08_friendlink_list">友情链接</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/keywordslist"
+                                   data-param="menuplatform|user_keywords_list">检索记录</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_05_banner"></i>
+                            <h4>广告管理</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/adlist"
+                                   data-param="menuplatform|ad_list">广告列表</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/adposition"
+                                   data-param="menuplatform|ad_position">广告位置</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/home_floor"
+                                   data-param="menuplatform|ad_home_floor">首页楼层</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_07_content"></i>
+                            <h4>文章管理</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/article/articlecat"
+                                   data-param="menuplatform|02_articlecat_list">文章分类</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/article/article"
+                                   data-param="menuplatform|03_article_list">文章列表</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_08_members"></i>
+                            <h4>会员</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/user/index"
+                                   data-param="menuplatform|03_users_list">会员列表</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/user/recharge"
+                                   data-param="menuplatform|06_recharge">充值记录</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/user/account_log"
+                                   data-param="menuplatform|06_account_log">余额日志</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/user/userrank"
+                                   data-param="menuplatform|06_list_integrate">会员等级</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/user/addresslist"
+                                   data-param="menuplatform|12_user_address_list">收货地址</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/user/feedback"
+                                   data-param="menuplatform|12_feedback">用户留言</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_10_priv_admin"></i>
+                            <h4>权限管理</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/system/userslist"
+                                   data-param="menuplatform|01_admin_list">用户列表</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/system/rolelist"
+                                   data-param="menuplatform|admin_role">角色管理</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/system/menulist"
+                                   data-param="menuplatform|admin_menu">菜单管理</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/system/adminlog"
+                                   data-param="menuplatform|admin_logs">操作日志</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/system/msglist"
+                                   data-param="menuplatform|admin_message">操作留言</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="tit"><a href="javascript:void(0)"><i class="nav_icon icon_13_backup"></i><h4>数据管理</h4>
+                    </a></div>
+                    <div class="sub-menu" style="top: -408px;">
+                        <ul>
+
+                            <li class="curr"><s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/system/optimize"
+                                   data-param="menuplatform|03_db_optimize" target="workspace">数据优化
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navLeftTab" id="adminNavTabs_menushopping" style="display:none;">
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_02_cat_and_goods"></i>
+                            <h4>商品管理</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/goods"
+                                   data-param="menushopping|01_goods_list">商品列表</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/category"
+                                   data-param="menushopping|03_category_manage">商品分类</a>
+                            </li>
+                            <li class="hide">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/storecategory"
+                                   data-param="menushopping|04_category_manage">店铺分类</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/comment"
+                                   data-param="menushopping|05_comment_manage">用户评论</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/brandlist"
+                                   data-param="menushopping|06_goods_brand">品牌管理</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/goodstype"
+                                   data-param="menushopping|08_goods_type">商品规格</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/product_cate"
+                                   data-param="menushopping|08_product_cate">参数类型</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/product_group"
+                                   data-param="menushopping|08_product_group">参数分组</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/product_type"
+                                   data-param="menushopping|08_product_type">商品参数</a>
+                            </li>
+                            <li class="layui-hide">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/product_attr"
+                                   data-param="menushopping|08_product_attr">参数值表</a>
+                            </li>
+                            <!---
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/libgoods"
+                                   data-param="menushopping|libgoods">本地商品</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/libcatlist"
+                                   data-param="menushopping|gallery_album">本地分类</a>
+                            </li>
+                            -->
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/insurance"
+                                   data-param="menushopping|insurance">附加服务</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/goods_storage_put"
+                                   data-param="menushopping|goods_storage_put">库存入库</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/goods/goods_storage_out"
+                                   data-param="menushopping|goods_storage_out">库存出库</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item fold_item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_02_promotion"></i>
+                            <h4>促销管理</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/market/center"
+                                   data-param="menushopping|02_marketing_center">
+                                    营销中心
+                                </a>
+                            </li>
+                            <li class="">
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/market/paimaigoods"
+                                   data-param="menuspaimaigoods|03_paimaigoods">拍卖专区</a>
+                            </li>
+                            <li class="">
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/market/seckill"
+                                   data-param="menushopping|03_seckill_list">秒杀活动</a>
+                            </li>
+                            <li class="">
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/market/groupgoods"
+                                   data-param="menushopping|08_group_buy">团购活动</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/market/exgoods"
+                                   data-param="menushopping|15_exchange_goods">积分商城</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/market/coupon"
+                                   data-param="menushopping|15_coupon">优惠券场</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/market/venue"
+                                   data-param="menushopping|09_topic">专题活动</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/giftcard/index"
+                                   data-param="menushopping|09_giftcard">卡片管理</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_04_order"></i>
+                            <h4>订单管理</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/order/index"
+                                   data-param="menushopping|02_order_list">订单列表</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/order/booking"
+                                   data-param="menushopping|06_undispose_booking">缺货登记</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/order/delivery"
+                                   data-param="menushopping|09_delivery_order">发货单列表</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/order/refund_list"
+                                   data-param="menushopping|12_back_apply">退货单列表</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/order/appeal"
+                                   data-param="menushopping|13_complaint">投诉管理</a>
+                            </li>
+<!--                            <li>-->
+<!--                                <s></s>-->
+<!--                                <a href="javascript:void(0);" data-url="/admin/order/complaint"-->
+<!--                                   data-param="menushopping|13_complaint">交易纠纷</a>-->
+<!--                            </li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_17_merchants"></i>
+                            <h4>店铺管理</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/store/store_process"
+                                   data-param="menushopping|01_seller_stepup">店铺设置</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/store/index"
+                                   data-param="menushopping|02_merchants_users_list">店铺列表</a>
+                            </li>
+                            <li class="hide">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="merchants_commission.php?act=list"
+                                   data-param="menushopping|03_merchants_commission">店铺结算</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/store/seller"
+                                   data-param="menushopping|12_seller_account">店铺账户</a>
+                            </li>
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);"
+                                   data-url="/admin/store/storeapply"
+                                   data-param="menushopping|12_seller_apply">入驻申请</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navLeftTab" id="adminNavTabs_finance" style="display:none;">
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_06_stats"></i>
+                            <h4>统计</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/finance/store"
+                                   data-param="finance|01_shop_stats">店铺数量统计</a>
+                            </li>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/finance/shopsale"
+                                   data-param="finance|01_shop_shopsale">店铺销售统计</a>
+                            </li>
+                            <!--                        <li>
+                                                        <s></s>
+                                                        <a href="javascript:void(0);" data-url="/admin/Finance/store"
+                                                           data-param="finance|02_user_stats">会员统计</a>
+                                                    </li>
+                                                    <li>
+                                                        <s></s>
+                                                        <a href="javascript:void(0);" data-url="/admin/Finance/store"
+                                                           data-param="finance|03_sell_analysis">销售分析</a>
+                                                    </li>
+                                                    <li>
+                                                        <s></s>
+                                                        <a href="javascript:void(0);" data-url="/admin/Finance/store"
+                                                           data-param="finance|04_industry_analysis">行业统计</a>
+                                                    </li>
+                                                    <li>
+                                                        <s></s>
+                                                        <a href="javascript:void(0);" data-url="/admin/Finance/store"
+                                                           data-param="finance|exchange_count">积分明细</a>
+                                                    </li>
+                                                    <li>
+                                                        <s></s>
+                                                        <a href="javascript:void(0);" data-url="/admin/Finance/store"
+                                                           data-param="finance|report_guest">客户统计</a>
+                                                    </li>
+                                                    <li>
+                                                        <s></s>
+                                                        <a href="javascript:void(0);" data-url="/admin/Finance/store"
+                                                           data-param="finance|report_order">订单统计</a>
+                                                    </li>
+                                                    <li>
+                                                        <s></s>
+                                                        <a href="javascript:void(0);" data-url="/admin/Finance/store"
+                                                           data-param="finance|report_users">会员排行</a>
+                                                    </li>
+                                                    -->
+                            <li>
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/finance/salelist"
+                                   data-param="finance|sale_list">销售订单统计</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_31_fund"></i>
+                            <h4>资金</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/finance/withdraw"
+                                   data-param="finance|01_summary_of_money">提现管理</a>
+                            </li>
+                            <!--                             <li>
+                                                             <s></s>
+                                                             <a href="javascript:void(0);" data-url="/admin/Finance/store" data-param="finance|02_member_account">会员账户</a>
+                                                         </li>
+                                                         <li>
+                                                             <s></s>
+                                                             <a href="javascript:void(0);" data-url="/admin/Finance/store" data-param="finance|05_finance_analysis">资金概述</a>
+                                                         </li>-->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navLeftTab" id="adminNavTabs_third_party" style="display:none;">
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_24_sms"></i>
+                            <h4>短信管理</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/smsconfig"
+                                   data-param="third_party|alitongxin_configure">阿里短信</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="tit">
+                        <a href="javascript:void(0)">
+                            <i class="nav_icon icon_25_file"></i>
+                            <h4>文件管理</h4>
+                        </a>
+                    </div>
+                    <div class="sub-menu">
+                        <ul>
+                            <li class="curr">
+                                <s></s>
+                                <a href="javascript:void(0);" data-url="/admin/website/ossconfig"
+                                   data-param="third_party|oss_configure">七牛云OSS配置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="admin-main-right">
+        <div id="loading" class="loading-wrap">
+            <div class="loading-content">
+                <div class="loading-round"></div>
+                <div class="loading-dot"></div>
+            </div>
+        </div>
+        <div id="mm" class="submenubutton" style="width: 140px;">
+            <div id="mm-tabclose" name="6" iconCls="fa fa-refresh">刷新</div>
+            <div class="menu-sep"></div>
+            <div id="Div1" name="1" iconCls="fa fa-close">关闭</div>
+            <div id="mm-tabcloseother" name="3">关闭其他</div>
+            <div id="mm-tabcloseall" name="2">关闭全部</div>
+            <div class="menu-sep"></div>
+            <div id="mm-tabcloseright" name="4">关闭右侧标签</div>
+            <div id="mm-tabcloseleft" name="5">关闭左侧标签</div>
+            <div class="menu-sep"></div>
+            <div id="mm-newwindow" name="7">新窗口中打开</div>
+        </div>
+
+        <div id="index_tabs" fit="true">
+            <div title="管理中心" iconCls="fa fa-home" fit="true" id="defaulthome"
+                 data-options="fit:true,border:true,iframe:true,content:'<iframe src=\'/admin/index/home\' scrolling=\'auto\' frameborder=\'0\' style=\'width:100%;height:100%;\' fit=\'true\'></iframe>'">
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
+</div>
+<script>
+    var headerH = document.getElementById('app').offsetHeight;
+    var tabH = $(".tabs-header").height();
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            admin_user: [],
+        },
+        methods: {
+            init: function () {
+                $.post('/admin/index/index', {
+                    pageparm: '',
+                }, function (ret) {
+                    vm.admin_user = ret.data.admin_user;
+                }, 'json');
+            },
+            updatePwd: function () {
+                layer.open({
+                    type:2,
+                    title:'修改密码',
+                    area: ['500px', '300px'],
+                    content:'/admin/system/userupdatePwd'
+                });
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+        layui.use('upload', function () {
+            var upload = layui.upload;
+
+            //执行实例
+            var uploadInst = upload.render({
+                elem: '#admin_avatar',
+                url: '/admin/uploader/alioss_upload', //上传接口
+                data: {
+                    upload: 1
+                },
+                accept: 'file', //允许上传的文件类型
+                done: function (ret) {
+                    vm.admin_user.admin_avatar = ret.url;
+                    if (ret.state == 'SUCCESS') {
+                        majax('/admin/index/doupdate', vm.admin_user, 'admin_user')
+                    }
+                },
+            });
+        });
+        var adminH = $(window).height() - headerH;
+        $("#defaulthome").height(adminH - tabH);
+        $(".navLeftTab").height(adminH);
+
+        /**点击当前tab卡，不刷新页面，只更新数据
+         $('#index_tabs').iTabs({
+            border:false,
+            onSelect:function(title,index){
+                setTimeout(function () {
+                    var currentTab = $('#index_tabs').iTabs('getSelected');
+                    var opts = $.data(currentTab[0], 'panel').options;
+                    if (opts.iframe) {
+                        var currentIframe = currentTab.find('iframe')[0];
+                        if(currentIframe.contentWindow.vm.init){
+                            currentIframe.contentWindow.vm.init();
+                        }
+                    }
+                },300);
+            }
+        });
+         **/
+
+        $('#index_tabs').tabs({
+            onBeforeClose: function (title) {
+                setTimeout(function () {
+                    autoShowMenuList();
+                }, 150);
+            },
+            onSelect: function (title) {
+                setTimeout(function () {
+                    autoShowMenuList();
+                }, 150);
+            }
+        });
+
+        message();
+    });
+
+    window.onresize = function () {
+        var navH = window.innerHeight - headerH;
+
+        $(".navLeftTab").height(navH);
+        $("#defaulthome").height(navH - tabH);
+    };
+    function refreashTab(){
+        let refresh_tab = $('#index_tabs').iTabs('getSelected');
+        let refresh_iframe = refresh_tab.find('iframe')[0];
+        refresh_iframe.contentWindow.location.href = refresh_iframe.src;
+    }
+
+</script>
+

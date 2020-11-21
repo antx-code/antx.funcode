@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>
+    .checkbox_item label{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
+        display: inline-block;
+    }
+    .checkbox_item .ui-label {
+        padding-left: 20px;
+        background: url(/public/static/images/input_checkbox.png) 2px 14px no-repeat;
+    }
+    .ui-checkbox:checked+label {
+        background: url(/public/static/images/input_checked.png) 2px 14px no-repeat;
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation hide" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>该页面展示商城所有功能权限。</li>
+                <li>打钩即是分配权限，请谨慎操作。</li>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info business_info" style="background:none;">
+                        <div class="step">
+                            <div class="items">
+                                <div class="item">
+                                    <div class="label">
+                                        <span class="require-field">*</span>
+                                        &nbsp;角色名：
+                                    </div>
+                                    <div class="value">
+                                        <input type="text" class="text" v-model="info.role_name" name="user_name" value="" id="user_name" autocomplete="off"/>
+                                        <div class="form_prompt"></div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="label">角色描述：</div>
+                                    <div class="value">
+                                        <textarea class="textarea" v-model="info.role_describe" name="role_describe" id="role_describe"></textarea>
+                                        <div class="form_prompt"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <template v-for="(vo,index) in list">
+                            <div class="step">
+                                <div class="tit">
+                                    <div class="checkbox_items">
+                                        <div class="checkbox_item">
+                                            <input type="checkbox" name="chkGroup" :value="vo.action_id" class="ui-checkbox"
+                                                   :id="chkGroup+index"/>
+                                            <label :for="chkGroup+index" class="ui-label blod">
+                                                {{vo.action_name}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="qx_items">
+                                    <div class="qx_item">
+                                        <div class="checkbox_items">
+                                            <template v-for="(vo2,index2) in childlist">
+                                                <div class="checkbox_item" v-if="vo2.parent_id==vo.action_id">
+                                                    <template v-if="vo2.check==1">
+                                                        <input type="checkbox" :value="vo2.action_id" name="action_code[]" checked="true"
+                                                               class="ui-checkbox" :id="article_cat+index2"/>
+                                                    </template>
+                                                    <template v-else>
+                                                        <input type="checkbox" :value="vo2.action_id" name="action_code[]"
+                                                               class="ui-checkbox" :id="article_cat+index2"/>
+                                                    </template>
+
+                                                    <label :for="article_cat+index2" class="ui-label">
+                                                        {{vo2.action_name}}
+                                                    </label>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <div class="steplast">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="checkbox" name="checkall" value="checkbox" class="ui-checkbox" id="checkall"/>
+                                    <label for="checkall" class="ui-label">全选</label>
+                                </div>
+                            </div>
+                            <div class="info_btn">
+                                <input type="submit" name="submit" value="确定 " class="button" id="submitBtn" @click="doadd"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
+<script>
+    var info = JSON.parse('{:addslashes($info)}');
+    var infoColumn = JSON.parse('{:addslashes($infoColumn)}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+            list: [],
+            chkGroup: 'chkGroup_',
+            article_cat: 'article_cat',
+        },
+        methods: {
+            init: function () {
+                $.post('/admin/system/menulistAjax', {
+                    role_id: vm.info.role_id?vm.info.role_id:0
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.childlist = ret.data.childlist;
+                    setTimeout(function () {
+                        pageinit();
+                    },300);
+                }, 'json');
+            },
+            doadd:function () {
+                var arr = new Array();
+                $(".mian-info").find("input[name='chkGroup']:checked").each(function (i) {
+                    arr.push($(this).val());
+                });
+                $(".mian-info").find("input[name='action_code[]']:checked").each(function (i) {
+                    arr.push($(this).val());
+                });
+
+                vm.info.action_list = arr.join(',');
+                majax('/admin/system/roleadd',vm.info);
+            }
+        }
+    });
+    function pageinit(){
+        $("#checkall").click(function() {
+            var checkbox = $(this).parents(".switch_info").find('input:checkbox[type="checkbox"]');
+            if ($(this).prop("checked") == true) {
+                checkbox.prop("checked", true);
+            } else {
+                checkbox.prop("checked", false);
+            }
+        });
+        $("input[name='chkGroup']").click(function() {
+            var checkbox = $(this).parents(".tit").next(".qx_items").find('input:checkbox[type="checkbox"]');
+            if ($(this).prop("checked") == true) {
+                checkbox.prop("checked", true);
+            } else {
+                checkbox.prop("checked", false);
+            }
+        });
+        $("input[name='action_code[]']").click(function() {
+            var qx_items = $(this).parents(".qx_items");
+            var length = qx_items.find("input[name='action_code[]']").length;
+            var length2 = qx_items.find("input[name='action_code[]']:checked").length;
+            if (length == length2) {
+                qx_items.prev().find("input[name='chkGroup']").prop("checked", true);
+            } else {
+                qx_items.prev().find("input[name='chkGroup']").prop("checked", false);
+            }
+        });
+        $(".qx_items").each(function(index, element) {
+            var length = $(this).find("input[name='action_code[]']").length;
+            var length2 = $(this).find("input[name='action_code[]']:checked").length;
+            if (length == length2) {
+                $(this).prev().find("input[name='chkGroup']").prop("checked", true);
+            } else {
+                $(this).prev().find("input[name='chkGroup']").prop("checked", false);
+            }
+        });
+    }
+    $(function() {
+        vm.init();
+        var arr = new Array();
+        $(".mian-info").find("input[name='action_code[]']:checked").each(function (i) {
+            arr[i] = $(this).val();
+        });
+    });
+</script>

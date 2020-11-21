@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>登录-管理中心</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="/public/static/css/purebox.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/login.css"/>
+    <script type="text/javascript" src="/public/static/plugins/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.SuperSlide.2.1.1.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/lib_ecmobanFunc.js"></script>
+</head>
+<body>
+<div class="login-layout">
+    <!--
+    <div class="logo"><img src="/public/static/images/logo.png"></div>
+    -->
+    <div class="login-form" style="position: relative">
+        <div class="formContent">
+            <div class="title">管理中心</div>
+            <div class="formInfo">
+                <div class="formText">
+                    <i class="icon icon-user"></i>
+                    <input type="text" name="username" id="username" autocomplete="off" class="input-text" value=""
+                           placeholder="用户名"/>
+                </div>
+                <div class="formText">
+                    <i class="icon icon-pwd"></i>
+                    <input type="password" style="display:none"/>
+                    <input type="password" name="password" id="password" autocomplete="off" class="input-text" value=""
+                           placeholder="密  码"/>
+                </div>
+                <div class="formText">
+                    <div class="checkbox">
+                        <div class="cur">
+                            <input type="hidden" value="0" name="remember"/>
+                        </div>
+                    </div>
+                    <span class="span">保存信息</span>
+                </div>
+                <div class="formText submitDiv" onclick="submitForm()">
+                    <span class="submit_span"><input type="submit" name="submit" class="sub sub_curr"
+                                                     value="登录"/></span>
+                </div>
+            </div>
+        </div>
+        <div id="error" style="position: absolute;left:0px;bottom: 30px;text-align: center;width:395px;">
+        </div>
+    </div>
+</div>
+<div id="bannerBox">
+    <ul id="slideBanner" class="slideBanner">
+        <li><img src="/public/static/images/banner_1.jpg"></li>
+        <li><img src="/public/static/images/banner_2.jpg"></li>
+        <li><img src="/public/static/images/banner_3.jpg"></li>
+        <li><img src="/public/static/images/banner_4.jpg"></li>
+        <li><img src="/public/static/images/banner_5.jpg"></li>
+    </ul>
+</div>
+<script>
+    var user_name_empty = "管理员用户名不能为空!";
+    var password_empty = "密码不能为空!";
+    $("#bannerBox").slide({
+        mainCell: ".slideBanner",
+        effect: "fold",
+        interTime: 3500,
+        delayTime: 500,
+        autoPlay: true,
+        autoPage: true,
+        endFun: function (i, c, s) {
+            $(window).resize(function () {
+                var width = $(window).width();
+                var height = $(window).height();
+                s.find(".slideBanner,.slideBanner li").css({"width": width, "height": height});
+            });
+        }
+    });
+    function submitForm() {
+        var username = true;
+        var password = true;
+        var dsc_token = $(":input[name='dsc_token']").val();
+        if ($('#theForm input[name=username]').val() == '') {
+            $('#error').html('<span class="error">' + user_name_empty + '</span>');
+            $('#theForm input[name=username]').focus();
+            username = false;
+            return false;
+        }
+        if ($('#theForm input[name=password]').val() == '') {
+            $('#error').html('<span class="error">' + password_empty + '</span>');
+            $('#theForm input[name=password]').focus();
+            password = false;
+            return false;
+        }
+        if (username && password) {
+            $.ajax({
+                type: 'POST',
+                url: '/admin/login/login',
+                data: {
+                    username: $('#username').val(),
+                    password: $('#password').val(),
+                },
+                dataType: 'json',
+                timeout: 30000,
+                async: true,
+                cache: false,
+                context: $('body'),
+                success: function (ret) {
+                    if (ret.status == 0) {
+                        window.location.href = '/admin/index/index';
+                    } else {
+                        $('#error').html('<span class="error">' + ret.msg + '</span>');
+                        return false;
+                    }
+                }
+            });
+        } else {
+            return false;
+        }
+    };
+    $(function () {
+        $(".formText .input-text").focus(function () {
+            $(this).parent().addClass("focus");
+        });
+        $(".formText .input-text").blur(function () {
+            $(this).parent().removeClass("focus");
+        });
+        $(".checkbox").click(function () {
+            if ($(this).hasClass("checked")) {
+                $(this).removeClass("checked");
+                $('input[name=remember]').val(0);
+            } else {
+                $(this).addClass("checked");
+                $('input[name=remember]').val(1);
+            }
+        });
+        $(".formText .input-yzm").focus(function () {
+            $(this).prev().show();
+        });
+        $(".formText").blur(function () {
+            $(this).prev().hide();
+        });
+        $('.submit_span .sub').on('click', function () {
+            $('.code').show();
+        });
+        /* 判断浏览器是ie6 - ie8 后台不可以进入*/
+        if (!$.support.leadingWhitespace) {
+            notIe();
+        }
+        $(document).keydown(function (event) {
+            if (event.keyCode == 13) {
+                submitForm();
+            }
+        });
+    });
+</script>
+</body>
+</html>

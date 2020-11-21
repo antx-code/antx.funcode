@@ -1,0 +1,183 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">新增优惠券</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/sale/coupon"><i class="icon-reply"></i>优惠券列表</a>
+</div>
+<div class="explanation clear" id="explanation">
+    <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4></div>
+    <ul>
+        <li>1. 面额模板，一般用在商品优惠活动中赠送给完成订单的会员</li>
+        <li>2. 指定发放，则是属于不公开的优惠券,商家可以指定关注店铺会员发放</li>
+        <li>3. 免费领取，该类型的优惠券在店铺首页会员可以直接领取</li>
+        <li>4. 线下发放，则表示通过打印成实体券，并且生成验证劵码，用户凭借券码消费</li>
+    </ul>
+</div>
+
+<div class="ecsc-form-goods">
+    <form method="post" id="coupon_form">
+        <div class="wrapper-list border1">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;优惠券名称：</dt>
+                <dd>
+                    <input type="text" name="name" maxlength="30" value="{$coupon.name||default=''}" size="20" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;优惠券面额：</dt>
+                <dd>
+                    <input type="text" name="money" value="{$coupon.money||default=''}" size="20" class="text">
+                    <div class="form_prompt"></div>
+                    <div class="notic">此优惠券可以抵销的金额</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;发行数量：</dt>
+                <dd>
+                    <input type="text" name="num" value="{$coupon.num||default=''}" size="20" class="text">
+                    <div class="form_prompt"></div>
+                    <div class="notic">此优惠券发行数量</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;最小订单金额：</dt>
+                <dd>
+                    <input name="min_goods_amount" type="text" id="min_goods_amount" value="{$coupon.min_goods_amount||default=''}" size="20" class="text">
+                    <div class="form_prompt"></div>
+                    <div class="notic">只有商品总金额达到这个数的订单才能使用此优惠券</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>发放类型：</dt>
+                <dd>
+                    <div class="checkbox_items">
+                        <div class="checkbox_item">
+                            <input type="radio" name="send_type" value="0" id="send_type_0" checked="true" class="ui-radio">
+                            <label for="send_type_0" class="ui-radio-label">面额模板</label>
+                        </div>
+                        <div class="checkbox_item">
+                            <input type="radio" name="send_type" value="1" id="send_type_1" class="ui-radio">
+                            <label for="send_type_1" class="ui-radio-label">指定用户发放</label>
+                        </div>
+                        <div class="checkbox_item">
+                            <input type="radio" name="send_type" value="2" id="send_type_2" class="ui-radio">
+                            <label for="send_type_2" class="ui-radio-label">免费领取</label>
+                        </div>
+                        <div class="checkbox_item">
+                            <input type="radio" name="send_type" value="3" id="send_type_3" class="ui-radio">
+                            <label for="send_type_3" class="ui-radio-label">线下发放</label>
+                        </div>
+                    </div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>发放起止日期：</dt>
+                <dd>
+                    <div class="text_time">
+                        <input name="send_start_time" id="send_start_time" class="easyui-datetimebox">
+                    </div>
+                    <span class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                    <div class="text_time" id="text_time2">
+                        <input name="send_end_time" id="send_end_time" class="easyui-datetimebox">
+                    </div>
+                    <div class="form_prompt"></div>
+                    <div class="notic">只有当前时间介于起始日期和截止日期之间时，此类型的优惠券才可以发放</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>使用起止日期：</dt>
+                <dd>
+                    <div class="text_time">
+                        <input name="use_start_time" id="use_start_time" class="easyui-datetimebox">
+                    </div>
+                    <span class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                    <div class="text_time">
+                        <input name="use_end_time" id="use_end_time" class="easyui-datetimebox">
+                    </div>
+                    <div class="form_prompt"></div>
+                    <div class="notic">只有当前时间介于起始日期和截止日期之间时，此类型的优惠券才可以使用</div>
+                </dd>
+            </dl>
+
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    {if isset($coupon.coupon_id)}
+                    <input type="hidden" name="coupon_id" value="{$coupon.coupon_id | default=''}">
+                    {/if}
+                    <input type="submit" value=" 确定 " class="sc-btn sc-blueBg-btn btn35" id="submitBtn">
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(function () {
+        $('#send_start_time').datetimebox({
+            width: 145,
+            value: '{$coupon.send_start_time}' > 0 ? moment.unix('{$coupon.send_start_time}').format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss'),
+        });
+        $('#send_end_time').datetimebox({
+            width: 145,
+            value: '{$coupon.send_end_time}' > 0 ? moment.unix('{$coupon.send_end_time}').format('YYYY-MM-DD HH:mm:ss') : moment().add(1, 'months').format('YYYY-MM-DD HH:mm:ss'),
+        });
+        $('#use_start_time').datetimebox({
+            width: 145,
+            value: '{$coupon.use_start_time}' > 0 ? moment.unix('{$coupon.use_start_time}').format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss'),
+        });
+        $('#use_end_time').datetimebox({
+            width: 145,
+            value: '{$coupon.use_end_time}' > 0 ? moment.unix('{$coupon.use_end_time}').format('YYYY-MM-DD HH:mm:ss') : moment().add(3, 'months').format('YYYY-MM-DD HH:mm:ss'),
+        });
+        if ('{$coupon.send_type}' != '') {
+            $("input[name='send_type']").eq(parseInt('{$coupon.send_type}')).attr("checked", 'checked');
+        }
+        $('#coupon_form').validate({
+            errorPlacement: function (error, element) {
+                var error_div = element.parents('dl').find('div.form_prompt');
+                element.parents('.formText').find(".notic").hide();
+                error_div.append(error);
+            },
+            rules: {
+                name: {
+                    required: true
+                },
+                num: {
+                    required: true,
+                    min: 1
+                },
+                money: {
+                    required: true,
+                    min: 1
+                },
+                min_goods_amount: {
+                    required: true,
+                    min: 1
+                },
+            },
+            messages: {
+                name: {
+                    required: '<i class="icon icon-exclamation-sign"></i>优惠券名称不能为空'
+                },
+                num: {
+                    required: '<i class="icon icon-exclamation-sign"></i>优惠券发行数量不能为空',
+                    min: '<i class="icon icon-exclamation-sign"></i>优惠券发行数量错误'
+                },
+                money: {
+                    required: '<i class="icon icon-exclamation-sign"></i>优惠券面额不能为空',
+                    min: '<i class="icon icon-exclamation-sign"></i>优惠券面额不能小于1元'
+                },
+                min_goods_amount: {
+                    required: '<i class="icon icon-exclamation-sign"></i>优惠券使用条件不能为空',
+                    min: '<i class="icon icon-exclamation-sign"></i>优惠券使用条件不能小于1元/订单'
+                }
+            }
+        });
+    });
+</script>
+{include file="public/footer"}

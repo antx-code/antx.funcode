@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>标识“<em>*</em>”的选项为必填项，其余为选填项。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info">
+                        <div class="item">
+                            <div class="label">
+                                <span class="require-field">*</span>
+                                名称：
+                            </div>
+                            <div class="label_value">
+                                <input type='text' name='attr_name' value="" size='30' class="text" autocomplete="off" v-model="info.attr_name"/>
+                                <div class="form_prompt"></div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">
+                                <span class="require-field">*</span>
+                                所属商品规格：
+                            </div>
+                            <div class="label_value">
+                                <div class="imitate_select select_w170">
+                                    <div class="cite">请选择...</div>
+                                    <ul style="display: none;">
+                                        <template v-for="(vo,index) in goods_type_list">
+                                            <li><a href='javascript:;' class='ftx-01' @click="cat_idInit(vo.cat_id)">{{vo.cat_name}}</a></li>
+                                        </template>
+                                    </ul>
+                                    <input name="cat_id" type="hidden">
+                                </div>
+                                <div class="form_prompt"></div>
+                            </div>
+                        </div>
+
+                        <div class="item">
+                            <div class="label"><span class="require-field">*</span>该属性值的录入方式：</div>
+                            <div class="label_value">
+                                <div class="checkbox_items">
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="attr_input_type" id="attr_input_type_2" value="2" v-model="info.attr_input_type">
+                                        <label for="attr_input_type_2" class="ui-radio-label">多行文本框（一行代表一个值）</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label"><span class="require-field">*</span>值列表：</div>
+                            <div class="label_value">
+                                <textarea name="attr_values" cols="30" rows="5" class="textarea h120" v-model="info.attr_values"></textarea>
+                            </div>
+                        </div>
+                        <div class="item" >
+                            <div class="label">能否进行检索：</div>
+                            <div class="label_value">
+                                <div class="checkbox_items">
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="attr_index" id="attr_index_0" value="0" v-model="info.attr_index"/>
+                                        <label for="attr_index_0" class="ui-radio-label">不需要检索</label>
+                                    </div>
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="attr_index" id="attr_index_1" value="1" v-model="info.attr_index"/>
+                                        <label for="attr_index_1" class="ui-radio-label">关键字检索</label>
+                                    </div>
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="attr_index" id="attr_index_2" value="2" v-model="info.attr_index"/>
+                                        <label for="attr_index_2" class="ui-radio-label">范围检索</label>
+                                    </div>
+                                </div>
+                                <div class="noict bf100" id="noticeindex">不需要该属性成为检索商品条件的情况请选择不需要检索，需要该属性进行关键字检索商品时选择关键字检索，如果该属性检索时希望是指定某个范围时，选择范围检索。</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">排序：</div>
+                            <div class="label_value">
+                                <input type='text' name='sort_order' value="" size='30' class="text" autocomplete="off" v-model="info.sort_order"/>
+                                <div class="form_prompt"></div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">&nbsp;</div>
+                            <div class="label_value info_btn">
+                                <input type="submit" value="确定 " class="button" id="submitBtn" @click="init()"/>
+                                <input type="reset" value=" 重置 " class="button button_reset" @click="infoReset()"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+        info.attr_values = showTextarea(info.attr_values);
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var goods_type_list = JSON.parse('{$goods_type_list|raw}');
+    var cat_id = {$cat_id};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            cat_id: cat_id,
+            info: info,
+            goods_type_list: goods_type_list,
+        },
+        methods: {
+            cat_idInit:function(cat_id){
+                vm.info.cat_id = cat_id;
+            },
+            infoReset:function(){
+                vm.info = infoColumn;
+            },
+            init: function () {
+                if(!vm.info.attr_name || !vm.info.cat_id || !vm.info.attr_values){
+                    $.messager.alert('提示', imgtips, 'warning');
+                    return false;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/goods/attributeadd',
+                    data: {
+                        pageparm: JSON.stringify(vm.info),
+                        cat_id: vm.cat_id,
+
+                    },
+                    dataType: 'json',
+                    timeout: 30000,
+                    async: true,
+                    cache: false,
+                    context: $('body'),
+                    success: function (ret) {
+                        if (ret.status == 1) {
+                            $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        } else {
+                            $.messager.alert('提示', ret.msg, 'warning');
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>

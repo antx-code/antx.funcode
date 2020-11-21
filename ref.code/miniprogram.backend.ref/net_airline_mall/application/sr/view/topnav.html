@@ -1,0 +1,45 @@
+<div class="ecsc-head-layout sr">
+    <div class="wrapper">
+        <div class="admin-logo">
+            <div class="t">
+                <a href="/">
+                    <img src="{$logo}" class="logo"/>
+                </a>
+            </div>
+        </div>
+        <div class="ecsc-nav">
+            <ul class="ecsc-nav-ul">
+                <li class="{if ($Request.controller=='Index')}current{/if}"><a href="/sr/index/index.html">首页</a>
+                    <div class="arrow"></div>
+                </li>
+                <li class="{if ($Request.controller=='Goods')}current{/if}"><a href="/sr/goods/index">商品</a>
+                    <div class="arrow"></div>
+                </li>
+                <li class="{if ($Request.controller=='Order')}current{/if}"><a href="/sr/order/index">订单</a>
+                    <div class="arrow"></div>
+                </li>
+                <li class="{if ($Request.controller=='Merchants')}current{/if}"><a href="/sr/merchants/index">结算</a>
+                    <div class="arrow"></div>
+                </li>
+                <li class="{if ($Request.controller=='Setting')}current{/if}"><a href="/sr/setting/index">设置</a>
+                    <div class="arrow"></div>
+                </li>
+            </ul>
+        </div>
+        <div class="ecsc-admin">
+            <div class="avatar">
+                <a href="javascript:void(0);">
+                    <img style="border-color:#95edff" id="supplier-logo" src="{$Think.session.sr.logo | default='/public/static/images/seller/default_avatar.png'}">
+                </a>
+            </div>
+            <dl>
+                <dt>
+                    <span>{$Think.session.sr.username}</span>
+                </dt>
+                <dd>
+                    <span><i class="sc_icon sc_icon_out"></i><a class="navbar-brand navbar-right" href="/sr/index/signout">退出</a></span>
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>

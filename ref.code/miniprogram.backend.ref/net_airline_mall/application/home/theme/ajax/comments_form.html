@@ -1,0 +1,181 @@
+{include file='public/head'}
+<style>.pb-ft {
+    margin: 20px 0 20px 75px;
+}</style>
+<div class="comment-goods" id="app" v-cloak>
+    <div class="user-items">
+        <div class="item item-pf">
+            <div class="label"><em>*</em>评分：</div>
+            <div class="value" shoptype="rates">
+                <div class="commstar" shoptype="p_rate">
+                    <a href="javascript:;" data-value="1" class="star1">1</a>
+                    <a href="javascript:;" data-value="2" class="star2">2</a>
+                    <a href="javascript:;" data-value="3" class="star3">3</a>
+                    <a href="javascript:;" data-value="4" class="star4">4</a>
+                    <a href="javascript:;" data-value="5" class="star5">5</a>
+                </div>
+                <input type="hidden" name="comment_rank" value="">
+                <div class="error" style="display:none;">请打分数</div>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="label"><em>*</em>心得：</div>
+            <div class="value">
+                <textarea name="content" class="textarea"
+                          id="textarea" cols="30" rows="10" size="10"
+                          placeholder="写下你的评价，分享给大家吧！"
+                          onkeyup="figure()" maxlength="500">
+                </textarea>
+                <div class="clear"></div>
+                <div class="error">您还可以输入<span id="sp">500</span>字</div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="label">晒单评论：</div>
+            <div class="value">
+                <div class="upload-img-box">
+                    <div class="img-lists">
+                        <ul class="img-list-ul" shoptype="imglist">
+                            <template v-for="(vo,index) in imglist">
+                                <li><a :href="vo" target="_blank">
+                                    <img width="78" height="78" alt="" :src="vo"></a>
+                                    <i class="iconfont icon-cha" shoptype="cimg-remove" @click="imgdelete(index)"
+                                       :data-imgid="index"></i>
+                                </li>
+                            </template>
+                        </ul>
+                        <div class="upload-btn">
+                            <div id="file_upload" class="uploadify" style="position: relative;">
+                                <a href="javascript:void(0);" id="uploadbutton" class="uploadbutton"
+                                   style="position: relative; z-index: 1;">
+                                    <i class="iconfont icon-digital"></i>
+                                </a>
+                                <div id="html5_1dag942ph1vog11053ao1rn4e8g8_container"
+                                     class="moxie-shim moxie-shim-html5"
+                                     style="position: absolute; top: 0px; left: 0px; width: 78px; height: 78px; overflow: hidden; z-index: 0;">
+                                    <input id="html5_1dag942ph1vog11053ao1rn4e8g8" type="file"
+                                           style="font-size: 999px; opacity: 0; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;"
+                                           multiple="" accept="image/bmp,image/gif,image/jpeg,image/png"></div>
+                            </div>
+                        </div>
+                        <div class="img-utips">共<em shoptype="num">{{start}}</em>张,还能上传<span id="img_number" shoptype="ima_number">{{end}}</span>张
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="label"></div>
+            <div class="value">
+                <div class="checkbox-item lh30">
+                    <input type="checkbox" id="is_anonymous" checked="checked" value="1" class="ui-checkbox" id="invoice_checkbox">
+                    <label for="is_anonymous" class="ui-label">匿名评价</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="pb-ft">
+        <a href="javascript:void(0)" class="pb-btn pb-ok" @click="init()">确定</a>
+        <a href="javascript:void(0)" class="pb-btn pb-cl" @click="cancle()">取消</a>
+    </div>
+</div>
+
+<script type="text/javascript" src="__STATIC__/js/jquery.purebox.js"></script>
+<script type="text/javascript" src="__STATIC__/js/jquery.validation.min.js"></script>
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__STATIC__/js/common.js"></script>
+<script type="text/javascript" src="__THEME__/js/magiczoomplus.min.js"></script>
+<script type="text/javascript" src="__THEME__/js/parabola.js"></script>
+<script type="text/javascript" src="__THEME__/js/mall-common.js"></script>
+
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            uid: '',
+            imglist: [],
+            start: 0,
+            end: 10,
+            rec_id: '{$Request.get.rec_id}'
+        },
+        methods: {
+            imgdelete: function (index) {
+                vm.imglist.splice(index, 1);
+                vm.start--;
+                vm.end++;
+            },
+            init: function () {
+                let comment_rank = $("input[name='comment_rank']").val();
+                if (!comment_rank) {
+                    layer.msg('请点击星星评分');
+                    return;
+                }
+                $.post('/home/member/comments_form', {
+                    comment_rank: comment_rank,
+                    content: document.getElementById("textarea").value,
+                    imgs: vm.imglist.join(','),
+                    user_name: window.parent.document.querySelector('.name h2').innerHTML,
+                    rec_id: vm.rec_id,
+                    is_anonymous: document.getElementById('is_anonymous').checked ? 1 : 0
+                }, function (ret) {
+                    layer.msg(ret.msg, {time: 1500}, function () {
+                        if (ret.status == 1) {
+                            window.parent.updateStatus(true);
+                            window.parent.layer.closeAll();
+                        }
+                    });
+                }, 'json');
+            },
+            cancle: function () {
+                window.parent.updateStatus(false);
+                window.parent.layer.closeAll();
+            }
+        }
+    });
+    var upload = layui.upload;
+    upload.render({
+        elem: '#file_upload',
+        url: '/admin/uploader/alioss_upload', //上传接口
+        accept: 'file', //允许上传的文件类型
+        acceptMime: 'image/*', //允许上传的文件类型
+        multiple: true,
+        number: 10,
+        before: function (obj) {
+            if (vm.start > 9) {
+                pbDialog('最多上传10张', "", 0);
+                return false;
+            }
+        },
+        done: function (ret) {
+            if (ret.state == 'SUCCESS') {
+                if (vm.start < 10) {
+                    vm.imglist.push(ret.url);
+                    vm.start++;
+                    vm.end--;
+                }
+            } else {
+                pbDialog(ret.message, "", 0);
+            }
+
+        },
+    });
+
+    //心得评价输入字数计算
+    function figure() {
+        var textarea = document.getElementById("textarea");
+        var maxlength = 500;
+        var length = textarea.value.length;
+        var count = maxlength - length;
+        var sp = document.getElementById("sp");
+        sp.innerHTML = count;
+        if (count <= 10) {
+            sp.style.color = "red";
+        } else {
+            sp.removeAttribute("style");
+        }
+    }
+</script>
+
+</body>
+</html>

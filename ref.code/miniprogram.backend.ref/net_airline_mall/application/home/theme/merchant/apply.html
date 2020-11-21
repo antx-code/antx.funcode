@@ -1,0 +1,218 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/merchant_header'}
+
+<div class="container settled-container bg-ligtGary">
+    <div class="w w1200">
+        <div class="sett-process-warp clearfix">
+            <div class="s-p-steps">
+                <ul>
+                    {volist name="process" id="vo"}
+                    <li class="{if $key==$step}curr{elseif $key<$step}cur{/if}{if count($process)==$i} last{/if}">
+                        <span>{$key}. {$vo.process_title}</span>
+                        {if count($process)!=$i}
+                        <i class="iconfont icon-arrow-right-alt"></i>
+                        {/if}
+                    </li>
+                    {/volist}
+                </ul>
+            </div>
+
+            <div class="panel">
+                <div class="panel-content">
+                    {if isset($field['_article'])}
+                    <div class="bg-warp sid-frist">
+                        <form action="" method="post">
+                            <div class="title">{$process[$step]['process_title']}</div>
+                            <div class="textareay">
+                                <div class="agreement">
+                                    {$field['_article'] | raw}
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <input name="agreement" type="hidden" value="1"/>
+                                <input name="step" type="hidden" value="{$step}"/>
+                                <input class="btn" type="submit" value="{$process[$step]['fields_next']}"/>
+                            </div>
+                        </form>
+                    </div>
+                    {else /}
+                    <form action="{:url('merchant/apply')}" method="post" id="stepForm">
+                        <div class="bg-warp">
+                            <div class="title">
+                                <span>{$process[$step]['process_title']}</span>
+                            </div>
+                            <div class="prompt">以下所需要上传电子版资质仅支持JPG、GIF、PNG格式的图片，大小不超过1M，且必须加盖企业彩色公章。</div>
+                            <div class="panel-body">
+                                {foreach $field as $index => $item}
+                                <div class="item">
+                                    <div class="label">
+                                        <em>{if $item.is_must}*{/if}</em>
+                                        <span>{$item.fieldsFormTitle}：</span>
+                                    </div>
+                                    <div class="value">
+                                        {if $item.fieldsFormType == 'input'}
+                                        <input class="text{if $item.is_must == 1} required{/if}{if $item.fieldsName == 'mail'} email{elseif $item.fieldsName == 'mobile'} isMobile{/if}" type="text" value="{$item.value}" size="{$item.fieldsLength}" name="{$item.fieldsName}" id="{$item.fieldsName}">
+                                        {elseif $item.fieldsFormType == 'textarea'}
+                                        <textarea name="{$item.fieldsName}" cols="45" rows="8" {if $item.is_must== 1}required{/if}>{$item.value}</textarea>
+                                        {elseif $item.fieldsFormType == 'select'}
+
+                                        <select name="{$item.fieldsName}[]" class="catselectB" id="selCountries_{$item.fieldsName}_{$sn}" {if $item.is_must== 1} required{/if}>
+                                        <option value="">请选择国家</option>
+                                        {foreach $countryList as $country}
+                                        <option value="{$country.region_id}" {if isset($item.value[0]) && $item.value[0]== $country.region_id}selected{/if}>{$country.region_name}</option>
+                                        {/foreach}
+                                        </select>
+                                        <select name="{$item.fieldsName}[]" class="catselectB" id="selProvinces_{$item.fieldsName}_{$sn}" onchange="region.changed(this, 2, 'selCities_{$item.fieldsName}_{$sn}')" {if $item.is_must== 1}required{/if}>
+                                        <option value="">请选择省</option>
+                                        {foreach $provinceList as $province}
+                                        <option value="{$province.region_id}" {if isset($item.value[1]) && $item.value[1]== $province.region_id}selected{/if}>{$province.region_name}</option>
+                                        {/foreach}
+                                        </select>
+                                        <select name="{$item.fieldsName}[]" class="catselectB" id="selCities_{$item.fieldsName}_{$sn}" onchange="region.changed(this, 3, 'selDistricts_{$item.fieldsName}_{$sn}')" {if $item.is_must== 1}required{/if}>
+                                        <option value="">请选择市</option>
+                                        {if isset($cityList)}
+                                        {foreach $cityList as $city}
+                                        <option value="{$city.region_id}" {if isset($item.value[2]) && $item.value[2]== $city.region_id}selected{/if}>{$city.region_name}</option>
+                                        {/foreach}
+                                        {/if}
+                                        </select>
+                                        <select name="{$item.fieldsName}[]" class="catselectB" id="selDistricts_{$item.fieldsName}_{$sn}" {if $item.is_must== 1} required{/if} {if !isset($item.value[3])}style="display:none" {/if}>
+                                        <option value="">请选择区</option>
+                                        {if isset($districtList)}
+                                        {foreach $districtList as $district}
+                                        <option value="{$district.region_id}" {if isset($item.value[3]) && $item.value[3]== $district.region_id}selected{/if}>{$district.region_name}</option>
+                                        {/foreach}
+                                        {/if}
+                                        </select>
+                                        {elseif $item.fieldsFormType == 'select_normal'}
+                                        <select name="{$item.fieldsName}" class="satselectB" {if $item.is_must== 1} required{/if}>
+                                        <option value="">请选择</option>
+                                        {foreach $item.options as $v_key=>$v_val}
+                                        <option value="{$v_key}" {if isset($item.value) && $item.value== $v_key}selected{/if}>{$v_val}</option>
+                                        {/foreach}
+                                        </select>
+                                        {elseif $item.fieldsFormType == 'other'}
+                                        <div class="type-file-box">
+                                            <input type="button" class="type-file-button" id="button"/>
+                                            <input type="file" class="type-file-file" value="{$item.value}" {if $item.is_must== 1} required{/if} data-state="" hidefocus="true" />
+                                            <input type="hidden" name="{$item.fieldsName}" value="{$item.value}"/>
+                                        </div>
+                                        <div class="clear"></div>
+                                        {if $item.value}
+                                        <img class="mt10 lisence-img" src="{$item.value}">
+                                        {else /}
+                                        <img class="mt10 lisence-img hidden" src="">
+                                        {/if}
+                                        <div class="clear"></div>
+                                        {/if}
+                                        {if $item.fieldsFormSpecial}
+                                        <div class="org"><em>{$item.fieldsFormSpecial}</em></div>
+                                        {/if}
+                                    </div>
+                                </div>
+                                {/foreach}
+                            </div>
+                            <div class="btn-group">
+                                <input type="hidden" name="step" value="{$step}">
+                                {if $step>1}
+                                <a class="btn btn-w" href="{:url('merchant/apply',['step'=>$step-1])}">上一步</a>
+                                {/if}
+                                <input type="button" value="{$process[$step]['fields_next']}" class="btn" id="nextStepBtn" onclick="checkForm()"/>
+                            </div>
+                        </div>
+                    </form>
+                    {/if}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="__STATIC__/plugins/qiniu/qiniu.min.js"></script>
+<script type="text/javascript" src="__THEME__/js/merchant_region.js"></script>
+<script>
+    var token = JSON.parse('{:json_encode($token)}');
+    var check_name = true;
+
+    function prevStep(obj) {
+        $(obj).parents('form').attr('method', 'get').submit();
+    }
+
+    function checkForm() {
+        var msg = '此为必填项';
+        try {
+            $('input.required').each(function (index, item) {
+                if (!$(item).val()) {
+                    $(item).addClass('error').parent().append('<label class="error">' + msg + '</label>');
+                    $(item).on('blur', function () {
+                        $(this).removeClass('error');
+                        if ($(this).val()) {
+                            $(this).parent().find('label.error').remove();
+                        }
+                    });
+                    $(item).focus();
+                    throw new Error(item);
+                }
+            });
+
+            $(':required').each(function (index, item) {
+                if (item.type != 'file' && (item.value == '' || item.value == '0') || item.type == 'file' && (item.value == '' && item.nextElementSibling.value == '')) {
+                    if (item.type == 'file') {
+                        msg = '请上传';
+                    } else if (item.type = 'select') {
+                        msg = '请选择';
+                    } else {
+                        msg = '此为必填项';
+                    }
+                    $(item).addClass('error').parent().append('<label class="error">' + msg + '</label>');
+                    $(item).on('blur', function () {
+                        $(this).removeClass('error');
+                        if ($(this).val()) {
+                            $(this).parent().find('label.error').remove();
+                        }
+                    });
+                    $(item).focus();
+                    throw new Error('请上传');
+                }
+            });
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+        if (!check_name) {
+            $('input[name="store_name"]').addClass('error').parent().append('<label class="error">换一个吧~</label>');
+            return false;
+        }
+        $('#stepForm').submit();
+    }
+
+    $('input[type="file"]').on('change', function () {
+        var _this = this;
+        single_upload( _this.files[0], function (res) {
+            layer.closeAll();
+            _this.nextElementSibling.value = res;
+            var img = $(_this).parent().parent().find('.lisence-img');
+            img.attr('src', _this.nextElementSibling.value);
+            img.show();
+        }, null, token);
+    });
+
+    $('input[name="store_name"]').on('blur', function () {
+        var param = {store_name: this.value};
+        $.ajax({
+            type: 'POST',
+            url: '/home/merchant/uniqueName',
+            data: param,
+            success: function (data) {
+                check_name = true;
+            },
+            error: function (xhr, type) {
+                check_name = false;
+                pbDialog(xhr.responseJSON, "", 0);
+            }
+        });
+    });
+</script>
+{include file='public/footer'}

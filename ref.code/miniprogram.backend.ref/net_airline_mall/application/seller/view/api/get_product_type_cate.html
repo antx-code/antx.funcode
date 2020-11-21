@@ -1,0 +1,10 @@
+<div data-level="{$list[0]['level'] | default=2}" class="imitate_select select_w145" shoptype="typeCatSelect">
+    <div class="cite">请选择分类</div>
+    <ul style="display: block">
+        <li><a href="javascript:;" data-value="" data-level=2 class="ftx-01">顶级分类</a></li>
+        {foreach $list as $cate}
+        <li><a href="javascript:;" data-value="{$cate.id}" data-text="{$cate.name}" data-level="{$cate.level}" class="ftx-01">{$cate.name}</a></li>
+        {/foreach}
+    </ul>
+    <input name="" type="hidden" value="0" id="parent_id_val{$list[0]['level'] | default=2}" shoptype="typeCatVal">
+</div>

@@ -1,0 +1,160 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<style>
+    .user-index-wallet li:nth-child(1) .words {background-position: -60px 0;}
+    .user-index-wallet li:nth-child(2) .words {background-position: -120px 0;}
+</style>
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="default" id="app" v-cloak>
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <ul class="user-index-order-statu clearfix">
+            <li>
+                <a href="/home/member/order">
+                    <div class="circle">
+                        <i class="iconfont icon-columns"></i>
+                    </div>
+                    <div class="info">
+                        <p>待确认</p>
+                        <div class="num">{{order[0]>0?order[0]:0}}</div>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="/home/member/order">
+                    <div class="circle">
+                        <i class="iconfont icon-truck-alt"></i>
+                    </div>
+                    <div class="info">
+                        <p>待收货</p>
+                        <div class="num">{{shipping[1]>0?shipping[1]:0}}</div>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="/home/member/order">
+                    <div class="circle">
+                        <i class="iconfont icon-edit"></i>
+                    </div>
+                    <div class="info">
+                        <p>待评价</p>
+                        <div class="num">{{order[2]?order[2]:0}}</div>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="/home/member/order">
+                    <div class="circle">
+                        <i class="iconfont icon-complete"></i>
+                    </div>
+                    <div class="info">
+                        <p>已完成</p>
+                        <div class="num">{{order[4]>0?order[4]:0}}</div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        <ul class="user-index-wallet clearfix">
+            <li>
+                <div class="words"></div>
+                <div class="info">
+                    <a href="/home/member/coupon">
+                        优惠券（<span class="red">{{couponsum}}</span>）
+                    </a>
+                    <br>
+                    <div class="num">
+                        <a href="/home/market/coupons" target="_blank" class="line">领券</a>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="words"></div>
+                <div class="info info-line">
+                    <a href="/home/market">（<span class="red">{$user.points}</span>）
+                    </a>
+                </div>
+            </li>
+        </ul>
+        <div class="user-mod">
+            <div class="user-section">
+                <div class="user-title">
+                    <h2>我的订单</h2>
+                    <a href="/home/member/order" class="more">查看所有订单</a>
+                </div>
+                <div class="user-index-order-list">
+                    <div class="no_records">
+                        <i class="no_icon"></i>
+                        <div class="no_info no_info_line">
+                            <h3>主人，您近期还没有购买任何商品哟~</h3>
+                            <div class="no_btn">
+                                <a href="/" class="sc-btn sc-red-btn">去逛商城</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="user-section">
+                <div class="user-title">
+                    <h2>近期收藏</h2>
+                    <a href="/home/member/favorite" class="more">查看所有收藏</a>
+                </div>
+                <div class="user-index-collection-list">
+                    <div class="no_records">
+                        <i class="no_icon"></i>
+                        <div class="no_info">
+                            <h3>主人，您近期还没有收藏商品呦~</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="user-section">
+                <div class="user-title">
+                    <h2>帮助</h2>
+                </div>
+                <ul class="user-help-list clearfix">
+                    <template v-for="(vo,index) in helpList">
+                        <li>
+                            <a :href="'/home/article/content?article_id='+vo.article_id"
+                               class="ftx-05" target="_blank">{{vo.title}}
+                            </a>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public:footer"}
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            helpList: [],
+            shipping: [],
+            order: [],
+            couponsum: 0,
+        },
+        methods: {
+            init: function () {
+                $.post('/home/member/index', {
+                }, function (ret) {
+                    vm.helpList = ret.data.helpList;
+                    vm.order = ret.data.order;
+                    vm.shipping = ret.data.shipping;
+                    vm.couponsum = ret.data.couponsum;
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+
+

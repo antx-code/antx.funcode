@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="dadd()">
+                        <div class="fbutton">
+                            <div class="add" title="新建规格类型"><span>
+                                <i class="icon icon-plus" aria-hidden="true"></i>新建规格类型</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keywords" v-model="keywords" class="text nofocus w140" placeholder="商品商品规格" autocomplete="off">
+                        <input type="submit" class="btn" name="secrch_btn" shoptype="secrch_btn" value="" @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="10%"><div class="tDiv">规格类型</div></th>
+                            <th width="10%"><div class="tDiv">属性数</div></th>
+                            <th width="10%"><div class="tDiv">状态</div></th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td>
+                                    <div class="tDiv"><span>{{vo.cat_name}}</span></div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.count_cat_id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <template v-if="vo.enabled==0">
+                                            <img src="/public/static/images/no.png" title="点击" class="pointer" @click="goods_type_enabledupdate(vo)">
+                                        </template>
+                                        <template v-else>
+                                            <img src="/public/static/images/yes.png" title="点击" class="pointer" @click="goods_type_enabledupdate(vo)">
+                                        </template>
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0)" class="btn_see" @click="attributelist(vo)"><i class="sc_icon sc_icon_see"></i>规格列表</a>
+                                        <a href="javascript:void(0)"
+                                           class="btn_edit" @click="dadd(vo)"><i class="icon icon-edit"></i>编辑</a>
+                                        <a href="javascript:;" class="btn_trash" @click="goods_type_delete(vo,index)">
+                                            <i class="icon icon-trash"></i>删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="list-page">
+                                    <div id="turn-page">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: []
+        },
+        methods: {
+            dadd: function (vo={}) {
+                if (vo.cat_id > 0) {
+                    layerOpenwin('编辑规格', '/admin/goods/goodstypeadd?cat_id=' + vo.cat_id);
+                } else {
+                    layerOpenwin('新建规格', '/admin/goods/goodstypeadd');
+                }
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/goods/goodstype', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+
+            attributelist:function(vo){
+                window.parent.addParentTab({title: '商品规格表', href: '/admin/goods/attributelist?cat_id=' + vo.cat_id});
+            },
+            goods_type_delete: function (vo, index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.messager.progress();
+                        $.post('/admin/goods/goods_type_delete', {
+                            cat_id: vo.cat_id,
+                        }, function (ret) {
+                            $.messager.progress('close');
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                                $("#gridList").treegrid('reload');
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            goods_type_enabledupdate: function (vo) {
+                var pageparm = vo;
+                var enabled = vo.enabled == 0 ? 1 : 0;
+                pageparm.enabled = enabled;
+                majax('/admin/goods/goodstypeadd', pageparm);
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

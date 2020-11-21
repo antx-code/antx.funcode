@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>设置密码</title>
+    <link rel="stylesheet" type="text/css" href="/public/wap/css/aui.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/wap/css/common.css"/>
+    <style type="text/css">
+        body{background:#f5f5f5}
+        .aui-list{border:none;background-image:none}
+        .aui-list.aui-form-list .aui-list-item{background-image:none;border:none;margin-bottom:1.25rem}
+        .aui-list .aui-list-item-label-icon{border-right:1px solid #eee;min-width:1rem;padding-right:0.5rem;height:18px}
+        .aui-list .aui-list-item-input{padding-left:0.5rem}
+        .icoimg{width:20px;height:20px}
+        .aui-btn-block.aui-btn-sm{line-height:2rem;height:2rem}
+        .block-help{position:absolute;right:0;top:-1rem}
+    </style>
+</head>
+<body>
+<div class="aui-content-padded" id="app">
+    <div style="padding-top:2rem;">
+        <div class="aui-list aui-form-list aui-margin-15">
+            <div class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label-icon">
+                        <img src="/public/wap/static/images/wode.png" class="icoimg">
+                    </div>
+                    <div class="aui-list-item-input">
+                        <input type="password" placeholder="请输入老密码" class="aui-font-size-14" v-model="oldpassword">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="aui-list aui-form-list aui-margin-15">
+            <div class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <div class="aui-list-item-label-icon">
+                        <img src="/public/wap/static/images/password.png" class="icoimg">
+                    </div>
+                    <div class="aui-list-item-input">
+                        <input type="password" placeholder="再次输入密码" class="aui-font-size-14" v-model="newpassword">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="aui-margin-15 aui-padded-t-15" @click="init()">
+            <div class="aui-btn aui-btn-info aui-btn-block aui-btn-sm">完成</div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            oldpassword: '',
+            newpassword: '',
+        },
+        methods: {
+            init: function () {
+                if (vm.oldpassword == '') {
+                    wxapp.alert('fail', '老密码不能为空');
+                    return false;
+                }
+                if (vm.newpassword == '') {
+                    wxapp.alert('fail', '新密码不能为空');
+                    return false;
+                }
+                wxapp.ajax(config.updatePwdUrl, {
+                    oldpassword: vm.oldpassword,
+                    newpassword: vm.newpassword
+                }).then(function (ret) {
+                    if (ret.status == 1) {
+                        wxapp.alert('success', '更新成功');
+                        setTimeout(function () {
+                            closeWin();
+                        }, 1000)
+                    } else {
+                        wxapp.alert('fail', '更新失败');
+                    }
+                })
+            }
+        },
+        mounted: function () {
+            compatibility();
+        }
+    });
+</script>
+
+

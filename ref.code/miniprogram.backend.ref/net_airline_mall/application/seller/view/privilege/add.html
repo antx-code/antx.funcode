@@ -1,0 +1,78 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">管理员列表</a></li>
+    </ul>
+</div>
+
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/privilege/admin_list"><i class="icon-reply"></i>下级管理员列表</a>
+</div>
+
+<div class="ecsc-form-goods">
+    <form name="theForm" method="post" id="user_form">
+        <div class="wrapper-list border1">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;用户名：</dt>
+                <dd>
+                    <input type="text" name="username" maxlength="20" value="{$user.username??''}" size="34" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;Email地址：</dt>
+                <dd>
+                    <input type="text" name="email" value="{$user.email??''}" size="34" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;密 码：</dt>
+                <dd>
+                    <input type="password" name="password" maxlength="32" size="34" class="text" id="password">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;确认密码：</dt>
+                <dd>
+                    <input type="password" name="repassword" maxlength="32" size="34" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="submit" value=" 确定 " class="sc-btn sc-blueBg-btn btn35" id="submitBtn">
+                    <input type="reset" value=" 重置 " class="sc-btn sc-blue-btn btn35">
+                    <input type="hidden" name="act" value="insert">
+                    <input type="hidden" name="token" value="{$Request.token.token}"/>
+                    <input type="hidden" name="id" value="{$user.id??''}">
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+<script>
+    $('#user_form').validate({
+        rules: {
+            username: 'required',
+            email: {
+                required: true,
+                email: true
+            },
+            password: {
+                required: function () {
+                    return !Boolean($('input[name="id"]').val());
+                },
+                minlength: 6
+            },
+            repassword: {
+                minlength: 6,
+                equalTo: "#password"
+            }
+        }
+    });
+</script>
+{include file="public/footer"}

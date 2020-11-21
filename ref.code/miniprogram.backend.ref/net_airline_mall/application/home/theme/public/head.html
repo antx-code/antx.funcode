@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="Keywords" content="{$siteInfo.shop_keywords}{$store.store_keyword ?? ''}">
+    <meta name="Description" content="{$siteInfo.shop_desc}{$store.store_subtitle ?? ''}">
+    <title>{$siteInfo.shop_title}{$store.shop_name ?? ''}</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+    <script type="text/javascript" src="__STATIC__/js/jquery.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/jquery.json.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/transport_jquery.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/vue.js"></script>
+    <script type="text/javascript" src="__STATIC__/plugins/moment/moment.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/function.js"></script>
+    <script type="text/javascript" src="__THEME__/js/suggest.js"></script>
+    <script type="text/javascript" src="__THEME__/js/scroll_city.js"></script>
+    <script type="text/javascript" src="__THEME__/js/cart_common.js"></script>
+    <script type="text/javascript" src="__THEME__/js/cart_quick_links.js"></script>
+    <script type="text/javascript" src="__THEME__/js/region.js"></script>
+    <script type="text/javascript" src="__THEME__/js/utils.js"></script>
+
+
+    <!--layui库引入开始-->
+    <link href="__STATIC__/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="__STATIC__/plugins/layui/layui.all.js"></script>
+    <!--layui库引入结束-->
+
+
+
+
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/purebox.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/base.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/style.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/user.css"/>
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/quickLinks.css"/>
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/suggest.css"/>
+
+
+</head>
+<body>
+<input type="hidden" name="user_id" value="{$Think.session.user.user_id|default=0}">

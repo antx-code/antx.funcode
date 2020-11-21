@@ -1,0 +1,121 @@
+{include file="public/header"}
+
+<div id="app">
+    <div class="tabmenu">
+        <ul class="tab">
+            <li class="active"><a>自定义导航栏</a></li>
+        </ul>
+    </div>
+    <div class="btn-info">
+        <a class="sc-btn sc-blue-btn" href="/seller/store/navigator_add.html"><i class="icon-plus"></i>添加导航</a>
+    </div>
+
+    <div class="list-div" id="listDiv">
+        <table class="ecsc-default-table mt20">
+            <thead>
+            <tr>
+                <th width="20%" class="tl pl10">名称</th>
+                <th width="12%">是否显示</th>
+                <th width="13%">是否新窗口</th>
+                <th width="10%">排序</th>
+                <th width="30%">链接</th>
+                <th width="15%">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(vo,index) in list">
+                <td class="tl pl10">{{vo.name}}</td>
+                <td align="center">
+                    <div :class="['switch','ml25',{active:vo.is_show}]" :title="vo.is_show?'是':'否'" @click="toggle('is_show', index)">
+                        <div class="circle"></div>
+                    </div>
+                </td>
+                <td align="center">
+                    <div :class="['switch','ml25',{active:vo.blank}]" :title="vo.is_show?'是':'否'" @click="toggle('blank', index)">
+                        <div class="circle"></div>
+                    </div>
+                </td>
+                <td align="center"><span @click="edit('sort_order',index)">{{vo.sort_order}}</span></td>
+                <td align="center"><span @click="edit('url',index)">{{vo.url}}</span></td>
+                <td class="ecsc-table-handle">
+                    <span><a :href="'/seller/store/navigator_add.html?id='+vo.id" title="编辑" class="btn-green"><i class="icon icon-edit"></i><p>编辑</p></a></span>
+                    <span><a @click="del(index)" title="删除" class="btn-red"><i class="icon icon-trash"></i><p>删除</p></a></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: JSON.parse('{:json_encode($list)}'),
+            beforeRequest: false
+        },
+        methods: {
+            toggle: function (field, index) {
+                var param = {
+                    id: vm.list[index]['id'],
+                    field: field,
+                    value: parseInt(vm.list[index][field]) ? 0 : 1
+                };
+                this.modify(param, function (res) {
+                    if (res.msg) {
+                        easyshow(res.msg);
+                    } else {
+                        vm.list[index][field] = parseInt(res.content);
+                    }
+                });
+
+            },
+            edit: function (field, index) {
+                var obj = event.currentTarget;
+                var param = {
+                    id: vm.list[index]['id'],
+                    field: field
+                };
+                clickEdit(obj, param, vm.modify);
+            },
+            del: function (index) {
+                if (alert) {
+                    if (!window.confirm('您确定要删除吗？')) {
+                        return;
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/store/navigator_add.html?is_delete=1',
+                    data: {id: vm.list[index]['id']},
+                    success: function (data) {
+                        vm.list.splice(index, 1);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            modify: function (param, callback) {
+                if (vm.beforeRequest) {
+                    return;
+                }
+                vm.beforeRequest = true;
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/store/navigator",
+                    data: param,
+                    success: function (data) {
+                        vm.beforeRequest = false;
+                        callback(data);
+                    },
+                    error: function (xhr, type) {
+                        vm.beforeRequest = false;
+                        callback(xhr.responseJSON);
+                    }
+                });
+            }
+        }
+    });
+</script>
+{include file="public/footer"}

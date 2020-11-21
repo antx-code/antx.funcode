@@ -1,0 +1,258 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">添加/编辑分类</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/goods/store_category"><i class="icon-reply"></i>店铺商品分类</a>
+</div>
+
+<div class="ecsc-form-goods">
+    <form method="post" name="theForm" id="category_info_form">
+        <div class="wrapper-list">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;分类名称：</dt>
+                <dd>
+                    <input type="text" class="text" name="cat_name" maxlength="20" value="{$category.info.cat_name |default=''}" size="27">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;拼音：</dt>
+                <dd>
+                    <input type="text" name="pinyin_keywords" value="{$category.info.pinyin_keywords |default=''}" size="50" class="text mr10">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;手机小图标：</dt>
+                <dd>
+                    <div class="type-file-box">
+                        <div class="border_ccc mb10 relative">
+                            <img id="touch_icon-img" class="cate_icon" src="{$category.info.touch_icon | default='/public/static/images/update_images.jpg'}">
+                            <input type="file" class="type-file-file" data-state="imgfile" size="30" id="upload">
+                            <input type="hidden" name="touch_icon" class="type-file-text" id="touch_icon" value="{$category.info.touch_icon |default=''}">
+                        </div>
+                    </div>
+                    <div class="form_prompt"></div>
+                    <div class="notic m20" id="AdCodeImg">（注：手机端专用,建议上传正方形图片（100*100））</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>上级分类：</dt>
+                <dd>
+                    <div class="search_select">
+                        <category-seletor :category="cat"></category-seletor>
+                    </div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>关键字：</dt>
+                <dd><input type="text" name="keywords" value="{$category.info.keywords |default=''}" size="50" class="text mr10"></dd>
+            </dl>
+            <dl>
+                <dt>排序：</dt>
+                <dd><input type="text" class="text text_4" name="sort" value="{$category.info.sort |default='50'}" size="15"></dd>
+            </dl>
+            <dl>
+                <dt>是否显示：</dt>
+                <dd>
+                    <div class="checkbox_items">
+                        <div class="checkbox_item">
+                            <input type="radio" class="ui-radio" name="is_show" value="1" id="is_show_1" checked="true">
+                            <label class="ui-radio-label" for="is_show_1">是</label>
+                        </div>
+                        <div class="checkbox_item">
+                            <input type="radio" class="ui-radio" name="is_show" value="0" id="is_show_0" {if isset($category.info) && $category.info.is_show=='0'}checked="true"{/if}>
+                            <label class="ui-radio-label" for="is_show_0">否</label>
+                        </div>
+                    </div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>显示店铺导航栏：</dt>
+                <dd>
+                    <div class="checkbox_items">
+                        <div class="checkbox_item">
+                            <input type="radio" class="ui-radio" name="is_nav" value="1" id="show_in_nav_1" {if isset($category.info) && $category.info.is_nav=='1'}checked="true"{/if}>
+                            <label class="ui-radio-label" for="show_in_nav_1">是</label>
+                        </div>
+                        <div class="checkbox_item">
+                            <input type="radio" class="ui-radio" name="is_nav" value="0" id="show_in_nav_0" {if isset($category.info) && $category.info.is_nav=='0'}checked="true"{/if}>
+                            <label class="ui-radio-label" for="show_in_nav_0">否</label>
+                        </div>
+                    </div>
+                </dd>
+            </dl>
+
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="submit" value=" 确定 " class="sc-btn sc-blueBg-btn btn35" id="submitBtn">
+                    <input type="reset" value=" 重置 " class="sc-btn btn35 sc-blue-btn">
+                    {if isset($category.info)}
+                    <input type="hidden" name="cat_id" value="{$category.info.cat_id}">
+                    {/if}
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+
+<script type="text/x-template" id="category-seletor">
+    <div class="categorySelect">
+        <div class="selection">
+            <input type="text" class="text w290 valid" id="category_name" v-model="category.parent_name || '顶级分类'" autocomplete="off" readonly="" @click="hidecover=!hidecover">
+            <input type="hidden" name="parent_id" v-model="category.parent_id">
+            <input type="hidden" name="level" v-model="category.level">
+        </div>
+        <div class="select-container w320" :class="{hidden:hidecover}">
+            <div class="select-top">
+                <a href="javascript:" class="categoryTop" @click="resetChoose">重选</a>
+                &gt; <span class="txt">{{category.cat_path.join(' > ')}}</span>
+            </div>
+            <div class="select-list">
+                <ul>
+                    <li class="blue" data-show="1" data-seller="0" v-for="(vo,index) in category.list" @click="choose(index)">
+                        <em v-if="vo.level==2">Ⅱ</em><em v-else-if="vo.level==3">Ⅲ</em><em v-else>Ⅰ</em>
+                        {{vo.cat_name}}
+                    </li>
+                </ul>
+            </div>
+            <div :class="['loading',{hidden:requrest}]"><img src="/public/static/images/ajaxLoader.gif"><i>&nbsp;</i></div>
+        </div>
+    </div>
+</script>
+
+<script>
+    var vm = new Vue({
+        el: '#category_info_form',
+        data: {
+            cat: JSON.parse('{:json_encode($category)}'),
+        },
+        components: {
+            'category-seletor': {
+                template: '#category-seletor',
+                props: ['category'],
+                data: function () {
+                    return {
+                        hidecover: true,
+                        requrest: true
+                    };
+                },
+                methods: {
+                    choose: function (index) {
+                        var _this = this;
+                        _this.category.parent_name = _this.category.list[index]['cat_name'];
+                        _this.category.parent_id = _this.category.list[index]['cat_id'];
+                        _this.category.level = _this.category.list[index]['level'] + 1;
+                        if (_this.category.cat_path.length < 3) {
+                            _this.category.cat_path.push(_this.category.parent_name);
+                        } else {
+                            _this.category.cat_path.splice(2, 1, _this.category.parent_name);
+                        }
+                        _this.getCategory();
+                    },
+                    resetChoose: function () {
+                        this.category.parent_name = '';
+                        this.category.parent_id = 0;
+                        this.category.cat_path = [];
+                        this.category.level = 1;
+                        this.getCategory();
+                    },
+                    getCategory: function () {
+                        var _this = this;
+                        _this.requrest = false;
+                        $.ajax({
+                            type: 'POST',
+                            url: '/seller/api/get_store_category',
+                            data: {parent_id: _this.category.parent_id},
+                            success: function (data) {
+                                if (_this.category.cat_path.length < 3) {
+                                    _this.category.list = data;
+                                } else {
+                                    _this.hidecover = !_this.hidecover;
+                                }
+                                _this.requrest = true;
+                            },
+                            error: function (xhr, type) {
+                                _this.requrest = true;
+                                easyshow('获取店铺分类数据失败');
+                            }
+                        });
+                    }
+                },
+                created: function () {
+                    var _this = this;
+                    document.onclick = function (e) {
+                        if (e.target.id != 'category_name' && !$(e.target).is('.select-container') && !$(e.target).parents("div").is(".select-container")) {
+                            _this.hidecover = true;
+                        }
+                    };
+                }
+            }
+        }
+    });
+    var token;
+
+    $.ajax({
+        type: 'POST',
+        url: '/seller/api/uploadtoken',
+        success: function (data) {
+            token = data;
+        },
+        error: function (xhr, type) {
+            easyshow('xhr.responseJSON');
+        }
+    });
+
+    $("#upload").on("change").bind('change', function () {
+        single_upload(this.files[0], function (res) {
+            layer.closeAll();
+            document.getElementById('touch_icon-img').src = res;
+            document.getElementById('touch_icon').value = res;
+        }, null, token);
+    });
+
+    $(function () {
+        $('#category_info_form').validate({
+            errorPlacement: function (error, element) {
+                var error_div = element.parents('dl').find('div.form_prompt');
+                error_div.append(error);
+            },
+            rules: {
+                cat_name: {required: true},
+                pinyin_keywords: {required: true},
+                touch_icon: {required: true},
+            },
+            ignore: "",
+            messages: {
+                cat_name: {
+                    required: '<i class="icon icon-exclamation-sign"></i>分类名称不能为空'
+                },
+                pinyin_keywords: {
+                    required: '<i class="icon icon-exclamation-sign"></i>分类拼音不能为空',
+                },
+                touch_icon: {
+                    required: '<i class="icon icon-exclamation-sign"></i>请上传图标',
+                }
+            },
+            submitHandler: function (form) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/cat_edit',
+                    data: $(form).serialize(),
+                    success: function (data) {
+                        location.href = '/seller/goods/store_category';
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+{include file="public/footer"}

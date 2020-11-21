@@ -1,0 +1,118 @@
+<div class="user-form foreg-form">
+    <form action="javascript:;" method="get" name="theForm" id="theForm" class="user-form">
+        <div class="form-row">
+            <div class="form-label"><span class="red">*</span>收货人：</div>
+            <div class="form-value">
+                <input type="text" class="form-input" value="{$info.consignee | default=''}" maxlength="20" name="consignee" id="consignee_name">
+                <div class="form_prompt"></div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-label"><span class="red">*</span>手机号码：</div>
+            <div class="form-value">
+                <input type="text" class="form-input" maxlength="11" name="mobile" value="{$info.mobile | default=''}" id="consignee_mobile">
+                <span class="fl">固定电话：</span>
+                <input type="text" class="form-input" maxlength="20" value="{$info.tel | default=''}" name="tel" id="consignee_phone">
+                <div class="form_prompt"></div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label form-label-lh"><span class="red">*</span>所在地区：</div>
+            <div class="form-value" shoptype="regionLinkage">
+                <dl class="mod-select mod-select-small fl" shoptype="smartdropdown" id="selCountries_">
+                    <dt>
+                        <span class="txt" shoptype="txt">请选择</span>
+                        <input type="hidden" value="1" name="country">
+                    </dt>
+                    <dd shoptype="layer">
+                        <div class="option" data-value="1" data-text="中国" shoptype="ragionItem" data-type="1">中国</div>
+                    </dd>
+                </dl>
+                <dl class="mod-select mod-select-small fl" shoptype="smartdropdown" id="selProvinces_">
+                    <dt>
+                        <span class="txt" shoptype="txt">{$info.province_text | default='请选择'}</span>
+                        <input type="hidden" value="{$info.province | default=0}" name="province">
+                    </dt>
+                    <dd shoptype="layer">
+                        <div class="option" data-value="0">请选择</div>
+                    </dd>
+                </dl>
+                <dl class="mod-select mod-select-small fl" shoptype="smartdropdown" id="selCities_">
+                    <dt>
+                        <span class="txt" shoptype="txt">{$info.city_text | default='请选择'}</span>
+                        <input type="hidden" value="{$info.city | default=0}" name="city">
+                    </dt>
+                    <dd shoptype="layer">
+                        <div class="option" data-value="0">请选择</div>
+                    </dd>
+                </dl>
+                <dl class="mod-select mod-select-small fl" shoptype="smartdropdown" id="selDistricts_" style="display:none;">
+                    <dt>
+                        <span class="txt" shoptype="txt">{$info.district_text | default='请选择'}</span>
+                        <input type="hidden" value="{$info.district | default=0}" name="district">
+                    </dt>
+                    <dd shoptype="layer">
+                        <div class="option" data-value="0">请选择</div>
+                    </dd>
+                </dl>
+                <div class="form_prompt lh40"></div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-label"><span class="red">*</span>详细信息：</div>
+            <div class="form-value">
+                <input type="text" class="form-input form-input-long" name="address" value="{$info.address | default=''}" id="consignee_address">
+                <div class="form_prompt"></div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-label">电子邮箱：</div>
+            <div class="form-value">
+                <input type="text" class="form-input" name="email" value="{$info.email | default=''}" id="consignee_email">
+                <div class="form_prompt"></div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-label">邮编：</div>
+            <div class="form-value">
+                <input type="text" class="form-input" name="zipcode" value="{$info.zipcode | default=''}" id="consignee_zipcode">
+                <span id="consigneeZipcodeNote" class="status error"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-label">地址别名：</div>
+            <div class="form-value"><input type="text" class="form-input fl" value="{$info.sign_building | default=''}" name="sign_building" id="consignee_sign_building">
+                <div class="notic">设置一个易记的名称，如：'送到家里'、'送到公司'&nbsp;&nbsp;</div>
+            </div>
+            <span id="consigneeAliasNote" class="status error hide">请您填写地址别名</span>
+        </div>
+        <div class="form-row">
+            <div class="form-label">最佳送货时间：</div>
+            <div class="form-value add_best_time">
+                <input type="hidden" name="best_time" value="{:is_array($info['best_time'])?$info['best_time'][0].' '.$info['best_time'][1]:'每天 均可'}">
+                <dl class="mod-select mod-select-small fl" shoptype="smartdropdown">
+                    <dt>
+                        <span class="txt" shoptype="txt">{$info['best_time'][0] | default='每天'}</span>
+                    </dt>
+                    <dd shoptype="layer">
+                        <div class="option" data-value="每天" shoptype="timeItem">每天</div>
+                        <div class="option" data-value="工作日" shoptype="timeItem">工作日</div>
+                        <div class="option" data-value="周末" shoptype="timeItem">周末</div>
+                    </dd>
+                </dl>
+                <dl class="mod-select mod-select-small fl" shoptype="smartdropdown">
+                    <dt>
+                        <span class="txt" shoptype="txt">{$info['best_time'][1] | default='均可'}</span>
+                    </dt>
+                    <dd shoptype="layer">
+                        <div class="option" data-value="均可" shoptype="timeItem">均可</div>
+                        <div class="option" data-value="上午" shoptype="timeItem">上午</div>
+                        <div class="option" data-value="下午" shoptype="timeItem">下午</div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        <input name="address_id" value="{$info.address_id | default=0}" type="hidden">
+    </form>
+</div>

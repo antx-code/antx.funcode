@@ -1,0 +1,79 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">优惠券发放详情</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/sale/coupon"><i class="icon-reply"></i>优惠券列表</a>
+</div>
+<div class="list-div" id="listDiv" v-cloak>
+    <table class="ecsc-default-table">
+        <thead>
+        <tr>
+            <th width="8%">
+                <div class="first_all">
+                    <input onclick="listTable.selectAll(this, &quot;checkboxes&quot;)" type="checkbox" class="ui-checkbox" id="all">
+                    <label class="ui-label" for="all"><a href="javascript:listTable.sort('bonus_id');">编号</a></label>
+                </div>
+            </th>
+            <th width="15%"><a>红包类型</a></th>
+            <th width="15%"><a>订单号</a></th>
+            <th width="15%"><a>使用会员</a></th>
+            <th width="10%"><a>使用时间</a></th>
+            <th width="10%"><a>邮件通知</a></th>
+            <th width="15%">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo,index) in list">
+            <td class="first_td_checkbox">
+                <div class="first_all">
+                    <input value="1" id="checkboxes_1" name="checkboxes[]" type="checkbox" class="ui-checkbox">
+                    <label class="ui-label" for="checkboxes_1">1</label>
+                </div>
+            </td>
+            <td>{{vo.name}}</td>
+            <td>{{vo.order_id}}</td>
+            <td>{{vo.user_name}}</td>
+            <td>
+                <span v-if="vo.used_time>0">已使用</span><span v-else>未使用</span>
+            </td>
+            <td>已发成功</td>
+            <td class="ecsc-table-handle">
+                <span><a class="btn-red" @click="del(index)"><i class="icon icon-trash"></i><p>删除</p></a></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#listDiv',
+        data: {
+            list: JSON.parse('{:json_encode($list)}'),
+        },
+        methods: {
+            del: function (index) {
+                if (!window.confirm('您确实要删除[' + this.list[index].user_name + ']的优惠券吗？')) {
+                    return;
+                }
+                var id = this.list[index].list_id;
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/sale/coupon_detail',
+                    data: {list_id: id},
+                    success: function (data) {
+                        vm.list.splice(index, 1);
+                        easyshow();
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        }
+    });
+</script>
+{include file="public/footer"}

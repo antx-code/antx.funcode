@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>个人信息</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .s-user-top .user_profile_box .profile-index-top{margin-left:0;}
+        .s-user-top .user_profile_box .profile-index-top p{font-size:14px;color:#333;height:4.5rem;line-height:4.5rem}
+        .user_profile_box{border-bottom:1px solid #f1f1f1;padding-bottom:2rem}
+
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <div id="profile">
+        <div class="van-cell-group van-hairline--top-bottom">
+            <div class="van-cell">
+                <div class="van-cell__title">
+                    <div class="s-user-top">
+                        <div class="user_profile_box">
+                            <div class="profile-index-top">
+                                <p><span>头像 </span></p>
+                            </div>
+                            <div class="user-img">
+                                <div class="user-img-box van-uploader"><img src="https://x.dscmall.cn/storage/images/errorImg.png"  class="img-height">
+                                    <input type="file" accept="image/jpg, image/jpeg, image/png, image/gif" multiple="multiple" class="van-uploader__input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="van-cell van-cell--clickable">
+                <div class="van-cell__title"><span>昵称</span></div>
+                <div class="van-cell__value"><span>{{info.nick_name}}</span></div>
+                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+            </div>
+            <div class="van-cell van-cell--clickable" @click="sexinit()">
+                <div class="van-cell__title"><span>性别</span></div>
+                <div class="van-cell__value">
+                    <span v-if="info.sex==0">保密</span>
+                    <span v-if="info.sex==1">男</span>
+                    <span v-if="info.sex==2">女</span>
+                </div>
+                <i class="van-icon van-icon-arrow van-cell__right-icon"></i></div>
+            <div class="van-cell van-cell--clickable">
+                <div class="van-cell__title"><span>出生日期</span></div>
+                <div class="van-cell__value"><span>{{info.birthday}}</span></div>
+                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: {},
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD');
+            }
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.getuserinfo, {order_id: vm.order_id}).then(function (ret) {
+                    vm.info = ret.data.user;
+                })
+            },
+            profile:function(){
+                $.post(config.profile, {
+                    token: $api.getStorage('token') ? $api.getStorage('token') : '31e21723813f818925f53f815c51830a',
+                    pageparm: JSON.stringify(vm.info)
+                }, function (ret) {
+                    vm.init();
+                }, 'json');
+            },
+            sexinit:function () {
+                api.actionSheet({
+                    title: '选择性别',
+                    cancelTitle: '取消',
+                    buttons: ['保密', '男', '女']
+                }, function(ret, err) {
+                    vm.info.sex = ret.buttonIndex-1;
+                    vm.profile();
+                });
+            }
+        },
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

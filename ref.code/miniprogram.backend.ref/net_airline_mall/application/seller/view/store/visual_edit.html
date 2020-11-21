@@ -1,0 +1,271 @@
+{include file="public/header"}
+<link rel="stylesheet" type="text/css" href="/public/static/plugins/swiper/swiper.min.css">
+<style>
+    .flexcenter img:hover {
+        filter: brightness(50%);
+    }
+
+    .border {
+        border: 1px solid #139ff0;
+    }
+
+    .border img {
+        max-width: 200px;
+    }
+
+    .flexcenter {
+        display: flex;
+        position: relative;
+        align-items: center;
+    }
+
+    .flexcenter img {
+        max-width: 300px;
+        max-height: 100px;
+        margin: 10px 20px 0 0;
+        cursor: pointer;
+    }
+
+    .flexcenter .del {
+        position: unset;
+        margin-left: 20px;
+    }
+    .del {
+        width: 24px;
+        height: 24px;
+        padding: 2px;
+        background: url('/public/static/images/close.png') center no-repeat;
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 9999;
+        cursor: pointer;
+        border: 1px solid #b2b2b2;
+        border-radius: 50%;
+    }
+
+    .del:hover {
+        border: 1px solid red;
+    }
+    .swiper-slide img {
+        max-width: 100%;
+        max-height: 300px;
+    }
+</style>
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">店铺首页模板</a></li>
+        <li><a href="javascript:">首页轮播</a></li>
+    </ul>
+</div>
+
+<div class="design-content items-info" id="app" v-cloak>
+    <div class="wrapper-list">
+        <div class="templet">
+            <div class="templet-thumb">
+                <img id="screenshot" :src="template[store.template].img" width="168" height="216">
+            </div>
+
+            <div class="templet-info">
+                <h3 class="template_tit">当前使用模板</h3>
+                <strong class="template_name">{{template[store.template].name}}</strong>
+                <span>{{template[store.template].desc}}</span>
+                <div class="template_desc"><a href="javascript:">{{template[store.template].author}}</a></div>
+            </div>
+            <div class="plat"></div>
+        </div>
+
+        <div class="tabs" style="height: 43px!important;width: 100%;padding-left:0">
+            <ul class="qh">
+                <li class="current" data-export="1" shoptype="li_type">可用的模板</li>
+            </ul>
+        </div>
+
+        <div class="template-info">
+            <div class="template-list" data-type="backups" id="backupTemplates" style="display: block;">
+                <ul class="list">
+                    <li :class="{curr:store.template==index}" :data-name="'store_tpl_' + index" v-for="(vo,index) in template">
+                        <strong class="span">{{vo.name}}</strong>
+                        <div class="span">{{vo.desc}}</div>
+                        <div class="img">
+                            <img width="263" height="338" :src="vo.img" data-src-wide="vo.img" border="0" :id="'store_tpl_' + index" class="pic" shoptype="pic">
+                            <div class="bg"></div>
+                        </div>
+                        <div class="info">
+                            <div class="row"><a :href="vo.img" target="_blank" class="mr10" shoptype="see">查看大图</a></div>
+                        </div>
+                        <div class="box" @click="useThis(index)">
+                            <i class="icon icon-gou"></i>
+                            <span>立即使用</span>
+                        </div>
+                        <i class="ing"></i>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="wrapper-list hide">
+        <div class="btn-info">
+            <a class="sc-btn sc-blue-btn" @click="add()"><i class="icon-plus"></i>添加图片</a>
+        </div>
+        <div class="explanation clear mb20">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>温馨提示</h4></div>
+            <ul>
+                <li>首页 <b>轮播大图</b> , 最多上传6张图片。</li>
+                <li>请点击蓝框区域编辑广告图片。图片尺寸: <b>1920 * 600</b>效果最佳</li>
+            </ul>
+        </div>
+        <div class="advertising">
+            <div class="relative">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide" v-for="(vo,idx) in store.slide"><img :src="vo"></div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+            <div class="border mt10 pb10">
+                <div class="mt10">
+                    <label for="effect">切换效果:
+                        <select id="effect" v-model="store.slide_type" @change="updateImg();carsousel_run()">
+                            <option value="slide">滑动</option>
+                            <option value="fade">淡入</option>
+                            <option value="cube">方块</option>
+                            <option value="coverflow">3D流</option>
+                            <option value="flip">3D翻转</option>
+                        </select>
+                    </label>
+                </div>
+                <div v-for="(vo,index) in store.slide" class="flexcenter">
+                    <img :src="vo" alt="点击更换图片" @click="instead(index)">
+                    <input type="text" class="text text_7" v-model="store.slide_url[index]" @change="updateImg()">
+                    <div class="del" @click="del(index)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/public/static/plugins/swiper/swiper.min.js"></script>
+<script>
+    var mySwiper;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            store: JSON.parse('{:json_encode($store)}'),
+            template: JSON.parse('{:json_encode($template)}'),
+            token: '',
+        },
+        methods: {
+            useThis: function (index) {
+                layer.load(1);
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/store/visual_edit',
+                    data: {template: index},
+                    success: function (data) {
+                        layer.closeAll();
+                        vm.store.template = index;
+                    },
+                    error: function (xhr, type) {
+                        layer.closeAll();
+                        easyshow(xhr.resposneJSON);
+                    }
+                });
+            },
+            carsousel_run() {
+                if (mySwiper) {
+                    mySwiper.destroy();
+                }
+                mySwiper = new Swiper('.swiper-container', {
+                    autoplay: true,
+                    effect: vm.store.slide_type,
+                    speed: 500,
+                    grabCursor: true,
+                    pagination: {
+                        el: '.swiper-pagination',
+                    },
+                    loop: true,
+                });
+                mySwiper.params.autoplay.delay = 5000;
+            },
+            add: function () {
+                if (vm.store.slide.length > 5) {
+                    easyshow('广告图片最多添加6张');
+                    return;
+                }
+                vm.store.slide.push('http://shangxing.heimicms.com/Fuuzz9lFfD077J98PlZQlb-N4GML');
+                vm.store.slide_url.push('/');
+            },
+            updateImg(callback) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/store/visual_edit',
+                    data: {slide: vm.store.slide, slide_url: vm.store.slide_url, slide_type: vm.store.slide_type},
+                    success: function (res) {
+                        if (typeof callback == 'function') callback(res);
+                        else easyshow('保存成功~');
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            instead: function (index) {
+                var input = document.createElement('input');
+                input.type = 'file';
+                input.style.opacity = 0;
+                input.onchange = function () {
+                    single_upload(this.files[0], function (res) {
+                        layer.closeAll();
+                        Vue.set(vm.store.slide, index, res);
+                        vm.updateImg();
+                    }, null, vm.token);
+                    $(input).remove();
+                };
+                document.body.append(input);
+                $(input).trigger('click');
+            },
+            del: function (index) {
+                if (!window.confirm('您确定要删除吗?')) {
+                    return false;
+                }
+                vm.store.slide.splice(index, 1);
+                vm.store.slide_url.splice(index, 1);
+                vm.updateImg();
+            },
+        },
+        created: function () {
+            if (!this.store.slide) {
+                this.store.slide = ['http://shangxing.heimicms.com/Fuuzz9lFfD077J98PlZQlb-N4GML'];
+                this.store.slide_url = ['/'];
+                this.store.slide_type = 'slide';
+            }
+        },
+        mounted: function () {
+            var instance = this;
+            $.ajax({
+                type: 'POST',
+                url: '/seller/api/uploadtoken',
+                success: function (data) {
+                    instance.token = data;
+                },
+                error: function (xhr, type) {
+                    easyshow(xhr.responseJSON);
+                }
+            });
+            if (instance.store.slide.length) {
+                instance.effect = instance.store.slide_type;
+            }
+        }
+    });
+
+    $('.tab li').eq(1).click(function () {
+        setTimeout(function () {
+            vm.carsousel_run();
+        }, 50);
+    });
+</script>
+{include file="public/footer"}

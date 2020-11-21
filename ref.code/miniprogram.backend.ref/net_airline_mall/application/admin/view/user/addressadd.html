@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<script type="text/javascript" src="/public/static/js/region.js"></script>
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>标识“<em>*</em>”的选项为必填项，其余为选填项。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info user_basic">
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            收货人姓名：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.consignee" class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">配送区域：</div>
+                        <div class="label_value">
+                            <div class="level_linkage">
+                                <div class="fl">
+                                    <div class="ui-dropdown smartdropdown alien" style="z-index: 100;">
+                                        <input type="hidden" value="0" :value="info.province" name="province" id="selProvinces">
+                                        <div class="txt">省</div>
+                                        <i class="down u-dropdown-icon"></i>
+                                        <div class="options clearfix" style="max-height:300px;">
+                                            <template v-for="(vo,index) in regionList.oneList">
+                                                <span class="liv" :data-text="vo.region_name" :data-type="vo.region_id"
+                                                      :data-value="vo.region_id" @click="regionListInit(1,vo.region_id)">
+                                                    {{vo.region_name}}
+                                                </span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="ui-dropdown smartdropdown alien" style="z-index: 99;">
+                                        <input type="hidden" value="0" :value="info.city" name="city" id="selCities">
+                                        <div class="txt">市</div>
+                                        <i class="down u-dropdown-icon"></i>
+                                        <div class="options clearfix" style="max-height:300px;">
+                                            <template v-for="(vo,index) in regionList.twoList">
+                                                <span class="liv" :data-text="vo.region_name" :data-type="vo.region_id"
+                                                      :data-value="vo.region_id" @click="regionListInit(2,vo.region_id)">
+                                                    {{vo.region_name}}
+                                                </span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="ui-dropdown smartdropdown alien" style="z-index: 98;">
+                                        <input type="hidden" value="0" :value="info.district" name="district" id="selDistricts">
+                                        <div class="txt">区</div>
+                                        <i class="down u-dropdown-icon"></i>
+                                        <div class="options clearfix" style="max-height:300px;">
+                                            <template v-for="(vo,index) in regionList.thrList">
+                                                <span class="liv" :data-text="vo.region_name" :data-type="vo.region_id"
+                                                      :data-value="vo.region_id">
+                                                    {{vo.region_name}}
+                                                </span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            详细地址：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.address" class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            手机：
+                        </div>
+                        <div class="label_value">
+                            <input type="number" v-model="info.mobile" class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">电子邮件：</div>
+                        <div class="value">
+                            <input type="text" class="text" name="email" v-model="info.email" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">邮政编码：</div>
+                        <div class="value">
+                            <input type="text" class="text" name="zipcode" v-model="info.zipcode" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">标志建筑：</div>
+                        <div class="value">
+                            <input type="text" class="text" name="sign_building" v-model="info.sign_building"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">最佳送货时间：</div>
+                        <div class="value">
+                            <input type="text" class="text" name="best_time" v-model="info.best_time"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+
+            level: 0,
+            regionList: {
+                oneList: [],
+                twoList: [],
+                thrList: [],
+            }
+        },
+        methods: {
+            init: function () {
+                vm.info.province = $("input:hidden[name='province']").val();
+                vm.info.city = $("input:hidden[name='city']").val();
+                vm.info.district = $("input:hidden[name='district']").val();
+                majax('/admin/user/addressadd', vm.info);
+            },
+            regionListInit: function (level = 0, parent_id = 0) {
+                vm.level = 0;
+                $.post('/admin/user/getregionList', {
+                    level: level,
+                    parent_id: parent_id,
+                }, function (ret) {
+                    if (ret.data.oneList) {
+                        vm.regionList.oneList = ret.data.oneList;
+                    }
+                    if (ret.data.twoList) {
+                        vm.regionList.twoList = ret.data.twoList;
+                    }
+                    if (ret.data.thrList) {
+                        vm.regionList.thrList = ret.data.thrList;
+                    }
+                }, 'json');
+            }
+        }
+    });
+    $(function () {
+        vm.regionListInit();
+        setTimeout(function () {
+            $.levelLink();//地区三级联动
+        },300);
+    });
+</script>

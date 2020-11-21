@@ -1,0 +1,105 @@
+{include file="header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li><a href="/sr/merchants/account">店铺账户</a></li>
+        <li><a href="/sr/merchants/withdrawals">提现记录</a></li>
+        <li class="active"><a href="javascript:">收支明细</a></li>
+    </ul>
+</div>
+
+<div class="list-div mt10" id="app" v-cloak>
+    <div class="btn-info"><a @click="getData('',true)" class="sc-btn sc-blue-btn"><i class="icon-download-alt"></i>导出Excel</a></div>
+
+    <table class="ecsc-default-table">
+        <thead>
+        <tr>
+            <th width="20%">帐户变动时间</th>
+            <th width="20%">帐户变动原因</th>
+            <th width="20%">当前余额</th>
+            <th width="20%">变动金额</th>
+            <th width="20%">变动后余额</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(vo,index) in list">
+            <td class="left">{{vo.change_time}}</td>
+            <td align="center">
+                <span>{{vo.type}}</span>
+            </td>
+            <td align="center">{{vo.before_amount}}</td>
+            <td align="center"><span style="color:#FF0000">{{vo.amount}}</span></td>
+            <td align="center"><span>{{vo.after_amount}}</span></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="pagination">
+        <div id="page-bar"></div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+        },
+        methods: {
+            getData(instance, down) {
+                instance = instance ? instance : vm;
+                var param = {
+                    page: instance.page,
+                    pageSize: instance.pageSize
+                };
+                if (down) {
+                    $('<form action="/sr/merchants/account_log/download/1.html"></form>').appendTo('body').submit().remove();
+                    return;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/sr/merchants/account_log',
+                    data: param,
+                    success: function (data) {
+                        instance.list = data.list;
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        instance.pageSize = data.pageSize;
+                        if (data.page == 1) instance.pagerender(instance);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            pagerender(instance) {
+                instance = instance ? instance : vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: parseInt(instance.pageSize),
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+        },
+        created() {
+            this.getData(this);
+        }
+    });
+</script>
+
+{include file="footer"}

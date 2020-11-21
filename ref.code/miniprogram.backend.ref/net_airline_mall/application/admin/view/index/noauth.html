@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<link href="https://www.layui.com/admin/std/dist/layuiadmin/style/admin.css" rel="stylesheet" type="text/css"/>
+<div class="layui-fluid" id="app">
+    <div class="layadmin-tips">
+        <i class="layui-icon" face style="font-size: 150px !important;">&#xe664;</i>
+        <div class="layui-text" style="font-size: 20px;border-top:solid 5px #2F4056;">
+            无权限（1秒自动关闭当前页面......）
+        </div>
+    </div>
+</div>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            uid: '',
+            list: []
+        },
+        methods: {
+            init: function () {
+
+            }
+        }
+    });
+    $(function () {
+        parentTabClose();
+    });
+</script>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak="">
+    <div class="content">
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" placeholder="公司名称|联系人|手机号" class="text nofocus" v-model="keywords">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn" @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%">
+                                <div class="tDiv">编号</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">公司名称</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">联系人</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">手机</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">加盟类目</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">详细地址</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">提交时间</div>
+                            </th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td>
+                                    <div class="tDiv">{{vo.id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.companyname}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.username}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.mobile}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.cateinfo}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.address}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.create_time_cn}}</div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+
+            ids: [],
+
+        },
+        methods: {
+
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/index/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'joinus'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                                vm.init();
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            init: function () {
+                $.post('/admin/index/joinus', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

@@ -1,0 +1,393 @@
+{include file="public/header"}
+
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">订单列表</a></li>
+    </ul>
+</div>
+<div id="app" v-cloak>
+    <div class="order-step" v-if="order.pay_code=='cod'">
+        <dl>
+            <dt class="flex"><i class="sc_icon cod-icon mr5"></i>货到付款订单</dt>
+        </dl>
+        <dl class="step-first current">
+            <dt><i class="iconOk"></i><span>提交订单</span><i class="jt"></i></dt>
+            <dd class="date" title="下单时间：">{{order.add_time | timeParse}}</dd>
+        </dl>
+        <dl :class="{current:order.shipping_status>1}">
+            <dt><i class="iconOk"></i><span>商家发货</span><i class="jt"></i></dt>
+            <dd class="date"><span v-if="order.shipping_status>1">{{order.shipping_time | timeParse}}</span><span v-else-if="order.shipping_status==1">发货中</span><span v-else>未发货</span></dd>
+        </dl>
+        <dl :class="{current:order.confirm_time>0}">
+            <dt><i class="iconOk"></i><span>确认收货</span><i class="jt"></i></dt>
+            <dd class="date"><span v-if="order.confirm_time>0">{{order.confirm_time | timeParse}}</span><span v-else>未收货</span></dd>
+        </dl>
+        <dl :class="{current:order.is_comment==1}">
+            <dt><i class="iconOk"></i><span>评价</span></dt>
+            <dd class="date">&nbsp;</dd>
+        </dl>
+    </div>
+    <div class="order-step" v-else>
+        <dl class="step-first current">
+            <dt><i class="iconOk"></i><span>提交订单</span><i class="jt"></i></dt>
+            <dd class="date" title="下单时间：">{{order.add_time | timeParse}}</dd>
+        </dl>
+        <dl :class="{current:order.pay_status==1}">
+            <dt><i class="iconOk"></i><span>支付订单</span><i class="jt"></i></dt>
+            <dd class="date"><span v-if="order.pay_status==1">{{order.pay_time | timeParse}}</span><span v-else>未付款</span></dd>
+        </dl>
+        <dl :class="{current:order.shipping_status>1}">
+            <dt><i class="iconOk"></i><span>商家发货</span><i class="jt"></i></dt>
+            <dd class="date"><span v-if="order.shipping_status>1">{{order.shipping_time | timeParse}}</span><span v-else-if="order.shipping_status==1">发货中</span><span v-else>未发货</span></dd>
+        </dl>
+        <dl :class="{current:order.confirm_time>0}">
+            <dt><i class="iconOk"></i><span>确认收货</span><i class="jt"></i></dt>
+            <dd class="date"><span v-if="order.confirm_time>0">{{order.confirm_time | timeParse}}</span><span v-else>未发货</span></dd>
+        </dl>
+        <dl :class="{current:order.is_comment==1}">
+            <dt><i class="iconOk"></i><span>评价</span></dt>
+            <dd class="date">&nbsp;</dd>
+        </dl>
+    </div>
+
+    <div class="order-step-info order-step-handle">
+        <!--操作提示-->
+        <div class="explanation clear mb20">
+            <div class="ex_tit" id="checkZoom"><i class="sc_icon"></i><h4>温馨提示</h4></div>
+            <ul>
+                <li>订单操作流程：<br>
+                    1. 在线支付：提交订单 -> 买家付款[商家确认订单/取消订单|退款] -> 商家发货 -> 买家确认收货、15天自动确认收货 -> 买家评价 ->平台自动结算资金 [售后]<br>
+                    2. 货到付款：提交订单 -> 确认订单 -> 商家发货 -> 买家确认收货 -> 买家评价 [售后]
+                </li>
+            </ul>
+        </div>
+        <div class="step-title">
+            <i class="dian"></i>
+            <h3>操作信息</h3>
+            <a class="sc-btn sc-blue-btn fr" href="/seller/order/order_list"><i class="icon-reply"></i>订单列表</a>
+        </div>
+        <div class="handle-state">
+            <i class="iconOk"></i>
+            <div class="tit">当前订单状态：<strong>{{order_status[order.order_status]}},{{pay_status[order.pay_status]}},{{shipping_status[order.shipping_status]}}</strong></div>
+        </div>
+        <!--操作按钮 订单日志-->
+        <div class="handle-info">
+            <div class="handle-note"><textarea v-model="action_note" cols="80" rows="3" class="textarea" placeholder="操作备注"></textarea></div>
+            <div class="handle-btn">
+                <button class="sc-btn sc-redBg-btn" v-for="(text,code) in btn" @click="handle(code)">{{text}}</button>
+            </div>
+            <div class="ecsc-order-condition">
+                <table class="ecsc-default-table order">
+                    <thead>
+                    <tr>
+                        <th width="15%" class="tc">操作者</th>
+                        <th width="15%" class="tc">操作日志</th>
+                        <th width="18%" class="tc">操作时间</th>
+                        <th width="9%" class="tc">订单状态</th>
+                        <th width="9%" class="tc">付款状态</th>
+                        <th width="9%" class="tc">发货状态</th>
+                        <th wdith="40%" class="tc">备注</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(vo,index) in action_log">
+                        <td class="bdl">{{vo.action_user_name}}</td>
+                        <td class="bdl">{{vo.status_desc}}</td>
+                        <td class="bdl">{{vo.log_time | timeParse}}</td>
+                        <td class="bdl">{{order_status[vo.order_status]}}</td>
+                        <td class="bdl">{{shipping_status[vo.shipping_status]}}</td>
+                        <td class="bdl">{{pay_status[vo.pay_status]}}</td>
+                        <td class="bdl bdr" v-html="vo.action_remark"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-step-info">
+        <div class="step-title"><i class="dian"></i>
+            <h3>订单信息</h3></div>
+        <ul class="order-info-list">
+            <li>
+                <dl>
+                    <dt>购货人：</dt>
+                    <dd>
+                        <span class="txt">{{order.user_name}}</span>
+                        <div class="fl"><a @click="user_info(order.user_id)" data-dialog="userinfo">信息</a></div>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt></dt>
+                    <dd></dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>收货人：</dt>
+                    <dd>
+                        <span class="txt">{{order.consignee}}</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>手机号码：</dt>
+                    <dd>{{order.mobile}}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>收货地址：</dt>
+                    <dd>
+                        <span class="txt">[{{order.province_text}}  {{order.city_text}}  {{order.district_text}}  ] {{order.address}}</span>
+                        <span class="handle"><a :href="'/seller/order/order_edit?step=consignee&order_id='+order.order_id" v-if="order.order_status<2"><i class="icon icon-edit"></i></a></span>
+                </dl>
+                <dl>
+                    <dt>自动确认收货时间：</dt>
+                    <dd>
+                        <span>15</span>天
+                    </dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>配送方式：</dt>
+                    <dd>
+                        <span class="txt"><span class="require-field">*</span></span>
+                        <span class="handle">
+
+                        </span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>订单号：</dt>
+                    <dd>
+                        <span class="txt">{{order.order_sn}}</span>
+                    </dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>支付方式：</dt>
+                    <dd>
+                        <span class="txt">{{order.pay_name}}</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>下单时间：</dt>
+                    <dd><span class="txt">{{order.add_time | timeParse}}</span></dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>付款时间：</dt>
+                    <dd><span class="txt" v-if="order.pay_status">{{order.pay_time | timeParse}}</span><span class="txt" v-else>未付款</span></dd>
+                </dl>
+                <dl>
+                    <dt>发货时间：</dt>
+                    <dd><span class="txt" v-if="order.shipping_status">{{order.shipping_time | timeParse}}</span><span class="txt" v-else>未发货</span></dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>发票类型：</dt>
+                    <dd>
+                        <span class="txt" v-if="order.invoice_type">增值税发票</span>
+                        <span class="txt" v-else>普通发票</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>发票抬头：</dt>
+                    <dd>
+                        <span class="txt red invoice-title" v-if="order.invoice_title!='不开发票'" title="点击查看详情" @click="showInvoice()">{{order.invoice_title}}</span>
+                    </dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>买家留言：</dt>
+                    <dd>
+                        <span class="txt" v-if="order.user_note"></span><span class="grey" v-else>无</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>订单来源：</dt>
+                    <dd>{{order.source}}</dd>
+                </dl>
+            </li>
+            <li>
+                <dl>
+                    <dt>商家留言：</dt>
+                    <dd><span class="txt" v-if="order.admin_note">{{order.admin_note}}</span><span class="grey">无</span>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt></dt>
+                    <dd></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+    <div class="order-step-info">
+        <div class="step-title">
+            <i class="dian"></i>
+            <h3>商品信息<a :href="'/seller/order/order_edit?step=goods&order_id='+order.order_id" v-if="order.order_status<2" class="blue"><i class="icon icon-edit"></i></a></h3>
+            <div class="order-deliver">
+                <a href="javascript:" @mouseenter="queryShipping()" id="show_shipping">物流跟踪<i class="icon-angle-down"></i>
+                    <div class="more">
+                        <span class="arrow"></span>
+                        <div id="shipping_ul">
+                            <div id="retData"><img src="/public/static/images/ajaxLoader.gif"></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="ecsc-order-content">
+            <table class="ecsc-default-table order">
+                <thead>
+                <tr>
+                    <th class="w10">&nbsp;</th>
+                    <th colspan="2">商品名称[货号]</th>
+                    <th>价格</th>
+                    <th>商品赠送积分</th>
+                    <th>数量</th>
+                    <th>属性</th>
+                    <th>库存</th>
+                    <th>小计</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="bd-line" v-for="(vo,index) in goods">
+                    <td class="bdl w10">&nbsp;</td>
+                    <td class="w50">
+                        <div class="pic-thumb">
+                            <img :src="vo.goods_img">
+                        </div>
+                    </td>
+                    <td class="tl">
+                        <a :href="'/seller/home/goods/detail?id='+vo.goods_id" target="_blank">{{vo.goods_name}}</a>
+                        <br>
+                        <span>货号：[{{vo.goods_sn}}]</span>
+                    </td>
+                    <td><em>¥</em>{{vo.goods_price}}</td>
+                    <td>{{vo.give_integral}}</td>
+                    <td>{{vo.goods_num}}</td>
+                    <td align="center">{{vo.tempvalue}}<br>
+                    </td>
+                    <td align="center">{{vo.goods_number}}</td>
+                    <td>
+                        <div align="center">
+                            <em>¥</em>{{(vo.goods_price*vo.goods_num).toFixed(2)}}
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="order-step-info">
+        <div class="step-title"><i class="dian"></i>
+            <h3>费用信息<a :href="'/seller/order/order_edit?step=money&order_id='+order.order_id" v-if="order.pay_status==0 && order.order_status<2"><i class="icon icon-edit"></i></a></h3></div>
+        <div class="ecsc-order-content">
+            <div class="total">
+                <div class="item">
+                    商品总金额：<strong><em>¥</em>{{parseFloat(order.goods_price)}}</strong>
+                    + 配送费用：<strong><em>¥</em>{{parseFloat(order.shipping_price)}}</strong>
+                    - 订单优惠：<strong><em>¥</em>{{parseFloat(order.order_prom_amount)}}</strong>
+                </div>
+                <div class="item"> = 订单总金额：<strong class="em"><em>¥</em>{{parseFloat(order.total_amount)}}</strong></div>
+                <div class="item">
+                    - 使用余额： <strong><em>¥</em>{{parseFloat(order.user_money)}}</strong>
+                    - 使用积分抵扣： <strong><em>¥</em>{{parseFloat(order.integral_money)}}</strong>
+                    - 使用优惠券： <strong><em>¥</em>{{parseFloat(order.coupon_price)}}</strong>
+                    + 商家调价： <strong><em>¥</em>{{parseFloat(order.discount)}}</strong>
+                </div>
+                <div class="item">
+                    = 应付款金额： <strong class="em"><em>¥</em>{{parseFloat(order.order_amount)}}（净利润约：<em>¥</em>{{parseFloat(order.user_money)+parseFloat(order.order_amount)-parseFloat(order.cost_amount)}}）</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            order: JSON.parse('{:json_encode($order)}'),
+            goods: JSON.parse('{:addslashes(json_encode($goods))}'),
+            order_status: JSON.parse('{:json_encode($order_status)}'),
+            pay_status: JSON.parse('{:json_encode($pay_status)}'),
+            shipping_status: JSON.parse('{:json_encode($shipping_status)}'),
+            btn: JSON.parse('{:json_encode($btn)}'),
+            action_log: JSON.parse('{:json_encode($action_log)}'),
+            action_note: ''
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            handle: function (code, field) {
+                if (code == 'self_pickup') {
+                    layer.msg('到店自提订单,请在APP扫码核销发货');
+                    return;
+                }
+                if (code == 'cancel_order' && this.action_note == '') {
+                    easyshow('请填写操作备注~');
+                    return;
+                }
+                var index = layer.load(1);
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/order/order_detail',
+                    data: {code: code, order_id: vm.order.order_id, order_sn: vm.order.order_sn, action_note: vm.action_note},
+                    success: function (data) {
+                        location.href = data;
+                    },
+                    error: function (xhr, type) {
+                        layer.close(index);
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            user_info: function (user_id) {
+                layer.open({
+                    type: 2,
+                    area: ['500px', '300px'],
+                    content: ['/seller/api/get_user_info?user_id=' + user_id, 'no']
+                });
+            },
+            queryShipping: function () {
+                let obj = $('#retData');
+                if (obj.hasClass('request')) {
+                    return;
+                }
+                obj.addClass('request');
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/api/queryShipping',
+                    data: {id: vm.order.order_id},
+                    success: function (data) {
+                        obj.html(data);
+                    },
+                    error: function (xhr, type) {
+                        obj.html(xhr.responseJSON);
+                    },
+                    complete: function () {
+                        obj.parent().parent().addClass('loaded');
+                    }
+                });
+            },
+            showInvoice: function () {
+                layer.open({
+                    type: 2,
+                    content: ['/seller/order/showInvoice?order_id=' + vm.order.order_id]
+                });
+            }
+        }
+    });
+
+</script>
+{include file="public/footer"}

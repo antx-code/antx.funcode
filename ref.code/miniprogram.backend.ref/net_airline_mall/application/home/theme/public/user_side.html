@@ -1,0 +1,87 @@
+<div class="user-side" shoptype="userSide">
+    <div class="user-mod user-perinfo">
+        <div class="profile clearfix">
+            <div class="avatar">
+                <a onclick="changeAvatar(this)" class="u-pic">
+                    {if $user.avatar}
+                    <img src="{$user.avatar}" alt="">
+                    {else/}
+                    <img src="/public/static/theme/images/touxiang.jpg" alt="">
+                    {/if}
+                </a>
+            </div>
+            <div class="name">
+                <h2>{$user.user_name}</h2>
+                <h6>{$user.mobile}</h6>
+                <div class="user-rank user-rank-1 hide">铜牌</div>
+            </div>
+        </div>
+        <div class="account">
+            <div class="item clearfix">
+                <div class="item-name">账户资料：</div>
+                <div class="item-main">
+                    <b class="integrity"><em style="width: 45%;"></em></b>
+                    <span>45%</span>
+                </div>
+            </div>
+            <div class="item clearfix">
+                <div class="item-name">账户安全：</div>
+                <div class="item-main safe">
+                    {if $user.id_card}
+                    <a href="/home/member/updateicard" class="iconfont icon-see active"><span class="tip">实名认证已完成</span></a>
+                    {else /}
+                    <a href="/home/member/updateicard" class="iconfont icon-see "><span class="tip">实名认证未完成</span></a>
+                    {/if}
+
+                    <a href="/home/member/updatepwd" class="iconfont icon-password active"><span class="tip">密码已设置</span></a>
+                    <a href="/home/member/updatemob" class="iconfont icon-mobile-phone active"><span class="tip">手机已验证</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="user-mod">
+        <div class="side-menu">
+            <dl>
+                <dt>
+                    <i class="square"></i>
+                    <span>订单中心</span>
+                </dt>
+                <dd>
+                    <p class="{if $act=='order' || $act=='orderdetail' || $act=='commented' }current{/if}"><a href="/home/member/order" target="_self">我的订单</a></p>
+                    <p class="{if $act=='address' || $act=='addrupdate' }current{/if}"><a href="/home/member/address" target="_self">收货地址</a></p>
+                    <p class="hide"><a href="user.php?act=return_list" target="_self">退换订单</a></p>
+                </dd>
+            </dl>
+            <dl>
+                <dt>
+                    <i class="square"></i>
+                    <span>会员中心</span>
+                </dt>
+                <dd>
+                    <p class="{if $act=='profile'}current{/if}" ><a href="/home/member/profile" target="_self">用户信息</a></p>
+                    <p class="{if $act=='account' || $act=='updatepwd' || $act=='updatemob' || $act=='updatepay' || $act=='updateicard'}current{/if}">
+                        <a href="/home/member/account" target="_self">账户安全</a>
+                    </p>
+                    <p class="{if $act=='favorite' || $act=='favstore'}current{/if}"><a href="/home/member/favorite" target="_self">收藏关注</a></p>
+                    <p class="{if $act=='comment_list'}current{/if}"><a href="/home/member/comment_list" target="_self">评论/晒单</a></p>
+                    <p class="{if $act=='feedbkadd'}current{/if}"><a href="/home/member/feedbkadd" target="_self">我的留言</a></p>
+
+<!--                    <p class="{if $act=='complaint'}current{/if}"><a href="/home/member/complaint">交易纠纷</a></p>-->
+                    <p class="{if $act=='invoice'}current{/if}"><a href="/home/member/invoice">我的发票</a></p>
+                </dd>
+            </dl>
+            <dl>
+                <dt><i class="square"></i><span>账户中心</span></dt>
+                <dd>
+                    <p class="{if $act=='coupon'}current{/if}"><a href="/home/member/coupon" target="_self">优惠券</a></p>
+                    <p class="{if $act=='giftcard'}current{/if}"><a href="/home/member/giftcard" target="_self">礼品卡</a></p>
+                </dd>
+            </dl>
+            <dl class="hide">
+                <dt><i class="square"></i><span>店铺管理</span></dt>
+                <dd><p><a href="/seller" target="_blank">店铺后台</a></p></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="__THEME__/js/sms.js"></script>

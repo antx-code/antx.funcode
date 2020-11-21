@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>该页面展示了所有角色信息列表。</li>
+                <li>角色为管理员下级的管理角色统称。</li>
+                <li>角可以输入用户名名称关键字进行搜索，侧边栏可进行高级搜索。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <!--商品分类列表-->
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="doadd({})">
+                        <div class="fbutton">
+                            <div class="add" title="添加角色">
+                                <span>
+                                    <i class="icon icon-plus"></i>
+                                    添加角色
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keywords"
+                               v-model="keywords" class="text nofocus" placeholder="用户名" autocomplete="off"/>
+                        <input type="submit" class="btn" name="secrch_btn"
+                               shoptype="secrch_btn" value="" @click="secrchInit()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="10%">
+                                <div class="tDiv">角色ID</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">角色名</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">角色描述</div>
+                            </th>
+                            <th width="20%">
+                                <div class="handle">操作</div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td>
+                                    <div class="tDiv">{{vo.role_id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.role_name}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.role_describe}}</div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a4">
+                                        <a href="javascript:void(0)" title="编辑" class="btn_edit" @click="doadd(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <a href="javascript:void(0);" title="移除" class="btn_trash" @click="dodelete(index)">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="list-page">
+                                    <div id="turn-page"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            cat_id: 0,
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+        },
+        methods: {
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            doadd: function (vo) {
+                if (vo.role_id > 0) {
+                    layerOpenwinMid('编辑角色', '/admin/system/roleadd?role_id=' + vo.role_id);
+                } else {
+                    layerOpenwinMid('新增角色', '/admin/system/roleadd/');
+                }
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/system/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'admin_role'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            init: function () {
+                $.post('/admin/system/rolelist', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        },
+    });
+
+    $(function () {
+        vm.init();
+    });
+</script>
+</body>
+</html>

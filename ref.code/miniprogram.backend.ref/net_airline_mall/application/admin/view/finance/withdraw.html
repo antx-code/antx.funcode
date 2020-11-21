@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>用户资金变动操作。</li>
+            </ul>
+        </div>
+        <div class="flexilist mt30">
+            <div class="common-content">
+                <div class="mian-info sale_info">
+                    <div class="switch_info">
+
+                        <div class="items pb10 bor_bt_das">
+                            <div class="item">
+                                <div class="label"><em class="require-field">*</em>区间查询：</div>
+                                <div class="label_value">
+                                    <div class="text_time" id="text_time_start">
+                                        <input type="text" class="text" name="start_time" value="" id="start_time">
+                                    </div>
+                                    <span class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                                    <div class="text_time" id="text_time_end">
+                                        <input type="text" class="text" name="end_time" value="" id="end_time">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="item">
+                                <div class="label">审核状态：</div>
+                                <div class="label_value">
+                                    <div class="checkbox_items">
+                                        <div class="checkbox_item">
+                                            <input type="checkbox" name="status" value="0" class="ui-checkbox"
+                                                   id="shipping_status_05">
+                                            <label for="shipping_status_05" class="ui-label">待审核</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input type="checkbox" name="status" value="1" class="ui-checkbox"
+                                                   id="shipping_status_04">
+                                            <label for="shipping_status_04" class="ui-label"><font class="green">已完成</font></label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input type="checkbox" name="status" value="2" class="ui-checkbox"
+                                                   id="shipping_status_03">
+                                            <label for="shipping_status_03" class="ui-label"><font color="red"> 已拒绝</font></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item mt20">
+                                <div class="label">&nbsp;</div>
+                                <div class="label_value">
+                                    <a href="javascript:void(0);" class="btn btn30 blue_btn" shoptype="query"
+                                       @click="secrchInit()"><i class="icon icon-search"></i>查询</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" placeholder="店铺名称|手机号" class="text nofocus" v-model="keywords">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                            <tr>
+                                <th width="5%"><div class="tDiv">编号</div></th>
+                                <th width="10%"><div class="tDiv">商户名</div></th>
+                                <th width="10%"><div class="tDiv">变动金额</div></th>
+                                <th width="10%"><div class="tDiv">变动类型</div></th>
+                                <th width="10%"><div class="tDiv">冻结金额</div></th>
+                                <th width="10%"><div class="tDiv">账户余额</div></th>
+                                <th width="10%"><div class="tDiv">描述</div></th>
+                                <th width="10%"><div class="tDiv">审核状态</div></th>
+                                <th width="10%"><div class="tDiv">申请时间</div></th>
+                                <th width="20%" class="handle">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td><div class="tDiv">{{vo.log_id}}</div></td>
+                                <td><div class="tDiv">{{vo.store_name}}</div></td>
+
+                                <td><div class="tDiv"><span class="red font14">{{vo.amount}}</span></div></td>
+                                <td>
+                                    <div class="tDiv">
+                                        <template v-if="vo.type==0"><span>结算</span></template>
+                                        <template v-if="vo.type==1"><span class="red">提现</span></template>
+                                        <template v-if="vo.type==2"><span class="green">充值</span></template>
+                                    </div>
+                                </td>
+                                <td><div class="tDiv"><span class="blue font14">{{vo.frozen_money}}</span></div></td>
+                                <td><div class="tDiv"><span class="green font14">{{vo.seller_money}}</span></div></td>
+                                <td><div class="tDiv">{{vo.desc}}</div></td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="tlist">
+                                            <template v-if="vo.is_paid==0"><span class="org2">待处理</span></template>
+                                            <template v-if="vo.is_paid==1"><span class="green">已完成</span> </template>
+                                            <template v-if="vo.is_paid==2"><span class="red">拒绝</span> </template>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><div class="tDiv">{{vo.add_time|timeParse}}</div></td>
+                                <td class="handle">
+                                    <div class="tDiv a2">
+                                        <a href="javascript:void(0)" title="银行账户" class="btn_edit" @click="bankinfo(vo)">
+                                            <i class="sc_icon sc_icon_see"></i>
+                                            银行账户
+                                        </a>
+                                        <a href="javascript:void(0);" @click="add(vo)" class="icon icon-edit">
+                                            审核
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <template v-if="count===0">
+                            <tr class="">
+                                <td colspan="12" class="no_record"><div class="tDiv">没有找到任何记录</div></td>
+                            </tr>
+                        </template>
+                            <tr>
+                                <td colspan="10">
+                                    <div class="tDiv">
+                                        <div class="list-page">
+                                            <div id="turn-page"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userinfo" class="hide">
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <table class="layui-table" lay-size="sm">
+                    <thead>
+                        <tr>
+                            <th>商户名称</th>
+                            <th>账户名称</th>
+                            <th>提现银行</th>
+                            <th>账号</th>
+                            <th>银行预留手机号</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{store_name}}</td>
+                            <td>{{account_name}}</td>
+                            <td>{{bank_name}}</td>
+                            <td>{{bank_card}}</td>
+                            <td>{{bank_mobile}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+            statusIDS: '',
+
+            start_time: '',
+            end_time: '',
+
+
+            store_name: '',
+            account_name: '',
+            bank_name: '',
+            bank_card: '',
+            bank_mobile: '',
+
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            add: function (vo = {}) {
+                layerOpenwin('审核操作', '/admin/finance/withdoing?log_id=' + vo.log_id);
+            },
+            bankinfo: function (vo) {
+                vm.store_name = JSON.parse(JSON.stringify(vo.store_name));
+                vm.account_name = JSON.parse(JSON.stringify(vo.account_name));
+                vm.bank_name = JSON.parse(JSON.stringify(vo.bank_name));
+                vm.bank_card = JSON.parse(JSON.stringify(vo.bank_card));
+                vm.bank_mobile = JSON.parse(JSON.stringify(vo.bank_mobile));
+                $('#userinfo').window({
+                    title: '账户结算银行账户信息',
+                    width: 800,
+                    height: 400,
+                    modal: true,
+                });
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.keywords = '';
+                vm.start_time = '';
+                vm.end_time = '';
+                vm.statusIDS = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.init();
+            },
+            init: function () {
+                vm.start_time = $('#start_time').datetimebox('getValue');
+                vm.end_time = $('#end_time').datetimebox('getValue');
+
+                $.post('/admin/finance/withdraw', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    statusIDS: getstatus(),
+                    start_time: vm.start_time,
+                    end_time: vm.end_time,
+
+
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+        }
+    });
+    $(function () {
+        $('#start_time').datetimebox({
+            value: '',
+            required: false,
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            value: '',
+            required: false,
+            showSeconds: false
+        });
+        vm.init();
+    });
+    function getstatus() {
+        var order_status = [];
+        $("input[name='status']:checked").each(function(){
+            order_status.push($(this).val());
+        });
+        return order_status.join(',');
+    }
+
+</script>

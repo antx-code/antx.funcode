@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>东家店</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>.swiper-container {width: 100%;}</style>
+</head>
+
+<body>
+<div id="app">
+    <div class="con">
+        <div class="store-nav-list">
+            <div class="swiper-container box-flex swiper-container-horizontal swiper-container-ios">
+                <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;">
+                    <template v-for="(vo,index) in catelist">
+                        <div class="swiper-slide swiper-slide-visible swiper-slide-next">
+                            <a href="javascript:void(0)" class="" @click="openGoodList(vo)">
+                                <div class="store-box"><img :src="vo.touch_icon?vo.touch_icon:'https://x.dscmall.cn/storage/images/errorImg.png'" class="img"></div>
+                                <h5>{{vo.cat_name}}</h5>
+                            </a>
+                        </div>
+                    </template>
+                    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+                </div>
+            </div>
+            <div class="shopping-menu hide">
+                <div class="filter_tab">
+                    <div class="pro_filter_items dis-box">
+                        <div class="item"><span>热门</span><i class="iconfont icon-xiajiantou"></i></div>
+                        <div class="item"><span>地区</span><i class="iconfont icon-xiajiantou"></i></div>
+                        <div class="item"><span>距离</span><i class="iconfont icon-xiajiantou"></i></div>
+                        <div class="item"><span>附近</span></div>
+                    </div>
+                </div>
+            </div>
+            <div waterfall-disabled="disabled" waterfall-offset="400" class="store-info">
+                <template v-for="(vo,index) in list">
+                    <div class="store-list">
+                        <header class="goods-shop-info padding-all" @click="openStoreindex(vo.store_id)">
+                            <section class="dis-box">
+                                <div class="g-s-i-img"><img :src="vo.logo" class="img"></div>
+                                <div class="g-s-i-title box-flex">
+                                    <h3>{{vo.store_name}}</h3>
+                                    <p>已经有 <span>{{vo.storeCount>0?vo.storeCount:0}}</span> 人关注</p>
+                                    <p class="distance hide">距离1069.38km</p>
+                                </div>
+                                <div class="g-s-info-add"><a href="javascript:void(0);" class=""><span>查看</span></a>
+                                </div>
+                            </section>
+                        </header>
+                        <section class="goods-shop-pic">
+                            <div class="padding-all">
+                                <div class="swiper-container product-one-list of-hidden swiper-container-horizontal swiper-container-ios">
+                                    <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px);">
+                                        <template v-for="(vo2,index2) in vo.goodslist">
+                                            <div class="product-list-li swiper-slide swiper-slide-visible"
+                                                 @click="openGoodsdetail(vo2)">
+                                                <div class="product-div">
+                                                    <a href="javascript:void(0)" class="">
+                                                        <img :src="vo2.original_img" class="product-list-img">
+                                                        <div class="product-text">
+                                                            <p><span class="price"><em>¥{{vo2.shop_price}}</em></span>
+                                                            </p>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </template>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            cat_id: 0,
+            store_id: 29,
+            list: [],
+            catelist: [],
+            miniapp:0,//0：公众号，1：小程序
+        },
+        methods: {
+            openGoodList: function (vo) {
+                vm.cat_id = vo.cat_id;
+                vm.init();
+            },
+            openGoodsdetail: function (vo) {
+                if(vm.miniapp == 1){
+                    wx.miniProgram.navigateTo({
+                        url: '/pages/goods/index?goods_id='+vo.goods_id
+                    });
+                }else{
+                    api.openWin({
+                        name: 'goodsdetail_win',
+                        url: 'widget://html/goodsdetail_win.html',
+                        pageParam: {
+                            goods_id: vo.goods_id
+                        }
+                    });
+                }
+            },
+            openStoreindex: function (store_id) {
+                api.openWin({
+                    name: 'storeindex_win.html',
+                    url: 'widget://html/storeindex_win.html',
+
+                    pageParam: {
+                        store_id: store_id,
+                        miniapp: vm.miniapp,
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.storelists,{cat_id: vm.cat_id},1).then(function (ret) {
+                    vm.list = ret.data.list;
+                    vm.catelist = ret.data.catelist;
+
+                    setTimeout(function () {
+                        new Swiper('.swiper-container', {
+                            pagination: '.swiper-pagination',
+                            slidesPerView: 4,
+                            paginationClickable: true,
+                            spaceBetween: 20,
+                            freeMode: true
+                        });
+                    },100)
+                });
+            },
+        }
+    });
+    window.onload = function () {
+        var pageparm = getUrlPageparm();
+        if (pageparm.token) {
+            $api.setStorage('token', pageparm.token);
+            vm.miniapp = pageparm.miniapp;
+        }else{
+            vm.miniapp = 0;
+        }
+        vm.init();
+    }
+</script>

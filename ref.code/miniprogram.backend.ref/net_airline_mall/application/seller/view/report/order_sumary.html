@@ -1,0 +1,280 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">报表统计</a></li>
+    </ul>
+</div>
+
+<div class="order_stats" id="app" v-cloak>
+    <div class="btn-info">
+        <a class="sc-btn sc-blue-btn" @click="download()"><i class=""></i>订单统计报表下载</a>
+    </div>
+    <div class="clear"></div>
+
+    <div class="order_stats_top">
+        <div class="order_stats_items">
+            <div class="order_stats_item order_stats_item2">
+                <i class="icon"><img src="/public/static/images/icon2.png"></i>
+                <div class="desc">
+                    <span class="tit">有效订单总金额</span>
+                    <span class="value"><em>¥</em>{{total_amount}}</span>
+                </div>
+            </div>
+            <div class="order_stats_item order_stats_item3">
+                <i class="icon"><img src="/public/static/images/icon3.png"></i>
+                <div class="desc">
+                    <span class="tit">总点击数</span>
+                    <span class="value">{{click_count}}</span>
+                </div>
+            </div>
+            <div class="order_stats_item order_stats_item4">
+                <i class="icon"><img src="/public/static/images/icon4.png"></i>
+                <div class="desc">
+                    <span class="tit">每千点击订单数</span>
+                    <span class="value">{{order_trans}}</span>
+                </div>
+            </div>
+            <div class="order_stats_item order_stats_item5">
+                <i class="icon"><img src="/public/static/images/icon5.png"></i>
+                <div class="desc">
+                    <span class="tit">每千点击购物额</span>
+                    <span class="value"><em>¥</em>{{amount_trans}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="order_stats_search">
+        <div class="screeItme">
+
+            <strong class="fl lh mr10">起始时间：</strong>
+            <div class="text_time" id="text_time1">
+                <input name="end_date" id="start_date" v-model="start_date" class="easyui-datetimebox">
+            </div>
+            <div class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</div>
+            <div class="text_time" id="text_time2">
+                <input name="end_date" id="end_date" v-model="end_date" class="easyui-datetimebox">
+            </div>
+            <input type="button" value="查询" class="sc-btn sc-blueBg-btn btn30 ml10" @click="getData()">
+        </div>
+    </div>
+    <div class="main-content p0 mt20">
+        <div class="tabmenu">
+            <ul class="tab">
+                <li class="active" id="order_circs-tab" data-tab="order_circs"><a @click="tab(0)">订单概况</a></li>
+                <li id="area-tab" data-tab="area"><a @click="tab(1)">地区分布</a></li>
+            </ul>
+        </div>
+        <div class="items-info">
+            <div class="wrapper-list">
+                <div id="order_sumary" style="height:400px"></div>
+            </div>
+            <div class="wrapper-list" style="display:none;">
+                <div id="order_region" style="height:400px" v-show="region_option.legend.data>0"></div>
+                <div v-show="region_option.legend.data==0" style="text-align: center;font-size: 18px;">
+                    <strong>暂无地区分布数据</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/public/static/js/echarts.js"></script>
+<script>
+    var order_chart, region_chart;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            click_count: 0,
+            start_date: '',
+            end_date: '',
+            option: {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+                toolbox: {
+                    feature: {
+                        dataView: {show: true, readOnly: false},
+                        magicType: {show: true, type: ['line', 'bar']},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
+                    }
+                },
+                legend: {
+                    data: ['销售金额', '订单数量']
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: [],//timeline
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '金额',
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: '{value} 元'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '订单数量',
+                        minInterval: 1,
+                        max: function (value) {
+                            return parseInt(value.max * 1.2);
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: '{value} 单'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '销售金额',
+                        type: 'bar',
+                        data: [],
+                        itemStyle: {
+                            normal: {
+                                color: '#139ff0'
+                            }
+                        }
+                    },
+                    {
+                        name: '订单数量',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: [],
+                        itemStyle: {
+                            normal: {
+                                color: '#f68fbf'//#C23531
+                            }
+                        }
+                    }
+                ]
+            },
+            region_option: {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: []//省份
+                },
+                series: [
+                    {
+                        name: '订单分布',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '60%'],
+                        data: [],//{value:'',name:''}
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        computed: {
+            total_amount: function () {
+                return eval(this.option.series[0].data.join("+"));
+            },
+            order_trans: function () {
+                if (!this.click_count) this.click_count = 1;
+                return (parseInt(eval(this.option.series[1].data.join("+"))) * 1000 / this.click_count).toFixed(2);
+            },
+            amount_trans: function () {
+                return (parseInt(eval(this.option.series[0].data.join("+"))) * 1000 / this.click_count).toFixed(2);
+            }
+        },
+        methods: {
+            download: function () {
+                var url = '/seller/report/download?start=' + moment(this.start_date).unix() + '&end=' + moment(this.end_date).unix();
+                window.open(url);
+            },
+            getData: function (instance) {
+                instance = instance ? instance : vm;
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/report/order_sumary',
+                    data: {
+                        start: moment(instance.start_date).unix(),
+                        end: moment(instance.end_date).unix()
+                    },
+                    success: function (data) {
+                        instance.option.xAxis[0].data = data.timeline;
+                        instance.option.series[0].data = data.order_amount;
+                        instance.option.series[1].data = data.order_num;
+                        instance.region_option.legend.data = [];
+                        instance.region_option.series[0].data = [];
+                        if (data.region.length) {
+                            data.region.forEach(function (v) {
+                                instance.region_option.legend.data.push(v.name);
+                            });
+                            instance.region_option.series[0].data = data.region;
+                        }
+                        instance.click_count = data.click_count;
+                        order_chart.setOption(instance.option);
+                        region_chart.setOption(instance.region_option);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            tab: function (index) {
+                $(".items-info .wrapper-list").eq(index).show();
+                order_chart.resize();
+                region_chart.resize();
+            }
+        },
+        created: function () {
+            this.start_date = moment(moment().subtract(15, 'days').format('YYYY-MM-DD')).format('YYYY-MM-DD HH:mm:ss');
+            this.end_date = moment().format('YYYY-MM-DD HH:mm:ss');
+        },
+        mounted: function () {
+            var _this = this;
+            $('#start_date').datetimebox({
+                showSeconds: false,
+                value: _this.start_date,
+                onChange: function (date) {
+                    _this.start_date = date;
+                    _this.getData();
+                }
+            });
+            $('#end_date').datetimebox({
+                showSeconds: false,
+                value: _this.end_date,
+                onChange: function (date) {
+                    _this.end_date = date;
+                    _this.getData();
+                }
+            });
+            order_chart = echarts.init(document.getElementById('order_sumary'));
+            region_chart = echarts.init(document.getElementById('order_region'));
+            _this.getData(_this);
+        }
+    });
+
+</script>
+{include file="public/footer"}

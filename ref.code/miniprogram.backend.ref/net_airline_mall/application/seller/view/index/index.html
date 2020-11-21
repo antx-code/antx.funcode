@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>商家管理中心</title>
+    <link type="text/css" href="/topjui/css/topjui.core.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/public/static/css/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/seller/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/plugins/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/perfect-scrollbar.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/public/static/css/seller/general.css"/>
+
+    <script type="text/javascript" src="/public/static/plugins/jquery/jquery.min.js"></script>
+
+    <script type="text/javascript" src="/public/static/js/topjui.config.js"></script>
+    <script type="text/javascript" src="/topjui/js/topjui.core.min.js"></script>
+    <script type="text/javascript" src="/topjui/js/locale/topjui.lang.zh_CN.js"></script>
+
+    <script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+    <script type="text/javascript" src="/public/static/plugins/qiniu/qiniu.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+    <script type="text/javascript" src="/public/static/js/function.js"></script>
+    <script type="text/javascript" src="/public/static/js/seller.js"></script>
+    <script type="text/javascript" src="/public/static/js/perfect-scrollbar.min.js"></script>
+
+</head>
+<body>
+{include file='public/topnav'}
+
+<div class="ecsc-layout">
+    <div class="site wrapper">
+        <div class="ecsc-layout-left">
+            <div class="sidebar" id="sidebar">
+                <div class="column-menu">
+                    <div class="welcome">欢迎页
+                        <div class="arrow"></div>
+                    </div>
+                    <div class="add-quickmenu">
+                        <a href="javascript:void(0);">添加快捷功能</a>
+                    </div>
+                    <ul id="seller_center_left_menu" style="padding-top:10px;">
+                        {foreach $Think.session.seller.seller_quicklink as $key=>$text}
+                        {assign name="contro" value=":substr($key,0,strpos($key,'@'))" /}
+                        {assign name="acti" value=":substr($key,strpos($key,'@')+1)" /}
+                        <li data-action="{$key}"><a href="{:url($contro.'/'.$acti)}">{$text}</a></li>
+                        {/foreach}
+                    </ul>
+                    <div class="sitemap-menu">
+                        <div class="sitemap-menu-arrow">
+                            <div class="arrow1"></div>
+                            <div class="arrow2"></div>
+                        </div>
+                        <div class="title-bar">
+                            <h2>管理导航</h2>
+                            <span id="closeSitemap" class="close"></span>
+                        </div>
+                        <div class="content" id="quicklink_list">
+                            {foreach $Think.session.seller.menu as $ctrl => $vo}
+                            <dl>
+                                <dt>{$vo.title}</dt>
+                                {foreach $vo.left as $act => $menu}
+                                {if $menu.show}
+                                <dd class="{:in_array($ctrl.'@'.$act,$quicklink_key)?'selected':''}">
+                                    <i nctype="btn_add_quicklink" class="icon-check" title="添加为常用功能菜单"
+                                       data-action="{$ctrl.'@'.$act}" data-status="{:in_array($ctrl.'@'.$act,$quicklink_key)?1:0}"></i>
+                                    <a href="{:url($ctrl.'/'.$act)}">{$menu.title}</a>
+                                </dd>
+                                {/if}
+                                {/foreach}
+                            </dl>
+                            {/foreach}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ecsc-layout-right">
+            <div class="main-content" id="mainContent">
+
+                <div class="top-container">
+                    <div class="basic-info">
+                        <div class="ecsc-seller-info">
+                            <div class="store-logo"><img src="{$store.logo}"/></div>
+                            <div class="store-info">
+                                <div class="seller-name">{$store.store_name}</div>
+                                <div class="seller-desc">
+                                    <div class="item">
+                                        <span><em>用 户 名：</em><strong>{$Think.session.seller.username}</strong></span>
+                                        <span class="store-name"><em>店铺名称：</em><strong><a href="{:url('home/store/index',['id'=>$store.store_id])}" target="_blank">{$store.store_name}</a></strong></span>
+                                    </div>
+                                    <div class="item">
+                                        <span><em>管理权限：</em><strong>{if $Think.session.seller.controller=='all'}管理员{else /}店长{/if}</strong></span>
+                                        <span><em>最后登录：</em>
+                                            {if $Think.session.seller.last_login_time>0}
+                                            <strong>{$Think.session.seller.last_login_time | date='Y-m-d H:i:s'}</strong>
+                                            {/if}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-items">
+                                <ul>
+                                    <li><a href="{:url('order/order_list')}">待处理订单<em>({:array_sum($order_count)})</em></a></li>
+                                    <!--<li><a href="{:url('service/message')}">提示信息<em>({$msg_count})</em></a></li>-->
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="detail-rate">
+                            <div class="title">店铺动态评分</div>
+                            <ul>
+                                <li>
+                                    <div class="canvas" data-per="{:round($store.store_desc_score/5*100)}">
+                                        <div class="canvas_wrap">
+                                            <div class="circle">
+                                                <div class="circle_item circle_left"></div>
+                                                <div class="circle_item circle_right wth0"></div>
+                                            </div>
+                                            <div class="canvas_num">{$store.store_desc_score}分</div>
+                                        </div>
+                                    </div>
+                                    <span>描述相符</span>
+                                </li>
+                                <li>
+                                    <div class="canvas" data-per="{:round($store.store_service_score/5*100)}">
+                                        <div class="canvas_wrap">
+                                            <div class="circle">
+                                                <div class="circle_item circle_left"></div>
+                                                <div class="circle_item circle_right wth0"></div>
+                                            </div>
+                                            <div class="canvas_num">{$store.store_service_score}分</div>
+                                        </div>
+                                    </div>
+                                    <span>服务态度</span>
+                                </li>
+                                <li>
+                                    <div class="canvas" data-per="{:round($store.store_delivery_score/5*100)}">
+                                        <div class="canvas_wrap">
+                                            <div class="circle">
+                                                <div class="circle_item circle_left"></div>
+                                                <div class="circle_item circle_right wth0"></div>
+                                            </div>
+                                            <div class="canvas_num">{$store.store_delivery_score}分</div>
+                                        </div>
+                                    </div>
+                                    <span>发货速度</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="seller-cont">
+                    <div class="container_left">
+                        <div class="container type-a type-one">
+                            <div class="hd">
+                                <h3>店铺及商品提示</h3>
+                            </div>
+                            <div class="content">
+                                <ul>
+                                    <li><a href="{:url('goods/goods_list')}">在线销售商品<em>({$goods_count['is_on_sale'][1]??0})</em></a></li>
+                                    <li><a href="{:url('goods/goods_list')}">已下架的商品<em>({$goods_count['is_on_sale'][0]??0})</em></a></li>
+                                    <li><a href="{:url('goods/goods_list')}">审核中的商品<em>({$goods_count['review_status']??0})</em></a></li>
+                                    <li><a href="{:url('goods/del_recycle')}">商品回收站<em>({$goods_count.is_delete??0})</em></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="container type-a type-two">
+                            <div class="hd">
+                                <h3>交易提示</h3>
+                            </div>
+                            <div class="content">
+                                <ul>
+                                    {foreach $order_count as $status=>$num}
+                                    <li><a href="{:url('order/order_list')}" target="_blank">{$status_text[$status]}<em>({$num})</em></a></li>
+                                    {/foreach}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container_right">
+                        <div class="container type-b type-b-one">
+                            <div class="hd">
+                                <h3>商家帮助</h3>
+                            </div>
+                            <div class="content">
+                                <ul>
+                                    {foreach $help as $id=>$title}
+                                    <li><a href="{:url('home/article/content',['article_id'=>$id])}">{$title}</a></li>
+                                    {/foreach}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="container type-b type-b-two">
+                            <div class="hd">
+                                <h3>联系方式</h3>
+                            </div>
+                            <div class="content">
+                                <ul>
+                                    <li>电话：{$store.mobile}</li>
+                                    <li>邮箱：{$store.email}</li>
+                                    <li>地址：{$store.store_address}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="seller-cont">
+                    <div class="hd">
+                        <h3>店铺数据
+                            <em style="font-size:12px; color:#7d7d7d">（已成交付款为准：已付款订单）</em>
+                        </h3>
+                    </div>
+                    <div class="main-left">
+                        {foreach $report as $key=>$vo}
+                        <div class="container">
+                            <div class="container-left"><i class="shop-icon {$key=='mobile' ? 'shop-icon-move' : 'shop-icon-pc'}"></i></div>
+                            <div class="container-right">
+                                {foreach $vo as $day=>$report}
+                                <ul>
+                                    <li>{$day=='today'? '今日' : '昨日'}{$key=='mobile' ? '移动' : 'PC'}成交额
+                                        <p>{$report.amount}</p>
+                                    </li>
+                                    <li>{$day=='today'? '今日' : '昨日'}{$key=='mobile' ? '移动' : 'PC'}订单数
+                                        <p>{$report.order_num??0}</p>
+                                    </li>
+                                    <li>{$day=='today'? '今日' : '昨日'}{$key=='mobile' ? '移动' : 'PC'}客单价
+                                        <p>{:is_null($report.order_num)? 0 : round($report.amount/$report.order_num,2)}</p>
+                                    </li>
+                                </ul>
+                                {/foreach}
+                            </div>
+                        </div>
+                        {/foreach}
+                    </div>
+                    <div class="main-right">
+                        今日总成交额
+                        <p><em>¥</em>{$today_amount_sum}</p>
+                        今日全店成交转化率
+                        <p>{$conversion_rate} %</p>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="rank-container">
+                        <div class="container type-a">
+                            <div class="hd">
+                                <h3>单品销售排名</h3>
+                            </div>
+                            <div class="content">
+                                <table class="ecsc-default-table rank">
+                                    <thead>
+                                    <tr>
+                                        <th width="20%" class="frist">排名</th>
+                                        <th width="70%" class="tl">商品信息</th>
+                                        <th width="10%">销量(件)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {volist name="sale_rank" id="vo"}
+                                    <tr class="bd-line2">
+                                        <td class="frist">{$i}</td>
+                                        <td class="tl"><a target="_blank" href="{:url('goods/goods_list',['id'=>$key])}" class="goods_name"> {$vo.goods_name}</a></td>
+                                        <td class="tc">{$vo.total_sale_num}</td>
+                                    </tr>
+                                    {/volist}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+
+                        $(".canvas").each(function () {
+                            var per = $(this).data("per");
+                            if (per > 50) {
+                                $(this).find('.circle').addClass('clip-auto');
+                                $(this).find('.circle_right').removeClass('wth0');
+                            }
+                            $(this).find(".circle_left").css("-webkit-transform", "rotate(" + (18 / 5) * per + "deg)");
+                        });
+
+                        $(document).ready(function () {
+                            //添加删除快捷操作
+                            $('[nctype="btn_add_quicklink"]').on('click', function () {
+                                var left = $("#seller_center_left_menu");
+                                var menu_curr = $(this).data('action');
+                                var menu_status = $(this).data('status');
+                                var menu_left = left.find("[data-action='" + menu_curr + "']");
+                                if (menu_left.length > 0) {
+                                    menu_left.remove();
+                                }
+
+                                var menu_count = left.find('li').length;
+                                if (menu_status == 0 && menu_count > 9) {
+                                    easyshow('快捷操作最多添加10个');
+                                    return;
+                                }
+                                var $quicklink_item = $(this).parent();
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/seller/index/index',
+                                    data: {status: menu_status, action: menu_curr, text: $quicklink_item.find('a').text()},
+                                    success: function (data) {
+                                        $('[nctype="btn_add_quicklink"][data-action="' + menu_curr + '"]').attr('data-status', menu_status == 0 ? 1 : 0);
+                                    }
+                                });
+
+
+                                if ($quicklink_item.hasClass('selected')) {
+                                    $quicklink_item.removeClass("selected");
+                                } else {
+                                    $quicklink_item.addClass("selected");
+                                    var $link = $quicklink_item.find('a');
+                                    var menu_name = $link.text();
+                                    var menu_link = $link.attr('href');
+                                    var menu_item = '<li " data-action="' + menu_curr + '"><a href="' + menu_link + '">' + menu_name + '</a></li>';
+                                    $(menu_item).appendTo('#seller_center_left_menu').hide().fadeIn();
+                                }
+                            });
+
+                            if ($('.store-logo img').attr('src') == '') {
+                                layer.confirm('新店铺请补充资料,上传Logo', {icon: 7, title:'提示'}, function(index){
+                                    location.href='/seller/store/setting.html?tab=2';
+                                    layer.close(index);
+                                });
+                            }
+                        });
+
+                    </script>
+                    {include file='public/footer'}

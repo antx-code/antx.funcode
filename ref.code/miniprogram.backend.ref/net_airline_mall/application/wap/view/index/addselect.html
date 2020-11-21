@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no, email=no"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>地址列表</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="address">
+        <div class="flow-consignee-list">
+            <template v-for="(vo,index) in list">
+                <div class="van-radio-group">
+                    <div class="van-cell-group van-hairline--top-bottom">
+                        <section class="flow-checkout-adr">
+                            <div class="flow-have-adr" @click="confirmordertoWin(vo)">
+                                <div class="f-h-adr-title">
+                                    <div class="box-flex"><label>{{vo.consignee}}</label></div>
+                                    <div class="box-flex"><label class="fr">{{vo.mobile}}</label></div>
+                                </div>
+                                <p>{{vo.region_name}} {{vo.address}}</p>
+                            </div>
+                            <div class="flow-set-adr van-cell">
+                                <div class="van-cell__title" v-if="vo.is_default==1">
+                                    <div class="van-radio">
+                                        <span class="van-radio__input">
+                                            <i class="van-icon van-icon-checked"></i>
+                                        </span>
+                                        <span class="van-radio__label">默认地址</span>
+                                    </div>
+                                </div>
+                                <div class="van-cell__title"  v-if="vo.is_default==0" @click="addrdefault(vo)">
+                                    <div class="van-radio">
+                                        <span class="van-radio__input"><i class="van-icon van-icon-check"></i></span>
+                                        <span class="van-radio__label">默认地址</span>
+                                    </div>
+                                </div>
+                                <div class="van-cell__value">
+                                    <a href="javascript:void(0)" @click="addeditwin(vo.address_id)"><i class="iconfont icon-bianji"></i>编辑</a>
+                                    <a href="javascript:void(0);" @click="deladdress(vo)"><i class="iconfont icon-delete"></i>删除</a>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </template>
+        </div>
+        <div class="filter-btn">
+            <a href="javascript:void(0)" class="btn btn-submit box-flex" @click="addeditwin(0)">新增收货人信息</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            order_id: 0,
+            list: []
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.address).then(function (ret) {
+                    vm.list = ret.data;
+                })
+            },
+            addrdefault: function (vo) {
+                var pageparm = JSON.parse(JSON.stringify(vo));
+                pageparm.is_default = 1;
+                wxapp.ajax(config.addrdefault,pageparm).then(function (ret) {
+                    vm.init();
+                });
+            },
+            confirmordertoWin: function (vo) {
+                var pageparm = JSON.parse(JSON.stringify(vo));
+                pageparm.is_default = 1;
+                if(vm.order_id > 0){
+                    wxapp.ajax(config.orderupaddress,{address_id:vo.address_id,order_id:vm.order_id},1).then(function (ret) {
+                        if(ret.status == 1){
+                            api.sendEvent({
+                                name: 'confirmorderInit',
+                                extra: {
+                                    vo: pageparm,
+                                }
+                            });
+                        }
+                        setTimeout(function () {
+                            api.closeWin();
+                        },300);
+                    })
+                }else{
+                    api.sendEvent({
+                        name: 'confirmorderInit',
+                        extra: {
+                            vo: pageparm,
+                        }
+                    });
+                    setTimeout(function () {
+                        api.closeWin();
+                    },300);
+                }
+
+            },
+            deladdress:function (vo) {
+                wxapp.ajax(config.deladdress,{address_id:vo.address_id}).then(function (ret) {
+                    wxapp.alert('success', ret.msg);
+                    vm.init();
+                })
+            },
+            addeditwin:function (address_id) {
+                api.openWin({
+                    name: 'addedit_win',
+                    url: 'widget://html/addedit_win.html',
+                    pageParam: {
+                        address_id: address_id
+                    }
+                });
+            }
+        }
+    });
+    window.onload = function () {
+        vm.order_id = api.pageParam.order_id>0?api.pageParam.order_id:0;
+        vm.init();
+    };
+</script>

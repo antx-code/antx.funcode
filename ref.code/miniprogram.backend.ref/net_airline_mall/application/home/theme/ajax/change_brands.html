@@ -1,0 +1,20 @@
+<ul>
+    {volist name="brands.list" id="vo" length="[len]"}
+    <li>
+        <div class="brand-img">
+            <a href="{:url('goods/brand',['id'=>$key])}" target="_blank">
+                <img src="{$vo.brand_logo}">
+            </a>
+        </div>
+        <div class="brand-mash">
+            <div data-bid="{$key}" shoptype="coll_brand">
+                <i class="iconfont icon-zan-alt"></i>
+            </div>
+            <div class="coupon"><a href="{:url('category/catgoodslist',['brand_id'=>$vo.brand_id])}" target="_blank">关注人数<br>
+                <div id="collect_count_{$key}">{:isset($brands['collect'][$key])?isset($brands['collect'][$key]):0}</div>
+            </a></div>
+        </div>
+    </li>
+    {/volist}
+</ul>
+<a href="javascript:void(0);" shoptype="changeBrand" class="refresh-btn"><i class="iconfont icon-rotate-alt"></i><span>换一批</span></a>

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="tabs_info">
+            <ul>
+                <li :class="{'curr':store_id==0}">
+                    <a href="javascript:void(0);" @click="storeInit(0)">自营</a>
+                </li>
+                <li :class="{'curr':store_id==10000}" @click="storeInit(10000)">
+                    <a href="javascript:void(0);">店铺</a>
+                </li>
+            </ul>
+        </div>
+        <div class="explanation mb10" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>该页面展示了商城所有的商品信息，可对商品进行编辑修改操作。可输入商品名称关键字进行搜索，侧边栏进行高级搜索。</li>
+            </ul>
+        </div>
+        <div class="tabs_info">
+            <ul>
+                <li :class="{'curr':tabindex==1}" @click="tabindexInit(1)">
+                    <a href="javascript:void(0)">普通商品 </a>
+                </li>
+                <li :class="{'curr':tabindex==4}" @click="tabindexInit(4)">
+                    <a href="javascript:void(0)">回收站 </a>
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <!--商品列表-->
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="add()">
+                        <div class="fbutton">
+                            <div class="add" title="添加商品">
+                                <span><i class="icon icon-plus"></i>添加商品</span>
+                            </div>
+                        </div>
+                    </a>
+                    <button class="layui-btn layui-btn-sm layui-btn-normal" @click="giftcardImport()">导出</button>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()"><i class="icon icon-refresh"></i></div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keyword" class="text nofocus w140" placeholder="商品名称/货号/条形码" v-model="keywords" @keyup="secrchInit()">
+                        <input type="submit" class="btn" name="secrch_btn" shoptype="secrch_btn" value="" @click="secrchInit()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <div class="flexigrid ht_goods_list">
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <thead>
+                            <tr>
+                                <th width="3%"></th>
+                                <th width="4%">
+                                    <template v-if="sort_order=='desc'">
+                                        <div class="tDiv" @click="secrchInit('asc')">
+                                            <a href="javascript:void(0);">编号</a>
+                                            <img src="/public/static/images/sort_desc.gif"/>
+                                        </div>
+                                    </template>
+                                    <template v-if="sort_order=='asc'">
+                                        <div class="tDiv" @click="secrchInit('desc')">
+                                            <a href="javascript:void(0);">编号</a>
+                                            <img src="/public/static/images/sort_asc.gif"/>
+                                        </div>
+                                    </template>
+                                </th>
+                                <th width="20%">
+                                    <div class="tDiv">商品名称</div>
+                                </th>
+                                <th width="15%">
+                                    <div class="tDiv">商家名称</div>
+                                </th>
+                                <th width="10%">
+                                    <div class="tDiv">价格/货号/运费</div>
+                                </th>
+                                <th width="8%">
+                                    <div class="tDiv">标签</div>
+                                </th>
+                                <th width="5%">
+                                    <div class="tDiv">真实销量</div>
+                                </th>
+                                <th width="5%">
+                                    <div class="tDiv">虚拟销量</div>
+                                </th>
+                                <th width="5%">
+                                    <div class="tDiv">SKU/库存</div>
+                                </th>
+                                <th width="5%">
+                                    <div class="tDiv">审核状态</div>
+                                </th>
+                                <th width="20%" class="handle">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="(vo,index) in list">
+                                <td class="sign">
+                                    <div class="tDiv">
+                                        <input type="checkbox" name="checkboxes[]" :value="vo.goods_id" class="checkbox"
+                                               :id="checkbox+vo.goods_id"/>
+                                        <label :for="checkbox+vo.goods_id" class="checkbox_stars"></label>
+                                    </div>
+                                </td>
+                                <td class="sky_id">
+                                    <div class="tDiv">{{vo.goods_id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv goods_list_info">
+                                        <div class="img">
+                                            <a :href="'/home/goods/detail?id='+vo.goods_id" target="_blank">
+                                                <img :src="vo.original_img" width="68" height="68"/>
+                                            </a>
+                                        </div>
+                                        <div class="desc">
+                                            <div class="name">
+                                                <a @click="copyName(vo.goods_name)">
+                                                    <span class="span">{{vo.goods_name}}</span>
+                                                </a>
+                                            </div>
+                                            <p class="brand">
+                                                品牌：<em>{{vo.brand_name}}</em>
+                                            </p>
+                                            <p class="activity hide">
+                                                <em class="saleEnd">特卖结束</em>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <span class="red">{{vo.store_name}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="tDiv_item">
+                                            <span class="label">价格：</span>
+                                            <div class="value">
+                                                <span>{{vo.shop_price}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="tDiv_item">
+                                            <span class="label">货号：</span>
+                                            <div class="value">
+                                                <span>{{vo.goods_sn}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="tDiv_item hide">
+                                            <span class="label">运费：</span>
+                                            <div class="value">按固定运费</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="tlist">
+                                            <span>精品：</span>
+                                            <div class="switch" title="是"
+                                                 :class="{'active':vo.is_best==1}"
+                                                 @click="goodsupdate_is_best(vo)">
+                                                <div class="circle"></div>
+                                            </div>
+                                        </div>
+                                        <div class="tlist">
+                                            <span>新品：</span>
+                                            <div class="switch" title="是"
+                                                 :class="{'active':vo.is_new==1}"
+                                                 @click="goodsupdate_is_new(vo)">
+                                                <div class="circle"></div>
+                                            </div>
+                                        </div>
+                                        <div class="tlist">
+                                            <span>热销：</span>
+                                            <div class="switch" title="是"
+                                                 :class="{'active':vo.is_hot==1}"
+                                                 @click="goodsupdate_is_hot(vo)">
+                                                <div class="circle"></div>
+                                            </div>
+                                        </div>
+                                        <div class="tlist tlist-last">
+                                            <span>上架：</span>
+                                            <div class="switch" title="是"
+                                                 :class="{'active':vo.is_on_sale==1}"
+                                                 @click="goodsupdate_is_on_sale(vo)">
+                                                <div class="circle"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        {{vo.total_sale_num}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input type="text" name="virtual_sale_num" class="text w40" v-model="vo.virtual_sale_num" @blur="update_virtual(vo)"/>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <a href="javascript:void(0)" @click="openproduct(vo)" v-if="vo.product_id">
+                                            <i class="icon icon-edit font16"></i>
+                                        </a>
+                                        <input type="text" name="sort_order" class="text w40" v-model="vo.goods_number"
+                                               @blur="update_stock(vo)" v-else/>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.review_status==2}"
+                                             @click="goodsupdate_review_status(vo)">
+                                            <div class="circle"></div>
+                                        </div>
+                                    </div>
+
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv ht_tdiv" style="padding-bottom:0px;">
+                                        <template v-if="vo.is_delete>0">
+                                            <p>
+                                                <a :href="'/home/goods/detail?id='+vo.goods_id" target="_blank" class="btn_see">
+                                                    <i class="sc_icon sc_icon_see"></i>
+                                                    查看
+                                                </a>
+                                                <a href="javascript:void(0)" class="btn_trash"
+                                                   @click="goodsupdate_is_delete(vo,index,0)">
+                                                    <i class="fa fa-recycle"></i>
+                                                    还原
+                                                </a>
+                                                <a href="javascript:void(0)"
+                                                   @click="goodsDelete(index)">
+                                                    <i class="fa icon-trash"></i>
+                                                    彻底删除
+                                                </a>
+                                            </p>
+                                        </template>
+                                        <template v-else>
+                                            <p>
+                                                <a :href="'/home/goods/detail?id='+vo.goods_id" target="_blank" class="btn_see">
+                                                    <i class="sc_icon sc_icon_see"></i>
+                                                    查看
+                                                </a>
+                                                <a href="javascript:void(0)" @click="add(vo)"
+                                                   class="btn_edit">
+                                                    <i class="icon icon-edit"></i>
+                                                    编辑
+                                                </a>
+                                            </p>
+                                            <p>
+                                                <a href="javascript:void(0)" @click="goodsCopy(vo.goods_id)"
+                                                   class="btn_edit" title='复制商品信息'>
+                                                    <i class="icon icon-copy"></i>
+                                                    复制
+                                                </a>
+                                                <a href="javascript:void(0)" class="btn_edit"
+                                                   @click="goodsupdate_is_delete(vo,index,1)"
+                                                   v-if="vo.is_delete==0">
+                                                    <i class="icon icon-trash"></i>
+                                                    加回收站
+                                                </a>
+                                                <a href="javascript:void(0)" class="btn_edit"
+                                                   @click="miniprograme_qrcode(vo.goods_id)"
+                                                   v-if="vo.is_delete==0 && vo.is_on_sale && vo.review_status==2">
+                                                    <i class="icon sc_icon_see"></i>
+                                                    二维码
+                                                </a>
+                                                <a href="javascript:void(0)" class="btn_edit"
+                                                   @click="make_miniqrcdoe(vo.goods_id)"
+                                                   v-if="vo.is_delete==0 && vo.is_on_sale && vo.review_status==2">
+                                                    <i class="icon sc_icon_see"></i>
+                                                    重新生成二维码
+                                                </a>
+                                            </p>
+                                        </template>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="12">
+                                    <div class="tDiv">
+                                        <div class="tfoot_btninfo">
+                                            <div class="checkbox_item fl font12 mt5 mr5">
+                                                <input type="checkbox" name="all_list" class="ui-checkbox"
+                                                       id="all_list">
+                                                <label for="all_list" class="ui-label">全选</label>
+                                            </div>
+                                            <input type="hidden" name="act" value="batch"/>
+                                            <!-- 操作类型 start -->
+                                            <div class="imitate_select select_w120">
+                                                <div class="cite">请选择</div>
+                                                <ul>
+                                                    <li>
+                                                        <a href="javascript:void(0)"
+                                                           class="ftx-01">请选择...</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" data-value="trash"
+                                                           @click="libgoodsallexecute('trash')" class="ftx-01">回收站</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" data-value="on_sale"
+                                                           @click="libgoodsallexecute('on_sale')" class="ftx-01">上架</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);"
+                                                           data-value="not_on_sale"
+                                                           @click="libgoodsallexecute('not_on_sale')" class="ftx-01">下架</a>
+                                                    </li>
+
+                                                </ul>
+                                                <input name="type" type="hidden" value="">
+                                            </div>
+                                        </div>
+                                        <div class="list-page">
+                                            <div id="turn-page"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--商品列表end-->
+        </div>
+    </div>
+    <!--高级搜索 start-->
+    <div class="gj_search">
+        <div class="search-gao-list" id="searchBarOpen">
+            <i class="icon icon-zoom-in"></i>
+            高级搜索
+        </div>
+        <div class="search-gao-bar" style="right:-350px;">
+            <div class="handle-btn" id="searchBarClose">
+                <i class="icon icon-zoom-out"></i>
+                收起边栏
+            </div>
+            <div class="title">
+                <h3>高级搜索</h3>
+            </div>
+            <div class="searchContent w300">
+                <div class="layout-box">
+                    <dl class="w300">
+                        <dt>分类</dt>
+                        <dd>
+                            <div class="categorySelect">
+                                <div class="selection">
+                                    <input type="text" name="category_name" id="category_name" class="text w260 mr0 valid" value="请选择分类"
+                                           readonly="" data-filter="cat_name" v-model="category_name">
+                                    <input type="hidden" name="cat_id" id="cat_id" value="0" data-filter="cat_id">
+                                </div>
+                                <div class="select-container" style="width:290px; display:none;">
+                                    <div class="select-top">
+                                        <a href="javascript:;" class="categoryTop" data-cid="0" data-cname=""
+                                           @click="getcategoryListInitReset()">重选</a>
+                                        &gt<span>{{category_tip}}</span>
+                                    </div>
+                                    <div class="select-list">
+                                        <ul>
+                                            <template v-for="(vo,index) in categoryList">
+                                                <li @click="getcategoryListInit(vo.cat_id,vo.cat_name)"
+                                                    :data-cid="vo.cat_id" :data-cname="vo.cat_name">
+                                                    <em>
+                                                        <template v-if="catlevel==1">Ⅰ</template>
+                                                        <template v-if="catlevel==2">Ⅱ</template>
+                                                        <template v-if="catlevel==3">Ⅲ</template>
+                                                        <template v-if="catlevel==4">Ⅳ</template>
+                                                    </em>
+                                                    {{vo.cat_name}}
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl class="w300">
+                        <dt>品牌</dt>
+                        <dd>
+                            <div class="brandSelect">
+                                <div class="selection">
+                                    <input type="text" name="brand_name" id="brand_name" class="text w140 valid"
+                                           data-filter="brand_name" shoptype="require" v-model="brand_name_show"
+                                           value="请选择" readonly/>
+                                </div>
+                                <div class="brand-select-container" style="display:none;">
+                                    <div class="brand-top">
+                                        <div class="letter">
+                                            <ul>
+                                                <li @click="brandListInit()"><a href="javascript:void(0);" data-letter="">全部品牌</a></li>
+                                                <template v-for="(vo,index) in brandfirstcharList">
+                                                    <li @click="brandListInit(vo)"><a href="javascript:void(0);">{{vo}}</a></li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                        <div class="b_search">
+                                            <input type="text" class="b_text" v-model="brand_name" placeholder="品牌名称关键字查找">
+                                            <a href="javascript:void(0);" class="btn-mini" @click="brandListInit()"><i class="icon icon-search"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="brand-list">
+                                        <ul>
+                                            <li data-id="0" data-name="请选择品牌" class="blue">取消选择</li>
+                                            <template v-for="(vo,index) in brandList">
+                                                <li :data-id="vo.brand_id" :data-name="vo.brand_name" @click="brandSelect(vo)">
+                                                    <em>{{vo.brand_first_char}}</em>
+                                                    {{vo.brand_name}}
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                    <div class="brand-not" style="display:none;">
+                                        没有符合"<strong>其他</strong>"条件的品牌
+                                    </div>
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="bot_btn">
+                <input type="submit" class="btn red_btn" name="tj_search" value="提交查询" @click="init()"/>
+                <input type="reset" class="btn btn_reset" name="reset" value=" 重置" @click="pageFreash()"/>
+            </div>
+        </div>
+    </div>
+    <!--高级搜索 end-->
+</div>
+
+<textarea id="copytext" style="position: absolute;top:0;left:0;z-index: 0;width:0;height:0"></textarea>
+
+<script>
+    var copytext = document.getElementById('copytext');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            store_id: 0,
+            checkbox: 'checkbox_',
+            tabindex: 1,
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            sort_order: 'desc',
+            is_delete: 0,
+            brand_id: 0,
+            list: [],
+
+            brand_name_show: '请选择',
+            brand_name: '',
+            brandfirstcharList: brandfirstcharList,
+            brandList: [],
+
+            //商品分类聚合选择开始
+            categoryList: [],
+            catlevel: 0,
+            category_name: '顶级分类',
+            category_tip: '请选择分类',
+            cat_id: 0,
+            //商品分类聚合选择结束
+        },
+        methods: {
+            giftcardImport: function () {
+                window.open('/admin/goods/goodsImport');
+            },
+            add: function (vo = {}) {
+                var title = '', url = '';
+                if (vo.goods_id > 0) {
+                    title = '编辑商品';
+                    url = '/admin/goods/goodsadd?goods_id=' + vo.goods_id;
+                } else {
+                    title = '添加商品';
+                    url = '/admin/goods/goodsadd';
+                }
+                layer.open({
+                    type: 2,
+                    title: title,
+                    area: ['100%', '95%'],
+                    content: url,
+                    cancel: function (index, layero) {
+                        vm.init();
+                        layer.closeAll();
+                    }
+                });
+            },
+            openproduct: function (vo) {
+                layerOpenwinMid('设置规格', '/admin/goods/products?goods_id=' + vo.goods_id);
+            },
+            tabindexInit: function (tab) {
+                vm.tabindex = tab;
+                switch (tab) {
+                    case 1:
+                        vm.page = 1;
+                        vm.count = 1;
+                        vm.keywords = '';
+                        vm.sort_order = 'asc';
+                        vm.is_delete = 0;
+                        break;
+                    case 4:
+                        vm.is_delete = 1;
+                        vm.page = 1;
+                        vm.count = 1;
+                        break;
+                }
+                vm.init();
+            },
+            storeInit: function (store_id) {
+                vm.store_id = store_id;
+                vm.page = 1;
+                vm.count = 1;
+                vm.keywords = '';
+                vm.init();
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.is_delete = '';
+
+                vm.brand_id = 0;
+                vm.brand_name = '';
+                vm.brand_name_show = '请选择';
+
+                vm.category_name = '请选择分类';
+                vm.category_tip = '请选择分类';
+                vm.cat_id = 0;
+                vm.catlevel = 0;
+                vm.init();
+            },
+            secrchInit: function (sort_order = 'asc') {
+                vm.page = 1;
+                vm.count = 0;
+                vm.sort_order = sort_order;
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/goods/goods', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    sort_order: vm.sort_order,
+                    is_delete: vm.is_delete,
+                    brand_id: vm.brand_id,
+                    cat_id: vm.cat_id,
+                    store_id: vm.store_id,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            goodsDelete: function (index) {
+                $.post('/admin/goods/goodsDelete', {
+                    goods_id: vm.list[index].goods_id
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        vm.init();
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            goodsupdate: function (index) {
+                majax('/admin/goods/doupdate', vm.list[index], 'goods');
+            },
+            goodsupdate_is_sui: function (vo) {
+                var is_sui = vo.is_sui == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_sui = is_sui;
+                majax('/admin/goods/doupdate', pageparm, 'goods');
+            },
+            goodsupdate_is_ad: function (vo) {
+                var is_ad = vo.is_ad == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_ad = is_ad;
+                majax('/admin/goods/doupdate', pageparm, 'goods');
+            },
+            goodsupdate_review_status: function (vo) {
+                var review_status = vo.review_status == 2 ? 3 : 2;
+                var pageparm = vo;
+                pageparm.review_status = review_status;
+                majax('/admin/goods/doupdate', pageparm, 'goods');
+            },
+            goodsupdate_is_best: function (vo) {
+                var is_best = vo.is_best == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_best = is_best;
+                majax('/admin/goods/doupdate', pageparm, 'goods');
+            },
+            goodsupdate_is_new: function (vo) {
+                var is_new = vo.is_new == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_new = is_new;
+                majax('/admin/goods/doupdate', pageparm, 'goods');
+            },
+            goodsupdate_is_hot: function (vo) {
+                var is_hot = vo.is_hot == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_hot = is_hot;
+                majax('/admin/goods/doupdate', pageparm, 'goods');
+            },
+            goodsupdate_is_on_sale: function (vo) {
+                var is_on_sale = vo.is_on_sale == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_on_sale = is_on_sale;
+                majax('/admin/goods/doupdate', pageparm, 'goods');
+            },
+            goodsupdate_is_delete: function (vo, index, isdelete = 1) {
+
+                $.messager.confirm('提示', '确认操作吗？', function (r) {
+                    if (r == true) {
+                        var pageparm = vo;
+                        pageparm.is_delete = isdelete;
+                        $.post('/admin/goods/doupdate', {
+                            pageparm: JSON.stringify(pageparm),
+                            table: 'goods'
+                        }, function (ret) {
+                            $.messager.progress('close');
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            brandListInit: function (brand_first_char = '') {
+                $.post('/admin/goods/brandListAjax', {
+                    brand_first_char: brand_first_char,
+                    brand_name: vm.brand_name,
+                }, function (ret) {
+                    vm.brandList = ret.data;
+                }, 'json');
+            },
+            brandSelect: function (vo) {
+                vm.brand_id = vo.brand_id;
+                vm.brand_name = vo.brand_name;
+            },
+
+            //商品分类聚合选择开始
+            getcategoryListInit: function (cat_id, cat_name) {
+                vm.cat_id = cat_id;
+                if (cat_name) {
+                    vm.category_name = cat_name;
+                    vm.category_tip += '>' + cat_name;
+                }
+                $.post('/admin/goods/getcategoryList', {
+                    parent_id: cat_id,
+                    table: 'category'
+                }, function (ret) {
+                    if (ret.data.length > 0) {
+                        vm.categoryList = ret.data;
+                        vm.catlevel++;
+                    } else {
+                        $(".select-container").hide();
+                    }
+                }, 'json');
+            },
+            getcategoryListInitReset: function () {
+                vm.catlevel = 0;
+                vm.category_name = '顶级分类';
+                vm.category_tip = '请选择分类';
+                vm.parent_id = 0;
+                vm.getcategoryListInit(vm.parent_id, '');
+            },
+            //商品分类聚合选择结束
+
+            goodsCopy: function (goods_id) {
+                $.post('/admin/goods/goodsCopy', {
+                    goods_id: goods_id,
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.pageFreash();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            //批量操作
+            libgoodsallexecute: function (index = null) {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.post('/admin/goods/goodsallexecute', {
+                    ids: vm.ids,
+                    table: 'goods',
+                    index: index
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.pageFreash();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            },
+            copyName: function (str) {
+                copytext.value = str;
+                copytext.select();
+                document.execCommand("copy");
+                layer.msg('已复制!', {time: 1200});
+            },
+            miniprograme_qrcode: function (goods_id) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/goods/miniprograme_qrcode',
+                    data: {goods_id: goods_id},
+                    success: function (data) {
+                        window.open(data);
+                    },
+                    error: function (xhr, type) {
+                        layer.msg(xhr.responseJSON);
+                    }
+                });
+            },
+            make_miniqrcdoe: function (goods_id) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/goods/make_miniqrcdoe',
+                    data: {goods_id: goods_id},
+                    success: function (data) {
+                        console.log(data)
+                    }
+                });
+            },
+            update_stock: function (item) {
+                if (isNaN(item.goods_number) || item.goods_number < 0) {
+                    layer.msg('库存只能是0以上数字');
+                    return;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/goods/goods_stock_chage',
+                    data: {goods_id: item.goods_id, num: item.goods_number},
+                    success: function (data) {
+                        $.messager.show({title: '提示', msg: '操作成功', timeout: 2000, showType: 'slide'});
+                    },
+                    error: function (xhr, type) {
+                        layer.msg(xhr.responseJSON);
+                    }
+                });
+            },
+            update_virtual: function (item) {
+                let pageparm = {
+                    goods_id: item.goods_id,
+                    virtual_sale_num: item.virtual_sale_num
+                };
+                $.post('/admin/goods/doupdate', {
+                    pageparm: JSON.stringify(pageparm),
+                    table: 'goods'
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            }
+        },
+
+
+    });
+    $(function () {
+        vm.init();
+        vm.brandListInit();
+        vm.getcategoryListInit(vm.parent_id, '');
+        $.gjSearch("-350px");//初始化高级搜索
+    });
+</script>
+</body>
+</html>

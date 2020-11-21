@@ -1,0 +1,83 @@
+{include file="header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li><a href="/sr/merchants/account">店铺账户</a></li>
+        <li class="active"><a href="/sr/merchants/withdrawals">提现记录</a></li>
+        <li><a href="/sr/merchants/account_log">收支明细</a></li>
+    </ul>
+</div>
+
+<div class="ecsc-form-goods">
+    <div class="btn-info"><a href="/sr/merchants/withdrawals" class="sc-btn sc-blue-btn"><i class="icon-reply"></i> 返回提现记录</a></div>
+    <form action="{:url('merchants/withdraw_apply')}" method="post" id="withdraw_apply_form">
+        <div class="wrapper-list">
+            <dl>
+                <dt>当前可提现余额：</dt>
+                <dd id="seller_money" class="txtline red">{$store.seller_money}</dd>
+            </dl>
+            <dl>
+                <dt>账号名称：</dt>
+                <dd class="txtline">{$store.account_name}</dd>
+            </dl>
+            <dl>
+                <dt>银行：</dt>
+                <dd class="txtline">{$store.bank_name}</dd>
+            </dl>
+            <dl>
+                <dt>银行卡号：</dt>
+                <dd class="txtline">{$store.bank_card}</dd>
+            </dl>
+            <dl>
+                <dt>手机号码：</dt>
+                <dd class="txtline">{$store.bank_mobile}</dd>
+            </dl>
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;申请提现金额：</dt>
+                <dd><input name="amount" type="text" class="text">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>提现备注：</dt>
+                <dd>
+                    <textarea name="remark" cols="50" rows="10" class="textarea"></textarea>
+                    <div class="notic">你可以预留提现的相关说明，例:请您尽快转账.</div>
+                </dd>
+            </dl>
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="submit" class="sc-btn sc-blueBg-btn btn35" value=" 确定 ">
+                    <input type="reset" class="sc-btn btn35 sc-blue-btn" value=" 重置 ">
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+<script>
+    $(function () {
+        $('#withdraw_apply_form').validate({
+            errorPlacement: function (error, element) {
+                var error_div = element.parents('dl').find('div.form_prompt');
+                error_div.append(error);
+            },
+            rules: {
+                amount: {
+                    required: true,
+                    number: true,
+                    min: 0.01,
+                    max:parseFloat('{$store.seller_money}')
+                },
+            },
+            messages: {
+                amount: {
+                    required: '<i class="icon icon-exclamation-sign"></i>提现金额不能为空',
+                    number: '<i class="icon icon-exclamation-sign"></i>提现金额请填写数字',
+                    min: '<i class="icon icon-exclamation-sign"></i>提现金额最少0.01元',
+                    max:'<i class="icon icon-exclamation-sign"></i>提现金额超出账号余额'
+                },
+            }
+        });
+    });
+</script>
+{include file="footer"}

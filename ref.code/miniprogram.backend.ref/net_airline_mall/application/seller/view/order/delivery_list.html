@@ -1,0 +1,192 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:;">发货单列表</a></li>
+    </ul>
+</div>
+<div id="app" v-cloak>
+    <div class="search-info">
+        <div class="search-form">
+            <form action="javascript:vm.getData()" name="searchForm">
+                <input type="text" class="text w150 mr10" v-model="delivery_sn" placeholder="发货单流水号">
+                <input type="text" class="text w150 mr10" v-model="order_sn" value="" placeholder="订单号">
+                <select class="text w150 mr10" v-model="status" @change="getData()">
+                    <option value="-1">请选择...</option>
+                    <option value="0">发货中</option>
+                    <option value="1">已发货</option>
+                    <option value="2">退货</option>
+                </select>
+                <div class="search-key">
+                    <input type="text" class="text w150" v-model="consignee" placeholder="收货人">
+                    <input type="submit" class="submit" value=" 搜索 ">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table_list" id="listDiv">
+        <table class="ecsc-default-table order">
+            <thead>
+            <tr>
+                <th width="16%">
+                    <div class="first_all">
+                        <input onclick="" type="checkbox" id="all" class="ui-checkbox">
+                        <label class="ui-label" for="all"><a @click="orderby('delivery_sn')" title="点击对列表排序">发货单流水号</a></label>
+                        <img :src="sort_img" v-if="field=='delivery_sn'">
+                    </div>
+                </th>
+                <th width="16%"><a @click="orderby('order_sn')">订单号</a><img :src="sort_img" v-if="field=='order_sn'"></th>
+                <th width="12%"><a @click="orderby('consignee')">收货人</a><img :src="sort_img" v-if="field=='consignee'"></th>
+                <th width="8%"><a @click="orderby('add_time')">出库时间</a><img :src="sort_img" v-if="field=='add_time'"></th>
+                <th width="8%"><a @click="orderby('update_time')">发货时间</a><img :src="sort_img" v-if="field=='update_time'"></th>
+                <th width="10%">状态</th>
+                <th width="10%">操作人</th>
+                <th width="10%">操作</th>
+            </tr>
+            </thead>
+            <tbody v-for="(delivery,index) in list">
+            <tr>
+                <td colspan="20" class="sep-row"></td>
+            </tr>
+            <tr class="sep_bor">
+                <td class="bdl">
+                    <div class="first_all"><input type="checkbox" value="delivery.delevery_no" class="ui-checkbox" id="checkbox_12"><label class="ui-label" for="checkbox_12">{{delivery.delivery_sn}}</label></div>
+                </td>
+                <td class="bdl" rowspan="1">{{delivery.order_sn}}</td>
+                <td>{{delivery.consignee}}</td>
+                <td>{{delivery.add_time | timeParse}}</td>
+                <td v-if="delivery.update_time>0">{{delivery.update_time | timeParse}}</td>
+                <td v-else>出库中</td>
+                <td>{{status_text[delivery.status]}}</td>
+                <td>{{delivery.action_user}}</td>
+                <td class="ecsc-table-handle">
+                    <span><a :href="'/seller/order/delivery.html?delivery_id=' + delivery.delivery_id" class="btn-orange"><i class="icon sc_icon_see" v-if="delivery.status"></i><i class="icon-edit" v-else></i><p v-if="delivery.status>0">查看</p><p v-else>发货</p></a></span>
+                    <span class="mr0" v-if="delivery.status==0"><a @click="del(index)" class="btn-red"><i class="icon icon-trash"></i><p>删除</p></a></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            field: 'delivery_id',
+            sort: 'desc',
+            beforeRequest: false,
+            delivery_sn: '',
+            order_sn: '{$Request.param.order_sn}',
+            status: -1,
+            consignee: '',
+            status_text: ['出库中', '已发货', '退货']
+        },
+        computed: {
+            sort_img() {
+                return this.sort == 'desc' ? '/public/static/images/sort_desc.gif' : '/public/static/images/sort_asc.gif';
+            }
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            getData(instance) {
+                instance = instance ? instance : vm;
+                var param = {
+                    page: instance.page,
+                    pageSize: instance.pageSize,
+                    field: instance.field,
+                    sort: instance.sort,
+                };
+                if (instance.delivery_sn) {
+                    param.delivery_sn = instance.delivery_sn;
+                    param.page = 1;
+                }
+                if (instance.order_sn) {
+                    param.order_sn = instance.order_sn;
+                    param.page = 1;
+                }
+                if (instance.status >= 0) {
+                    param.status = instance.status;
+                    param.page = 1;
+                }
+                if (instance.consignee) {
+                    param.consignee = instance.consignee;
+                    param.page = 1;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/order/delivery_list',
+                    data: param,
+                    success: function (data) {
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        instance.list = data.list;
+                        if (data.page == 1) instance.pagerender(instance);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            orderby: function (field) {
+                this.field = field;
+                this.sort = this.sort == 'desc' ? 'asc' : 'desc';
+                this.getData();
+            },
+            pagerender: function (instance) {
+                instance = instance ? instance : vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            del: function (idx) {
+                layer.confirm('确认要删除发货单吗?', {icon: 3, title: '删除提示'}, function (index) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/seller/order/delivery_del',
+                        data: {delivery_id: vm.list[idx].delivery_id},
+                        success: function (data) {
+                            vm.list.splice(idx, 1);
+                        },
+                        error: function (xhr, type) {
+                            layer.msg(xhr.responseJSON);
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        },
+        created() {
+            this.getData(this);
+        }
+    });
+</script>
+
+{include file="public/footer"}

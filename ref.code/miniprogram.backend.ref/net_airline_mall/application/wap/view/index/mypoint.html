@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>我的积分</title>
+
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+
+    <style>
+        .user-header .heaer-img .img {
+            border: 2px solid #eee;
+            border-radius: 50%;
+            width: 5rem;
+            height: 5rem
+        }
+
+        .user-header .header-admin {
+            margin-left: 1.2rem;
+            margin-top: .5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .user-header .header-admin .header-admin-box h4 {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 1.6rem;
+            margin-right: .5rem;
+            color: #333;
+        }
+
+        .account .purse-header-box p {
+            color: #999;
+        }
+
+        .header-jifen {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            color: blue;
+        }
+        .account .purse-header-box {
+            width: 100%;
+            border-radius: 1rem;
+            background-color: #0196fd;
+            color: #fff;
+            -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+            padding: 1.1rem
+        }
+        .nav .list{padding: 15px 10px !important;width:25vw;padding-bottom:0!important;}
+        .nav .list .txt{font-size: 12px !important;height:24px;overflow:hidden}
+        .nav{display:flex; text-align: center;flex-wrap: wrap;}
+        .nav .list .txt{line-height:200%}
+        .nav .list img{max-width:100%;padding:1rem}
+        .title_index{text-align:center;height:5rem!important;line-height:5rem!important;}
+        .title_index h4{font-size:1.8rem!important;height:5rem!important;line-height:5rem!important;font-weight:bold}
+        .pro-img{width:calc(50vw - 0.9rem) !important;height:calc(50vw - 0.9rem) !important;overflow: hidden}
+    </style>
+</head>
+
+<body>
+<div id="app" v-cloak="">
+    <div class="account" style="">
+        <section class="purse-header-box" style="background: #fff;box-shadow: 0 2px 6px #eee;">
+            <div class="user-header dis-box">
+                <div class="heaer-img">
+                    <img :src="member.user.avatar?member.user.avatar:'https://x.dscmall.cn/storage/images/errorImg.png'" alt="" class="img">
+                </div>
+                <div class="header-admin box-flex">
+                    <div class="header-admin-box dis-box">
+                        <h4 class="box-flex">{{member.user.mobile}}</h4>
+                    </div>
+                    <p style="margin-top: 5px;">{{member.user.nick_name}}</p>
+                    <div class="header-jifen" style="display: none">积分说明</div>
+                </div>
+            </div>
+            <div class="user-money-list dis-box">
+                <div class="box-flex "><span style="color: #999;">积分 <em style="font-size: 32px;color:rgb(255, 136, 0);">{{member.user.points}}</em></span></div>
+                <div class="box-flex text-right hide"><span style="position: relative;bottom: -20px;color: #333;">积分明细</span></div>
+            </div>
+        </section>
+
+    </div>
+    <div class="title_index">
+        <h4>热门兑换</h4>
+    </div>
+    <section class="product-list product-list-medium">
+        <div class="prolist">
+            <template v-for="(vo,index) in info.goodsList">
+                <div class="prolist-item" @click="openGoodsdetail(vo)">
+                    <div class="pro-img">
+                        <a href="javascript:void(0)" class=""> <img :src="vo.original_img" class="img" /></a>
+                    </div>
+                    <div class="pro-info">
+                        <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                        <div class="price">
+                            积分：{{vo.exchange_integral}}
+                        </div>
+                        <div class="outer">
+                            市场价：{{vo.shop_price}}
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </section>
+</div>
+</body>
+
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            token: '',
+            info: {},
+
+            c_h: 0,//时
+            c_m: 0,//分
+            c_s: 0,//秒
+
+            page: 0,
+
+            keywords: '',
+
+            member: {}
+
+        },
+        methods: {
+            openGoodswin: function (vo) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        cat_id: vo.cat_id
+                    }
+                });
+            },
+            openStoreindex: function (vo) {
+                api.openWin({
+                    name: 'index_win.html',
+                    url: 'widget://html/store/index_win.html',
+                    pageParam: {
+                        store_id: vo.store_id
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.exchange, {}, 0).then(function (ret) {
+                    if(ret.status == 1){
+                        vm.info = ret.data;
+                    }
+                })
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'exdetail_win',
+                    url: 'widget://html/exdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            searchInit:function () {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        keywords: vm.keywords
+                    }
+                });
+            },
+            getuserinfo: function () {
+                wxapp.ajax(config.getuserinfo, {}, 1).then(function (ret) {
+                    if(ret.status == 1){
+                        vm.member = ret.data;
+                    }
+                })
+            },
+        },
+    });
+    window.onload = function () {
+        var pageparm = getUrlPageparm();
+        if (pageparm.token) {
+            $api.setStorage('token', pageparm.token);
+        }
+        vm.init();
+        vm.getuserinfo();
+    };
+</script>

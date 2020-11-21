@@ -1,0 +1,121 @@
+{include file="header"}
+<div id="app">
+    <div class="tabmenu">
+        <ul class="tab">
+            <li class="active"><a>基本信息</a></li>
+        </ul>
+    </div>
+
+    <div class="ecsc-form-goods items-info">
+        <div class="wrapper-list" data-type="base">
+            <input type="hidden" name="form_submit" value="ok">
+            <dl>
+                <dt>供应商名称：</dt>
+                <dd><input type="text" :value="store.name" disabled="disabled" size="40" class="text text_disabled"></dd>
+            </dl>
+            <dl>
+                <dt>登录账号：</dt>
+                <dd><input type="text" v-model="store.username" class="text" disabled></dd>
+            </dl>
+            <dl>
+                <dt>登录密码：</dt>
+                <dd><input v-model="store.password" class="text" placeholder="留空不修改密码"></dd>
+            </dl>
+            <dl>
+                <dt>联系手机号：</dt>
+                <dd><input v-model="store.mobile" class="text"></dd>
+            </dl>
+            <dl>
+                <dt>品牌LOGO：</dt>
+                <dd>
+                    <div class="type-file-box">
+                        <div class="input">
+                            <input type="text" class="type-file-text" v-model="store.logo" readonly="">
+                            <input type="button" class="type-file-button" value="上传...">
+                            <input type="file" data-field="logo" id="logo" class="type-file-file" size="30">
+                        </div>
+                        <span class="show">
+                            <a :href="store.logo" target="_blank" class="nyroModal"><i class="icon icon-picture" @mouseover="showTip(store.logo)" onmouseout="toolTip()"></i></a>
+                        </span>
+                    </div>
+                    <div class="form_prompt"></div>
+                    <div class="notic">(宽度128像素, 高度128像素)</div>
+                </dd>
+            </dl>
+        </div>
+        <div class="" data-type="button">
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="button" class="sc-btn sc-blueBg-btn btn35" @click="check" value="保存">
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            store: JSON.parse('{:json_encode($store)}'),
+            layerindex: '',
+            token: ''
+        },
+        methods: {
+            showTip: function (src) {
+                if (src.indexOf('http') < 0)
+                    toolTip('<img src="/public/static/' + src + '" >');
+                else
+                    toolTip('<img src="' + src + '" >');
+            },
+            check: function () {
+                var _this = this;
+                if (!_this.store.logo) {
+                    error_div(document.getElementById('banner_pc'), '请设置LOGO');
+                }
+                if (!_this.store.mobile) {
+                    error_div(document.getElementById('banner_mobile'), '请填写联系手机号');
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/sr/setting/index',
+                    data: _this.store,
+                    success: function (data) {
+                        layer.msg(data);
+                        $('#supplier-logo').attr('src', vm.store.logo);
+                    },
+                    error: function (xhr, type) {
+                        layer.msg(xhr.responseJSON);
+                    }
+                });
+            },
+        },
+        mounted: function () {
+            var instance = this;
+            $('input[type="file"]').on("change").bind('change', function () {
+                var _this = this;
+                if (!instance.token) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/sr/setting/uploadtoken',
+                        async: false,
+                        success: function (data) {
+                            instance.token = data;
+                        },
+                        error: function (xhr, type) {
+                            easyshow(xhr.responseJSON);
+                        }
+                    });
+                }
+                single_upload(_this.files[0], function (res) {
+                    layer.closeAll();
+                    instance.store[_this.dataset.field] = res;
+                }, null, instance.token);
+            });
+        }
+    });
+
+</script>
+{include file="footer"}

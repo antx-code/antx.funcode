@@ -1,0 +1,36 @@
+<div class="comment-goods">
+    <div class="user-items">
+        <div class="item item-pf">
+            <div class="label"><em>*</em>评分：</div>
+            <div class="value" ectype="rates">
+                <div class="commstar">
+                    {for start="1" end="6"}
+                    <a href="javascript:;" data-value="{$i}" class="star{$i} {if $i==$comment->comment_rank} selected{/if}">{$i}</a>
+                    {/for}
+                </div>
+                <input type="hidden" name="comment_rank" value="{$comment->comment_rank}">
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="label"><em>*</em>心得：</div>
+            <div class="value"><span class="txt">{$comment->content}</span></div>
+        </div>
+        {if count($comment->imgs)}
+        <div class="item">
+            <div class="label">晒单评论：</div>
+            <div class="value">
+                <div class="upload-img-box">
+                    <div class="img-lists">
+                        <ul class="img-list-ul" ectype="imglist">
+                            {volist name="$comment->imgs" id="vo"}
+                            <li><img width="78" height="78" alt="" src="{$vo}"></li>
+                            {/volist}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {/if}
+    </div>
+</div>

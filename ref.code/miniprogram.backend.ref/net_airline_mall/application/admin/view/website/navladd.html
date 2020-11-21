@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>请认真填写导航名称、链接地址等信息。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info user_basic">
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            导航名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" name='name' v-model="info.name" value='' class="text"/>
+                            <div class="notic m20">必填项</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            链接地址：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" name='url' v-model="info.url" value='' class="text"/>
+                            <div class="notic m20">必填项</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">是否显示：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item"><input type="radio" id="sex_1" value="0" class="ui-radio" v-model="info.is_show">
+                                    <label for="sex_1" class="ui-radio-label">否</label></div>
+                                <div class="checkbox_item"><input type="radio" id="sex_2" value="1" class="ui-radio" v-model="info.is_show">
+                                    <label for="sex_2" class="ui-radio-label">是</label></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">是否打开新窗口：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item"><input type="radio" id="sex_3" value="0" class="ui-radio" v-model="info.is_newwin">
+                                    <label for="sex_3" class="ui-radio-label">否</label></div>
+                                <div class="checkbox_item"><input type="radio" id="sex_4" value="1" class="ui-radio" v-model="info.is_newwin">
+                                    <label for="sex_4" class="ui-radio-label">是</label></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">显示顺序：</div>
+                        <div class="label_value">
+                            <input type="text" name='sort' v-model="info.sort" value="0" class="text"/>
+                        </div>
+                    </div>
+                    <div class="item shop_logo">
+                        <div class="label">链接图片：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="imgurl" class="type-file-button">
+                                <input type="text" name="textfile" class="type-file-text" id="textfield" readonly
+                                       v-model="info.imgurl">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = {$info | raw};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                majax('/admin/website/navladd', vm.info);
+            }
+        }
+    });
+    $(function () {
+        moreUploadFile('imgurl');//初始化图片文件操作
+    });
+</script>

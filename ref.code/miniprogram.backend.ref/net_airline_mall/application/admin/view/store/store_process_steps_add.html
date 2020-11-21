@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+                <li>请谨慎填写表单创建相关数据。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info">
+                        <div class="m-step-section">
+
+
+                            <template v-for="(vo,index) in list">
+                                <div class="m-item" :class="{'m-item-curr':index==0}">
+                                    <template v-if="!info.id && index==0">
+                                        <div class="handle" @click="infoadd()">
+                                            <i class="sc_icon sc_icon_jia"></i>
+                                        </div>
+                                    </template>
+                                    <div class="info">
+                                        <div class="p-item">
+                                            <span class="ipt_text">
+                                                <strong class="fl">表单字段：</strong>
+                                                <input type="text" v-model="vo.fieldsName" class="text w150"/>
+                                            </span>
+                                            <span class="ipt_text">
+                                                <strong class="fl">数据类型：</strong>
+                                                <select v-model="vo.fieldsDateType" class="imitate_select select_w140">
+                                                    <option class="cite" disabled value="">请选择</option>
+                                                    <template v-for="(vo2,index2) in fieldsDateTypeList">
+                                                        <option class="ftx-01">{{vo2}}</option>
+                                                    </template>
+                                                </select>
+                                            </span>
+                                            <span class="ipt_text">
+                                                <strong class="fl">表单标题：</strong>
+                                                <input type="text" v-model="vo.fieldsFormTitle" class="text w150"/>
+                                            </span>
+                                            <span class="ipt_text">
+                                                <strong class="fl">数据长度：</strong>
+                                                <input type="text" v-model="vo.fieldsLength" class="text w50"/>
+                                            </span>
+                                            <span class="ipt_text">
+                                                <strong class="fl">表单注释：</strong>
+                                                <input type="text" v-model="vo.fieldsFormSpecial" class="text w150"/>
+                                            </span>
+                                            <span class="ipt_text">
+                                                <strong class="fl">表单类型：</strong>
+                                                 <select v-model="vo.fieldsFormType" class="imitate_select select_w140">
+                                                    <option class="cite" disabled value="">请选择</option>
+                                                    <template v-for="(vo3,index3) in fieldsFormTypeList">
+                                                        <option class="ftx-01" :value="vo3.fieldsFormType">{{vo3.text}}</option>
+                                                    </template>
+                                                </select>
+                                            </span>
+                                            <span class="ipt_text" v-if="vo.fieldsFormType=='select_normal'">
+                                                <strong class="fl">表单可选项,json格式：</strong>
+                                                <input type="text" v-model="vo.fieldsValue" class="text w180"/>
+                                            </span>
+                                            <span class="ipt_text">
+                                                <strong class="fl">是否必选项：</strong>
+                                                <select v-model="vo.is_must" class="imitate_select select_w150">
+                                                    <option disabled value="" class="cite">请选择</option>
+                                                    <option class="ftx-01" value="0">否</option>
+                                                    <option class="ftx-01" value="1">是</option>
+                                                </select>
+                                            </span>
+                                            <span class="ipt_text">
+                                                <strong class="fl">排序：</strong>
+                                                <input type="text" v-model="vo.sort_order" class="text w50"/>
+                                            </span>
+                                            <span class="ipt_text">
+                                                <div class="m-btn-trash" style="display: block;">
+                                                    <a href="javascript:void(0);" class="btn_trash" @click="listDeleteInit(index)">
+                                                        <i class="icon icon-trash"></i>
+                                                        删除
+                                                    </a>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </template>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="items mt20">
+                            <div class="item hidden">
+                                <div class="label">特殊说明：</div>
+                                <div class="label_value">
+                                    <textarea name="fields_special" class="textarea"></textarea>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="label">&nbsp;</div>
+                                <div class="label_value info_btn">
+                                    <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var process_id = '{$process_id}';
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            fieldsDateTypeList: ['VARCHAR', 'CHAR', 'INT', 'MEDIUMINT', 'SMALLINT', 'TINYINT', 'TEXT', 'TEXTAREA', 'DECIMAL',"IMG","FILE"],
+            fieldsFormTypeList: [
+                {fieldsFormType:'input',text:'文本字段(input)'},
+                {fieldsFormType:'textarea',text:'文本区域(textarea)'},
+                {fieldsFormType:'radio',text:'单选按钮(radio)'},
+                {fieldsFormType:'checkbox',text:'多选按钮(checkbox)'},
+                {fieldsFormType:'select',text:'区域选择下拉菜单(select)'},
+                {fieldsFormType:'select_normal',text:'普通下拉菜单(select_normal)'},
+                {fieldsFormType:'img',text:'图片(img)'},
+                {fieldsFormType:'file',text:'文件(文件)'},
+                {fieldsFormType:'other',text:'其他(other)'},
+            ],
+            process_id: process_id,
+            info: info,
+            list: [info],
+
+            merchants_dateTyp: ''
+        },
+        methods: {
+            listDeleteInit: function (index) {
+                vm.list.splice(index, 1);
+            },
+            infoadd: function () {
+                vm.list.push(JSON.parse(JSON.stringify(info)));
+            },
+            init: function () {
+                majax('/admin/store/store_process_steps_add', vm.list);
+            }
+        }
+    });
+</script>

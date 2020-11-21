@@ -1,0 +1,1673 @@
+{include file="public/header"}
+<link type="text/css" href="/topjui/editor/themes/default/css/ueditor.min.css" rel="stylesheet"/>
+<link rel="stylesheet" type="text/css" href="/public/static/css/spectrum.css"/>
+<section id="app" v-cloak>
+    <div class="stepflex stepflexActive">
+        <dl :class="{current:step>0}" data-step="1">
+            <dt class="pointer"><i class="sc-set"></i></dt>
+            <dd><em>1</em>､<span>设置商品模式</span><i class="jt"></i></dd>
+        </dl>
+        <dl :class="{current:step>1}">
+            <dt class="pointer"><i class="sc-cate"></i></dt>
+            <dd><em>2</em>､<span>选择商品分类</span><i class="jt"></i></dd>
+        </dl>
+        <dl :class="{current:step>2}">
+            <dt class="pointer"><i class="sc-info"></i></dt>
+            <dd><em>3</em>､<span>填写商品信息</span><i class="jt"></i></dd>
+        </dl>
+        <dl :class="{current:step>3}">
+            <dt class="pointer"><i class="sc-attr"></i></dt>
+            <dd><em>4</em>､<span>填写商品规格</span><i class="jt"></i></dd>
+        </dl>
+        <dl :class="{current:step>4}">
+            <dt class="pointer"><i class="sc-rel"></i></dt>
+            <dd><em>5</em>､<span>选择商品关联</span><i class="jt"></i></dd>
+        </dl>
+    </div>
+
+    <div class="step-info goods_info">
+        <div class="step step_one" data-step="1" v-show="step==1">
+            <div class="mos clearfix">
+                <div class="mos_item mos_default active" data-model="0" data-stepmodel="3">
+                    <div class="mos_left"><i class="icon-model"></i></div>
+                    <div class="mos_right">
+                        <div class="radio-item">
+                            <input type="radio" name="model" class="ui-radio" id="model_default" checked="checked">
+                            <label for="model_default" class="ui-radio-label">默认模式</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mos_item mos_warehouse nocursor" @click="remind('暂时仅支持默认模式')">
+                    <div class="mos_left"><i class="icon-model"></i></div>
+                    <div class="mos_right">
+                        <div class="radio-item">
+                            <input type="radio" name="model" class="ui-radio" id="model_warehouse" disabled>
+                            <label for="model_warehouse" class="ui-radio-label nocursor">仓库模式</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mos_item mos_region nocursor" @click="remind('暂时仅支持默认模式')">
+                    <div class="mos_left"><i class="icon-model"></i></div>
+                    <div class="mos_right">
+                        <div class="radio-item">
+                            <input type="radio" name="model" class="ui-radio" id="model_region" disabled>
+                            <label for="model_region" class="ui-radio-label nocursor">地区模式</label>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="goods_model" id="goods_model" value="0">
+            </div>
+            <div class="goods_btn">
+                <a class="sc-btn btn35 sc-blueBg-btn" data-step="2" @click="nextStep">下一步</a>
+            </div>
+        </div>
+        <div class="step step_two" data-step="2" v-show="step==2">
+            <div class="choiceClass" id="choiceClass">您当前选择的商品类别是：<strong class="green">{{category_path.join(' > ')}}</strong></div>
+            <div class="sort_info">
+                <div class="sort_list">
+                    <div class="sort_list_warp">
+                        <div class="category_list ps-container scroll-y">
+                            <ul>
+                                <li><a href="javascript:;"><i class="sc_icon"></i>请选择分类</a></li>
+                                <li v-for="(vo,index) in category1" :data-cat_id="vo.cat_id" :class="{current:cat_ids.indexOf(vo.cat_id)>=0}">
+                                    <a @click="selectCat(vo.cat_id,1)"><i class="sc_icon"></i>{{vo.cat_name}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="sort_list">
+                    <div class="sort_list_warp">
+                        <div class="category_list ps-container scroll-y">
+                            <ul data-cat_level="2">
+                                <li><a href="javascript:"><i class="sc_icon"></i>请选择分类</a></li>
+                                <li v-for="(vo,index) in category2" :data-cat_id="vo.cat_id" :class="{current:cat_ids.indexOf(vo.cat_id)>=0}">
+                                    <a @click="selectCat(vo.cat_id,2)"><i class="sc_icon"></i>{{vo.cat_name}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="sort_list">
+                    <div class="sort_list_warp">
+                        <div class="category_list ps-container scroll-y">
+                            <ul data-cat_level="3">
+                                <li><a href="javascript:"><i class="sc_icon"></i>请选择分类</a></li>
+                                <li v-for="(vo,index) in category3" :data-cat_id="vo.cat_id" :class="{current:cat_ids.indexOf(vo.cat_id)>=0}">
+                                    <a @click="selectCat(vo.cat_id,3)"><i class="sc_icon"></i>{{vo.cat_name}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="sort_point"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="goods_btn">
+                <a @click="prevStep" class="sc-btn btn35 sc-blue-btn" data-step="1" data-type="step">上一步</a>
+                <a @click="nextStep" class="sc-btn btn35 sc-blueBg-btn" data-step="3" data-type="step" data-down="true">下一步</a>
+            </div>
+        </div>
+        <div class="step step_three" data-step="3" v-show="step==3">
+            <div class="step_content">
+                <div class="ecsc-form-goods">
+                    <div class="ecsc-form-title">
+                        <i class="dian"></i>
+                        <h3>通用信息</h3>
+                    </div>
+                    <dl>
+                        <dt>商品分类：</dt>
+                        <dd class="txtline">
+                            <span>{{category_path.join(' > ')}}</span>
+                            <a @click="prevStep" class="edit_category green" shoptype="edit_category"><i class="icon icon-edit"></i></a>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>店铺分类：</dt>
+                        <dd>
+                            <category-seletor :category="store_cat"></category-seletor>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>商品货号：</dt>
+                        <dd>
+                            <input type="text" class="text" name="goods_sn" v-model="goods.goods_sn" size="20" @change="checkGoodsSn">
+                            <div class="form_prompt"></div>
+                            <div class="notic">商家货号是指商家管理商品的编号，买家不可见最多可输入20个字符，支持输入中文、字母、数字、_、/、-和小数点</div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt><span class="require-field">*</span>&nbsp;商品名称：</dt>
+                        <dd>
+                            <input name="goods_name" type="text" id="goods_name" class="text mr10" v-model="goods.goods_name">
+                            <div id="font_color" class="font_color mr10">
+                                <input type="text" id="full" value="" style="display:none">
+                            </div>
+                            <input type="hidden" id="goods_name_style" v-model="goods.goods_name_style">
+                            <div class="form_prompt"></div>
+                            <div class="notic">商品标题名称长度至少1个字符，最长150个汉字</div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt><span class="require-field">*</span>&nbsp;本店售价：</dt>
+                        <dd>
+                            <div id="td_shopPrice1">
+                                <input name="shop_price" v-model="goods.shop_price" type="text" class="text">
+                                <a class="lh30 ml10 fl" @click="marketPriceSetted">按市场价计算</a>
+                                <div class="form_prompt"></div>
+                                <div class="notic">价格必须是0.01~9999999之间的数字，且不能高于市场价。此价格为商品实际销售价格，如果商品存在规格，该价格显示最低价格。</div>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>市场售价：</dt>
+                        <dd>
+                            <input name="market_price" v-model="goods.market_price" type="text" class="text">
+                            <a href="javascript:void(0);" class="lh30 ml10" @click="integral_market_price">取整数</a>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>成本价：</dt>
+                        <dd>
+                            <input name="cost_price" v-model="goods.cost_price" type="text" class="text">
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt><span class="require-field">*</span>&nbsp;商品库存数量：</dt>
+                        <dd>
+                            <div id="td_goodsNumber1">
+                                <input name="goods_number" v-model="goods.goods_number" type="text" class="text">
+                                <div class="form_prompt"></div>
+                                <div class="notic">商铺库存数量必须为0~999999999之间的整数，若设置商品规格属性库存，则此处无需填写</div>
+                            </div>
+                            <div id="td_goodsNumber2" style="display:none;" class="whouse_text"></div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>库存警告数量：</dt>
+                        <dd>
+                            <input name="warn_number" v-model="goods.warn_number" type="text" class="text">
+                            <div class="notic">设置最低库存预警值。当库存低于预警值时商家中心商品列表页库存列红字提醒，请填写0~255的数字，0为不预警。</div>
+                        </dd>
+                    </dl>
+                    <dl class="item" v-if="brandList.length">
+                        <dt>商品品牌：</dt>
+                        <dd class="relative">
+                            <div class="selection">
+                                <input type="text" name="brand_name" id="brand_name" class="text w140 valid" autocomplete="off" value="请选择品牌" readonly="">
+                                <div class="form_prompt"></div>
+                            </div>
+                            <div class="brand-select-container" style="display:none;">
+
+                                <div class="brand-top">
+                                    <div class="letter">
+                                        <ul>
+                                            <li @click="getBrandList()">
+                                                <a href="javascript:" data-letter="">全部品牌</a>
+                                            </li>
+                                            <li v-for="(vo,index) in brandfirstcharList" @click="getBrandList(vo)"><a href="javascript:">{{vo}}</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="b_search">
+                                        <input type="text" class="b_text" v-model="brand_name"
+                                               autocomplete="off">
+                                        <a href="javascript:" class="btn-mini" @click="getBrandList()">
+                                            <i class="icon icon-search"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="brand-list">
+                                    <ul>
+                                        <li data-brand_id="0" data-brand_name="请选择品牌" class="blue" @click="brandSelect()">取消选择</li>
+                                        <li v-for="(vo,index) in brandList" :data-id="vo.brand_id" :data-name="vo.brand_name" @click="brandSelect(vo)">
+                                            <em>{{vo.brand_first_char}}</em>
+                                            {{vo.brand_name}}
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="brand-not" style="display:none;">没有符合"<strong>其他</strong>"条件的品牌</div>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt><span class="require-field">*</span>&nbsp;上传商品图片：</dt>
+                        <dd style="position: relative;">
+                            <div id="goods_figure" class="update_images fl mr10">
+                                <div class="img relative">
+                                    <img :src="goods.original_img || '/public/static/images/update_images.jpg'">
+                                    <input type="file" id="original_img" class="pointer">
+                                </div>
+                            </div>
+                            <div class="form_prompt">
+                                <p>尺寸：800px * 800px</p>
+                                <p>大小：不限，根据实际自行确定大小</p>
+                                <p>格式：jpg，gif，png，jpeg</p>
+                            </div>
+                            <div class="notic"></div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>图片外部链接：</dt>
+                        <dd>
+                            <div class="step_label">
+                                <div class="checkbox_items">
+                                    <div class="checkbox_item fr mr0">
+                                        <input class="ui-checkbox" v-model="goods_img_url" id="is_img_url" @change="is_img_url" type="checkbox">
+                                        <label class="ui-label" for="is_img_url">&nbsp;</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="step_value">
+                                <div class="checkbox_items">
+                                    <input v-model="img_url" class="text" id="goods_img_url" placeholder="图片外部链接地址" :disabled="!goods_img_url" type="text">
+                                    <div class="notic">外链地址必须带有http://格式</div>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+
+                    <dl>
+                        <dt class="step_label">商品运费：</dt>
+                        <dd class="step_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item mr15">
+                                    <input type="radio" name="freight" class="ui-radio freight" id="freight_1" value="1" v-model="goods.freight">
+                                    <label for="freight_1" class="ui-radio-label">按固定运费</label>
+                                </div>
+
+                                <div class="checkbox_item">
+                                    <input type="radio" name="freight" class="ui-radio freight" id="freight_2" value="2" v-model="goods.freight">
+                                    <label for="freight_2" class="ui-radio-label">按运费模板</label>
+                                </div>
+
+                                <input id="shipping_fee" type="text" name="shipping_fee" class="text w150 mr10" autocomplete="off" v-model="goods.shipping_fee" v-show="goods.freight==1">
+                                <select id="transport_id" v-show="goods.freight==2" v-model="goods.transport_id" class="fl">
+                                    <option value="0">请选择</option>
+                                    <option v-for="(vo,index) in transport" :value="index">{{vo}}</option>
+                                </select>
+                                <div class="form_prompt"></div>
+                            </div>
+                        </dd>
+                    </dl>
+
+                    <dl>
+                        <dt class="step_label">应结金额：</dt>
+                        <dd class="step_value">
+                            <input type="hidden" name="commission_rate" class="text w150" autocomplete="off" value="">
+                            <span class="red">%</span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="ecsc-form-goods">
+                    <div class="ecsc-form-title"><i class="dian"></i>
+                        <h3>详细描述</h3></div>
+                    <dl class="goods_describe">
+                        <dd>
+                            <div class="tabmenu">
+                                <ul class="tab">
+                                    <li class="active"><a href="javascript:">电脑端</a></li>
+                                    <!--<li><a href="javascript:">手机端</a></li>-->
+                                </ul>
+                            </div>
+                            <div class="items-info gallery_album" data-inid="gallery_album_shop" data-act="gallery_album_list" shoptype="gallery_album_list">
+                                <div class="wrapper-list">
+                                    <div id="FCKeditor">
+                                        <script id="goods_desc" name="goods_desc" type="text/plain"></script>
+                                    </div>
+                                </div>
+                                <div class="wrapper-list" style="display:none;">
+                                    <div class="panel_warp">
+                                        <div class="pannel">
+                                            <div class="pannel-content" shoptype="mobile_pannel">
+                                                <div class="section_warp"></div>
+                                            </div>
+                                            <input type="hidden" name="desc_mobile" value="">
+                                        </div>
+                                        <div class="explain">
+                                            <p>
+                                                <strong>一、基本要求</strong>
+                                                <span><em>1、</em>手机详情总体大小：图片+文字，<i class="red">图片不超过20张，文字不超过5000字</i>；</span>
+                                                <span><em>建议：</em>所有图片都是本宝贝相关的图片。</span>
+                                            </p>
+                                            <p>
+                                                <strong>二、图片大小</strong>
+                                                <span><em>1、</em>建议使用宽度480 ~ 620像素、高度小于等于960像素的图片；</span>
+                                                <span><em>2、</em>格式为：JPG\JEPG\GIF\PNG；</span>
+                                                <span><em>举例：</em>可以上传一张宽度为480，高度为960像素，格式为JPG的图片。</span>
+                                            </p>
+                                            <p>
+                                                <strong>三、文字要求</strong>
+                                                <span><em>1、</em>每次插入文字不能超过500个字，标点、特殊字符按照一个字计算；</span>
+                                                <span><em>2、</em>请手动输入文字，不要复制粘贴网页上的文字，防止出现乱码；</span>
+                                                <span><em>3、</em>以下特殊字符“&lt;”、“&gt;”、“"”、“’”、“\”会被替换为空。</span>
+                                                <span><em>建议：</em>不要添加太多的文字，这样看起来更清晰。</span>
+                                            </p>
+                                        </div>
+                                        <div class="step_top_btn">
+                                            <a href="javascript:void(0);" class="sc-btn btn35 sc-blueBg-btn mr10" shoptype="mb_add_img"><i class="sc_icon sc_icon_images"></i>添加图片</a>
+                                            <a href="javascript:void(0);" class="sc-btn btn35 sc-blueBg-btn" shoptype="mb_add_txt"><i class="sc_icon sc_icon_font"></i>添加文字</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="ecsc-form-goods">
+                    <div class="ecsc-form-title"><i class="dian"></i>
+                        <h3>其它信息</h3></div>
+                    <dl id="dl_give_integral">
+                        <dt>赠送消费积分数：</dt>
+                        <dd>
+                            <input type="text" name="give_integral" v-model="goods.give_integral" size="20" class="text">
+                            <div class="notic">购买该商品时赠送消费积分数，最高可设置<em id="give_integral">0</em>消费积分</div>
+                        </dd>
+                    </dl>
+                    <dl id="dl_rank_integral">
+                        <dt>赠送等级积分数：</dt>
+                        <dd>
+                            <input type="text" name="rank_integral" value="0" v-model="goods.rank_integral" size="20" class="text">
+                            <div class="notic">购买该商品时赠送等级积分数，最高可设置<em id="rank_integral">0</em>等级积分</div>
+                        </dd>
+                    </dl>
+                    <dl id="dl_pay_integral">
+                        <dt>积分购买金额：</dt>
+                        <dd>
+                            <input type="text" name="integral" value="0" size="20" v-model="goods.integral" class="text">
+                            <div class="notic">(此处需填写金额)购买该商品时最多可以使用积分的金额，最高可设置积分购买<em id="pay_integral">0</em>金额</div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>商品重量：</dt>
+                        <dd id="ncProductDetails">
+                            <input type="text" class="text mr10" v-model="goods.goods_weight" size="20">
+                            <div class="value_select fl">
+                                <div id="commodity_weight" class="imitate_select select_w60">
+                                    <div class="cite">千克</div>
+                                    <ul style="display: none;">
+                                        <li><a href="javascript:;" data-value="1" class="ftx-01">千克</a></li>
+                                        <li><a href="javascript:;" data-value="0.001" class="ftx-01">克</a></li>
+                                    </ul>
+                                    <input name="weight_unit" type="hidden" value="1" id="company_val">
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>商品单位：</dt>
+                        <dd>
+                            <input type="text" class="text mr10" v-model="goods.goods_unit" value="个" size="20">
+                            <div class="notic">比如：个，件，份，套。默认为个</div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>店铺推荐：</dt>
+                        <dd>
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="checkbox" name="store_best" class="ui-checkbox" id="store_best" v-model.number="goods.store_best" true-value="1" false-value="0">
+                                    <label class="ui-label" for="store_best">精品</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="checkbox" name="store_new" class="ui-checkbox" id="store_new" v-model.number="goods.store_new" true-value="1" false-value="0">
+                                    <label class="ui-label" for="store_new">新品</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="checkbox" name="store_hot" class="ui-checkbox" id="store_hot" v-model.number="goods.store_hot" true-value="1" false-value="0">
+                                    <label class="ui-label" for="store_hot">热销</label>
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>上架：</dt>
+                        <dd>
+                            <div :class="['switch switch_2',{active:goods.is_on_sale>0}]" title="是" @click="goods.is_on_sale=goods.is_on_sale?0:1">
+                                <div class="circle"></div>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>能作为普通商品销售：</dt>
+                        <dd>
+                            <div :class="['switch switch_2',{active:goods.is_alone_sale>0}]" title="否" @click="goods.is_alone_sale=goods.is_alone_sale?0:1">
+                                <div class="circle"></div>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>是否为免运费商品：</dt>
+                        <dd>
+                            <div :class="['switch switch_2',{active:goods.is_shipping>0}]" title="否" @click="goods.is_shipping=goods.is_shipping?0:1">
+                                <div class="circle"></div>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>商品关键词：</dt>
+                        <dd>
+                            <input type="text" class="text" name="keywords" v-model="goods.keywords" size="40">
+                            <div class="notic">商品关键词请用空格分隔</div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>商品简单描述：</dt>
+                        <dd>
+                            <textarea class="textarea" name="goods_brief" v-model="goods.goods_brief" cols="40" rows="3"></textarea>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>评论标签</dt>
+                        <dd>
+                            <textarea name="goods_product_tag" v-model="goods.goods_product_tag" cols="40" rows="3" class="textarea fl"></textarea>
+                            <div class="notic">请用','号分割；例：商品好看,很实用,材料很好...（注意逗号要使用英文逗号）</div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>服务承诺标签</dt>
+                        <dd>
+                            <textarea class="textarea" name="goods_tag" v-model="goods.goods_tag"></textarea>
+                            <div class="notic">请用','号分割（注：逗号要使用英文逗号）</div>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>商家备注：</dt>
+                        <dd>
+                            <textarea name="seller_note" v-model="goods.seller_note" cols="40" rows="3" class="textarea fl"></textarea>
+                            <div class="notic">仅供商家自己看的信息</div>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="goods_footer">
+                <div class="goods_btn goods_btn_fixed">
+                    <a @click="prevStep" class="sc-btn btn35 sc-blue-btn">上一步</a>
+                    <a @click="nextStep" class="sc-btn btn35 sc-blueBg-btn">下一步</a>
+                </div>
+            </div>
+        </div>
+        <div class="step step_four" data-step="4" v-show="step==4">
+            <div class="step_content">
+                <!-- 商品规格-->
+                <div class="ecsc-form-goods">
+                    <div class="ecsc-form-title"><i class="dian"></i>
+                        <h3>商品规格</h3></div>
+                    <div class="step_item">
+                        <div class="step_item_left"><h5>规格分类：</h5></div>
+                        <div class="step_item_right">
+                            <div class="item_right_li">
+                                <div class="value_select">
+                                    <div id="parent_id1" class="imitate_select select_w145">
+                                        <div class="cite">请选择</div>
+                                        <ul style="display: none;">
+                                            <li><a href="javascript:;" data-value="0" data-level="1" class="ftx-01">请选择</a></li>
+
+                                            <li v-for="(cat_name,cat_id) in goods_type" @click="selectTypeCat(cat_id)"><a class="ftx-01">{{cat_name}}</a></li>
+                                        </ul>
+                                    </div>
+                                    <input name="attr_parent_id" type="hidden" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--规格列表-->
+                    <div class="step_item pb0" id="tbody-goodsAttr">
+                        <div class="step_item_left">
+                            <h5>商品规格：</h5>
+                        </div>
+                        <div class="step_item_right">
+                            <div class="item_right_li" v-for="(vo,index) in attr_list">
+                                <div class="label">{{vo.attr_name}}：</div>
+                                <div class="value li_value">
+                                    <div class="checkbox_items fn attr_input_type_4">
+                                        <div class="checkbox_item" v-for="(vo2,index2) in vo.attr_values">
+                                            <input type="checkbox" class="ui-checkbox" :value="vo2.val" :id="vo2.val" @change="productsListInit(index,index2)">
+                                            <label :for="vo2.val" class="ui-label">{{vo2.val}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--规格模式-->
+                    <div class="step_item_table" id="attribute_table">
+                        <table class="table_head" width="100%">
+                            <thead>
+                            <tr>
+                                <th width="20%">
+                                    <template v-for="(vo,index) in attr_list">
+                                        {{vo.attr_name}}
+                                    </template>
+                                </th>
+                                <th width="10%"><em class="require-field">*</em>市场价<i class="sc_icon sc_icon_edit pointer pro_market"></i></th>
+                                <th width="10%"><em class="require-field pointer">*</em>本店价<i class="sc_icon sc_icon_edit pointer pro_shop"></i></th>
+                                <th width="10%"><em class="require-field pointer">*</em>促销价<i class="sc_icon sc_icon_edit pointer pro_promote"></i></th>
+                                <th width="10%"><em class="require-field">*</em>库存<i class="sc_icon sc_icon_edit pointer pro_number pointer"></i></th>
+                                <th width="10%"><em class="require-field">*</em>预警值<i class="sc_icon sc_icon_edit pointer pro_warning pointer"></i></th>
+                                <th width="12%">商品货号</th>
+                                <th width="12%">商品条形码</th>
+                                <th width="5%">操作</th>
+                            </tr>
+                            </thead>
+                        </table>
+                        <div id="listDiv">
+                            <div class="step_item_table2 ps-container" id="step_item_table2">
+                                <table class="table_attr" width="100%">
+                                    <tbody>
+
+                                    <tr data-changelog="1" v-for="(vo,index) in product_list">
+                                        <td class="td_bg_blue" style="padding:0 5px;" width="20%">{{vo.tempvalue}}</td>
+                                        <td width="10%"><input type="text" class="text w60" autocomplete="off" v-model="vo.product_market_price"></td>
+                                        <td width="10%"><input type="text" class="text w60" autocomplete="off" v-model="vo.product_price"></td>
+                                        <td width="10%"><input type="text" class="text w60" autocomplete="off" v-model="vo.product_promote_price"></td>
+                                        <td width="10%"><input type="text" class="text w50 tc" autocomplete="off" v-model="vo.product_number"></td>
+                                        <td width="10%"><input type="text" class="text w50 tc" autocomplete="off" v-model="vo.product_warn_number"></td>
+                                        <td width="12%"><input type="text" class="text w90" autocomplete="off" v-model="vo.product_sn"></td>
+                                        <td width="12%"><input type="text" class="text w90" autocomplete="off" v-model="vo.bar_code"></td>
+                                        <td width="5%">
+                                            <a href="javascript:;" class="btn_trash" @click="productsListDelete(index)">
+                                                <i class="icon icon-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- 属性类型-->
+                <div class="ecsc-form-goods">
+                    <div class="ecsc-form-title"><i class="dian"></i>
+                        <h3>商品类型</h3>
+                    </div>
+                    <!--平台属性分类-->
+                    <div class="step_item">
+                        <div class="step_item_left"><h5>属性分类：</h5></div>
+                        <div class="step_item_right">
+                            <div class="item_right_li">
+                                <div class="value_select">
+                                    <div id="attr_type" class="select_w145">
+                                        <select v-model="attr_type" @change="selectAttrType()">
+                                            <option value="0">平台分类</option>
+                                            <option value="1">本店分类</option>
+                                        </select>
+                                    </div>
+                                    <div id="attr_cate1" class="imitate_select select_w145">
+                                        <div class="cite">请选择</div>
+                                        <ul>
+                                            <li><a @click="attr_cat2=[];attr_cat3=[]">请选择</a></li>
+                                            <li v-for="(vo,index) in attr_cat1" @click="selectAttrCat(vo.id,2)"><a class="ftx-01">{{vo.name}}</a></li>
+                                        </ul>
+                                    </div>
+                                    <div id="attr_cate2" class="imitate_select select_w145" v-show="attr_cat2.length">
+                                        <div class="cite">请选择</div>
+                                        <ul>
+                                            <li v-for="(vo,index) in attr_cat2" @click="selectAttrCat(vo.id,3)"><a class="ftx-01">{{vo.name}}</a></li>
+                                        </ul>
+                                    </div>
+                                    <div id="attr_cate3" class="imitate_select select_w145" v-show="attr_cat3.length">
+                                        <div class="cite">请选择</div>
+                                        <ul>
+                                            <li v-for="(vo,index) in attr_cat3" @click="selectAttrCat(vo.id,0)"><a class="ftx-01">{{vo.name}}</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--fixme here-->
+                    <!--属性类型选择-->
+                    <div class="step_item">
+                        <div class="step_item_left"><h5>属性类型</h5></div>
+                        <div class="step_item_right">
+                            <div class="item_right_li">
+                                <div class="value_select">
+                                    <div id="product_type" class="imitate_select select_w145">
+                                        <div class="cite">请选择</div>
+                                        <ul style="display: none;">
+                                            <li v-for="(attr_type,index) in attr_type_list" @click="selectType(index)"><a class="ftx-01">{{attr_type.name}}</a></li>
+                                        </ul>
+                                    </div>
+                                    <input name="attr_parent_id" type="hidden" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--商品属性-->
+                <div class="ecsc-form-goods attr-box" v-show="product_attr_list.other.length>0 || product_attr_list.group.length>0">
+                    <div class="ecsc-form-title">
+                        <i class="dian"></i>
+                        <h3>商品属性</h3>
+                    </div>
+                    <!--属性选择-->
+                    <div class="step_item pb0" v-for="(attr,index) in product_attr_list.other">
+                        <div class="step_item_left">
+                            <h5>{{attr.name}}：</h5>
+                        </div>
+                        <div class="step_item_right">
+                            <div class="item_right_li goods_attr_type">
+                                <!--多选按钮-->
+                                <div class="value" v-if="attr.showtype=='checkbox'">
+                                    <div class="value li_value">
+                                        <div class="checkbox_items fn attr_input_type_28">
+                                            <div class="checkbox_item" v-for="(item,idx) in attr.attrvaluejson">
+                                                <input type="checkbox" :name="'p_attr_'+attr.id" class="ui-checkbox" :value="item" :id="'goods_attr_checkbox'+index+idx" @change="selectProductAttr(attr.id)">
+                                                <label :for="'goods_attr_checkbox'+index+idx" class="ui-label">{{item}}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--单选按钮-->
+                                <template class="value" v-else-if="attr.showtype=='radio'">
+                                    <div class="checkbox_items fn attr_input_type_28">
+                                        <div class="checkbox_item mr15" v-for="(item,idx) in attr.attrvaluejson">
+                                            <input type="radio" :name="'p_attr_'+attr.id" :id="'attr_radio_'+index+idx" :value="item" class="ui-radio freight" @change="selectProductAttr(attr.id)">
+                                            <label :for="'attr_radio_'+index+idx" class="ui-radio-label attr_radio">{{item}}</label>
+                                        </div>
+                                    </div>
+                                </template>
+                                <!--datetime-->
+                                <div class="value" v-else-if="attr.showtype=='datetime'">
+                                    <div class="value li_value">
+                                        <div class="text_time">
+                                            <input :name="'p_attr_'+attr.id" class="easyui-datebox" :data-attr_id="attr.id" :id="'asdf_'+attr.id" style="width:135px;">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--select-->
+                                <div class="value mr15" v-else-if="attr.showtype=='select'">
+                                    <div class="value li_value">
+                                        <select :name="'p_attr_'+attr.id" @change="selectProductAttr(attr.id)">
+                                            <option value="">请选择</option>
+                                            <option :value="item" v-for="(item,idx) in attr.attrvaluejson">{{item}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!--textarea-->
+                                <div class="value mr15" v-else-if="attr.showtype=='textarea'">
+                                    <div class="value li_value">
+                                        <textarea :name="'p_attr_'+attr.id" cols="50" rows="3" @change="selectProductAttr(attr.id)"></textarea>
+                                    </div>
+                                </div>
+                                <!--text-->
+                                <div class="value" v-else>
+                                    <input :name="'p_attr_'+attr.id" type="text" placeholder="请输入属性值" class="text" @change="selectProductAttr(attr.id)">
+                                </div>
+                                <!--自定义输入框-->
+                                <div class="value" v-if="!no_self_input[attr.showtype]">
+                                    <input :name="'p_attr_'+attr.id" type="text" class="text" value="" placeholder="自定义属性值" @change="selectProductAttr(attr.id)" title="没有合适的选项时,在此填写自定义属性值">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--分组属性-->
+                    <div class="step_item" v-for="group_attr in product_attr_list.group">
+                        <div class="step_item_left">
+                            <h5>{{group_attr.group_name}}：</h5>
+                        </div>
+                        <div class="step_item_right group_attr_box" v-for="(attr,index) in group_attr.data">
+                            <div class="attr-group-left">
+                                <h5>{{attr.name}}：</h5>
+                            </div>
+                            <div class="attr-group-right">
+                                <div class="item_right_li goods_attr_type">
+                                    <!--多选按钮-->
+                                    <div class="value" v-if="attr.showtype=='checkbox'">
+                                        <div class="value li_value">
+                                            <div class="checkbox_items fn attr_input_type_28">
+                                                <div class="checkbox_item" v-for="(item,idx) in attr.attrvaluejson">
+                                                    <input type="checkbox" :name="'p_attr_'+attr.id" class="ui-checkbox" :value="item" :id="'g_goods_attr_checkbox'+index+idx" @change="selectProductAttr(attr.id)">
+                                                    <label :for="'g_goods_attr_checkbox'+index+idx" class="ui-label">{{item}}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--单选按钮-->
+                                    <template class="value" v-else-if="attr.showtype=='radio'">
+                                        <div class="checkbox_items fn attr_input_type_28">
+                                            <div class="checkbox_item mr15" v-for="(item,idx) in attr.attrvaluejson">
+                                                <input type="radio" :name="'p_attr_'+attr.id" :id="'g_attr_radio_'+index+idx" :value="item" class="ui-radio freight" @change="selectProductAttr(attr.id)">
+                                                <label :for="'g_attr_radio_'+index+idx" class="ui-radio-label attr_radio">{{item}}</label>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <!--datetime-->
+                                    <div class="value" v-else-if="attr.showtype=='datetime'">
+                                        <div class="value li_value">
+                                            <div class="text_time">
+                                                <input :name="'p_attr_'+attr.id" class="easyui-datebox" :data-attr_id="attr.id" :id="'asdf_'+attr.id" style="width:135px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--select-->
+                                    <div class="value mr15" v-else-if="attr.showtype=='select'">
+                                        <div class="value li_value">
+                                            <select :name="'p_attr_'+attr.id" @change="selectProductAttr(attr.id)">
+                                                <option value="">请选择</option>
+                                                <option :value="item" v-for="(item,idx) in attr.attrvaluejson">{{item}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!--textarea-->
+                                    <div class="value mr15" v-else-if="attr.showtype=='textarea'">
+                                        <div class="value li_value">
+                                            <textarea :name="'p_attr_'+attr.id" cols="50" rows="3" @change="selectProductAttr(attr.id)"></textarea>
+                                        </div>
+                                    </div>
+                                    <!--text-->
+                                    <div class="value" v-else>
+                                        <input :name="'p_attr_'+attr.id" type="text" placeholder="请输入属性值" class="text" @change="selectProductAttr(attr.id)">
+                                    </div>
+                                    <!--自定义输入框-->
+                                    <div class="value" v-if="!no_self_input[attr.showtype]">
+                                        <input :name="'p_attr_'+attr.id" type="text" class="text" value="" placeholder="自定义属性值" @change="selectProductAttr(attr.id)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--商品相册-->
+                <div class="ecsc-form-goods">
+                    <div class="ecsc-form-title"><i class="dian"></i>
+                        <h3>商品相册</h3></div>
+                    <div class="step_item border-bottom0">
+
+                        <div class="goods_album mt20" id="gallery_img_list">
+                            <ul id="ul_pics">
+                                <li id="gallery_137" v-for="(vo,index) in goodsgalleryList">
+                                    <div class="img" @click="img_default(index)">
+                                        <img :src="vo.img_original" width="160" height="160">
+                                    </div>
+                                    <div class="info">
+                                        <span class="zt red"></span>
+                                        <div class="sort">
+                                            <span>排序：</span>
+                                            <input type="text" class="stext" autocomplete="off" v-model="vo.img_sort">
+                                        </div>
+                                        <a @click="delete_img(index)" class="delete_img"><i class="icon icon-trash"></i></a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="step_top_btn tl mt10 gallery_album" data-act="gallery_album_list" style="position: relative;">
+                            <a class="sc-btn btn35 sc-blueBg-btn" id="addImages" style="position: relative; z-index: 1;"><i class="sc_icon_images"></i>添加图片 <input type="file" id="gallery" class="opacity-input" multiple></a>
+                            <span class="red">按住ctrl可同时批量选择多张图片上传</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="goods_footer">
+                <div class="goods_btn goods_btn_fixed">
+                    <a @click="prevStep" class="sc-btn btn35 sc-blue-btn">上一步</a>
+                    <a @click="nextStep" class="sc-btn btn35 sc-blueBg-btn">下一步</a>
+                </div>
+            </div>
+        </div>
+        <div class="step" data-step="6" v-show="step==5">
+            <div class="step" shoptype="filter" data-filter="goods">
+                <div class="step_content">
+                    <div class="ecsc-form-goods">
+                        <div class="ecsc-form-title"><i class="dian"></i>
+                            <h3>商品关联</h3></div>
+                    </div>
+                    <!--通用部分 start-->
+                    <div class="goods_search_div mt20">
+                        <input type="text" id="search-keywords" class="text w150 mr10" value="" placeholder="请输入关键字" data-filter="keyword" autocomplete="off">
+                        <a @click="searchGoods" class="sc-btn sc-blueBg-btn">搜索</a>
+                    </div>
+                    <!--通用部分 end-->
+                    <div class="move_div">
+                        <div class="move_left">
+                            <h4>可选商品</h4>
+                            <div class="move_info">
+                                <div class="move_list scroll-y">
+                                    <ul>
+                                        <li :class="{current:Object.keys(related).indexOf(index)>=0}" :data-text="vo" v-for="(vo,index) in relationGoods" @click="relative(index)"><i class="sc_icon sc_icon_ok"></i><a>{{vo}}</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="move_middle">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" name="is_single" class="ui-radio" id="one_way" value="0" v-model="is_double">
+                                    <label for="one_way" class="ui-radio-label">单向关联</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" name="is_single" class="ui-radio" id="two_way" value="1" v-model="is_double">
+                                    <label for="two_way" class="ui-radio-label">双向关联</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="move_right">
+                            <h4>跟该商品关联的商品</h4>
+                            <div class="move_info">
+                                <div class="move_list ps-container scroll-y">
+                                    <ul>
+                                        <li class="current" :data-text="vo" v-for="(vo,index) in related" @click="relative(index,true)"><i class="sc_icon sc_icon_no"></i><a>{{vo}}</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="goods_footer">
+                <div class="goods_btn goods_btn_fixed">
+                    <a @click="prevStep" class="sc-btn btn35 sc-blue-btn">上一步</a>
+                    <a @click="publish" class="sc-btn btn35 sc-blueBg-btn">立即发布</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+<script type="text/javascript" src="/topjui/editor/ueditor.config.js"></script>
+<script type="text/javascript" src="/topjui/editor/ueditor.all.min.js"></script>
+<script type="text/javascript" src="/topjui/editor/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="/public/static/js/spectrum.js"></script>
+
+<script type="text/x-template" id="category-seletor">
+    <div class="categorySelect">
+        <div class="selection">
+            <input type="text" class="text w290 valid" id="category_name" v-model="category.parent_name || '请选择分类'" autocomplete="off" readonly="" @click="hidecover=!hidecover">
+            <input type="hidden" name="parent_id" v-model="category.parent_id">
+            <input type="hidden" name="level" v-model="category.level">
+        </div>
+        <div class="select-container w320" :class="{hidden:hidecover}">
+            <div class="select-top">
+                <a href="javascript:" class="categoryTop" @click="resetChoose">重选</a>
+                &gt; <span class="txt">{{category.cat_path.join(' > ')}}</span>
+            </div>
+            <div class="select-list">
+                <ul>
+                    <li class="blue" data-show="1" data-seller="0" v-for="(vo,index) in category.list" @click="choose(index)">
+                        <em v-if="vo.level==2">Ⅱ</em><em v-else-if="vo.level==3">Ⅲ</em><em v-else>Ⅰ</em>
+                        {{vo.cat_name}}
+                    </li>
+                </ul>
+            </div>
+            <div :class="['loading',{hidden:requrest}]"><img src="/public/static/images/ajaxLoader.gif"><i>&nbsp;</i></div>
+        </div>
+    </div>
+</script>
+
+<script>
+    $.fn.datebox.defaults.formatter = function (date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        return y + '-' + m + '-' + d;
+    };
+    var vm = new Vue({
+        el: '#app',
+        filters: {
+            timeParse: function (val) {
+                if (val < 1) return moment().format('YYYY-MM-DD HH:mm:ss');
+                val += '';
+                if (val.length > 10) {
+                    return moment.unix(val).format('YYYY-MM-DD HH:mm:ss');
+                } else {
+                    return val;
+                }
+            }
+        },
+        data: {
+            step: 1,
+            category1: {},
+            category2: {},
+            category3: {},
+            category_path: JSON.parse('{:json_encode($cate_path)}'),
+            transport: JSON.parse('{:json_encode($transport)}'),
+            goods: JSON.parse('{:addslashes(json_encode($goods))}'),
+            brandList: [],
+            brandfirstcharList: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z'],
+            brand_name: '',
+            token: '',
+            goods_img_url: false,//是否引用外部主图
+            img_url: '',
+            attr_type: 0,//属性分类归属,平台/本店
+            goods_type: [],//属性分类
+            attr_cat1: JSON.parse('{:json_encode($attr_cat)}'),//属性
+            attr_cat2: [],
+            attr_cat3: [],
+            attr_type_list: [],//属性类型列表
+            product_attr_list: JSON.parse('{:json_encode($product_attr_key)}'),//属性item列表
+            product_attr_value: JSON.parse('{:$product_attr_value}'),//属性value列表
+            no_self_input: {datetime: true, textarea: true, text: true},
+            attr_list: JSON.parse('{:json_encode($attr_list)}'),//规格
+            product_list: JSON.parse('{:json_encode($product)}'),//已设置的商品属性
+            goodsgalleryList: JSON.parse('{:json_encode($gallery)}'),//商品相册
+            relationGoods: {},  //左侧关联商品
+            related: JSON.parse('{:json_encode($related)}'),//右侧已选择关联的商品
+            is_double: {$is_double},//是否双向关联
+            cat_ids: JSON.parse('{:json_encode($cat_ids)}'),//编辑模式,商品分类
+            store_cat: JSON.parse('{:json_encode($store_cat)}'),//店铺分类
+        },
+        components: {
+            'category-seletor': {
+                template: '#category-seletor',
+                props: ['category'],
+                data: function () {
+                    return {
+                        hidecover: true,
+                        requrest: true
+                    };
+                },
+                methods: {
+                    choose: function (index) {
+                        var _this = this;
+                        _this.category.parent_name = _this.category.list[index]['cat_name'];
+                        _this.category.parent_id = _this.category.list[index]['cat_id'];
+                        _this.category.level = _this.category.list[index]['level'] + 1;
+                        if (_this.category.cat_path.length < 3) {
+                            _this.category.cat_path.push(_this.category.parent_name);
+                        } else {
+                            _this.category.cat_path.splice(2, 1, _this.category.parent_name);
+                        }
+                        _this.getCategory();
+                    },
+                    resetChoose: function () {
+                        this.category.parent_name = '';
+                        this.category.parent_id = 0;
+                        this.category.cat_path = [];
+                        this.category.level = 1;
+                        this.getCategory();
+                    },
+                    getCategory: function () {
+                        var _this = this;
+                        _this.requrest = false;
+                        $.ajax({
+                            type: 'POST',
+                            url: '/seller/api/get_store_category',
+                            data: {parent_id: _this.category.parent_id},
+                            success: function (data) {
+                                vm.goods.user_cat = _this.category.parent_id;
+                                if (_this.category.cat_path.length < 3) {
+                                    _this.category.list = data;
+                                } else {
+                                    _this.hidecover = !_this.hidecover;
+                                }
+                                _this.requrest = true;
+                            },
+                            error: function (xhr, type) {
+                                _this.requrest = true;
+                                easyshow('获取店铺分类数据失败');
+                            }
+                        });
+                    }
+                },
+                created: function () {
+                    var _this = this;
+                    document.onclick = function (e) {
+                        if (e.target.id != 'category_name' && !$(e.target).is('.select-container') && !$(e.target).parents("div").is(".select-container")) {
+                            _this.hidecover = true;
+                        }
+                    };
+                }
+            }
+        },
+        watch: {
+            product_attr_list: {
+                immediate: true,
+                handler: function (val) {
+                    setTimeout(function () {
+                        $('.easyui-datebox').datebox({
+                            panelWidth: 180,
+                            onSelect: function (date) {
+                                var result = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+                                vm.selectProductAttr(this.dataset.attr_id, result);
+                            }
+                        });
+                    }, 100);
+                }
+            },
+            attr_type_list: function (val) {
+                this.product_attr_list.other = [];
+                this.product_attr_list.group = [];
+                this.product_attr_value = {};
+                $('#product_type').addClass('error-shadow').find('ul').show();
+            }
+        },
+        methods: {
+            init: function (instance) {
+                instance.getBrandList('', instance);
+                instance.getUploadToken(instance);
+                instance.getGoodsType(instance);
+                if (instance.goods.goods_id > 0 && instance.cat_ids.length > 0) {
+                    instance.category1 = JSON.parse('{:json_encode($category1)}');
+                    instance.category2 = JSON.parse('{:json_encode($category2)}');
+                    instance.category3 = JSON.parse('{:json_encode($category3)}');
+                } else {
+                    instance.getCategory(instance, 1, 0);
+                }
+            },
+            nextStep: function () {
+                var msg;
+                switch (this.step) {
+                    case 2:
+                        if (!parseInt(vm.goods.cat_id)) {
+                            vm.category_path = ['请选择分类'];
+                            msg = true;
+                        }
+                        break;
+                    case 3:
+                        if (!trim(vm.goods.goods_name)) {
+                            vm.error_div(document.getElementById('goods_name'), '商品名称不能为空。');
+                            msg = true;
+                        }
+                        if (vm.goods.shop_price <= 0) {
+                            vm.error_div(document.getElementsByName('shop_price')[0], '商品价格必须大于0');
+                            msg = true;
+                        }
+                        if (!vm.goods.original_img && !vm.img_url) {
+                            vm.error_div(document.getElementById('original_img'), '请上传商品默认图片');
+                            msg = true;
+                        }
+
+                        if (vm.goods.freight == 2 && vm.goods.transport_id < 1) {
+                            vm.error_div(document.getElementById('transport_id'), '请选择运费模板');
+                            msg = true;
+                        }
+                        break;
+                }
+                if (msg) {
+                    if (msg !== true) {
+                        easyshow(msg);
+                    }
+                    return;
+                }
+                this.step += 1;
+            },
+            prevStep: function () {
+                this.step -= 1;
+            },
+            getCategory: function (instance, level, cat_id) {
+                instance = instance ? instance : vm;
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/api/get_category",
+                    data: {parent: cat_id},
+                    success: function (data) {
+                        instance['category' + level] = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow('商品分类获取失败');
+                    }
+                });
+            },
+            getBrandList: function (char, instance) {
+                instance = instance ? instance : vm;
+                var param = {
+                    is_own: true
+                };
+                if (char) {
+                    param.brand_first_char = char;
+                }
+                if (trim(instance.brand_name)) {
+                    param.brand_name = instance.brand_name;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/api/brandListAjax',
+                    data: param,
+                    dataType: 'json',
+                    success: function (data) {
+                        instance.brandList = data;
+                        //品牌首字母
+                        // data.data.forEach(function (v, i) {
+                        //     if (instance.brandfirstcharList.indexOf(v.brand_first_char) < 0)
+                        //         instance.brandfirstcharList.push(v.brand_first_char);
+                        // });
+                        // instance.brandfirstcharList.sort();
+                    },
+                    error: function (xhr, type) {
+                        easyshow('获取品牌列表失败');
+                    }
+                });
+            },
+            getUploadToken: function (instance) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/api/uploadtoken',
+                    success: function (data) {
+                        instance.token = data;
+                    },
+                    error: function (xhr, type) {
+                        console.log(xhr);
+                        easyshow('获取图片上传token失败');
+                    }
+                });
+            },
+            getGoodsType: function (instance) {
+                $.ajax({
+                    type: 'GET',
+                    url: "/seller/api/goods_type",
+                    dataType: 'json',
+                    success: function (data) {
+                        instance.goods_type = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow('获取属性分类失败');
+                    }
+                });
+            },
+            fileuploaderInit: function () {
+                //上传主图
+                $("#original_img").on("change").bind('change', function () {
+                    single_upload(this.files[0], function (res) {
+                        layer.closeAll();
+                        vm.goods.original_img = res;
+                    }, null, vm.token);
+                });
+                $("#gallery").on("change").bind("change", function () {
+                    var files = this.files;
+                    if (vm.goodsgalleryList.length + files.length > 5) {
+                        easyshow('最多上传5张图片');
+                        return;
+                    }
+
+                    for (var i = 0, j = files.length; i < j; i++) {
+                        single_upload(files[i], function (res) {
+                            layer.closeAll();
+                            vm.goods.original_img = res;
+                            vm.goodsgalleryList.push({
+                                img_original: res,
+                                img_sort: 0,
+                                external_url: '',
+                            });
+                        }, null, vm.token);
+                    }
+                });
+
+            },
+            //品牌选择
+            brandSelect: function (vo) {
+                if (!vo) {
+                    vo = {};
+                    var data = event.currentTarget.dataset;
+                    vo.brand_id = data.brand_id;
+                    vo.brand_name = data.brand_name;
+                }
+                vm.goods.brand_id = vo.brand_id;
+                vm.brand_name = vo.brand_name;
+                document.getElementById('brand_name').value = vo.brand_name;
+            },
+            //分类选择
+            selectCat: function (cat_id, level) {
+                this.goods.cat_id = cat_id;
+                if (level < 3) {
+                    this.getCategory(this, level + 1, cat_id);
+                    if (level < 2) {
+                        vm.cat_ids.splice(0);
+                        vm.cat_ids.push(cat_id);
+                        vm.category_path = [];
+                        vm.category_path.push(vm.category1[cat_id].cat_name);
+                        vm.category3 = {};
+                        $("ul[data-cat_level=2] li").removeClass('current');
+                    } else {
+                        vm.cat_ids.splice(1, 1, cat_id);
+                        vm.category_path.splice(1);
+                        vm.category_path.push(vm.category2[cat_id].cat_name);
+                        $("ul[data-cat_level=3] li").removeClass('current');
+                    }
+                } else {
+                    vm.cat_ids.splice(2, 1, cat_id);
+                    vm.category_path.splice(2);
+                    vm.category_path.push(vm.category3[cat_id].cat_name);
+                }
+            },
+            //商品货号查重
+            checkGoodsSn: function () {
+                if (!trim(vm.goods.goods_sn).length) {
+                    return;
+                }
+                var param = {
+                    goods_sn: vm.goods.goods_sn
+                };
+                if (vm.goods.goods_id) {
+                    param.goods_id = vm.goods.goods_id;
+                }
+                var obj = event.currentTarget;
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/api/check_goods_sn",
+                    data: param,
+                    success: function (data) {
+                        vm.error_div(obj, '');
+                    },
+                    error: function (xhr, type) {
+                        vm.error_div(obj, xhr.responseJSON, 1);
+                    }
+                });
+            },
+            //错误提示
+            error_div: function (obj, error) {
+                var error_div = $(obj).parents('dd').find('div.form_prompt');
+
+                error_div.find("label").remove();
+                if (!error) {
+                    $(obj).removeClass("error");
+                    return;
+                } else {
+                    $(obj).addClass("error");
+                }
+
+                $(obj).focus();
+                $(obj).bind('change', function () {
+                    vm.error_div(this);
+                    $(this).unbind('change');
+                });
+                error_div.find("label").remove();
+                error_div.append("<label class='error'><i class='icon icon-exclamation-sign'></i>" + error + "</label>");
+            },
+            //根据市场价计算本店价格
+            marketPriceSetted: function () {
+                var shopPrice = parseFloat(vm.goods.market_price ? vm.goods.market_price : 0) / 1.2;
+                shopPrice += '';
+
+                n = shopPrice.lastIndexOf(".");
+                if (n > -1) {
+                    shopPrice = shopPrice.substr(0, n + 3);
+                }
+                this.goods.shop_price = shopPrice;
+            },
+            //市场价取整
+            integral_market_price: function () {
+                this.goods.market_price = parseInt(this.goods.market_price);
+            },
+            //取消引用外部主图时,清空input
+            is_img_url: function () {
+                if (!this.goods_img_url) {
+                    vm.img_url = '';
+                    document.getElementById('goods_img_url').style.color = '#666';
+                }
+            },
+            //设置促销
+            setPromote: function () {
+                var node = event.currentTarget;
+                if (node.value == 1) {
+                    $(node).parents('.checkbox_items').find('.hidden_div').show();
+                } else {
+                    $(node).parents('.checkbox_items').find('.hidden_div').hide();
+                }
+            },
+            //选择规格分类
+            selectTypeCat: function (cat_id) {
+                $.ajax({
+                    type: 'GET',
+                    url: "/seller/api/attributelistAjax",
+                    data: {cat_id: cat_id},
+                    dataType: 'json',
+                    success: function (data) {
+                        vm.product_list = [];
+                        vm.attr_list = data.data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow('获取规格分类失败');
+                    }
+                });
+            },
+            //选择规格，按讨论结果，弃用一对多属性
+            productsList: function (index, index1) {
+                var spec_arr = [];
+                var dataset = {};
+                var sort = [];
+                $("#tbody-goodsAttr input[type='checkbox']:checked").each(function () {
+                    dataset = this.dataset;
+                    if (!spec_arr.hasOwnProperty(dataset.attr_id))
+                        spec_arr[dataset.attr_id] = [];
+                    spec_arr[dataset.attr_id].push(dataset.goods_attr_id);
+                });
+
+                spec_arr.forEach(function (v, k) {
+                    sort[k] = v.length;
+                });
+
+            },
+            //选择规格
+            productsListInit: function (index, index2) {
+
+                if (vm.attr_list[index].attr_values[index2].checked) {
+                    vm.attr_list[index].attr_values[index2].checked = 0;
+                } else {
+                    vm.attr_list[index].attr_values[index2].checked = 1;
+                }
+
+                //组装数组开始
+                var productsList_temp = [];
+                for (var i = 0; i < vm.attr_list.length; i++) {
+                    var productsList_item = [];
+                    for (var a = 0; a < vm.attr_list[i].attr_values.length; a++) {
+                        if (vm.attr_list[i].attr_values[a].checked) {
+                            productsList_item.push(vm.attr_list[i].attr_values[a].val);
+                        }
+                    }
+                    if (productsList_item.length > 0) {
+                        productsList_temp.push(productsList_item);
+                    }
+                }
+                var productsList = getArrayByArrays(productsList_temp);
+
+                var arr = [];
+                for (var i = 0; i < productsList.length; i++) {
+
+                    if (vm.goods.goods_id > 0) {
+                        var product_item = {
+                            tempvalue: productsList[i],
+                            // attr_keys: '',
+                            goods_id: vm.goods.goods_id,
+                            product_sn: rand_str('sku-'),
+                            bar_code: '',
+                            product_number: 1000,
+                            product_price: vm.goods.shop_price,
+                            product_promote_price: 0.00,
+                            product_market_price: 0.00,
+                            product_warn_number: 10,
+                        };
+                    } else {
+                        var product_item = {
+                            tempvalue: productsList[i],
+                            // attr_keys: '',
+                            product_sn: rand_str('sku-'),
+                            bar_code: '',
+                            product_number: 1000,
+                            product_price: vm.goods.shop_price,
+                            product_promote_price: 0.00,
+                            product_market_price: 0.00,
+                            product_warn_number: 10,
+                        };
+                    }
+
+                    arr.push(product_item);
+                }
+                vm.product_list = arr;
+                //组装数组结束
+            },
+            //删除规格组合
+            productsListDelete: function (index) {
+                vm.product_list.splice(index, 1);
+            },
+            selectAttrType: function () {
+                this.attr_cat1 = [];
+                this.attr_cat2 = [];
+                this.attr_cat3 = [];
+                this.selectAttrCat(0, 1);
+            },
+            //选择属性类型分类
+            selectAttrCat: function (id, level) {
+                vm.goods.pro_type = id;
+                if (level > 0) {
+                    vm['attr_cat' + level] = [];
+                } else {
+                    return;
+                }
+                $.ajax({
+                    type: 'GET',
+                    url: "/seller/api/getProductType",
+                    data: {id: id, type: vm.attr_type},
+                    success: function (data) {
+                        if (level > 0) {
+                            vm['attr_cat' + level] = data.cat;
+                            $('#attr_cate' + level).find('ul').show();
+                        }
+                        vm.attr_type_list = data.type;
+                    },
+                    error: function (xhr, type) {
+                        easyshow('获取属性分类失败');
+                    }
+                });
+            },
+            //选择属性类型
+            selectType: function (index) {
+                vm.goods.pro_type = vm.attr_type_list[index].id;
+                $.ajax({
+                    type: 'GET',
+                    url: "/seller/api/getProductAttr",
+                    data: {type_id: vm.attr_type_list[index].id},
+                    success: function (data) {
+                        $('#product_type').removeClass('error-shadow');
+                        vm.product_attr_list = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow('获取属性列表失败');
+                    }
+                });
+            },
+            //设置属性
+            selectProductAttr: function (attr_id, timeValue) {
+                var val = '';
+                if (timeValue) {
+                    val = timeValue;
+                } else {
+                    var obj = event.currentTarget;
+                    switch (obj.type) {
+                        case 'checkbox':
+                            val = vm.getCheckboxValues(obj.name);
+                            break;
+                        case 'radio':
+                        case 'select-one':
+                        case 'textarea':
+                        case 'text':
+                            val = obj.value;
+                            break;
+                    }
+                }
+
+                if (val == '') {
+                    if (vm.product_attr_value[attr_id]) {
+                        delete vm.product_attr_value[attr_id];
+                    }
+                } else {
+                    console.log(vm.product_attr_value);
+                    vm.product_attr_value[attr_id.toString()] = val;
+                }
+            },
+            //设置相册主图
+            img_default: function (index) {
+                //todo
+                console.log(this.goodsgalleryList[index]);
+            },
+            //相册删除
+            delete_img: function (index) {
+                this.goodsgalleryList.splice(index, 1);
+            },
+            //搜索关联商品
+            searchGoods: function () {
+                var keywords = document.getElementById('search-keywords').value;
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/api/search_goods",
+                    data: {keywords: keywords},
+                    success: function (data) {
+                        vm.relationGoods = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow('搜索商品错误');
+                    }
+                });
+            },
+            //关联点击
+            relative: function (goods_id, del) {
+                if (del) {
+                    delete vm.related[goods_id];
+                    vm.related = Object.assign({}, vm.related, vm.related);
+                    return;
+                }
+                var exist = Object.keys(vm.related).indexOf(goods_id);
+                if (exist < 0) {
+                    vm.$set(vm.related, goods_id, vm.relationGoods[goods_id]);
+                } else {
+                    delete vm.related[goods_id];
+                    vm.related = Object.assign({}, vm.related, vm.related);
+                }
+            },
+            publish: function () {
+                var index = layer.load(1);
+                if (!vm.goods.original_img && vm.img_url) {
+                    //优先使用外部链接图片
+                    vm.goods.original_img = vm.img_url;
+                }
+                if (vm.goods.is_promote > 0) {
+                    var start_time = document.getElementById('promote_start_date').value;
+                    var end_time = document.getElementById('promote_end_date').value;
+                    vm.goods.promote_start_date = moment(start_time).unix();
+                    vm.goods.promote_end_date = moment(end_time).unix();
+                }
+                vm.goods.goods_desc = get_editor_content('goods_desc');
+                if (vm.goods.freight == 2) {
+                    vm.goods.shipping_fee = 0;
+                } else {
+                    vm.goods.transport_id = 0;
+                }
+                if (vm.goods.goods_weight > 0) {
+                    vm.goods.weight_unit = document.getElementById('company_val').value;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: "/seller/goods/add_edit",
+                    data: {
+                        goods: vm.goods,
+                        attr: vm.product_list,
+                        attribue: vm.attr_list,
+                        product_attr: vm.product_attr_value,
+                        gallery: vm.goodsgalleryList,
+                        related: Object.keys(vm.related),
+                        is_double: vm.is_double,
+                    },
+                    success: function (data) {
+                        layer.close(index);
+                        location.href = "/seller/goods/goods_list";
+                    },
+                    error: function (xhr, type) {
+                        layer.close(index);
+                        layer.alert(xhr.responseJSON);
+                    }
+                });
+            },
+            //获取checkbox选中值
+            getCheckboxValues: function (name) {
+                var obj = document.getElementsByName(name);
+                var check_val = [];
+                for (var k in obj) {
+                    if (obj[k].checked)
+                        check_val.push(obj[k].value);
+                }
+                return check_val.join(',');
+            }
+        },
+        created: function () {
+            var _this = this;
+            _this.init(_this);
+            if (_this.goods.goods_id > 0) {
+                _this.step = 3;
+            }
+        },
+        mounted: function () {
+            this.fileuploaderInit();
+            var _this = this;
+            //编辑商品属性状态还原
+            setTimeout(function () {
+                if (Object.keys(_this.product_attr_value).length) {
+                    var obj;
+                    Object.keys(_this.product_attr_value).forEach(function (v) {
+                        obj = document.querySelectorAll('.attr-box *[name="p_attr_' + v + '"]')[0];
+                        switch (obj.type) {
+                            case 'select-one':
+                                var arr = [];
+                                for (var i = 0, l = obj.options.length; i < l; i++) {
+                                    arr.push(obj.options[i].value);
+                                }
+                                var temp = arr.join(',');
+                                if (temp.indexOf(_this.product_attr_value[v]) >= 0) {
+                                    obj.value = _this.product_attr_value[v];
+                                } else {
+                                    $(obj).parents('.item_right_li').find('input[name="p_attr_' + v + '"]').val(_this.product_attr_value[v]);
+                                }
+                                break;
+                            case 'checkbox':
+                                obj = document.querySelectorAll('*[name="p_attr_' + v + '"]');
+                                obj.forEach(function (item) {
+                                    if (_this.product_attr_value[v].indexOf(item.value) >= 0) {
+                                        $(item).prop("checked", true);
+                                    }
+                                });
+                                break;
+                            case 'radio':
+                                obj = $('*[name="p_attr_' + v + '"][value="' + _this.product_attr_value[v] + '"]');
+                                if (obj.length) {
+                                    obj.prop("checked", true);
+                                } else {
+                                    $('*[name="p_attr_' + v + '"]').parents('.item_right_li').find('input[name="p_attr_' + v + '"]').val(_this.product_attr_value[v]);
+                                }
+                                break;
+                            case 'hidden':
+                                try {
+                                    $(obj).parent().prev('input[data-attr_id="' + v + '"]').datebox('setValue', _this.product_attr_value[v]);
+                                } catch (e) {
+                                    console.warn('设置日期失败');
+                                    console.warn(e);
+                                }
+                                break;
+                            case 'text':
+                            case 'textarea':
+                                obj.value = _this.product_attr_value[v];
+                                break;
+                        }
+                    });
+                }
+            }, 50);
+        }
+    });
+
+    $(function () {
+        //todo 编辑模式改变默认颜色 $("#font_color input").spectrum("set","#ff0000")
+        $("#font_color input").spectrum({
+            showInitial: true,
+            showPalette: true,
+            showSelectionPalette: true,
+            showInput: true,
+            maxPaletteSize: 10,
+            preferredFormat: "hex",
+            chooseText: "确认",
+            cancelText: "取消",
+            palette: [
+                ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)",
+                    "rgb(204, 204, 204)", "rgb(217, 217, 217)", "rgb(255, 255, 255)"],
+                ["rgb(152, 0, 0)", "rgb(255, 0, 0)", "rgb(255, 153, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)",
+                    "rgb(0, 255, 255)", "rgb(74, 134, 232)", "rgb(0, 0, 255)", "rgb(153, 0, 255)", "rgb(255, 0, 255)"],
+                ["rgb(230, 184, 175)", "rgb(244, 204, 204)", "rgb(252, 229, 205)", "rgb(255, 242, 204)", "rgb(217, 234, 211)",
+                    "rgb(208, 224, 227)", "rgb(201, 218, 248)", "rgb(207, 226, 243)", "rgb(217, 210, 233)", "rgb(234, 209, 220)",
+                    "rgb(221, 126, 107)", "rgb(234, 153, 153)", "rgb(249, 203, 156)", "rgb(255, 229, 153)", "rgb(182, 215, 168)",
+                    "rgb(162, 196, 201)", "rgb(164, 194, 244)", "rgb(159, 197, 232)", "rgb(180, 167, 214)", "rgb(213, 166, 189)",
+                    "rgb(204, 65, 37)", "rgb(224, 102, 102)", "rgb(246, 178, 107)", "rgb(255, 217, 102)", "rgb(147, 196, 125)",
+                    "rgb(118, 165, 175)", "rgb(109, 158, 235)", "rgb(111, 168, 220)", "rgb(142, 124, 195)", "rgb(194, 123, 160)",
+                    "rgb(166, 28, 0)", "rgb(204, 0, 0)", "rgb(230, 145, 56)", "rgb(241, 194, 50)", "rgb(106, 168, 79)",
+                    "rgb(69, 129, 142)", "rgb(60, 120, 216)", "rgb(61, 133, 198)", "rgb(103, 78, 167)", "rgb(166, 77, 121)",
+                    "rgb(91, 15, 0)", "rgb(102, 0, 0)", "rgb(120, 63, 4)", "rgb(127, 96, 0)", "rgb(39, 78, 19)",
+                    "rgb(12, 52, 61)", "rgb(28, 69, 135)", "rgb(7, 55, 99)", "rgb(32, 18, 77)", "rgb(76, 17, 48)"]
+            ]
+        });
+
+        $('.sp-choose').click(function () {
+            var sp_color = $('.sp-input').val();
+            $('#goods_name').css("color", sp_color);
+            vm.goods.goods_name_style = sp_color;
+        });
+
+        ueditorInit('goods_desc').ready(function () {
+            this.setContent(vm.goods.goods_desc ? vm.goods.goods_desc : '');
+        });
+    });
+
+
+</script>
+{include file="public/footer"}

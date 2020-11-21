@@ -1,0 +1,32 @@
+<ul id="suggestions_list_id">
+    <input type="hidden" value="1" name="selectKeyOne" id="keyOne" />
+    <li onmouseover="_over(this);" title="手机" onmouseout="_out(this);" onClick="javascript:fill('手机');">
+        <div class="left-span">
+            &nbsp;{$keyword}
+        </div>
+        <div class="suggest_span">
+            约{$goodsCount}个商品
+        </div>
+    </li>
+    <li onmouseover="_over(this);" onmouseout="_out(this);">
+        &nbsp;&nbsp;&nbsp;在
+        {volist name="catList" id="vo" offset="0" length='2'}
+        <a class='cate_user' href='/home/index/category?cat_id={$vo.cat_id}' style='color:#ec5151;'>
+            {$vo.cat_name}
+        </a>
+        {/volist}
+        分类下搜索
+    </li>
+    <li style="height:1px; overflow:hidden; border-bottom:1px #eee solid; margin-top:-1px;"></li>
+    {volist name="goodsList" id="vo"}
+    <li onmouseover="_over(this);" onmouseout="_out(this);" title="{$vo.goods_name}"
+        onClick="javascript:fill('{$vo.goods_name}','{$vo.goods_id}');">
+        <div class="left-span">
+            &nbsp;{$vo.goods_name}
+        </div>
+        &nbsp;
+        <b></b>
+        <div class="suggest_span">约1个商品</div>
+    </li>
+    {/volist}
+</ul>

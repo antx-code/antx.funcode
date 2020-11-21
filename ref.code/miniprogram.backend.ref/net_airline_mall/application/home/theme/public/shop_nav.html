@@ -1,0 +1,45 @@
+<div class="hd_main">
+    <div class="hd_bg" style="background-image: none; background-color: rgb(237, 237, 237);overflow: hidden">
+        <img src="{$store.banner_pc}">
+    </div>
+    <div class="nav_bg" style="background-color: rgb(0, 0, 0);">
+        <div class="nav w1200" data-mode="nav_mode" data-purebox="nav">
+            <div class="store_nav_left w200">
+                <div class="all_box">
+                    <div class="all_cats">
+                        <a href="javascript:">店铺全部分类</a>
+                    </div>
+                    <div class="all_cats_tcc">
+                        <ul>
+                            {foreach $cat as $index=>$cat1}
+                            <li>
+                                <div class="jOneLevelarea user_temp_one">
+                                    <div class="jTwoLevel">
+                                        <span class="square_box"></span>
+                                        <a href="{:url('store/category',['id'=>$store.store_id,'cid'=>$cat1.cat_id])}">{$cat1.cat_name}</a>
+                                    </div>
+                                    <div class="s_b">
+                                        {if isset($cat1['children'])}
+                                        {foreach $cat1.children as $cat2}
+                                        <a href="{:url('store/category',['id'=>$store.store_id,'cid'=>$cat2.cat_id])}">{$cat2.cat_name}</a>
+                                        {/foreach}
+                                        {/if}
+                                    </div>
+                                </div>
+                            </li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="store_nav_right">
+                <ul data-type="range">
+                    <li class="current"><a href="{:url('store/index',['id'=>$store.store_id])}" class="nav_hover">首页</a></li>
+                    {volist name="$store.nav" id="nav" length="10"}
+                    <li><a href="{$nav.url}" target="{if $nav.blank}_blank{/if}">{$nav.name}</a></li>
+                    {/volist}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

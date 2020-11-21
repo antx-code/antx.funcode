@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+
+            </div>
+            <ul><li>不参与价格结算！！！</li></ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="add()">
+                        <div class="fbutton">
+                            <div class="add" title="添加参数"><span>
+                                <i class="icon icon-plus"></i>添加参数</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keyword" v-model="keywords" class="text nofocus" placeholder="名称"
+                               autocomplete="off">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn" @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="10%"><div class="tDiv">编号</div></th>
+                            <th width="10%"><div class="tDiv">名称</div></th>
+                            <th width="10%"><div class="tDiv">录入方式</div></th>
+                            <th width="30%"><div class="tDiv">JSON值</div></th>
+                            <th width="10%"><div class="tDiv">参数类型</div></th>
+                            <th width="10%"><div class="tDiv">参数分组</div></th>
+                            <th width="10%"><div class="tDiv">排序</div></th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td><div class="tDiv">{{vo.id}}</div></td>
+                                <td><div class="tDiv">{{vo.name}}</div></td>
+                                <td><div class="tDiv">
+                                    <template v-if="vo.showtype=='checkbox'">多选框</template>
+                                    <template v-if="vo.showtype=='radio'">单选框</template>
+                                    <template v-if="vo.showtype=='select'">下拉菜单</template>
+                                    <template v-if="vo.showtype=='textarea'">多行文本域</template>
+                                    <template v-if="vo.showtype=='text'">文本域</template>
+                                    <template v-if="vo.showtype=='datetime'">时间</template>
+                                </div></td>
+                                <td><div class="tDiv">{{vo.attrvaluejson}}</div></td>
+                                <td><div class="tDiv">{{vo.typename}}</div></td>
+                                <td><div class="tDiv">{{vo.group_name}}</div></td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input type="text" name="sort" class="text w40" v-model="vo.sort"
+                                               @keyup.enter="doupdate(vo)"/>
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0)" title="编辑" class="btn_edit" @click="add(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="list-page">
+                <div id="turn-page"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+            type_id: {$type_id},
+
+            product_attr_list: []
+
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            add: function (vo = {}) {
+                if (vo.id > 0) {
+                    layerOpenwin('编辑参数', '/admin/goods/product_attradd?id=' + vo.id);
+                } else {
+                    layerOpenwin('添加参数', '/admin/goods/product_attradd');
+                }
+
+            },
+            enabledInit: function (index) {
+                if (vm.list[index].enabled == 0) {
+                    vm.list[index].enabled = 1;
+                } else {
+                    vm.list[index].enabled = 0;
+                }
+                vm.doupdate(vm.list[index]);
+            },
+            doupdate: function (vo) {
+                majax('/admin/goods/doupdate', vo, 'product_attr')
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+
+            init: function () {
+                $.post('/admin/goods/product_attr', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    type_id: vm.type_id,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/goods/product_attr_delete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            doalldelete: function () {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/goods/doalldelete', {
+                            ids: vm.ids,
+                            table: 'insurance'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.log_ids = [];
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

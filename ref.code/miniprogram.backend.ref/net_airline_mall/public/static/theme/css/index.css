@@ -1,0 +1,20 @@
+#recommend_brands ul {
+    padding: 0;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+ul {
+    padding: 0;
+}
+
+.floor-left-slide .hd ul {
+    text-align: center;
+}
+
+.rec-store-item .info .s-logo .img img {
+    width: 114px;
+    height: 56px;
+}

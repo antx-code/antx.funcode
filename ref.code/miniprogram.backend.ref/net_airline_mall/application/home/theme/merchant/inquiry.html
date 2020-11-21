@@ -1,0 +1,40 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/merchant_header'}
+
+<div class="container settled-container settled-prog-container">
+    <div class="w w1200">
+        <div class="sett-process-warp clearfix">
+
+            <div class="panel">
+                <div class="settled-prog-warp">
+                    <div class="che"><img src="__THEME__/images/merchant/che.png"></div>
+                    <div class="spw-cont">
+                        <div class="spw-tit"><h1>审核进度</h1></div>
+
+                        <div class="spw-mian spw-wait">
+                            <i class="spw-icon"></i>
+                            <div class="spw-info">
+                                <h2>{$progress.status}</h2>
+                                <div class="spw-txt">
+                                    <p>感谢您在本店申请商家入驻！</p>
+                                    <span>申请店铺名称：<strong class="orange2">{$progress.store_name}</strong></span>
+                                    <span>店铺描述：<em>{$progress.store_subtitle}</em></span>
+                                </div>
+                                <div class="setted-footer">
+                                    <a href="/" class="ftx-05">返回首页</a>
+                                    <a href="{:url('member/index')}" class="ftx-05">进入会员中心</a>
+                                    {if $progress.status_code==2}
+                                    <a href="{:url('seller/login/index')}" class="ftx-05">进入商家后台</a>
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file='public/footer'}

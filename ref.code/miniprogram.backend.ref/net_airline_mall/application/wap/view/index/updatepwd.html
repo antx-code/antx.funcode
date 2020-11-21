@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>修改密码</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .containTop {text-align: center;padding: 10px;line-height: 200%;color: #666;border: 1px solid #f1f1f1;margin-top: 20px;}
+        .containTop h6 {line-height: 300%}
+        .user-login-box .user-login-ul .item-input{padding:2rem 0!important;}
+        .smslogin{margin-top:5rem;height:2rem;line-height:2rem; text-align: center;font-size:1.4rem;color:#4b89dc}
+        .user-login-box .user-login-ul .item-input .icon-liulan1{top:1.6rem!important;}
+        .btn-submit{font-size:1.8rem}
+    </style>
+</head>
+
+<body>
+<div id="app" v-cloak>
+    <section class="con bg-color-write">
+        <div class="user-login-box">
+            <div class="el-form user-login-form">
+                <div class="user-login-head">
+                    <h1>修改密码</h1>
+                </div>
+                <div class="user-login-ul">
+                    <div class="el-form-item">
+                        <div class="el-form-item__content">
+                            <div class="item-input dis-box">
+                                <div class="label"><i class="iconfont icon-mobiles"></i></div>
+                                <div class="value box-flex">
+                                    <div class="el-input">
+                                        <input type="text" autocomplete="off" placeholder="请输入手机号" class="el-input__inner" v-model="info.mobile" disabled>
+                                    </div>
+                                </div>
+                                <div class="key">
+                                    <label v-if="timeer == 0" @click="send_message()">获取验证码</label>
+                                    <label v-if="timeer >0">{{timeer}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="el-form-item">
+                        <div class="el-form-item__content">
+                            <div class="item-input dis-box">
+                                <div class="label"><i class="iconfont icon-904anquansaoma"></i></div>
+                                <div class="value box-flex">
+                                    <div class="el-input">
+                                        <input type="text" autocomplete="off" maxlength="6" placeholder="请输入短信验证码" class="el-input__inner" v-model="mobile_code">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="el-form-item">
+                        <div class="el-form-item__content">
+                            <div class="item-input dis-box">
+                                <div class="label"><i class="iconfont icon-pwd"></i></div>
+                                <div class="value box-flex">
+                                    <div class="el-input">
+                                        <input type="password" autocomplete="off" placeholder="请输入新登录密码" class="el-input__inner" v-model="password">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-submit border-radius-top05" @click="register()">确认修改</button>
+            </div>
+        </div>
+
+    </section>
+</div>
+</body>
+
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script src="/public/wap/script/md5.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+
+            info:{},
+
+
+            mobile_code: '',
+            password: '',
+
+            timeer: 0,
+            count: 60,//短信验证码发送间隔时间设置
+        },
+        methods: {
+            send_message: function () {
+                if (vm.timeer > 0) {
+                    return false;
+                }
+                var temp_count = vm.count;
+                vm.timeer = temp_count;
+                var coutnnum = setInterval(function () {
+                    if (vm.timeer == 0) {
+                        clearInterval(coutnnum);
+                        return false;
+                    } else {
+                        vm.timeer -= 1;
+                    }
+                }, '1000');
+                wxapp.ajax(config.dayuSms, {
+                    mobile: vm.info.mobile,
+                    sign: md5(vm.info.mobile + appkey)
+                }).then(function (ret) {
+                    if (ret.status == 1) {
+                        wxapp.alert('success', ret.msg);
+                    } else {
+                        wxapp.alert('fail', ret.msg);
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.getuserinfo, {order_id: vm.order_id}).then(function (ret) {
+                    vm.info = ret.data.user;
+                })
+            },
+            updatepwd: function () {
+                if (!vm.mobile_code || !vm.password) {
+                    wxapp.alert('fail', '数据不全');
+                    return false;
+                }
+                var pageparm = {
+                    smscode: vm.mobile_code,
+                    newpwd: vm.password,
+                };
+                wxapp.ajax(config.updatepwd, {
+                    token: $api.getStorage('token') ? $api.getStorage('token') : '',
+                    pageparm: JSON.stringify(pageparm)
+                }).then(function (ret) {
+                    if (ret.status == 1) {
+                        wxapp.alert('success', ret.msg);
+                        setTimeout(function () {
+                            closeWin();
+                        }, 1000)
+                    } else {
+                        wxapp.alert('fail', ret.msg);
+                    }
+                })
+            }
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    }
+</script>
+

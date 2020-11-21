@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>
+    .sort_info .lv4 .sort_list {
+        width: 21.25%;
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>标识“<em>*</em>”的选项为必填项，其余为选填项。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <!--添加新商品-->
+            <div class="stepflex">
+                <dl class="first cur" :class="{'cur':step>0}" data-step="1">
+                    <dt class="pointer">1</dt>
+                    <dd class="s-text">设置商品模式</dd>
+                </dl>
+                <dl class="" :class="{'cur':step>1}" data-step="3">
+                    <dt class="pointer">2</dt>
+                    <dd class="s-text">选择商品分类</dd>
+                </dl>
+                <dl class="" :class="{'cur':step>2}" data-step="4">
+                    <dt class="pointer">3</dt>
+                    <dd class="s-text">填写商品信息</dd>
+                </dl>
+                <dl class="" :class="{'cur':step>3}" data-step="5" class="cur">
+                    <dt class="pointer">4</dt>
+                    <dd class="s-text">设置商品规格</dd>
+                </dl>
+                <dl class="" :class="{'cur':step>4}" class="last" data-step="6">
+                    <dt class="pointer">5</dt>
+                    <dd class="s-text">选择商品关联</dd>
+                </dl>
+            </div>
+            <div class="common-content goods_info">
+                <!--第一步 选择商品模式-->
+                <div class="step step_one" shoptype="step" data-step="1" v-show="step==1">
+                    <h3>设置商品模式</h3>
+                    <div class="mos clearfix">
+                        <div class="mos_item mos_default active" @click="stepInit(2)">
+                            <div class="mos_con">
+                                <div class="mos_left">
+                                    <i class="mos_icon mos_icon_default"></i>
+                                </div>
+                                <div class="mos_right">
+                                    <span>默认模式</span>
+                                </div>
+                            </div>
+                            <i class="sc_icon sc_icon_hook"></i>
+                        </div>
+
+                        <div class="mos_item mos_warehouse">
+                            <div class="mos_con">
+                                <div class="mos_left">
+                                    <i class="mos_icon mos_icon_warehouse"></i>
+                                </div>
+                                <div class="mos_right">
+                                    <span>仓库模式</span>
+                                </div>
+                            </div>
+                            <i class="sc_icon sc_icon_hook"></i>
+                        </div>
+                        <div class="mos_item mos_region">
+                            <div class="mos_con">
+                                <div class="mos_left">
+                                    <i class="mos_icon mos_icon_region"></i>
+                                </div>
+                                <div class="mos_right">
+                                    <span>地区模式</span>
+                                </div>
+                            </div>
+                            <i class="sc_icon sc_icon_hook"></i>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--第二步 仓库模式-->
+                <div class="step" style="display:none;" shoptype="step" data-step="2">
+                    <div class="step_title">
+                        <i class="ui-step"></i>
+                        <h3 shoptype="model">默认模式 </h3>
+                    </div>
+                    <div class="step_content" id="goods_model_list"></div>
+                    <div class="goods_btn">
+                        <a href="javascript:void(0);" class="btn btn35 btn_blue" data-step="1" data-type="step"
+                           shoptype="stepSubmit">上一步，选择商品模式</a>
+                        <a href="javascript:void(0);" class="btn btn35 blue_btn" data-step="3" data-type="step"
+                           data-down="true" shoptype="stepSubmit">下一步，选择商品分类</a>
+                    </div>
+                </div>
+
+
+                <!--第二步 选择商品分类-->
+                <div class="step step_two" shoptype="step" data-step="3" v-show="step==2">
+                    <div class="step_title">
+                        <i class="ui-step"></i>
+                        <h3>选择商品分类</h3>
+                    </div>
+                    <div class="sort_info">
+                        <div id="cate_add">
+                            <div class="sort_list sort_list_one">
+                                <div class="sort_list_warp">
+                                    <div class="category_list">
+                                        <ul>
+                                            <li>
+                                                <a href="javascript:void(0);"><i class="sc_icon"></i>
+                                                    请选择分类
+                                                </a>
+                                            </li>
+                                            <template v-for="(vo,index) in categoryList.oneList">
+                                                <li @click="categoryListInit(vo,1)" :class="{'current':vo.cat_id==pid1}">
+                                                    <a href="javascript:void(0);">
+                                                        <i class="sc_icon"></i>
+                                                        {{vo.cat_name}}
+                                                    </a>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                    <div class="sort_point"></div>
+                                </div>
+                            </div>
+                            <div class="sort_list sort_list_one">
+                                <div class="sort_list_warp">
+                                    <div class="category_list">
+                                        <ul>
+                                            <li>
+                                                <a href="javascript:void(0);">
+                                                    <i class="sc_icon"></i>
+                                                    请选择分类
+                                                </a>
+                                            </li>
+                                            <template v-for="(vo,index) in categoryList.twoList">
+                                                <li @click="categoryListInit(vo,2)" :class="{'current':vo.cat_id==pid2}">
+                                                    <a href="javascript:void(0);">
+                                                        <i class="sc_icon"></i>
+                                                        {{vo.cat_name}}
+                                                    </a>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="sort_point"></div>
+                            </div>
+                            <div class="sort_list">
+                                <div class="sort_list_warp">
+                                    <div class="category_list">
+                                        <ul>
+                                            <li>
+                                                <a href="javascript:void(0);">
+                                                    <i class="sc_icon"></i>
+                                                    请选择分类
+                                                </a>
+                                            </li>
+                                            <template v-for="(vo,index) in categoryList.thrList">
+                                                <li @click="categoryListInit(vo,3)" :class="{'current':vo.cat_id==info.cat_id}">
+                                                    <a href="javascript:void(0);">
+                                                        <i class="sc_icon"></i>
+                                                        {{vo.cat_name}}
+                                                    </a>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <template v-if="categoryList.fourList">
+                                    <div class="sort_point"></div>
+                                </template>
+                            </div>
+                            <template v-if="categoryList.fourList">
+                                <div class="sort_list" v-if="categoryList.fourList.length>0">
+                                    <div class="sort_list_warp">
+                                        <div class="category_list">
+                                            <ul>
+                                                <li>
+                                                    <a href="javascript:void(0);">
+                                                        <i class="sc_icon"></i>
+                                                        请选择分类
+                                                    </a>
+                                                </li>
+                                                <template v-for="(vo,index) in categoryList.fourList">
+                                                    <li @click="categoryListInit(vo,4)" :class="{'current':vo.cat_id==info.cat_id}">
+                                                        <a href="javascript:void(0);">
+                                                            <i class="sc_icon"></i>
+                                                            {{vo.cat_name}}
+                                                        </a>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+                        <input type="hidden" name="cat_id" id="cat_id" value="0" shoptype="cat_id"/>
+                    </div>
+                    <div class="goods_btn">
+                        <a href="javascript:void(0);" class="btn btn35 btn_blue" data-step="1" data-type="step"
+                           @click="stepInit(1)">上一步，选择商品模式</a>
+                        <a href="javascript:void(0);" class="btn btn35 blue_btn" data-step="4" data-type="step"
+                           data-down="true" @click="stepInit(3)">下一步，填写通用信息</a>
+                    </div>
+                </div>
+
+
+                <!--第三步 通用信息-->
+                <div class="step_three" style="display:none;" shoptype="step" data-step="3" v-show="step==3">
+                    <div class="step">
+                        <div class="step_title">
+                            <i class="ui-step"></i>
+                            <h3>通用信息</h3>
+                        </div>
+
+                        <div class="step_content">
+                            <div class="item item_wenzi">
+                                <div class="step_label">商品分类：</div>
+                                <div class="step_value">
+                                    <span class="fl">{{cat_name}}</span>
+                                    <a href="javascript:void(0);" class="edit_category" shoptype="edit_category" @click="stepInit(2)">
+                                        <i class="icon icon-edit"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">商品货号：</div>
+                                <div class="step_value">
+                                    <input type="text" name="goods_sn" class="text w150" autocomplete="off"
+                                           v-model="info.goods_sn"/>
+                                    <div class="form_prompt"></div>
+                                    <div class="notic">如果您不输入商品货号，系统将自动生成一个唯一的货号。</div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">
+                                    <em class="require-field">*</em>
+                                    商品名称：
+                                </div>
+                                <div class="step_value">
+                                    <input type="text" name="goods_name" class="text" autocomplete="off"
+                                           v-model="info.goods_name"
+                                           shoptype="require"/>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">供应商：</div>
+                                <div class="step_value">
+                                    <select v-model="info.sr_id" style="width: 172px;height: 30px;">
+                                        <option value="0">请选择</option>
+                                        <option :value="key" v-for="(vo,key) in srList">{{vo}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">商品简单描述：</div>
+                                <div class="step_value">
+                                    <textarea class="textarea" name="goods_brief" v-model="info.goods_brief"></textarea>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">
+                                    <em class="require-field">*</em>
+                                    本店售价：
+                                </div>
+                                <div class="step_value">
+                                    <input type="text" name="shop_price" class="text w150"
+                                           shoptype="require" autocomplete="off" v-model="info.shop_price"/>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">市场价：</div>
+                                <div class="step_value">
+                                    <input type="text" name="market_price" class="text w150" autocomplete="off"
+                                           v-model="info.market_price"/>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">
+                                    <em class="require-field" v-if="info.sr_id>0">*</em>
+                                    成本价：
+                                </div>
+                                <div class="step_value">
+                                    <input type="text" name="cost_price" class="text w150" autocomplete="off"
+                                           v-model="info.cost_price"/>
+                                </div>
+                            </div>
+                            <div class="item" id="goods_number">
+                                <div class="step_label">
+                                    <em class="require-field">*</em>
+                                    商品库存：
+                                </div>
+                                <div class="step_value">
+                                    <input type="text" name="goods_number" class="text w150" shoptype="require"
+                                           autocomplete="off" v-model="info.goods_number"/>
+                                    <div class="notic">库存在商品为虚货或商品存在货品时为不可编辑状态，库存数值取决于其虚货数量或货品数量。</div>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">库存预警值：</div>
+                                <div class="step_value">
+                                    <input type="text" name="warn_number" class="text w150" autocomplete="off"
+                                           value="1" v-model="info.warn_number"/>
+                                    <div class="notic">设置最低库存预警值。当库存低于预警值时商家中心商品列表页库存列红字提醒，请填写0~255的数字，0为不预警。</div>
+                                </div>
+                            </div>
+
+                            <!--商品品牌组件开始--->
+                            <div class="item">
+                                <div class="step_label">商品品牌：</div>
+                                <div class="step_value">
+                                    <div class="selection">
+                                        <input type="text" name="brand_name" id="brand_name" class="text w140 valid" v-model="brand_name" value="请选择" readonly/>
+                                        <a href="javascript:void(0);" class="btn btn30 blue_btn"
+                                           onclick="layerOpenwin('添加品牌','/admin/goods/brandadd')">
+                                            添加
+                                        </a>
+                                        <input type="hidden" name="brand_id" id="brand_id" :value="info.brand_id" data-filter="brand_id">
+                                        <div class="form_prompt"></div>
+                                    </div>
+                                    <div class="brand-select-container" style="display:none;">
+                                        <div class="brand-top">
+                                            <div class="letter">
+                                                <ul>
+                                                    <li @click="brandListInit()">
+                                                        <a href="javascript:void(0);" data-letter="">全部品牌</a>
+                                                    </li>
+                                                    <template v-for="(vo,index) in brandfirstcharList">
+                                                        <li @click="brandListInit(vo)"><a href="javascript:void(0);">{{vo}}</a>
+                                                        </li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                            <div class="b_search">
+                                                <input type="text" class="b_text" v-model="brand_name">
+                                                <a href="javascript:void(0);" class="btn-mini" @click="brandListInit()">
+                                                    <i class="icon icon-search"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="brand-list">
+                                            <ul>
+                                                <li data-id="0" data-name="请选择品牌" class="blue">取消选择</li>
+                                                <template v-for="(vo,index) in brandList">
+                                                    <li :data-id="vo.brand_id" :data-name="vo.brand_name" @click="brandSelect(vo)">
+                                                        <em>{{vo.brand_first_char}}</em>
+                                                        {{vo.brand_name}}
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                        <div class="brand-not" style="display:none;">
+                                            没有符合"<strong>其他</strong>
+                                            "条件的品牌
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--商品品牌组件结束--->
+
+
+                            <!--商品地区组件开始--->
+                            <div class="item">
+                                <div class="step_label">商品产地：</div>
+                                <div class="step_value">
+                                    <select v-model="info.area" style="width: 172px;height: 30px;">
+                                        <option disabled value="">请选择</option>
+                                        <template v-for="(vo,index) in areaList">
+                                            <option :value="vo.area">{{vo.name}}</option>
+                                        </template>
+                                    </select>
+                                </div>
+                            </div>
+                            <!--商品地区组件结束--->
+
+                            <div class="item item_wenzi">
+                                <div class="step_label">
+                                    <em class="require-field">*</em>
+                                    商品图片：
+                                </div>
+                                <div class="step_value">
+                                    <div id="goods_figure" class="update_images mr10">
+                                        <div class="img">
+                                            <img :src="info.original_img?info.original_img:'/public/static/images/update_images.jpg'" id="original_img"/>
+                                        </div>
+                                    </div>
+                                    <div class="form_prompt">
+                                        <p>点击图片即可上传</p>
+                                        <p>大小：不限，根据实际自行确定大小</p>
+                                        <p>格式：jpg，gif，png，jpeg</p>
+                                        <p>格式：jpg，gif，png，jpeg</p>
+                                    </div>
+                                    <div class="notic ml70"></div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">图片外部链接：</div>
+                                <div class="step_value">
+                                    <input type="text" name="goods_img_url" autocomplete="off" class="text w150"
+                                           v-model="info.goods_img_url">
+                                    <div class="notic">外链地址必须带有http://格式</div>
+                                    <div class="form_prompt"></div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">商品运费：</div>
+                                <div class="step_value">
+                                    <div class="checkbox_items">
+                                        <div class="checkbox_item">
+                                            <input type="radio" name="freight" class="ui-radio" id="freight_1" value="1" v-model="info.freight"
+                                                   checked="checked">
+                                            <label for="freight_1" class="ui-radio-label">按固定运费</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input type="radio" name="freight" class="ui-radio" id="freight_2" value="2" v-model="info.freight">
+                                            <label for="freight_2" class="ui-radio-label">按运费模板</label>
+                                        </div>
+                                        <div class="form_prompt"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <template v-if="info.freight==1">
+                                <div class="item">
+                                    <div class="step_label">运费价格：</div>
+                                    <div class="step_value">
+                                        <input id="shipping_fee" type="text" name="shipping_fee" class="text w150" v-model="info.shipping_fee">
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-if="info.freight==2">
+                                <div class="item">
+                                    <div class="step_label"><span class="require-field">*</span>运费模板：</div>
+                                    <div class="step_value">
+                                        <div class="date-item year">
+                                            <div id="position_id_div" class="imitate_select select_w320">
+                                                <div class="cite"><span>选择运费模板</span></div>
+                                                <ul style="display: none;">
+                                                    <template v-for="(vo,index) in transportList">
+                                                        <li @click="info.transport_id=vo.transport_id">
+                                                            <a href="javascript:void(0)" :data-value="vo.transport_id"
+                                                               class="ftx-01">
+                                                                {{vo.transport_name}}
+                                                            </a>
+                                                        </li>
+                                                    </template>
+                                                </ul>
+                                                <input type="hidden" :value="info.transport_id">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <div class="item">
+                                <div class="step_label">扶贫产品：</div>
+                                <div class="step_value">
+                                    <div class="checkbox_items">
+                                        <div class="checkbox_item">
+                                            <input type="radio" name="fupin" class="ui-radio" id="is_fupin_1" value="1" v-model="info.is_fupin">
+                                            <label for="is_fupin_1" class="ui-radio-label">是</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input type="radio" name="fupin" class="ui-radio" id="is_fupin_2" value="0" v-model="info.is_fupin" checked="checked">
+                                            <label for="is_fupin_2" class="ui-radio-label">否</label>
+                                        </div>
+                                        <div class="form_prompt"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item hide">
+                                <div class="step_label">会员价格：</div>
+                                <div class="step_value">
+                                    <table class="table_div">
+                                        <tr>
+                                            <th class="th">铜牌</th>
+                                            <th class="th">银牌</th>
+                                            <th class="th">金牌</th>
+                                            <th class="th">代销用户</th>
+                                        </tr>
+                                        <tr>
+                                            <td class="td">
+                                                <span id="nrank_6"></span>
+                                                <input type="text" id="rank_6" name="user_price[]" class="text w50"
+                                                       autocomplete="off" v-model="info.user_price"
+                                                       size="8" class="text_3"/>
+                                            </td>
+                                            <td class="td">
+                                                <span id="nrank_7"></span>
+                                                <input type="text" id="rank_7" name="user_price[]" class="text w50"
+                                                       v-model="info.user_price"
+                                                       size="8" class="text_3"/>
+                                            </td>
+                                            <td class="td">
+                                                <span id="nrank_8"></span>
+                                                <input type="text" id="rank_8" name="user_price[]" class="text w50"
+                                                       autocomplete="off" v-model="info.user_price"
+                                                       size="8" class="text_3"/>
+                                            </td>
+                                            <td class="td">
+                                                <span id="nrank_3"></span>
+                                                <input type="text" id="rank_3" name="user_price[]" class="text w50"
+                                                       v-model="info.user_price"
+                                                       size="8" class="text_3" style="width:40px;"/>
+                                                <input type="hidden" name="user_rank[]" value="3"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div class="notic">会员价格为-1时表示会员价格按会员等级折扣率计算。你也可以为每个等级指定一个固定价格</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step_title"><i class="ui-step"></i>
+                            <h3>详细描述</h3></div>
+                        <div class="step_content">
+                            <div class="tabs_desc">
+                                <ul class="ui-tabs-nav">
+                                    <li class="current"><a href="javascript:void(0);"><i class="icon icon-desktop"></i>电脑端</a></li>
+                                </ul>
+                                <div class="panel-main gallery_album" shoptype="gallery_album_list" data-inid="gallery_album_shop" data-act="gallery_album_list">
+                                    <div class="panel panel-pc">
+                                        <script id="goods_desc" name="goods_desc" type="text/plain"></script>
+                                    </div>
+                                    <div class="panel panel-phone">
+                                        <div class="panel_warp">
+                                            <div class="explain">
+                                                <p>
+                                                    <strong>一、基本要求</strong>
+                                                    <span><em>1、</em>手机详情总体大小：图片+文字，<i class="red">图片不超过20张，文字不超过5000字</i>；</span>
+                                                    <span><em>建议：</em>所有图片都是本宝贝相关的图片。</span>
+                                                </p>
+                                                <p>
+                                                    <strong>二、图片大小</strong>
+                                                    <span><em>1、</em>建议使用宽度480 ~ 620像素、高度小于等于960像素的图片；</span>
+                                                    <span><em>2、</em>格式为：JPG\JEPG\GIF\PNG；</span>
+                                                    <span><em>举例：</em>可以上传一张宽度为480，高度为960像素，格式为JPG的图片。</span>
+                                                </p>
+                                                <p>
+                                                    <strong>三、文字要求</strong>
+                                                    <span><em>1、</em>每次插入文字不能超过500个字，标点、特殊字符按照一个字计算；</span>
+                                                    <span><em>2、</em>请手动输入文字，不要复制粘贴网页上的文字，防止出现乱码；</span>
+                                                    <span><em>3、</em>以下特殊字符“&lt;”、“&gt;”、“"”、“’”、“\”会被替换为空。</span>
+                                                    <span><em>建议：</em>不要添加太多的文字，这样看起来更清晰。</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step w190">
+                        <div class="step_title">
+                            <i class="ui-step"></i>
+                            <h3>其他信息</h3>
+                            <span class="stop stop_jia" shoptype="outerInfo" title="收起详情"></span>
+                        </div>
+                        <div class="step_content" style="display:none;">
+                            <div class="item dl_give_integral">
+                                <div class="step_label">赠送消费积分数：</div>
+                                <div class="step_value" style="margin-bottom:0px;">
+                                    <input type="text" name="give_integral" class="text" autocomplete="off" value="0"
+                                           v-model="info.give_integral">
+                                </div>
+                            </div>
+                            <div class="item dl_give_integral">
+                                <div class="step_label">&nbsp;&nbsp;</div>
+                                <div class="step_value">
+                                    购买该商品时赠送消费积分数,-1表示按商品价格赠送
+                                </div>
+                            </div>
+                            <div class="item dl_rank_integral">
+                                <div class="step_label">赠送等级积分数：</div>
+                                <div class="step_value" style="margin-bottom:0px;">
+                                    <input type="text" name="rank_integral" class="text" autocomplete="off"
+                                           v-model="info.rank_integral" value="0">
+                                </div>
+                            </div>
+                            <div class="item dl_rank_integral">
+                                <div class="step_label">&nbsp;&nbsp;</div>
+                                <div class="step_value">
+                                    购买该商品时赠送等级积分数,-1表示按商品价格赠送
+                                </div>
+                            </div>
+                            <div class="item dl_pay_integral">
+                                <div class="step_label">积分购买金额：</div>
+                                <div class="step_value" style="margin-bottom:0px;">
+                                    <input type="text" name="integral" class="text" autocomplete="off"
+                                           v-model="info.integral" value="0">
+                                </div>
+                            </div>
+                            <div class="item dl_pay_integral">
+                                <div class="step_label">&nbsp;&nbsp;</div>
+                                <div class="step_value">
+                                    (此处需填写金额)购买该商品时最多可以使用积分的金额
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="step_label">商品重量：</div>
+                                <div class="step_value">
+                                    <input type="text" name="goods_weight" class="text" autocomplete="off"
+                                           v-model="info.goods_weight">
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">商品单位：</div>
+                                    <div class="step_value">
+                                        <input type="text" name="goods_unit" class="text" autocomplete="off" value="个"
+                                               v-model="info.goods_unit">
+                                        <div class="notic">比如：个，件，份，套。默认为个</div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">加入推荐：</div>
+                                    <div class="step_value step_goods_service">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="is_best" class="ui-checkbox" value="1"
+                                                       id="is_best" v-model="info.is_best">
+                                                <label class="ui-label" for="is_best">精品</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="is_new" class="ui-checkbox" value="1"
+                                                       id="is_new" v-model="info.is_new">
+                                                <label class="ui-label" for="is_new">新品</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="is_hot" class="ui-checkbox" value="1"
+                                                       id="is_hot" v-model="info.is_hot">
+                                                <label class="ui-label" for="is_hot">热销</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="item">
+                                    <div class="step_label">店铺推荐：</div>
+                                    <div class="step_value step_goods_service">
+                                        <div class="checkbox_items">
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="store_best" class="ui-checkbox" value="1"
+                                                       id="store_best" v-model="info.store_best">
+                                                <label class="ui-label" for="store_best">精品</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="store_new" class="ui-checkbox" value="1"
+                                                       id="store_new" v-model="info.store_new">
+                                                <label class="ui-label" for="store_new">新品</label>
+                                            </div>
+                                            <div class="checkbox_item">
+                                                <input type="checkbox" name="store_hot" class="ui-checkbox" value="1"
+                                                       id="store_hot" v-model="info.store_hot">
+                                                <label class="ui-label" for="store_hot">热销</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">上架：</div>
+                                    <div class="step_value step_goods_service">
+                                        <div class="switch switch_2 active" title="是">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <input type="hidden" value="1" name="is_on_sale">
+                                        <div class="notic" style="margin-left:10px;"></div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">加入随手购：</div>
+                                    <div class="step_value step_goods_service">
+                                        <div class="switch switch_2 active" title="是">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <input type="hidden" value="1" name="is_sui">
+                                        <div class="notic" style="margin-left:288px;">
+                                            默认为是，设置的话会呈现在商品分类页面的底部随手购栏目。
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">显示：</div>
+                                    <div class="step_value step_goods_service">
+                                        <div class="switch switch_2 active" title="是">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <input type="hidden" value="1" name="is_show">
+                                        <div class="notic" style="margin-left:288px;">
+                                            默认为是。
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">能作为普通商品销售：</div>
+                                    <div class="step_value step_goods_service">
+                                        <div class="switch switch_2 active" title="否">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <input type="hidden" value="1" name="is_alone_sale">
+                                        <div class="notic" style="margin-left:288px;">
+                                            默认为是，如果勾选否，则该商品不能直接购买，只能作为配件、赠品等商品购买。
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">是否为免运费商品：</div>
+                                    <div class="step_value step_goods_service">
+                                        <div class="switch switch_2 " title="否">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <input type="hidden" value="0" name="is_shipping">
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">商品关键词：</div>
+                                    <div class="step_value">
+                                        <input type="text" name="keywords" class="text" autocomplete="off" v-model="info.keywords">
+                                        <div class="notic">
+                                            商品关键词请用空格分隔；有两个功能，一是可以作为站内关键词查询，在前台搜索框输入关键词后，能够搜索到该商品；二是作为搜索引擎收录使用。
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">评论标签：</div>
+                                    <div class="step_value">
+                                        <textarea class="textarea" name="goods_product_tag" v-model="info.goods_product_tag"></textarea>
+                                        <div class="notic">请用','号分割；例：商品好看,很实用,材料很好...（注意逗号要使用英文逗号）<br>商品确认收货后，买家评论时可勾选的“买家印象”处内容
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">服务承诺标签：</div>
+                                    <div class="step_value">
+                                        <textarea class="textarea" name="goods_tag" v-model="info.goods_tag"></textarea>
+                                        <div class="notic">请用','号分割（注：逗号要使用英文逗号）</div>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="step_label">商家备注：</div>
+                                    <div class="step_value">
+                                        <textarea class="textarea" name="seller_note" v-model="info.seller_note"></textarea>
+                                        <div class="notic">仅供商家自己看的信息</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="goods_footer">
+                            <div class="goods_btn goods_btn_fixed">
+                                <a href="javascript:void(0);" class="btn btn35 btn_blue"
+                                   @click="stepInit(2)">上一步，选择商品分类</a>
+                                <a href="javascript:void(0);" class="btn btn35 blue_btn" data-step="4" data-type="step"
+                                   data-down="true" shoptype="stepSubmit" @click="stepInit(4)">下一步，设置商品规格</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--第四步 商品规格和商品相册-->
+                <div class="step_four" style="" shoptype="step" data-step="4" v-show="step==4">
+                    <!--  虚拟商品不需要商品属性-->
+                    <div class="step">
+                        <div class="step_title">
+                            <i class="ui-step"></i>
+                            <h3 class="fl">设置商品规格</h3>
+                        </div>
+                        <div class="step_content relative">
+                            <div class="step_item">
+                                <div class="step_item_left"><h5>商品类型：</h5></div>
+                                <div class="step_item_right">
+                                    <div class="item_right_li">
+                                        <div class="value_select">
+                                            <div id="attr_select" class="imitate_select select_w320"
+                                                 shoptype="attrTypeSelect">
+                                                <div class="cite">{{goodsattrList.cat_name}}</div>
+                                                <ul style="display: none;" class="ps-container">
+                                                    <li>
+                                                        <a href="javascript:void(0);" data-value="0"
+                                                           class="ftx-01">请选择商品类型
+                                                        </a>
+                                                    </li>
+                                                    <template v-for="(vo,index) in goodsattrList.goodstypeList">
+                                                        <li @click="attributeListInit(vo)">
+                                                            <a href="javascript:void(0);" :data-value="vo.cat_id"
+                                                               class="ftx-01">{{vo.cat_name}}
+                                                            </a>
+                                                        </li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <input type="button" class="button mr10" value="添加商品类型"
+                                               onclick="layerOpenwin('添加商品类型','/admin/goods/goodstypeadd')">
+                                        <input type="button" class="button mr10" value="添加规格"
+                                               onclick="layerOpenwin('添加商品类型','/admin/goods/attributeadd')">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="step_item step_item_bg pb10" id="tbody-goodsAttr">
+                                <div class="step_item_row step_item_spec_row">
+                                    <div class="step_item_left">
+                                        <h5>商品规格：</h5>
+                                    </div>
+                                    <div class="step_item_right">
+                                        <template v-for="(vo,index) in goodsattrList.attributeList">
+                                            <div class="item_right_li">
+                                                <div class="label">{{vo.attr_name}}：</div>
+                                                <div class="value">
+                                                    <div class="checkbox_items attr_input_type_7">
+                                                        <template v-for="(vo2,index2) in vo.attr_values">
+                                                            <div class="checkbox_item">
+                                                                <input type="checkbox" data-type="attr_id" class="ui-checkbox" :value="vo2.checked" v-model="vo2.checked">
+                                                                <input type="checkbox" data-type="attr_value" class="ui-checkbox"
+                                                                       :value="vo2.val" :id="goods_attr_checkbox+vo2.val" @click="productsListInit(index,index2)">
+                                                                <label :for="goods_attr_checkbox+vo2.val" class="ui-label">{{vo2.val}}</label>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="step_item_table mt10" id="attribute_table">
+                                <table class="table_head" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th width="20%">
+                                            <template v-for="(vo,index) in goodsattrList.attributeList">
+                                                {{vo.attr_name}}
+                                            </template>
+                                        </th>
+                                        <th width="10%">
+                                            <em class="require-field">*</em>市场价
+                                            <i class="sc_icon sc_icon_edit pointer pro_market"></i>
+                                        </th>
+                                        <th width="10%"><em class="require-field">*</em>本店价
+                                            <i class="sc_icon sc_icon_edit pointer pro_shop"></i>
+                                        </th>
+                                        <th width="10%"><em class="require-field">*</em>促销价
+                                            <i class="sc_icon sc_icon_edit pointer pro_promote"></i>
+                                        </th>
+                                        <th width="10%"><em class="require-field">*</em>库存
+                                            <i class="sc_icon sc_icon_edit pointer pro_number"></i>
+                                        </th>
+                                        <th width="10%"><em class="require-field">*</em>预警值
+                                            <i class="sc_icon sc_icon_edit pointer pro_warning"></i>
+                                        </th>
+                                        <th width="15%">商品货号</th>
+
+                                        <th width="15%">操作</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                                <div id="listDiv">
+                                    <div class="step_item_table2">
+                                        <table class="table_attr" width="100%">
+                                            <tbody>
+                                            <template v-for="(vo,index) in goodsattrList.productsList">
+                                                <tr data-changelog="1">
+                                                    <td class="td_bg_blue" width="20%">
+                                                        {{vo.tempvalue}}
+                                                    </td>
+                                                    <td width="10%">
+                                                        <input type="text" class="text w60" autocomplete="off" v-model="vo.product_market_price">
+                                                    </td>
+                                                    <td width="10%">
+                                                        <input type="text" class="text w60" autocomplete="off" v-model="vo.product_price">
+                                                    </td>
+                                                    <td width="10%">
+                                                        <input type="text" class="text w60" autocomplete="off" v-model="vo.product_promote_price">
+                                                    </td>
+                                                    <td width="10%">
+                                                        <input type="text" class="text w60" autocomplete="off" v-model="vo.product_number">
+                                                    </td>
+                                                    <td width="10%">
+                                                        <input type="text" class="text w60" autocomplete="off" v-model="vo.product_warn_number">
+                                                    </td>
+
+                                                    <td width="15%">
+                                                        <input type="text" class="text w140" autocomplete="off" v-model="vo.product_sn">
+                                                    </td>
+                                                    <td class="handle" width="15%">
+                                                        <a href="javascript:;" class="btn_trash" @click="productsListDelete(index)">
+                                                            <i class="icon icon-trash"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step_title"><i class="ui-step"></i>
+                            <h3>商品相册</h3></div>
+                        <div class="step_content">
+                            <template v-if="goodsgalleryList.length>0">
+                                <div class="goods_album" id="gallery_img_list">
+                                    <ul id="ul_pics">
+                                        <template v-for="(vo,index) in goodsgalleryList">
+                                            <li>
+                                                <div class="img">
+                                                    <img :src="vo.img_original" width="160" height="160">
+                                                </div>
+                                                <div class="info">
+                                                    <span class="zt red"></span>
+                                                    <div class="sort">
+                                                        <span>排序：</span>
+                                                        <input type="text" class="stext" autocomplete="off"
+                                                               v-model="vo.img_sort">
+                                                    </div>
+                                                    <a @click="goodsgalleryInit(index)" href="javascript:void(0);"
+                                                       class="delete_img">
+                                                        <i class="icon icon-trash"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="info">
+                                                    <input v-model="vo.external_url" type="text" class="text w130"
+                                                           placeholder="图片外部链接地址">
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                            <div class="clear"></div>
+                            <div class="step_top_btn gallery_album" style="position: relative;" id="gallery_picture">
+                                <a href="javascript:void(0);" class="btn red_btn" id="addImages"
+                                   style="position: relative; z-index: 1;"><i class="sc_icon sc_icon_images"></i>添加图片
+                                </a>
+                                <span class="red">支持批量上传，建议最多上传10张。</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 设置参数-->
+                    <div class="step">
+                        <div class="step_title"><i class="ui-step"></i>
+                            <h3>设置参数</h3></div>
+                        <div class="step_content">
+                            <div class="step_item">
+                                <div class="step_item_left"><h5>参数分类：</h5></div>
+                                <div class="step_item_right">
+                                    <div class="step_item_right">
+                                        <div class="item_right_li">
+                                            <div class="value_select">
+                                                <div id="attr_type" class="select_w145 hide">
+                                                    <select v-model="attr_type" @change="selectAttrType()">
+                                                        <option value="0">平台</option>
+                                                    </select>
+                                                </div>
+                                                <div id="attr_cate1" class="imitate_select select_w145">
+                                                    <div class="cite">请选择</div>
+                                                    <ul>
+                                                        <li><a @click="attr_cat2=[];attr_cat3=[]">请选择</a></li>
+                                                        <li v-for="(vo,index) in attr_cat1" @click="selectAttrCat(vo.id,2)"><a class="ftx-01">{{vo.name}}</a></li>
+                                                    </ul>
+                                                </div>
+                                                <div id="attr_cate2" class="imitate_select select_w145" v-show="attr_cat2.length">
+                                                    <div class="cite">请选择</div>
+                                                    <ul>
+                                                        <li v-for="(vo,index) in attr_cat2" @click="selectAttrCat(vo.id,3)"><a class="ftx-01">{{vo.name}}</a></li>
+                                                    </ul>
+                                                </div>
+                                                <div id="attr_cate3" class="imitate_select select_w145" v-show="attr_cat3.length">
+                                                    <div class="cite">请选择</div>
+                                                    <ul>
+                                                        <li v-for="(vo,index) in attr_cat3" @click="selectAttrCat(vo.id,0)"><a class="ftx-01">{{vo.name}}</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!--fixme here-->
+                            <!--参数类型选择-->
+                            <div class="step_item">
+                                <div class="step_item_left"><h5>参数类型</h5></div>
+                                <div class="step_item_right">
+                                    <div class="item_right_li">
+                                        <div class="value_select">
+                                            <div id="product_type" class="imitate_select select_w145">
+                                                <div class="cite">请选择</div>
+                                                <ul style="display: none;">
+                                                    <li v-for="(attr_type,index) in attr_type_list" @click="selectType(index)"><a class="ftx-01">{{attr_type.name}}</a></li>
+                                                </ul>
+                                            </div>
+                                            <input name="attr_parent_id" type="hidden" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--商品参数-->
+                        <div class="ecsc-form-goods attr-box" v-show="product_attr_list.other.length>0 || product_attr_list.group.length>0">
+                            <hr class="layui-bg-gray">
+                            <!--属性选择-->
+                            <div class="step_item pb0" v-for="(attr,index) in product_attr_list.other">
+                                <div class="step_item_left">
+                                    <h5>{{attr.name}}：</h5>
+                                </div>
+                                <div class="step_item_right">
+                                    <div class="item_right_li goods_attr_type">
+                                        <!--多选按钮-->
+                                        <div class="value" v-if="attr.showtype=='checkbox'">
+                                            <div class="value li_value">
+                                                <div class="checkbox_items fn attr_input_type_28">
+                                                    <div class="checkbox_item" v-for="(item,idx) in attr.attrvaluejson">
+                                                        <input type="checkbox" :name="'p_attr_'+attr.id" class="ui-checkbox" :value="item" :id="'goods_attr_checkbox'+index+idx"
+                                                               @change="selectProductAttr(attr.id)">
+                                                        <label :for="'goods_attr_checkbox'+index+idx" class="ui-label">{{item}}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--单选按钮-->
+                                        <div class="value" v-else-if="attr.showtype=='radio'">
+                                            <div class="checkbox_items fn attr_input_type_28">
+                                                <div class="checkbox_item mr15" v-for="(item,idx) in attr.attrvaluejson">
+                                                    <input type="radio" :name="'p_attr_'+attr.id" :id="'attr_radio_'+index+idx" :value="item" class="ui-radio freight"
+                                                           @change="selectProductAttr(attr.id)">
+                                                    <label :for="'attr_radio_'+index+idx" class="ui-radio-label attr_radio">{{item}}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--datetime-->
+                                        <div class="value" v-else-if="attr.showtype=='datetime'">
+                                            <div class="value li_value">
+                                                <div class="text_time">
+                                                    <input :name="'p_attr_'+attr.id" class="easyui-datebox" :data-attr_id="attr.id" :id="'asdf_'+attr.id" style="width:135px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--select-->
+                                        <div class="value mr15" v-else-if="attr.showtype=='select'">
+                                            <div class="value li_value">
+                                                <select :name="'p_attr_'+attr.id" @change="selectProductAttr(attr.id)">
+                                                    <option value="">请选择</option>
+                                                    <option :value="item" v-for="(item,idx) in attr.attrvaluejson">{{item}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!--textarea-->
+                                        <div class="value mr15" v-else-if="attr.showtype=='textarea'">
+                                            <div class="value li_value">
+                                                <textarea :name="'p_attr_'+attr.id" cols="50" rows="3" @change="selectProductAttr(attr.id)"></textarea>
+                                            </div>
+                                        </div>
+                                        <!--text-->
+                                        <div class="value" v-else>
+                                            <input :name="'p_attr_'+attr.id" type="text" placeholder="请输入属性值" class="text" @change="selectProductAttr(attr.id)">
+                                        </div>
+                                        <!--自定义输入框-->
+                                        <div class="value" v-if="!no_self_input[attr.showtype]">
+                                            <input :name="'p_attr_'+attr.id" type="text" class="text" value="" placeholder="自定义属性值" @change="selectProductAttr(attr.id)" title="没有合适的选项时,在此填写自定义属性值">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--分组属性-->
+                            <div class="step_item" v-for="group_attr in product_attr_list.group">
+                                <div class="step_item_left">
+                                    <h5>{{group_attr.group_name}}：</h5>
+                                </div>
+                                <div class="step_item_right group_attr_box" v-for="(attr,index) in group_attr.data">
+                                    <div class="attr-group-left">
+                                        <h5>{{attr.name}}：</h5>
+                                    </div>
+                                    <div class="attr-group-right">
+                                        <div class="item_right_li goods_attr_type">
+                                            <!--多选按钮-->
+                                            <div class="value" v-if="attr.showtype=='checkbox'">
+                                                <div class="value li_value">
+                                                    <div class="checkbox_items fn attr_input_type_28">
+                                                        <div class="checkbox_item" v-for="(item,idx) in attr.attrvaluejson">
+                                                            <input type="checkbox" :name="'p_attr_'+attr.id" class="ui-checkbox" :value="item" :id="'g_goods_attr_checkbox'+index+idx" @change="selectProductAttr(attr.id)">
+                                                            <label :for="'g_goods_attr_checkbox'+index+idx" class="ui-label">{{item}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--单选按钮-->
+                                            <template class="value" v-else-if="attr.showtype=='radio'">
+                                                <div class="checkbox_items fn attr_input_type_28">
+                                                    <div class="checkbox_item mr15" v-for="(item,idx) in attr.attrvaluejson">
+                                                        <input type="radio" :name="'p_attr_'+attr.id" :id="'g_attr_radio_'+index+idx" :value="item" class="ui-radio freight" @change="selectProductAttr(attr.id)">
+                                                        <label :for="'g_attr_radio_'+index+idx" class="ui-radio-label attr_radio">{{item}}</label>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <!--datetime-->
+                                            <div class="value" v-else-if="attr.showtype=='datetime'">
+                                                <div class="value li_value">
+                                                    <div class="text_time">
+                                                        <input :name="'p_attr_'+attr.id" class="easyui-datebox" :data-attr_id="attr.id" :id="'asdf_'+attr.id" style="width:135px;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--select-->
+                                            <div class="value mr15" v-else-if="attr.showtype=='select'">
+                                                <div class="value li_value">
+                                                    <select :name="'p_attr_'+attr.id" @change="selectProductAttr(attr.id)">
+                                                        <option value="">请选择</option>
+                                                        <option :value="item" v-for="(item,idx) in attr.attrvaluejson">{{item}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!--textarea-->
+                                            <div class="value mr15" v-else-if="attr.showtype=='textarea'">
+                                                <div class="value li_value">
+                                                    <textarea :name="'p_attr_'+attr.id" cols="50" rows="3" @change="selectProductAttr(attr.id)"></textarea>
+                                                </div>
+                                            </div>
+                                            <!--text-->
+                                            <div class="value" v-else>
+                                                <input :name="'p_attr_'+attr.id" type="text" placeholder="请输入属性值" class="text" @change="selectProductAttr(attr.id)">
+                                            </div>
+                                            <!--自定义输入框-->
+                                            <div class="value" v-if="!no_self_input[attr.showtype]">
+                                                <input :name="'p_attr_'+attr.id" type="text" class="text" value="" placeholder="自定义属性值" @change="selectProductAttr(attr.id)">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="goods_footer">
+                        <div class="goods_btn goods_btn_fixed">
+                            <a href="javascript:void(0);" class="btn btn35 btn_blue" @click="stepInit(3)"
+                               shoptype="stepSubmit">上一步，填写商品信息</a>
+                            <a href="javascript:void(0);" class="btn btn35 blue_btn" data-down="true" @click="goodsadd()">
+                                <i class="sc_icon goods_complete_icon"></i>
+                                完成，发布商品
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!--第五步 选择关联信息提交表单-->
+                <div class="step_last" style="display:none;" shoptype="step" v-show="step==5">
+                    <div class="step" shoptype="filter" data-filter="goods">
+                        <div class="step_title">
+                            <i class="ui-step"></i>
+                            <h3>关联商品</h3>
+                            <span class="stop" shoptype="Relationgoods" title="收起详情"></span>
+                        </div>
+                        <div class="step_content">
+                            <div class="move_div">
+                                <div class="move_left">
+                                    <h4>可选商品</h4>
+                                    <div class="move_info">
+                                        <div class="move_list">
+                                            <ul></ul>
+                                        </div>
+                                    </div>
+                                    <div class="move_handle">
+                                        <a href="javascript:void(0);" class="btn btn25 moveAll"
+                                           shoptype="moveAll">全选</a>
+                                        <a href="javascript:void(0);" class="btn btn25 red_btn" shoptype="sub"
+                                           data-operation="add_link_goods">确定</a>
+                                    </div>
+                                </div>
+                                <div class="move_middle">
+                                    <div class="checkbox_items">
+                                        <div class="checkbox_item">
+                                            <input type="radio" name="is_single" class="ui-radio" id="one_way"
+                                                   value="1"/>
+                                            <label for="one_way" class="ui-radio-label">单向关联</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input type="radio" name="is_single" class="ui-radio" id="two_way"
+                                                   checked value="0"/>
+                                            <label for="two_way" class="ui-radio-label">双向关联</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="move_right">
+                                    <h4>跟该商品关联的商品</h4>
+                                    <div class="move_info">
+                                        <div class="move_list">
+                                            <ul></ul>
+                                        </div>
+                                    </div>
+                                    <div class="move_handle">
+                                        <a href="javascript:void(0);" class="btn btn25 moveAll"
+                                           shoptype="moveAll">全选</a>
+                                        <a href="javascript:void(0);" class="btn btn25 btn_red" shoptype="sub"
+                                           data-operation="drop_link_goods">移除关联</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step w190" shoptype="filter" data-filter="article">
+                        <div class="step_title">
+                            <i class="ui-step"></i>
+                            <h3>关联文章</h3>
+                            <span class="stop stop_jia" shoptype="Related_articles" title="收起详情"></span>
+                        </div>
+                        <div class="step_content" style="display:none">
+                            <div class="goods_search_div">
+                                <input type="text" name="keyword" class="text w150" value="" placeholder="文章标题"
+                                       data-filter="keyword" autocomplete="off"/>
+                                <a href="javascript:void(0);" class="btn btn30 mr10" shoptype="search">
+                                    <i class="icon icon-search"></i>
+                                    搜索
+                                </a>
+                                <a href="javascript:void(0);" class="btn btn30 red_btn"
+                                   shoptype="ajaxArticle">添加新文章</a>
+                            </div>
+                            <div class="move_div">
+                                <div class="move_left">
+                                    <h4>可选文章</h4>
+                                    <div class="move_info">
+                                        <div class="move_list">
+                                            <ul></ul>
+                                        </div>
+                                    </div>
+                                    <div class="move_handle">
+                                        <a href="javascript:void(0);" class="btn btn25 moveAll"
+                                           shoptype="moveAll">全选</a>
+                                        <a href="javascript:void(0);" class="btn btn25 red_btn" shoptype="sub"
+                                           data-operation="add_goods_article">确定</a>
+                                    </div>
+                                </div>
+                                <div class="move_middle">
+                                    <div class="move_point" data-operation="add_goods_article"></div>
+                                </div>
+                                <div class="move_right">
+                                    <h4>跟该商品关联的文章</h4>
+                                    <div class="move_info">
+                                        <div class="move_list">
+                                            <ul></ul>
+                                        </div>
+                                    </div>
+                                    <div class="move_handle">
+                                        <a href="javascript:void(0);" class="btn btn25 moveAll"
+                                           shoptype="moveAll">全选</a>
+                                        <a href="javascript:void(0);" class="btn btn25 btn_red" shoptype="sub"
+                                           data-operation="drop_goods_article">移除关联</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step w190" shoptype="filter" data-filter="area">
+                        <div class="step_title">
+                            <i class="ui-step"></i>
+                            <h3>关联地区</h3>
+                            <span class="stop stop_jia" shoptype="Related_region" title="收起详情"></span>
+                        </div>
+                        <div class="step_content" style="display:none">
+                            <div class="goods_search_div">
+                                <div class="search_select">
+                                    <div id="area_select" class="imitate_select select_w120">
+                                        <div class="cite">请选择区域</div>
+                                        <ul style="display: none;">
+                                            <li>
+                                                <a href="javascript:;" data-value="0" class="ftx-01">所有区域</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" data-value="1" class="ftx-01">华东</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" data-value="2" class="ftx-01">华北</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" data-value="3" class="ftx-01">华南</a>
+                                            </li>
+                                        </ul>
+                                        <input name="ra_id" type="hidden" value="0" id="area_select_val"
+                                               data-filter="keyword"/>
+                                    </div>
+                                </div>
+                                <a href="javascript:void(0);" class="btn btn30 mr10" shoptype="search">
+                                    <i class="icon icon-search"></i>
+                                    搜索
+                                </a>
+                                <a href="javascript:void(0);" class="btn btn30 red_btn" shoptype="ajaxArea">添加新地区</a>
+                            </div>
+                            <div class="move_div">
+                                <div class="move_left">
+                                    <h4>可选地区</h4>
+                                    <div class="move_info">
+                                        <div class="move_list">
+                                            <ul></ul>
+                                        </div>
+                                    </div>
+                                    <div class="move_handle">
+                                        <a href="javascript:void(0);" class="btn btn25 moveAll"
+                                           shoptype="moveAll">全选</a>
+                                        <a href="javascript:void(0);" class="btn btn25 red_btn" shoptype="sub"
+                                           data-operation="add_area_goods">确定</a>
+                                    </div>
+                                </div>
+                                <div class="move_middle">
+                                    <div class="move_point" data-operation="add_area_goods"></div>
+                                </div>
+                                <div class="move_right">
+                                    <h4>该商品的地区</h4>
+                                    <div class="move_info">
+                                        <div class="move_list">
+                                            <ul></ul>
+                                        </div>
+                                    </div>
+                                    <div class="move_handle">
+                                        <a href="javascript:void(0);" class="btn btn25 moveAll"
+                                           shoptype="moveAll">全选</a>
+                                        <a href="javascript:void(0);" class="btn btn25 btn_red" shoptype="sub"
+                                           data-operation="drop_area_goods">移除关联</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step w190" shoptype="filter" data-filter="goods">
+                        <div class="step_title">
+                            <i class="ui-step"></i>
+                            <h3>配件</h3>
+                            <span class="stop stop_jia" shoptype="parts_goods" title="收起详情"></span>
+                        </div>
+                        <div class="step_content" style="display:none">
+                            <div class="fl mb20">
+                                <a href="javascript:void(0);" class="btn red_btn btn30" shoptype="setupGroupGoods"
+                                   data-diffeseller="1">添加配件</a>
+                                <div class="fl">限购数量：</div>
+                                <input type="text" name="group_number" class="text w150" value="" placeholder="限购数量"
+                                       autocomplete="off"/>
+                            </div>
+                            <div class="list-div">
+                                <table cellpadding="1" cellspacing="1">
+                                    <thead>
+                                    <tr>
+                                        <th width="30%">
+                                            <div class="tDiv">商品名称</div>
+                                        </th>
+                                        <th width="15%">
+                                            <div class="tDiv">商品价格</div>
+                                        </th>
+                                        <th width="15%">
+                                            <div class="tDiv">配件价格</div>
+                                        </th>
+                                        <th width="15%">
+                                            <div class="tDiv">配件类型</div>
+                                        </th>
+                                        <th width="5%">
+                                            <div class="handle">操作</div>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody shoptype="group_list">
+                                    <tr>
+                                        <td class="no-records" colspan="12">没有找到任何记录</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="goods_footer">
+                        <div class="goods_btn goods_btn_fixed">
+                            <a href="javascript:void(0);" class="btn btn35 btn_blue" data-step="5" data-type="step"
+                               shoptype="stepSubmit">上一步，商品属性、图片</a>
+                            <a href="javascript:void(0);" class="btn btn35 blue_btn" data-step="6" data-down="true"
+                               data-type="submit" shoptype="stepSubmit">
+                                <i class="sc_icon goods_complete_icon"></i>
+                                完成，发布商品
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!--添加新商品end-->
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{:addslashes($info)}');
+    var goodsgalleryList = JSON.parse('{:addslashes($goodsgalleryList)}');
+    var goodsattrList = JSON.parse('{:addslashes($goodsattrList)}');
+    var infoColumn = JSON.parse('{:addslashes($infoColumn)}');
+    var categoryList = JSON.parse('{:addslashes($categoryList)}');
+    var transportList = JSON.parse('{:addslashes($transportList)}');
+    var areaList = JSON.parse('{:addslashes($areaList)}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            step: info.goods_id > 0 ? 3 : 1,
+            list: [],
+
+            outerInfo: 0,
+            cat_name: '{$cat_name}',
+            cat_id: info.cat_id > 0 ? info.cat_id : 0,
+            cat_level: 0,
+            categoryList: categoryList,
+            transportList: transportList,
+            areaList: areaList,
+            pid1: {$pid1},
+            pid2: {$pid2},
+
+            brand_name: '{$brand_name}',
+            brandfirstcharList: brandfirstcharList,
+            brandList: [],
+
+            goodsgalleryList: goodsgalleryList,
+
+            //更新属性表和规格表开始
+            /*
+                goodsattrList:
+                {
+                    goodstypeList: [],
+                    attributeList: [],
+                    productsList: [],
+                },
+            */
+            goods_attr_checkbox: 'goods_attr_checkbox',
+            goodsattrList: goodsattrList,
+            //更新属性表和规格表结束
+
+            infoColumn: infoColumn,
+            info: info,
+
+            attr_type: 0,//属性分类归属,平台/本店
+            goods_type: [],//属性分类
+            attr_cat1: JSON.parse('{:addslashes($attr_cat)}'),//属性
+            attr_cat2: [],
+            attr_cat3: [],
+            attr_type_list: [],//属性类型列表
+            product_attr_list: JSON.parse('{:addslashes($product_attr_key)}'),//属性item列表
+            product_attr_value: JSON.parse('{:addslashes($product_attr_value)}'),//属性value列表
+            srList: JSON.parse('{:addslashes($srList)}'),
+            no_self_input: {datetime: true, textarea: true, text: true},
+
+        },
+        watch: {
+            product_attr_list: {
+                immediate: true,
+                handler: function (val) {
+                    setTimeout(function () {
+                        $('.easyui-datebox').datebox({
+                            panelWidth: 180,
+                            onSelect: function (date) {
+                                var result = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+                                vm.selectProductAttr(vm.dataset.attr_id, result);
+                            }
+                        });
+                    }, 100);
+                }
+            },
+            attr_type_list: function (val) {
+                vm.product_attr_list.other = [];
+                vm.product_attr_list.group = [];
+                vm.product_attr_value = {};
+                $('#product_type').addClass('error-shadow').find('ul').show();
+            }
+        },
+        methods: {
+            //参数设置开始
+            selectAttrType: function () {
+                vm.attr_cat1 = [];
+                vm.attr_cat2 = [];
+                vm.attr_cat3 = [];
+                vm.selectAttrCat(0, 1);
+            },
+            selectAttrCat: function (id, level) {
+                vm.info.pro_type = id;
+                if (level > 0) {
+                    vm['attr_cat' + level] = [];
+                } else {
+                    return;
+                }
+                $.ajax({
+                    type: 'GET',
+                    url: "/admin/goods/getProductType",
+                    data: {id: id, type: vm.attr_type},
+                    success: function (data) {
+                        if (level > 0) {
+                            vm['attr_cat' + level] = data.cat;
+                            $('#attr_cate' + level).find('ul').show();
+                        }
+                        vm.attr_type_list = data.type;
+                    }
+                });
+            },
+            selectType: function (index) {
+                vm.info.pro_type = vm.attr_type_list[index].id;
+                $.ajax({
+                    type: 'GET',
+                    url: "/admin/goods/getProductAttr",
+                    data: {type_id: vm.attr_type_list[index].id},
+                    success: function (data) {
+                        $('#product_type').removeClass('error-shadow');
+                        vm.product_attr_list = data;
+                    },
+                });
+            },
+            selectProductAttr: function (attr_id, timeValue) {
+                var val = '';
+                if (timeValue) {
+                    val = timeValue;
+                } else {
+                    var obj = event.currentTarget;
+                    switch (obj.type) {
+                        case 'checkbox':
+                            val = vm.getCheckboxValues(obj.name);
+                            break;
+                        case 'radio':
+                        case 'select-one':
+                        case 'textarea':
+                        case 'text':
+                            val = obj.value;
+                            break;
+                    }
+                }
+
+                if (val == '') {
+                    if (vm.product_attr_value[attr_id]) {
+                        delete vm.product_attr_value[attr_id];
+                    }
+                } else {
+                    vm.product_attr_value[attr_id.toString()] = val;
+                }
+            },
+            getCheckboxValues: function (name) {
+                var obj = document.getElementsByName(name);
+                var check_val = [];
+                for (var k in obj) {
+                    if (obj[k].checked)
+                        check_val.push(obj[k].value);
+                }
+                return check_val.join(',');
+            },
+            //参数设置结束
+
+            stepInit: function (index) {
+                switch (index) {
+                    case 1:
+                        vm.step = index;
+                        break;
+                    case 2:
+                        vm.step = index;
+                        break;
+                    case 3:
+                        if (index == 3 && vm.outerInfo == 0) {
+                            if (!vm.cat_id && !vm.info.cat_id) {
+                                $.messager.alert('温馨提示', '请选择分类', 'info');
+                                return false;
+                            } else {
+                                vm.step = index;
+                                vm.outerInfo = 1;
+                                $.upDown("[shoptype='outerInfo']", ".step_title", ".step", 117);//展开收起
+                            }
+                        }
+                        vm.step = index;
+                        break;
+                    case 4:
+                        //供应商模式，必须填写成本价
+                        if (vm.info.sr_id > 0 && vm.info.cost_price < 0.01) {
+                            layer.msg('请填写成本价', {time: 1500});
+                            $('input[name="cost_price"]').focus();
+                            return;
+                        }
+                        vm.step = index;
+                        break;
+                }
+            },
+            init: function () {
+                if (!info.goods_id) {
+                    vm.categoryListInit();
+                }
+                vm.brandListInit();
+                vm.fileuploaderInit();
+                vm.goodstypeListInit();
+            },
+            goodsgalleryInit: function (index) {
+                vm.goodsgalleryList.splice(index, 1);
+            },
+
+            categoryListInit: function (vo = {}, cat_level = 0) {
+                vm.cat_id = vo.cat_id;
+                vm.cat_name = vo.cat_name;
+                vm.cat_level = cat_level;
+                $.post('/admin/goods/categoryListInitAjax', {
+                    cat_id: vm.cat_id,
+                    cat_level: vm.cat_level,
+                }, function (ret) {
+                    if (ret.data.oneList) {
+                        vm.categoryList.oneList = ret.data.oneList;
+                    }
+                    if (ret.data.twoList) {
+                        vm.categoryList.twoList = ret.data.twoList;
+                    }
+                    if (ret.data.thrList) {
+                        vm.categoryList.thrList = ret.data.thrList;
+                    }
+                    if (ret.data.fourList) {
+                        vm.categoryList.fourList = ret.data.fourList;
+                        if (vm.categoryList.fourList.length > 0) {
+                            $('#cate_add').addClass('lv4').find('.sort_list').eq(2).addClass('sort_list_one');
+                        } else {
+                            $('#cate_add').removeClass('lv4').find('.sort_list').eq(2).removeClass('sort_list_one');
+                        }
+                    }
+                }, 'json');
+            },
+
+            brandListInit: function (brand_first_char = '') {
+                $.post('/admin/goods/brandListAjax', {
+                    brand_first_char: brand_first_char,
+                    brand_name: vm.brand_name,
+                }, function (ret) {
+                    vm.brandList = ret.data;
+                }, 'json');
+            },
+            brandSelect: function (vo) {
+                vm.info.brand_id = vo.brand_id;
+                vm.brand_name = vo.brand_name;
+            },
+
+            goodstypeListInit: function (vo = {cat_name: ''}) {
+                $.post('/admin/goods/goodstypeListAjax', {
+                    cat_name: vo.cat_name,
+                }, function (ret) {
+                    vm.goodsattrList.goodstypeList = ret.data;
+                }, 'json');
+            },
+            attributeListInit: function (vo) {
+                if (vo.cat_id == vm.goodsattrList.cat_id) {
+                    return;
+                }
+                vm.goodsattrList.cat_id = vo.cat_id;
+                $.post('/admin/goods/attributelistAjax', {
+                    cat_id: vo.cat_id,
+                }, function (ret) {
+                    vm.goodsattrList.attributeList = ret.data;
+                    vm.goodsattrList.productsList = [];
+                }, 'json');
+
+            },
+            productsListInit: function (index, index2) {
+
+                if (vm.goodsattrList.attributeList[index].attr_values[index2].checked) {
+                    vm.goodsattrList.attributeList[index].attr_values[index2].checked = 0;
+                } else {
+                    vm.goodsattrList.attributeList[index].attr_values[index2].checked = 1;
+                }
+
+                //组装数组开始
+                var productsList_temp = [];
+                for (var i = 0; i < vm.goodsattrList.attributeList.length; i++) {
+                    var productsList_item = [];
+                    for (var a = 0; a < vm.goodsattrList.attributeList[i].attr_values.length; a++) {
+                        if (vm.goodsattrList.attributeList[i].attr_values[a].checked) {
+                            productsList_item.push(vm.goodsattrList.attributeList[i].attr_values[a].val);
+                        }
+                    }
+                    if (productsList_item.length > 0) {
+                        productsList_temp.push(productsList_item);
+                    }
+
+                }
+                var productsList = getArrayByArrays(productsList_temp);
+
+                var arr = [];
+                for (var i = 0; i < productsList.length; i++) {
+
+                    if (vm.info.goods_id > 0) {
+                        var product_item = {
+                            tempvalue: productsList[i],
+                            goods_attr: '',
+                            goods_id: vm.info.goods_id,
+                            product_sn: rand_str('sku-'),
+                            bar_code: '',
+                            product_number: 1000,
+                            product_price: vm.info.shop_price,
+                            product_promote_price: 0.00,
+                            product_market_price: 0.00,
+                            product_warn_number: 10,
+                        };
+                    } else {
+                        var product_item = {
+                            tempvalue: productsList[i],
+                            goods_attr: '',
+                            product_sn: rand_str('sku-'),
+                            bar_code: '',
+                            product_number: 1000,
+                            product_price: vm.info.shop_price,
+                            product_promote_price: 0.00,
+                            product_market_price: 0.00,
+                            product_warn_number: 10,
+                        };
+                    }
+
+                    arr.push(product_item);
+                }
+                vm.goodsattrList.productsList = arr;
+                //组装数组结束
+            },
+            productsListDelete: function (index) {
+                vm.goodsattrList.productsList.splice(index, 1);
+            },
+
+            fileuploaderInit: function () {
+                layui.use('upload', function () {
+                    var upload = layui.upload;
+                    var originalimgUploader = upload.render({
+                        elem: '#original_img',
+                        url: '/admin/uploader/alioss_upload', //上传接口
+                        data: {
+                            upload: 1
+                        },
+                        accept: 'images', //允许上传的文件类型
+                        acceptMime: 'image/*',
+                        done: function (ret) {
+                            vm.info.original_img = ret.url;
+                            if (ret.state == 'SUCCESS') {
+                                $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                            } else {
+                                $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                            }
+
+                        },
+                    });
+                    var gallerypitureUploader = upload.render({
+                        elem: '#gallery_picture',
+                        url: '/admin/uploader/alioss_upload',
+                        multiple: true,
+                        number: 10,
+                        data: {
+                            upload: 1
+                        },
+                        accept: 'images', //允许上传的文件类型
+                        acceptMime: 'image/*',
+                        done: function (ret) {
+                            vm.goodsgalleryList.push({
+                                img_original: ret.url,
+                                img_sort: 0,
+                                external_url: '',
+                            });
+                        },
+                    });
+                });
+            },
+
+            //入库操作
+            goodsadd: function () {
+                vm.info.cat_id = vm.cat_id;
+                vm.info.is_on_sale = $("input:hidden[name='is_on_sale']").val();
+                vm.info.is_alone_sale = $("input:hidden[name='is_alone_sale']").val();
+                vm.info.is_shipping = $("input:hidden[name='is_shipping']").val();
+                vm.info.is_sui = $("input:hidden[name='is_sui']").val();
+                vm.info.is_show = $("input:hidden[name='is_show']").val();
+                vm.info.goods_desc = get_editor_content('goods_desc');
+
+                $.post('/admin/goods/goodsadd', {
+                    pageparm: JSON.stringify(vm.info),
+                    goodsattrList: JSON.stringify(vm.goodsattrList),
+                    goodsgalleryList: JSON.stringify(vm.goodsgalleryList),
+                    product_attr: vm.product_attr_value,
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        window.parent.vm.init();
+                        setTimeout(function () {
+                            layer.closeAll();
+                        }, 1000);
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            }
+        },
+        mounted: function () {
+            var vm = this;
+            //编辑商品属性状态还原
+            setTimeout(function () {
+                if (Object.keys(vm.product_attr_value).length) {
+                    var obj;
+                    Object.keys(vm.product_attr_value).forEach(function (v) {
+                        obj = document.querySelectorAll('.attr-box *[name="p_attr_' + v + '"]')[0];
+                        if (obj) {
+                            switch (obj.type) {
+                                case 'select-one':
+                                    var arr = [];
+                                    for (var i = 0, l = obj.options.length; i < l; i++) {
+                                        arr.push(obj.options[i].value);
+                                    }
+                                    var temp = arr.join(',');
+                                    if (temp.indexOf(vm.product_attr_value[v]) >= 0) {
+                                        obj.value = vm.product_attr_value[v];
+                                    } else {
+                                        $(obj).parents('.item_right_li').find('input[name="p_attr_' + v + '"]').val(vm.product_attr_value[v]);
+                                    }
+                                    break;
+                                case 'checkbox':
+                                    obj = document.querySelectorAll('*[name="p_attr_' + v + '"]');
+                                    obj.forEach(function (item) {
+                                        if (vm.product_attr_value[v].indexOf(item.value) >= 0) {
+                                            $(item).prop("checked", true);
+                                        }
+                                    });
+                                    break;
+                                case 'radio':
+                                    obj = $('*[name="p_attr_' + v + '"][value="' + vm.product_attr_value[v] + '"]');
+                                    if (obj.length) {
+                                        obj.prop("checked", true);
+                                    } else {
+                                        $('*[name="p_attr_' + v + '"]').parents('.item_right_li').find('input[name="p_attr_' + v + '"]').val(vm.product_attr_value[v]);
+                                    }
+                                    break;
+                                case 'hidden':
+                                    try {
+                                        $(obj).parent().prev('input[data-attr_id="' + v + '"]').datebox('setValue', vm.product_attr_value[v]);
+                                    } catch (e) {
+                                        console.warn('设置日期失败');
+                                        console.warn(e);
+                                    }
+                                    break;
+                                case 'text':
+                                case 'textarea':
+                                    obj.value = vm.product_attr_value[v];
+                                    break;
+                            }
+                        }
+                    });
+                }
+            }, 300);
+        }
+    });
+    $(function () {
+        vm.init();
+
+        ueditorInit('goods_desc').ready(function () {
+            this.setContent(vm.info.goods_desc);
+        });
+        if (info.goods_id > 0) {
+            $.upDown("[shoptype='outerInfo']", ".step_title", ".step", 117);//展开收起
+        }
+    });
+</script>
+

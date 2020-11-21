@@ -1,0 +1,242 @@
+{include file='public/head'}
+{if isset($head_adv['ad_img'])}
+<div class="head_top_adv">
+    <a href="{$head_adv.ad_link}">
+        <img src="{$head_adv['ad_img']}">
+    </a>
+</div>
+{/if}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<link rel="stylesheet" type="text/css" href="__THEME__/css/index.css">
+<link rel="stylesheet" type="text/css" href="__THEME__/css/color.css">
+<style>
+    /*.w1200,.vip-outcon{width:1350px}*/
+</style>
+<div class="homeindex" shoptype="homeWrap">
+
+    <div class="content">
+        <!--轮播图-->
+        <div class="visual-item" data-mode="lunbo" data-purebox="banner" data-li="1" data-length="5" shoptype="visualItme" style="display: block;" data-diff="0">
+            <div class="view">
+                <div class="banner home-banner">
+                    <div class="bd">
+                        {if count($carcousel)}
+                        <ul data-type="range" data-slide="fold">
+                            {volist name="carcousel" id="vo"}
+                            <li style="background: url('{$vo.ad_img}') center center no-repeat; background-size: {$vo.ad_width}px {$vo.ad_height}px;">
+                                <div class="banner-width"><a href="{$vo.ad_link}" target="_blank"></a></div>
+                            </li>
+                            {/volist}
+                        </ul>
+                        {/if}
+                        <div class="spec" data-spec=""></div>
+                    </div>
+                    <div class="hd">
+                        <ul></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {if isset($top_adv) && count($top_adv)}
+        <div class="visual-item adv-list pa-adv-list">
+            <div class="view">
+                <ul class="adv-bd">
+                    {volist name="top_adv" id="vo"}
+                    <li><a href="{$vo.ad_link}"><img src="{$vo.ad_img}"></a></li>
+                    {/volist}
+                </ul>
+            </div>
+        </div>
+        {/if}
+        <!--楼层开始-->
+        {volist name="$floor" id="vo" key="idx"}
+        <div class="visual-item w1200" data-mode="homeFloor" data-purebox="homeFloor" data-li="1" shoptype="visualItme" data-diff="{$idx}">
+            <div class="view">
+                <div class="floor-content index2" data-type="range" id="homeFloor_{$idx}" data-lift="{$vo.title}">
+                    <div class="floor-line-con floorOne {$vo.style} template-2" data-idx="1" id="floor_{$idx}" shoptype="floorItem">
+                        <div class="floor-hd" shoptype="floorTit">
+                            <div class="hd-tit">{$vo.subtitle}</div>
+                            <div class="hd-tags">
+                                <a href="{:url('category/index',['id'=>$vo.cat_id])}">查看更多<small><i class="iconfont icon-right arrow"></i></small></a>
+                            </div>
+                        </div>
+                        <div class="floor-goods">
+                            <ul class="adv-list">
+                                {volist name="$vo.adv" id="normal_adv"}
+                                <li class="floor-adv"><a href="{$normal_adv.ad_link}"><img src="{$normal_adv.ad_img}"></a></li>
+                                {/volist}
+                            </ul>
+                            <ul class="p-list">
+                                {volist name="$vo.goods" id="good"}
+                                <li class="opacity_img">
+                                    <div class="p-img"><a href="{:url('goods/detail',['id'=>$good.goods_id])}" target="_blank"><img src="{$good.original_img}"></a></div>
+                                    <div class="p-name"><a href="{:url('goods/detail',['id'=>$good.goods_id])}" title="{$good.goods_name}">{$good.goods_name}</a></div>
+                                    <div class="p-price">
+                                        <span class="shop-price"><em>¥</em>{$good.shop_price}</span>
+                                        <span class="original-price"><em>¥</em>{$good.market_price}</span>
+                                    </div>
+                                </li>
+                                {/volist}
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        {/volist}
+
+        <!--猜你喜欢-->
+        <div class="visual-item w1200" data-mode="guessYouLike" data-purebox="goods" shoptype="visualItme" data-diff="0" data-goodsid="">
+            <div class="view">
+                <div class="lift-channel clearfix" id="guessYouLike" data-type="range" data-lift="商品">
+                    <div data-goodstitle="title">
+                        <div class="ftit"><h3>还没逛够</h3></div>
+                    </div>
+                    <ul></ul>
+                    <div class="spec" data-spec=""></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--顶部浮栏-->
+    <div class="attached-search-container" shoptype="suspColumn">
+        <div class="w w1200">
+            {include file="public/categorys"}
+            <div class="mall-search">
+                <div class="shop-search">
+                    <div class="form">
+                        <form id="searchForm" name="searchForm" method="get" action="/home/category/catgoodslist" onsubmit="return checkSearchForm(this)" class="search-form">
+                            <input autocomplete="off" onkeyup="lookup(this.value);" name="keywords" type="text" id="keyword" value="" class="search-text">
+                            <button type="submit" class="button button-goods" onclick="checkstore_search_cmt(0)">搜商品</button>
+                            <button type="submit" class="button button-store" onclick="checkstore_search_cmt(1)">搜店铺</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="suspend-login">
+                {if ($Think.session.user)}
+                <a href="{:url('user/index')}" class="nick_name">{$Think.session.user.user_name}</a>
+                {else}
+                <a href="{:url('login/index')}">登录</a> | <a href="{:url('login/register')}">注册</a>
+                {/if}
+            </div>
+
+            <div class="shopCart" id="ECS_CARTINFO">
+                <div class="shopCart-con shop-cm">
+                    <a href="{:url('cart/index')}">
+                        <i class="iconfont icon-carts"></i>
+                        <span></span>
+                        <em class="count cart_num">{$Think.session.cart_num|default=0}</em>
+                    </a>
+                </div>
+                <div class="dorpdown-layer" shoptype="dorpdownLayer">
+                    <div class="prompt">
+                        <div class="nogoods"><b></b><span>购物车中还没有商品，赶紧选购吧！</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--左侧导航条-->
+    <div class="lift lift-mode-one lift-hide" shoptype="lift" data-type="one" style="z-index:100001">
+        <div class="lift-list" shoptype="liftList"></div>
+    </div>
+
+</div>
+{include file='public/right_bar'}
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__THEME__/js/asyLoadfloor.js"></script>
+<script>
+    /*首页轮播*/
+    $(".nav .site-mast .categorys-tab-content").show();
+
+    var length = $(".banner .bd").find("li").length;
+    if (length > 1) {
+        $(".banner").slide({
+            titCell: ".hd ul", mainCell: ".bd ul", effect: "fold", interTime: 3500, delayTime: 500, autoPlay: true, autoPage: true, trigger: "click", endFun: function (i, c, s) {
+                $(window).resize(function () {
+                    var width = $(window).width();
+                    s.find(".bd li").css("width", width);
+                });
+            }
+        });
+    } else {
+        $(".banner .hd").hide();
+    }
+    //楼层轮播图广告
+    $("*[data-purebox='homeFloor']").each(function (index, element) {
+        var f_slide_length = $(this).find(".floor-left-slide .bd li").length;
+        if (f_slide_length > 1) {
+            $(element).find(".floor-left-slide").slide({titCell: ".hd ul", mainCell: ".bd ul", effect: "left", interTime: 3500, delayTime: 500, autoPlay: true, autoPage: true});
+        } else {
+            $(element).find(".floor-left-slide .hd").hide();
+        }
+    });
+    //楼层分类商品切换
+    $("*[shoptype='floorItem']").slide({titCell: ".hd-tags li", mainCell: ".floor-tabs-content", titOnClassName: "current"});
+
+    function getYouLike() {
+        $.ajax({
+            type: 'POST',
+            url: '/home/index/ajaxGuessYouLike',
+            success: function (data) {
+                $("#guessYouLike ul").html(data);
+            }
+        });
+    }
+
+    function readyLoad() {
+        var homeWrap = $("*[shoptype='homeWrap']");
+        var homeitem = homeWrap.find("*[shoptype='visualItme']");
+        var mode = "";
+        var range = "";
+        var lift = "";
+        var id = "";
+        var floorItem = "";
+        var liftObj = $("*[shoptype='lift']");
+        var returnTop = "";
+
+        if (liftObj.data("type") == "one") {
+            returnTop = '<div class="lift-item lift-item-top" shoptype="liftItem"><i class="iconfont icon-returntop"></i></div>';
+        } else {
+            returnTop = '<div class="lift-item lift-item-top" shoptype="liftItem">TOP<i class="iconfont icon-top-alt"></i></div>';
+        }
+
+        homeitem.each(function (k, v) {
+            mode = $(this).data("mode");
+            if (mode != "lunbo" && mode != "h-streamer") {
+                range = $(this).find("*[data-type='range']");
+                lift = range.data("lift");
+                id = range.attr("id");
+
+                var _div = '<div class="lift-item" shoptype="liftItem" data-target="#' + id + '" title="' + lift + '"><span>' + lift + '</span><i class="lift-arrow"></i></div>';
+
+                $("*[shoptype='liftList']").append(_div);
+            }
+        });
+
+        $("*[shoptype='liftList']").append(returnTop);
+    }
+
+    $(function () {
+        getYouLike();
+        $(window).scroll(function () {
+            var scrollTop = $(document).scrollTop();
+            var navTop = $("*[shoptype='shopNav']").offset().top;
+
+            if (scrollTop > navTop) {
+                $("*[shoptype='suspColumn']").addClass("show");
+            } else {
+                $("*[shoptype='suspColumn']").removeClass("show");
+            }
+        });
+    });
+    //楼层左侧栏悬浮框
+    readyLoad();
+    $.catetopLift();
+</script>
+{include file='public/footer'}

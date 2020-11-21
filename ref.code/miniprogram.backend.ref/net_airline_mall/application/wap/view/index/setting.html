@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>设置</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div id="profile">
+        <div class="van-cell-group van-hairline--top-bottom">
+            <div class="van-cell">
+                <div class="van-cell__title">
+                    <div class="s-user-top">
+                        <div class="user-bg-box-1"><img src="https://x.dscmall.cn/img/user-1.png" class="img"></div>
+                        <div class="user-bg2-box-1"><img src="https://x.dscmall.cn/img/user-2.png" class="img"></div>
+                        <div class="user_profile_box">
+                            <div class="user-img">
+                                <div class="user-img-box van-uploader">
+                                    <img :src="info.user.avatar?info.user.avatar:'https://x.dscmall.cn/storage/images/errorImg.png'"  class="img-height">
+                                </div>
+                            </div>
+                            <div class="profile-index-top">
+                                <h3>{{info.user.mobile}}</h3>
+                                <p><span>用户名 </span>{{info.user.user_name}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="van-cell van-cell--clickable" onclick="openwind('','address_win')">
+                <div class="van-cell__title"><span>收货地址</span></div>
+                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+            </div>
+        </div>
+<!--        <div class="m-top10 van-cell-group van-hairline&#45;&#45;top-bottom" onclick="openwind('user','updatecard_win')">
+            <div class="van-cell van-cell&#45;&#45;clickable">
+                <div class="van-cell__title"><span>实名认证</span></div>
+                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+            </div>
+        </div>
+        <div class="m-top10 van-cell-group van-hairline&#45;&#45;top-bottom" onclick="openwind('','updatepwd_win')">
+            <div class="van-cell van-cell&#45;&#45;clickable">
+                <div class="van-cell__title"><span>登录密码</span></div>
+                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+            </div>
+        </div>
+        <div class="m-top10 van-cell-group van-hairline&#45;&#45;top-bottom" onclick="openwind('user','updatepaypwd_win')">
+            <div class="van-cell van-cell&#45;&#45;clickable">
+                <div class="van-cell__title"><span>支付密码</span></div>
+                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+            </div>
+        </div>-->
+        <div class="m-top10 van-cell-group van-hairline--top-bottom" onclick="openwind('user','abous_win')">
+            <div class="van-cell van-cell--clickable">
+                <div class="van-cell__title"><span>关于我们</span></div>
+                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+            </div>
+        </div>
+        <div class="ect-button-more padding-all hide" @click="loginOut()">
+            <a class="van-button van-button--default van-button--large">
+                <span class="van-button__text">退出</span>
+            </a>
+        </div>
+    </div>
+</div>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: {},
+            list: []
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.getuserinfo).then(function (ret) {
+                    vm.info = ret.data;
+                })
+            },
+            loginOut:function () {
+                $api.setStorage('token', null);
+                setTimeout(function () {
+                    window.location.href = '/wap/index/center';
+                },1000);
+            }
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

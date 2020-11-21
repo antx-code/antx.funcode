@@ -1,0 +1,19 @@
+/*后台第三方登录插件样式*/
+.items-box{overflow: hidden;margin-right:-24px;padding:0;}
+.item_wrap{width:50%;float:left;display: inline-block;position:relative;}
+.plugin_item{display: block;overflow: hidden;margin-right: 24px;margin-bottom: 24px;color: #222; height: 94px; padding-left: 94px;border: 1px solid #e7e7eb;}
+.plugin_item:hover {text-decoration: none; background-color: #f4f5f9;border-color: #d9dadc;}
+.plugin_icon{width:94px;height:94px;position:absolute;top:0;left:0;}
+.plugin_icon img{width:94px;height:94px;}
+.plugin_content{padding: 10px 0 10px 20px;overflow: hidden;}
+.plugin_content .title{width: 216px;font-size: 18px;line-height:30px;font-weight: 400;font-style: normal;border-bottom:0px;height: auto;margin:0;padding:0;}
+.plugin_content .desc{color: #8d8d8d;font-size: 12px;line-height: 32px;width: 238px;}
+.plugin_status{position:relative;float: right;text-align: right; padding: 54px 12px 0px;}
+
+/*插件安装*/
+.flexilist{margin-top:20px;position:relative;z-index:1;line-height:26px;}
+.main-info{width:100%;position:relative;}
+.main-info .item{width:100%;line-height:30px;float:left;margin-bottom:10px;}
+.main-info .item .label-t{width:30%;float:left;text-align:right;padding-right: 8px;color:#333;}
+.main-info .item .label_value{width:68%;float:left}
+.main-info .text{width:299px;}

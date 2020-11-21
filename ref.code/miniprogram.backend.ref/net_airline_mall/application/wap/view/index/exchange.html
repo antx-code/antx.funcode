@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>积分商城</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .swiper-container {width: 100%;}
+        .nav .list{padding: 15px 10px !important;width:20vw;padding-bottom:0!important;}
+        .nav .list .txt{font-size: 12px !important;height:24px;overflow:hidden}
+        .nav{display:flex; text-align: center;flex-wrap: wrap;}
+        .nav .list .txt{line-height:200%}
+        .nav .list img{max-width:100%;padding:0.5rem}
+        .title_index{text-align:center;height:5rem!important;line-height:5rem!important;}
+        .title_index h4{font-size:1.8rem!important;height:5rem!important;line-height:5rem!important;font-weight:bold}
+        .pro-img{width:calc(50vw - 0.9rem) !important;height:calc(50vw - 0.9rem) !important;overflow: hidden}
+    </style>
+</head>
+
+<body>
+<div id="app">
+    <div class="store-nav-list">
+        <div class="swiper-container box-flex swiper-container-horizontal swiper-container-ios">
+            <div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;">
+                <div class="swiper-slide swiper-slide-visible swiper-slide-active">
+                    <a href="javascript:;"  :class="{'active':cat_id==0}" @click="catidInit({})">
+                        <h5>所有分类</h5>
+                    </a>
+                </div>
+                <template v-for="(vo,index) in info.categoryList">
+                    <div class="swiper-slide swiper-slide-visible swiper-slide-next">
+                        <a href="javascript:void(0)" @click="catidInit(vo)" :class="{'active':cat_id==vo.cat_id}">
+                            <h5>{{vo.cat_name}}</h5>
+                        </a>
+                    </div>
+                </template>
+                <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+            </div>
+        </div>
+    </div>
+    <section class="goods_info">
+        <div class="goods_photo d_jump">
+            <div id="slider" class="swipe">
+                <div class="swiper-wrapper">
+                    <template v-for="(vo,index) in info.adlist">
+                        <div class="swiper-slide aui-text-center">
+                            <img :src="vo.ad_img" />
+                        </div>
+                    </template>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+    <div class="auction tab-colse ">
+        <section class="filter_tab">
+            <div class="pro_filter_items dis-box">
+                <div class="item" :class="{'active':sort=='default','a-change':order=='asc'&&type==0}"
+                     @click="sortorderInit('default',0)"><span>默认</span></div>
+                <div class="item" :class="{'active':sort=='sale_num','a-change':order=='asc'&&type==1}"
+                     @click="sortorderInit('sale_num',1)">
+                    <span>兑换量</span><i class="iconfont icon-xiajiantou"></i>
+                </div>
+                <div class="item" :class="{'active':sort=='exchange_integral','a-change':order=='asc'&&type==2}"
+                     @click="sortorderInit('exchange_integral',2)">
+                    <span>积分值</span><i class="iconfont icon-xiajiantou"></i>
+                </div>
+            </div>
+        </section>
+        <!--
+        <div waterfall-disabled="disabled" waterfall-offset="300" class="goods-li">
+            <template v-for="(vo,index) in list">
+                <a href="javascript:void(0)" class="show bg-color-write li" @click="openGoodsdetail(vo)">
+                    <div class="left"><img :src="vo.original_img" class="img"></div>
+                    <div class="right">
+                        <h4 class="f-04 color-3 twolist-hidden m-top02">{{vo.goods_name}}</h4>
+                        <div class="cont auction dis-box">
+                            <div class="box-flex">
+                                <div class="f-06 color-red box-flex m-top04"><span
+                                        class="f-02 color-red">积分</span><span>{{vo.exchange_integral}}</span></div>
+                                <div class="f-02 color-9 m-top02">市场价:<span>¥{{vo.shop_price}}</span></div>
+                            </div>
+                            <div class="m-top10">
+                                <span class="min-btn tag-gradients-color color-white br-5 f-03">立即兑换</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </template>
+            -->
+        <section class="product-list product-list-medium">
+            <div class="prolist">
+                <template v-for="(vo,index) in info.goodsList">
+                    <div class="prolist-item" @click="openGoodsdetail(vo)">
+                        <div class="pro-img">
+                            <a href="javascript:void(0)" class=""> <img :src="vo.original_img" class="img" /></a>
+                        </div>
+                        <div class="pro-info">
+                            <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                            <div class="price">
+                                积分：{{vo.exchange_integral}}
+                            </div>
+                            <div class="outer">
+                                市场价：{{vo.shop_price}}
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </div>
+</div>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            sort: 'default',//exchange_integral|sale_num
+            order: '',
+            info: {},
+
+            cat_id: 0,
+            type: 0,
+        },
+        methods: {
+            catidInit:function(vo){
+                if(vo.cat_id){
+                    vm.cat_id = vo.cat_id;
+                }else{
+                    vm.cat_id = 0;
+                }
+                vm.pageinit();
+            },
+            sortorderInit: function (sort, type) {
+                vm.sort = sort;
+                vm.type = type;
+
+                if (vm.order == '') {
+                    vm.order = 'desc';
+                } else if (vm.order == 'desc') {
+                    vm.order = 'asc';
+                } else {
+                    vm.order = 'desc';
+                }
+                vm.pageinit();
+            },
+            pageinit:function(){
+                wxapp.ajax(config.exchange, {
+                    sort: vm.sort,
+                    order: vm.order,
+                    cat_id: vm.cat_id,
+                },1).then(function (ret) {
+                    vm.info = ret.data;
+                })
+            },
+            init: function () {
+                wxapp.ajax(config.exchange, {
+                    sort: vm.sort,
+                    order: vm.order,
+                    cat_id: vm.cat_id,
+                },1).then(function (ret) {
+                    vm.info = ret.data;
+                    vm.$nextTick(function(){
+                        vm.swiperInit();
+                    })
+                })
+            },
+            swiperInit: function () {
+                setTimeout(function () {
+                    new Swiper('#slider', {
+                        autoplay: 3000,
+                        visibilityFullFit: true,
+                        loop: true,
+                        pagination: '.swiper-pagination',
+                        paginationClickable: true
+                    });
+                }, 200);
+                setTimeout(function () {
+                    new Swiper('.swiper-container', {
+                        pagination: '.swiper-pagination',
+                        slidesPerView: 4,
+                        paginationClickable: true,
+                        spaceBetween: 20,
+                        freeMode: true
+                    });
+                },100);
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'exdetail_win',
+                    url: 'widget://html/exdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            }
+        },
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

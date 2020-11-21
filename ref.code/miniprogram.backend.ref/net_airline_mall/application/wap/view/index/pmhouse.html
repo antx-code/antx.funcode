@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>东家汇-竞拍房间</title>
+    <script src="https://app2019.zhanhuomall.com/Public/UserM/js/wsui.flexible.js"></script>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" href="/public/wap/static/css/wsui.css?v=1.26">
+    <link type="text/css" rel="stylesheet" href="/public/wap/static/css/ylmDialog-edit.css">
+    <link type="text/css" rel="stylesheet" href="/public/wap/static/css/reset.css">
+    <link type="text/css" rel="stylesheet" href="/public/wap/static/css/style1.0.0.css?v=1.26">
+    <link rel="stylesheet" type="text/css" href="/public/wap/css/pmhouse.css"/>
+    <style>
+        body{overflow-y:hidden;}
+        .room-b{overflow-y:hidden;}
+        #app{overflow-y:hidden;}
+        .room-top {margin-top:0.4rem;display:flex;justify-content: space-between;align-items: center;}
+        .room-top .r_info{ background: rgba(0,0,0,0.3);border-radius: 0.8rem;padding:0.1rem;overflow:hidden;display:flex;height:0.8rem;width:60vw}
+        .room-top .r_info .r_face{width:0.6rem;height:0.6rem;overflow:hidden;border-radius: 1rem;border:1px solid #fff}
+        .room-top .r_info .r_face img{max-width:100%}
+        .room-top .r_info .r_txt{color:#fff;margin-left:0.1rem;}
+        .room-top .r_info .r_txt p{font-size:0.2rem;color:rgba(255,255,255,0.5)}
+        .room-b{background: url("/public/wap/static/images/mbg.png");background-size: cover}
+        .room-top .r_info .r_num{color:#fff;margin-left:0.6rem;border-left:1px solid #fff;padding-left:0.6rem}
+        .room-top .r_info .r_num p{font-size:0.2rem;color:rgba(255,255,255,0.5)}
+        .room-top .r_info .r_num h1{color:#ffff00}
+        .room-b .level-1 {background:#cc0000;}
+        .room-b .level-2 {background:#0cab53}
+        .u .level{font-size:0.15rem;border-radius: 0.4rem;color:#fff;line-height:0.4rem;text-align: center}
+        .chujiabox{position: fixed;bottom:0;left:0;padding:0.3rem;width:100%;box-sizing: border-box}
+        .btn_chujia{background:#ffcc66;border-radius: 2rem; text-align: center;color:#fff;padding:0.2rem; width:100%}
+        .btn_chujia h1{height:0.4rem;line-height:0.4rem;font-size:0.4rem;}
+        .btn_chujia h2{font-size:0.2rem;line-height:0.2rem;}
+        .cd-popup-container a.cd-popup-go-close{width:0.7rem;height:0.7rem;bottom:-1.2rem}
+        .icon-guanbi1{line-height:0.7rem!important;}
+
+        .room-top .icon-guanbi1{font-size:0.3rem!important;line-height:1rem;color:#fff}
+    </style>
+</head>
+<body class="room-b">
+
+<div id="app" v-cloak="">
+
+    <div class="room-top">
+        <div class="r_info">
+            <div class="r_face">
+                <img :src="info.master.avatar?info.master.avatar:'/public/wap/static/images/nopic.png'">
+            </div>
+            <div class="r_txt">
+                <p>房主</p>
+                <h1>
+                    <span class="text-overflow-1">{{info.master.user_name}}</span>
+                </h1>
+            </div>
+            <div class="r_num">
+                <p>房间人数</p>
+                <h1>{{peopleCount}}人</h1>
+            </div>
+        </div>
+
+        <div class="win-close" @click="shutdown()"><i class="icon-guanbi1"></i></div>
+    </div>
+
+    <div class="auction-notice">
+        <div class="swiper-container swiper-container-horizontal swiper-container-free-mode">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide swiper-slide-duplicate" style="width: 150px;">
+                    <img :src="info.goods.original_img">
+                    {{info.goods.goods_name}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="room-member">
+        <template v-for="(vo,index) in peopleList">
+            <div class="u">
+                <div class="u-thumb">
+                    <img :src="vo.avatar?vo.avatar:'https://app2019.zhanhuomall.com/Public/UserM/images/room-mod2-noface.png'">
+                </div>
+                <div class="level level-1" style="display:none">出局</div>
+            </div>
+        </template>
+    </div>
+    <div class="room-shop">
+        <div id="endpai" v-if="info.paimai_house.status==1">
+            <div style="font-size: .3rem;color: #fff;text-align: center; margin-top:0rem;line-height:1;">
+                距结拍还有
+            </div>
+            <div class="countdown">
+            <span class="fnTimeAuction" id="auctionTime" data-unit="minute" data-end="2019/08/28 09:38:22">
+                 <i class="mini">{{c_h}}</i>: <i class="sec">{{c_m}}</i>: <i class="hm">{{c_s}}</i>
+            </span>
+            </div>
+        </div>
+        <div id="startpai" v-if="info.paimai_house.status==3">
+            <div style="font-size: .3rem;color: #fff;text-align: center; margin-top:0rem;">距开拍还有</div>
+            <div class="countdown">
+                <span class="fnTimeBeforeAuction" data-unit="minute" data-end="2019/08/28 09:35:22">
+             <i class="mini">{{c_h}}</i>: <i class="sec">{{c_m}}</i>: <i class="hm">{{c_s}}</i>
+                </span>
+            </div>
+        </div>
+        <div class="goodb">
+            <a href="javascript:void(0)">
+                <img :src="info.goods.original_img">
+                <div class="rb-goods">
+                    <div class="tit">{{info.goods.goods_name}}</div>
+                    <div class="price">
+                        <span class="zt-alert-2">起拍价：{{info.goods.min_price}}元</span>
+                        <span>市场价：{{info.goods.shop_price}}元</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <template v-if="jlist.length>0">
+            <div class="chujiaren">
+                <div class="thumb">
+                    <img :src="jlist[jlist.length-1].avatar?jlist[jlist.length-1].avatar:'https://app2019.zhanhuomall.com/Public/UserM/images/room-mod2-noface.png'">
+                    <i></i>
+                </div>
+            </div>
+
+            <div class="chujia">
+                <h1>{{jlist[jlist.length-1].user_name?jlist[jlist.length-1].user_name:jlist[jlist.length-1].mobile}}</h1>
+                <span>{{jlist[jlist.length-1].min_price}}</span>
+            </div>
+        </template>
+        <template v-else>
+            <div class="chujiaren">
+                <div class="thumb">
+                    <img src="/public/wap/static/images/nopic.png">
+                </div>
+            </div>
+            <div class="chujia"><span>暂无出价</span></div>
+        </template>
+
+    </div>
+    <div class="room-jiepai" id="bottom_time" style=" ">
+        <div class="jupai" id="jiepai" parent="1" style="display:none;">
+            倒计时
+            <span class="jie zt-alert-2">
+                 <i class="sec secondNum">00</i>
+             </span>
+            <p id="jiepaiStr"></p>
+        </div>
+    </div>
+    <!--聊天内容展示-->
+    <div class="room-chat" id="room-chat" style="padding-bottom:0;margin-bottom:2.2rem;"></div>
+
+    <div class="chujiabox">
+        <div class="btn_chujia" @click="rushlogadd()" v-if="info.paimai_house.status==1"><h1>出价</h1><h2>加价1元/次</h2></div>
+    </div>
+
+    <div class="room-menu flex" id="menuStart" v-if="info.paimai_house.status==1" style="display:none">
+        <a href="javascript:void(0);" class="flex-1 flex-middle flex-center cd-popup-trigger1" @click="shareTipInit(1)">分享</a>
+        <a href="javascript:void(0);" class="chu" @click="rushlogadd()">加价1元/次<span class="spinner"></span></a>
+        <div class="flex-1" style="padding:0 .3rem;"></div>
+        <a href="javascript:void(0);" class="flex-1 flex-middle flex-center" id="J_ShowActionSheet"
+           @click="houseleave()">退出</a>
+    </div>
+
+
+    <div class="room-menu tc" style="margin-top:.2rem;padding:.4rem 0;color:#ebba45;" v-if="info.paimai_house.status==2">
+        房间竞拍已结束
+    </div>
+    <div class="room-menu tc" style="margin-top:.2rem;padding:.4rem 0;color:#ebba45;" v-if="info.paimai_house.status==3">
+        未开始
+    </div>
+    <div class="room-menu tc" style="margin-top:.2rem;padding:.4rem 0;color:#ebba45;" v-if="info.paimai_house.status==0">
+        已流拍
+    </div>
+
+
+    <!--参与用户-->
+    <div class="cd-popup canyu" id="canyu">
+        <div class="cd-popup-container index-popup">
+            <div class="layer-content">
+                <div class="tit" style="margin-top:-3.4rem;">
+                    <img src="https://app2019.zhanhuomall.com/Public/UserM/images/room-user-t.png">
+                </div>
+                <div class="pop-memberlist" id="canyulist"></div>
+            </div>
+        </div>
+    </div>
+
+    <!--预设价-->
+    <div class="cd-popup chujiashezhi">
+        <div class="cd-popup-container">
+            <div class="layer-title">分享</div>
+            <div class="layer-content">
+                <div class="m-cell">
+                    <div class="cell-item" style="border-bottom:1px solid #ddd;">
+                        <div class="cell-right">
+                            <input type="number" step="0.01" class="cell-input checkInputNumber" id="chujiaMax"
+                                   placeholder="心理预设价">元
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-block btn-warning chujiashezhiclose">确定</button>
+            </div>
+            <a href="javascript:;" class="cd-popup-close"><i class="icon-guanbi1"></i></a>
+        </div>
+    </div>
+
+    <!--规则弹层-->
+    <div class="cd-popup guize " :class="{'is-visible':isvisible==1}">
+        <div class="cd-popup-container" style="width:70%;">
+            <div class="layer-title">竞拍规则</div>
+            <div class="layer-content" style="height:6rem;overflow-y:auto;">
+                <div>
+                    <img src="https://app2019.zhanhuomall.com/Public/UserM/images/index-tjyh.png"
+                         style="width:70%;margin:0 auto;">
+                </div>
+                <div style="padding:.2rem .4rem;font-size:.28rem;">
+                    <p><span class="zt-alert-0">①</span>满足10人即刻开拍或倒计时结束时≥6人可开拍</p>
+                    <p><span class="zt-alert-0">②</span>参与玩家需缴纳当前出价额30%的保证金，未拍中自动退还</p>
+                    <p><span class="zt-alert-0">③</span>开拍后倒计时结束结拍</p>
+                    <p><span class="zt-alert-0">④</span>系统提示10s后无人出价则玩家竞拍成功</p>
+                    <p><span class="zt-alert-0">⑤</span>竞拍成功的玩家需24.00小时内补齐尾款，否则扣罚保证金</p>
+                </div>
+            </div>
+            <a href="javascript:void(0);" class="cd-popup-close" @click="isvisibleInit(0)">
+                <i class="icon-guanbi1"></i>
+            </a>
+        </div>
+    </div>
+
+    <!--中途退场-->
+    <div class="cd-popup outroom">
+        <div class="cd-popup-container tip-popup">
+            <div class="layer-content">
+                <div class="status"><i class="icon-tishi zt-alert-3"></i></div>
+                <div style="font-size:.32rem;text-align:center;" id="outroommsg">中途退场将扣除<span
+                        class="zt-alert-0 outroomjifen">0</span>积分
+                </div>
+                <div class="m-button">
+                    <a href="javascript:;" class="btn-block btn-danger" onclick="popupClose()">我再想想</a>
+                    <a href="javascript:;" class="btn db tc" onclick="ws_outRoom()">确认退场</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--开拍倒计时-->
+    <div class="countdown-fivemask" id="startTime" parent="0" style="display:none;">
+        <div class="countdown-five">
+            <span id="cd" class="secondNum">5</span>
+        </div>
+    </div>
+
+    <!--用户余额提醒-->
+    <div class="cd-popup" :class="{'is-visible':userAccWarning==1}" id="userAccWarning">
+        <div class="cd-popup-container tip-popup">
+            <div class="layer-content">
+                <div class="tit"><img src="https://app2019.zhanhuomall.com/Public/UserM/images/room-tips1.png"></div>
+                <div class="tip-info">钱包余额不足，竞拍需保持余额不少于竞拍价30%</div>
+                <div class="m-button">
+                    <a href="/index.php/UserM/UserRecorder/recharge.html"
+                       class="btn-block btn-danger btn-radius">立即充值</a>
+                    <a href="javascript:;" class="btn all-mid" @click="userAccWarningInit(0)">算了吧</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--超过市场价提醒-->
+    <div class="cd-popup" id="priceoldWarning">
+        <div class="cd-popup-container tip-popup">
+            <div class="layer-content">
+                <div class="tit"><img src="https://app2019.zhanhuomall.com/Public/UserM/images/room-tips1.png"></div>
+                <div class="tip-info">竞拍价格已经超过市场价，请谨慎出价</div>
+                <div class="m-button">
+                    <a href="javascript:;" onclick="popupClose()" class="btn-block btn-danger btn-radius">算了吧</a>
+                    <a href="javascript:;" onclick="priceoldContinue()" class="btn all-mid">知道了，继续出价</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--竞拍成功-->
+    <div class="cd-popup auctionOk" id="auctionOk" :class="{'is-visible':auctionOk==1}">
+        <div class="cd-popup-container zhanhuo-popup">
+            <div class="layer-content">
+                <div class="tit" style="margin:-2rem -.2rem 0 -.2rem;">
+                    <img src="/public/wap/static/images/room-user-zh.png"></div>
+                <div class="pop-success">
+                    <div class="pop-yhq" id="auctionTicket" style="display: none"></div>
+                    <div class="info flex" id="auctionOkUser">
+                        <template v-if="jlist.length>0">
+                            <img :src="jlist[jlist.length-1].avatar?jlist[jlist.length-1].avatar:'/public/wap/static/images/nopic.png'" id="auctionOkFacepicurl">
+                            <div class="flex-1 mes">
+                                <span class="nickname"></span><i class="level"></i>
+                                <span class="db zt-alert-1"></span>
+                                <span style="display: block;color: #666;">市场价：<del>{{info.goods.shop_price}}</del>元</span>
+                                <span style="display: block;color: #666;">成交价：{{jlist[jlist.length-1].min_price}}元</span>
+                                <span class="time"></span>
+                            </div>
+                        </template>
+                    </div>
+                    <template v-if="jlist.length>0">
+                        <div class="m-button flex" v-if="info.user.user_id==jlist[jlist.length-1].user_id">
+                            <a href="javascript:void(0)" class="flex-1 btn" id="auctionOkPay" @click="paywin()">支付尾款</a>
+                            <a href="javascript:void(0)" class="flex-1 btn" id="auctionGoOn" @click="shutdown()">继续参加</a>
+                        </div>
+                    </template>
+                    <div class="tip">*竞拍成功未支付尾款将扣除保证金</div>
+                </div>
+                <a href="javascript:void(0)" class="cd-popup-go-close" id="auctionGoOnClose" @click="auctionOkInit(0)">
+                    <i class="icon-guanbi1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!--流拍-->
+    <div class="cd-popup auctionFail" id="auctionFail">
+        <div class="cd-popup-container tip-popup">
+            <div class="layer-content">
+                <div class="tit"><img src="https://app2019.zhanhuomall.com/Public/UserM/images/room-tips0.png"></div>
+                <div class="tip-h zt-alert-1">竞拍失败</div>
+                <div class="tip-info m-t-0" id="failMsg"></div>
+                <div class="m-button">
+                    <a href="javascript:void(0)" class="btn-block btn-danger btn-radius">继续参与</a>
+                </div>
+                <a href="javascript:void(0)" class="cd-popup-go-close"><i class="icon-guanbi1"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!--提示分享-->
+    <div class="cd-popup shareTip" :class="{'is-visible':shareTip==1}" id="shareTip">
+        <div class="cd-popup-container tip-popup">
+            <div class="layer-content">
+                <div class="tit"><img src="https://app2019.zhanhuomall.com/Public/UserM/images/room-tips0.png"></div>
+                <div class="tip-h zt-alert-1">竞拍人数不足</div>
+                <div class="tip-info m-t-0">分享邀请好友参与竞拍</div>
+                <div class="m-button">
+                    <a href="javascript:void(0);" class="btn-block btn-danger btn-radius"
+                       @click="shareTipInit(0)">立即分享</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="offline-ui offline-ui-up">
+        <div class="offline-ui-content"></div>
+        <a href="" class="offline-ui-retry"></a>
+    </div>
+</div>
+
+
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+
+    var mySwiper = new Swiper('.swiper-container', {
+        autoplay: 1,
+        speed: 6000,
+        loop: true,
+        freeMode: true,
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+    });
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            id: 145,
+
+            peopleList: [],
+            jlist: [],
+            info: [],
+
+            socket: null,
+            token: null,
+
+            fid: 0,
+
+            //各种说明提示
+            isvisible: 0,
+            userAccWarning: 0,
+            shareTip: 0,
+            auctionOk: 0,
+            peopleCount: 0,
+
+            c_h: 0,//时
+            c_m: 0,//分
+            c_s: 0,//秒,
+
+
+            order_sn:''
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('HH:mm');
+            }
+        },
+        methods: {
+            shutdown:function(){
+                window.history.go(-1);
+            },
+            cutdowntime: function () {
+                var diff_time = vm.info.paimai_house.end_time;// 倒计时时间差
+                vm.c_h = wxapp.fillzero(Math.floor(diff_time / 3600));
+                vm.c_m = wxapp.fillzero(Math.floor((diff_time / 60 % 60)));
+                vm.c_s = wxapp.fillzero(Math.floor((diff_time % 60)));
+                if (diff_time <= 0) {
+                    vm.c_h = '00';
+                    vm.c_m = '00';
+                    vm.c_s = '00';
+                }
+            },
+            auctionOkInit: function (index) {
+                vm.auctionOk = index;
+            },
+            shareTipInit: function (index) {
+                vm.shareTip = index;
+            },
+            userAccWarningInit: function (index) {
+                vm.userAccWarning = index;
+            },
+            isvisibleInit: function (index) {
+                vm.isvisible = index;
+            },
+            houseinfo: function () {
+
+            },
+            socketInit: function () {
+                console.log(vm.id);
+                wxapp.ajax(config.houseinfo, {id: vm.id}, 0).then(function (ret) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        vm.info = ret.data;
+                        vm.peopleCount = ret.data.peopleCount;
+                        vm.order_id = ret.data.order_id;
+                        if (vm.info.paimai_house.status == 2 && vm.info.user.token == vm.token) {
+                            vm.auctionOk = 1;
+                        }
+                        var countdown = setInterval(function () {
+                            vm.info.paimai_house.end_time--;
+                            vm.cutdowntime();
+                        }, 1000);
+
+                        var pageparm = {
+                            act: 'online',
+                            token: vm.token,
+                            id: vm.id
+                        };
+                        console.log(JSON.stringify(pageparm));
+                        vm.socket.send(JSON.stringify(pageparm));
+                    }
+                });
+                vm.socket.onmessage = function (event) {
+                    console.log('message is listen');
+                    console.log(JSON.parse(event.data));
+                    var res = JSON.parse(event.data);
+                    vm.fd = res.fd;
+                    vm.peopleList = res.peopleList;
+                    vm.info.paimai_house = res.paimai_house;
+                    console.log(JSON.stringify(vm.info.paimai_house));
+                    if (res.jlist.length > 0) {
+                        vm.jlist = res.jlist;
+                    }
+                    console.log(JSON.stringify(vm.jlist));
+                    vm.peopleCount = res.peopleList.length;
+                    if (vm.info.paimai_house.status == 2) {
+                        vm.auctionOk = 1;
+                    }
+                };
+                vm.socket.onerror = function(event){
+                    console.log('onerror is listen');
+                    console.log(JSON.parse(event.data));
+                };
+
+            },
+            jlistInit:function(){
+                wxapp.ajax(config.jlistInit,{id:vm.id},0).then(function (ret) {
+                    vm.info.paimai_house.status = ret.data.paimai_house.status;
+                    if (ret.data.jlist.length > 0) {
+                        vm.jlist = ret.data.jlist;
+                    }
+                    if (vm.info.paimai_house.status == 2) {
+                        vm.auctionOk = 1;
+                        clearInterval(orderinfo);
+                    }
+                })
+            },
+            houseleave: function () {
+                wxapp.ajax(config.houseleave, {id: vm.id}).then(function (ret) {
+                    if (ret.status == 1) {
+                        var pageparm = {
+                            act: 'leave',
+                            token: vm.token,
+                            id: vm.id
+                        };
+                        vm.socket.send(JSON.stringify(pageparm));
+                    }
+                })
+            },
+            rushlogadd: function () {
+                wxapp.ajax(config.rushlogadd, {id: vm.id},1).then(function (ret) {
+                    if (ret.status == 1) {
+                        console.log(JSON.stringify(ret));
+                        vm.order_id = ret.data.order_id?ret.data.order_id:'';
+                    } else {
+                        wxapp.alert('fail', ret.msg);
+                        vm.auctionOk = 1;
+                    }
+                    vm.socket.send(JSON.stringify({act: '', token: vm.token, id: vm.id}));
+                })
+            },
+
+            paywin:function () {
+                api.openWin({
+                    name: 'orderinfo_win',
+                    url: 'widget://html/orderinfo_win.html',
+                    pageParam: {
+                        order_id: vm.order_id,
+                    }
+                });
+            }
+        }
+    });
+    var orderinfo = null;
+    window.onload = function () {
+        vm.id = api.pageParam.id ? api.pageParam.id : 0;
+        vm.socket = new WebSocket('wss://enongmall.com:9501');
+        vm.token = $api.getStorage('token') ? $api.getStorage('token') : '249880c1b6523629e773056b37da3b01';
+
+        vm.socket.onopen = function (evt) {
+            console.log("socket连接成功");
+            console.log(vm.socket.readyState);
+            if (vm.socket.readyState == 1) {
+                vm.socketInit();
+            }
+
+        };
+        orderinfo = setInterval(function () {
+            vm.jlistInit();
+        },2000);
+
+    };
+</script>

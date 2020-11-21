@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<!--layui库引入开始-->
+<link href="/public/static/plugins/layuiadmin/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+<link href="/public/static/plugins/layuiadmin/style/admin.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/public/static/plugins/layuiadmin/layui/layui.js"></script>
+<!--layui库引入结束-->
+<body class="iframe_body">
+<div class="warpper" id="app" >
+    <div class="content">
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <table class="layui-table" lay-size="sm">
+                    <thead>
+                    <tr>
+                        <th width="10%">订单ID</th>
+                        <th width="10%">订单编号</th>
+                        <th width="10%">订单总额</th>
+                        <th width="10%">应付金额</th>
+                        <th width="10%">消费金额</th>
+                        <th width="10%">状态</th>
+                        <th width="10%">使用时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <template v-for="(vo,index) in list">
+                        <tr>
+                            <td>{{vo.order_id}}</td>
+                            <td>{{vo.order_sn}}</td>
+                            <td>{{vo.total_amount}}</td>
+                            <td style="color: #1E9FFF;">￥{{vo.order_amount}}</td>
+                            <td style="color: #FF5722;">￥{{vo.cash}}</td>
+                            <td>
+                                <span class="layui-badge layui-bg-green" v-if="vo.status==1">消费</span>
+                                <span class="layui-badge layui-bg-gray" v-if="vo.status==0">冻结</span>
+                                <span class="layui-badge layui-bg-gray" v-if="vo.status==2">退回</span>
+                            </td>
+                            <td>{{vo.use_time|timeParse}}</td>
+                        </tr>
+                    </template>
+
+                    </tbody>
+                </table>
+                <div id="turn-page"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var id = '{$id}';
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            id: id,
+            list: [],
+
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            init: function () {
+                showMask();
+                $.post('/admin/giftcard/giftlog', {
+                    id: vm.id,
+                }, function (ret) {
+                    vm.list = ret.data;
+                    hideMask();
+                }, 'json');
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
+

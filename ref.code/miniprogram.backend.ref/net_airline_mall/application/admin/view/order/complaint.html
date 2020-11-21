@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+
+            </div>
+            <ul>
+                <li>在订单确认收货15天内货已付款，买家可对订单进行投诉。</li>
+                <li>可对商家提交申请进行操作。</li>
+                <li>可进行投诉审核。审核完成后，被投诉店铺可进行申诉。申诉成功后，投诉双方进行对话，最后由后台管理员进行仲裁操作。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keyword" v-model="keywords" class="text nofocus" placeholder="投诉店铺名称">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%" class="sign">
+                                <div class="tDiv">
+                                    <input type="checkbox" name="all_list" class="checkbox" id="all_list"/>
+                                    <label for="all_list" class="checkbox_stars"></label>
+                                </div>
+                            </th>
+                            <th width="5%"><div class="tDiv">编号</div></th>
+                            <th width="10%"><div class="tDiv">订单ID</div></th>
+                            <th width="10%"><div class="tDiv">订单号</div></th>
+                            <th width="5%"><div class="tDiv">用户名</div></th>
+                            <th width="10%"><div class="tDiv">投诉店铺</div></th>
+                            <th width="10%"><div class="tDiv">是否显示</div></th>
+                            <th width="10%"><div class="tDiv">投诉时间</div></th>
+                            <th width="20%"><div class="tDiv">图片证据</div></th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td class="sign">
+                                    <div class="tDiv">
+                                        <input type="checkbox" name="checkboxes[]" :value="vo.complaint_id"
+                                               class="checkbox" :id="checkboxitem+vo.complaint_id">
+                                        <label :for="checkboxitem+vo.complaint_id" class="checkbox_stars"></label>
+                                    </div>
+                                </td>
+                                <td><div class="tDiv">{{vo.complaint_id}}</div></td>
+                                <td><div class="tDiv">{{vo.order_id}}</div></td>
+                                <td><div class="tDiv">{{vo.order_sn}}</div></td>
+                                <td><div class="tDiv">{{vo.user_name}}</div></td>
+                                <td><div class="tDiv">{{vo.store_name}}</div></td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.is_show==1}"
+                                             @click="enabledInit(index)">
+                                            <div class="circle"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><div class="tDiv">{{vo.create_time|timeParse}}</div></td>
+                                <td>
+                                    <div class="tDiv">
+                                        <template v-for="(vo2,index2) in vo.imgs.split(',')">
+                                            <a class="example-image-link" :href="vo2"
+                                               data-lightbox="example-set">
+                                                <img class="example-image" :src="vo2" style="width: 25px;margin-right: 10px;">
+                                            </a>
+                                        </template>
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0)" title="编辑" class="btn_edit" @click="add(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            处理
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="tfoot_btninfo">
+                                        <input type="submit" value="删除" id="btnSubmit"
+                                               name="btnSubmit" shoptype="btnSubmit" class="btn btn_disabled"
+                                               disabled="disabled" @click="doalldelete()">删除
+                                    </div>
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            add: function (vo = {}) {
+                if (vo.complaint_id) {
+                    window.parent.addParentTab(
+                        {
+                            title: '投诉处理',
+                            href: '/admin/order/complaintadd?complaint_id=' + vo.complaint_id
+                        }
+                    );
+                } else {
+                    window.parent.addParentTab(
+                        {
+                            title: '投诉处理',
+                            href: '/admin/order/transportadd'
+                        }
+                    );
+                }
+
+            },
+            enabledInit: function (index) {
+                if (vm.list[index].is_show == 0) {
+                    vm.list[index].is_show = 1;
+                } else {
+                    vm.list[index].is_show = 0;
+                }
+                vm.doupdate(vm.list[index]);
+            },
+            paytypeface: function (index) {
+                if (vm.list[index].pay_type_face == 0) {
+                    vm.list[index].pay_type_face = 1;
+                } else {
+                    vm.list[index].pay_type_face = 0;
+                }
+                vm.doupdate(vm.list[index]);
+            },
+
+            doupdate: function (vo) {
+                majax('/admin/website/doupdate', vo, 'complaint')
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+
+            init: function () {
+                $.post('/admin/order/complaint', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/order/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'complaint'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            doalldelete: function () {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/order/doalldelete', {
+                            ids: vm.ids,
+                            table: 'complaint'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.log_ids = [];
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

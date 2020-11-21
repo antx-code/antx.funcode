@@ -1,0 +1,15 @@
+<div class="ecsc-layout-left">
+    <div class="sidebar" id="sidebar">
+        <div class="column-menu">
+            <ul class="seller_center_left_menu">
+                {volist name="$menu[$ctrl]['left']" id="vo"}
+                {if ($vo['show'])}
+                <li class="{if ($key==$actname) || (isset($vo.group) && in_array($actname,$vo.group))}current{/if}"><a href="{:url($ctrl.'/'.$key)}"> {$vo.title} </a>
+                    <div class="arrow"></div>
+                </li>
+                {/if}
+                {/volist}
+            </ul>
+        </div>
+    </div>
+</div>

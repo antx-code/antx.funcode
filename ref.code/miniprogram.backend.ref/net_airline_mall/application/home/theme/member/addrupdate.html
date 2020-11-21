@@ -1,0 +1,186 @@
+{include file="public:head"}
+<script type="text/javascript" src="/public/static/js/jquery.validation.min.js"></script>
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <div class="user-mod" style="min-height: 1150px;" id="app" v-cloak>
+            <div class="user-title">
+                <h2>新增收货人信息</h2>
+            </div>
+            <div class="user-form">
+                <form id="addupdate">
+                    <div class="user-address-form">
+                    <div class="form-row">
+                        <div class="form-label"><span class="red">*</span>收货人：</div>
+                        <div class="form-value"><input type="text" name="consignee" value="" class="form-input" v-model="info.consignee">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label"><span class="red">*</span>手机号码：</div>
+                        <div class="form-value">
+                            <input type="text" name="mobile" value="" class="form-input" v-model="info.mobile">
+                            <span class="fl">电话号码：</span>
+                            <input type="text" name="tel" value="" class="form-input" v-model="info.tel">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label form-label-lh"><span class="red">*</span>所在地区：</div>
+                        <div class="form-value" shoptype="regionLinkage">
+                            <dl class="mod-select mod-select-small fl" shoptype="smartdropdown">
+                                <dt>
+                                    <span class="txt" shoptype="txt">中国</span>
+                                    <input type="hidden" value="1" name="country" :value="info.country">
+                                </dt>
+                                <dd shoptype="layer">
+                                    <div class="option" data-value="1" data-text="中国" shoptype="ragionItem" data-type="1">中国</div>
+                                </dd>
+                            </dl>
+                            <dl class="mod-select mod-select-small fl" shoptype="smartdropdown">
+                                <dt><span class="txt" shoptype="txt">请选择</span>
+                                    <input type="hidden" value="4" shoptype="ragionItem" name="province">
+                                </dt>
+                                <dd shoptype="layer" class="ps-container"></dd>
+                            </dl>
+                            <dl class="mod-select mod-select-small fl" shoptype="smartdropdown">
+                                <dt><span class="txt" shoptype="txt">请选择</span>
+                                    <input type="hidden" value="54" name="city">
+                                </dt>
+                                <dd shoptype="layer" class="ps-container"></dd>
+                            </dl>
+                            <dl class="mod-select mod-select-small fl" shoptype="smartdropdown" style="display:none">
+                                <dt><span class="txt" shoptype="txt">请选择</span>
+                                    <input type="hidden" value="532" name="district">
+                                </dt>
+                                <dd shoptype="layer" class="ps-container"></dd>
+                            </dl>
+                            <dl class="mod-select mod-select-small fl" shoptype="smartdropdown" style="display:none">
+                                <dt><span class="txt" shoptype="txt">请选择</span>
+                                    <input type="hidden" value="0" name="street" class="ignore" :value="info.street">
+                                </dt>
+                                <dd shoptype="layer" class="ps-container" style="">
+                                    <div class="ps-scrollbar-x-rail"
+                                         style="width: 118px; display: none; left: 0px; bottom: 3px;">
+                                        <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                                    </div>
+                                    <div class="ps-scrollbar-y-rail"
+                                         style="top: 0px; height: 0px; display: none; right: 0px;">
+                                        <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                                    </div>
+                                </dd>
+                            </dl>
+                            <div class="form_prompt"></div>
+                        </div>
+                        <span id="consigneeEreaNote" class="status error hide"></span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label"><span class="red">*</span>详细地址：</div>
+                        <div class="form-value">
+                            <input type="text" name="address" v-model="info.address" class="form-input form-input-long">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label"><span class="red">&nbsp;&nbsp;</span>电子邮箱：</div>
+                        <div class="form-value"><input type="text" name="email" value="" class="form-input" v-model="info.email">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-label"><span class="red">&nbsp;&nbsp;</span>邮政编码：</div>
+                        <div class="form-value"><input type="text" name="zipcode" value="" class="form-input" v-model="info.zipcode"></div>
+                    </div>
+                    <div class="form-btn-wp">
+                        <input type="button" name="button" class="form-btn" value="保存收货地址" id="submitAddress" @click="check()">
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+{include file="public:footer"}
+
+
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                vm.info.country = $("input[name=country]").val();
+                vm.info.province = $("input[name=province]").val();
+                vm.info.city = $("input[name=city]").val();
+                vm.info.district = $("input[name=district]").val();
+                $.post('/home/member/addrupdate', {
+                    pageparm: JSON.stringify(vm.info),
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        pbDialog(ret.msg, '', 1, '', '', '', false);
+                        setTimeout(function () {
+                            window.history.go(-1);
+                        }, 1500);
+                    } else {
+                        pbDialog(ret.msg, '', 0, '', '', '', false);
+                    }
+                }, 'json');
+            },
+            check:function(){
+                if($("form[id='addupdate']").valid()){
+                    vm.init();
+                }
+            }
+        },
+    });
+
+    $(function () {
+        if(info.address_id > 0){
+            $.levelLink(0);
+            setTimeout(function () {
+                $.levelLink(0);
+            },300);
+        }else{
+            $.levelLink(1);
+        };
+
+        $('#addupdate').validate({
+            rules: {
+                consignee: 'required',
+                mobile: {
+                    required: true,
+                    isMobile: true,
+                },
+                province: 'required',
+                city: 'required',
+                district: 'required',
+                address: 'required',
+            },
+            messages: {
+                consignee: '收货人必填',
+                mobile: {
+                    required: '手机号码不能为空',
+                    isMobile: '手机号码不正确，请重新输入',
+                },
+                address:'请填写详细地址'
+            },
+            success: function (label) {
+                label.addClass("succeed").html("<i></i>");
+            },
+        });
+
+    });
+</script>
+

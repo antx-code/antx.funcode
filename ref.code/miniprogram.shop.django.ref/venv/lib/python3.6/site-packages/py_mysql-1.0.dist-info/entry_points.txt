@@ -1,0 +1,3 @@
+[console_scripts]
+pysql = py_mysql.execute_queries:global_entry_point
+

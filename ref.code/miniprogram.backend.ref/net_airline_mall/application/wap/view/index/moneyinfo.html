@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>我的钱包</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/index.css"/>
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css"/>
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css"/>
+    <style>
+        .account .dis-box {
+            display: flex;
+            justify-content: space-between
+        }
+
+        .user-pur-box a {
+            text-align: center;
+            flex: 1
+        }
+
+        .account .purse-header-box h2 {
+            font-size: 2rem;
+            font-weight: bold
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="account">
+        <section class="purse-header-box">
+            <p>可用余额（元）</p>
+            <div class="dis-box">
+                <h2 class="box-flex">{{info.user.user_money?info.user.user_money:0.00}}</h2>
+                <h5 style="font-size: 14px;display:none">
+                    冻结余额：{{info.user.frozen_money?info.user.frozen_money:0.00}}</h5>
+            </div>
+            <div class="user-money-list dis-box">
+                <a href="javascript:void(0)" class="box-flex text-left" onclick="openwind('store','mycoupon_win')">
+                    <span>优惠券<em>{{info.couponsum?info.couponsum:0}}</em></span>
+                </a>
+                <div class="box-flex text-right">
+                    <span style="font-size: 14px;">积分 <em>{{info.user.points?info.user.points:0}}</em></span>
+                </div>
+            </div>
+        </section>
+        <section class="user-pur-box">
+            <div class="dis-box">
+                <a href="javascript:void(0)" class="box-flex" @click="rechargewin()">
+                    <h4 class="ellipsis-one"><img
+                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA3JpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo3YTlmNTQxYi04ZWJlLTQwZTMtYjZiZi03YTEyZmM5ODcwYTIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QTFCNkYzQzk5RjgyMTFFOEIzRjFCMkIyRjYwQzU4REUiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QTFCNkYzQzg5RjgyMTFFOEIzRjFCMkIyRjYwQzU4REUiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo3YTlmNTQxYi04ZWJlLTQwZTMtYjZiZi03YTEyZmM5ODcwYTIiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6N2E5ZjU0MWItOGViZS00MGUzLWI2YmYtN2ExMmZjOTg3MGEyIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+Bb+j8wAAA2BJREFUeNrMl11IVEEUx2fGtSjUwAItqOgLfNCUKLfIqF6qh1SCCAsJoqKeKskHCUKXXoJItjeJekm2KNFA86GnwChMgkQ3JCjoi+whK1yCdK3tf+6ey87evXfctXVr4OfMnXtn9u85Z849V06VlQm000KKFvSr0QtCSinssdWoV/q9mMtc4pr6pD2sufgaqRzzGrzmHa4ui/ujHRICG3BxJ0mIQWBiPk2BSl+ftkB7TSMtD4j/twWU5dZcNDmnVat8+DODxQsND82AHvAdrAD7c2jBKRL42/DAE9AI3moW2ChE7Ab6LTkQGFOGm+NgtyVOiEKwjedHQA14ngvXmwR2gChYC16Bp2AMbADTLPLZfMesYuu4tU/c14LlPKak+Riso/gAO7JmSYMFKSl+AxMaEbYStV+ONSVgiC0ZnW9L0iHZBPLYInZbAL7yeNplXbFlSSm2o3/DlhzkvbKabnyaEG2PpF1+eqy1LekHr8EePlAF2bYgtZPgmMczpYb1tiUr0H8BIXDK8PwE/zN+l3uDHDZLnTG4DFznNOLGmlncQv/APjb9i1nc2A22gnOO55pkb5h+q8vtkEyCh3/piTHN7aZ4q40nenENXOS5C7IvHIzVlVdiXJcSbla5Fd+oCizCeIYrijwQBQ2gObnaSKpkmtAHrbhVECqRiuwKR2mVieIKKF7lHMR8N8bV8kF4KFZbfgDXPSnlGbKJTxM77GGd9QarUA0Z5HGQ86Tp5PaDR9qdIe2JZrDL+a4ngbfBYnrvOVx/iZNwsYdw2vAqj6+As2mEwl3QmaK/L9xjDeorPrsJPOyxWRcLdEsbLQ5xzWnG6i1wE+Tz/ofgXurJ5VG4ON8tzUQ8XndF3L90zJ8H7XMQZ7t0gAUOa27/yG+sGmcKokMyCfWFerxwsA6AnRywx0E16Efg91rRICFO8eFRnNyV49tFpXyTHEXfqX8e4JAk1NRXHMF8SD8kJDCCiwIXgUQbCCR9M9CPilg7n16RoUAyxojlSoXUJkWrtb8Qezl7lKNfogn8QS42VdNt/H69xwXFSnACbJ5jCV/EbhS8n+DE7fc4/T4S+J7LJ69W55ZAs9CqODVVGp75QM5o/UdfbKWcmkpMHlT8gj/DJX7mpVGGrpbpLRi3NHWPhv4IMACsIrDEEqlCJgAAAABJRU5ErkJggg==">充值
+                    </h4>
+                </a>
+                <a href="javascript:void(0)" class="box-flex" @click="tips()">
+                    <h4 class="ellipsis-one"><img
+                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB8AAAAdCAYAAABSZrcyAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA3JpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo3YTlmNTQxYi04ZWJlLTQwZTMtYjZiZi03YTEyZmM5ODcwYTIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NjY1ODA2MUM5RjgyMTFFODkwQjNEQzdDMjc0NTEyRDQiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjY1ODA2MUI5RjgyMTFFODkwQjNEQzdDMjc0NTEyRDQiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo3YTlmNTQxYi04ZWJlLTQwZTMtYjZiZi03YTEyZmM5ODcwYTIiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6N2E5ZjU0MWItOGViZS00MGUzLWI2YmYtN2ExMmZjOTg3MGEyIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+5plaXwAAAfNJREFUeNrEVj1LA0EQnb1cZTQIWlqLhY2FYOMHogQRFQshja0pBH+Alf9CEmJpIYKgkiKGfKAhFiIoBKxstBBRSKKoQU3Wt3cbTcIZL2HPG3hkdjZ7b2Z2d2YZ55yEVCIaEWMABgw2jWMIm1YBhI0twrYH/RmIA0fAMZZcGWvmzO+0IqwF8gPY5gy9BliSw5qUdOiEZnhBNbmOwQNs3Rbk5hpzXAAyQMJwaIpfqiCfwCAlbH+Q/8C05YAk9KTYIhrl+Vpy3WaGFqg9GZRYA94pw7JwJCFxbidyBq9vMOhrI/J6ndUhaydy4d0wUJa6CvGKrOuVsMePSAOGN7/LLfBJ6kQEscvKIe0D5LqZiqZXjRSnvaQpTGWrogvyN5fIXzVyUdwk9+kOfTgDXIjy0eQ/JdXk18AyTfNTWydOIXHBKEZ+1O8468dVWsKm3tMkj/wH+QbaaZ5ibB6k+9/WNFuBI2M0zktOHThRK7alvtUwJ0pz0MnTzmmWP0q912J+wElyjaJsSOpRi/kdp+/5uvwNAIeyct4Bq9jvtOVLBo2liEbiU9RYgjh0YdvFXfE9D+G0j8CJTdz1M3naO+Aca+hqGlBRHXltG32Rz2yPRUsV5EWnymv1teJtMt/jZmN5qibDlY4qyLtcIu8U5EmXyGNfAgwAJdekT8NA99gAAAAASUVORK5CYII=">提现
+                    </h4>
+                </a>
+            </div>
+        </section>
+        <section class="my-nav-box">
+            <a href="javascript:void(0)" class="" onclick="openwind('user','rechargelog_win',1)">
+                <div class="dis-box padding-all my-bottom">
+                    <h3 class="my-u-title-size box-flex">
+                        <i class="iconfont icon-detail"></i>账户明细
+                    </h3>
+                    <span class="user-more"><i class="iconfont icon-more"></i></span>
+                </div>
+            </a>
+        </section>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.2.js"></script>
+<script>
+    let bottom = 0;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: {}
+        },
+        methods: {
+            tips:function(){
+                wxapp.alert('success','暂未开放');
+            },
+            init: function () {
+                wxapp.ajax(config.getuserinfo, {}, 0).then(function (ret) {
+                    if (ret.status == 1) {
+                        vm.info = ret.data;
+                    }
+                })
+            },
+            rechargewin: function () {
+                if (vm.miniapp > 0) {
+                    wx.miniProgram.navigateTo({
+                        url: "/pages/user/recharge"
+                    });
+                } else {
+                    openwind('user', 'recharge_win', 1);
+                }
+            },
+            openGoodswin: function (vo) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        brand_id: vo.brand_id
+                    }
+                });
+            }
+        }
+    });
+    window.onload = function () {
+        var pageparm = getUrlPageparm();
+        if (pageparm.token) {
+            $api.setStorage('token', pageparm.token);
+            vm.miniapp = pageparm.miniapp;
+        } else {
+            vm.miniapp = 0;
+        }
+        vm.init();
+    };
+</script>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>订单支付</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .dopay-list{display:flex; justify-content: space-between}
+        .dopay-list .pay_left{ display:flex;justify-content: flex-start}
+        .dopay-list .pay_left h3{font-size:1.8rem}
+
+    </style>
+</head>
+<body>
+
+
+
+
+<div id="app" v-cloak>
+    <div class="cashier-desk">
+        <div class="van-cell-noright van-cell-group van-hairline--top-bottom">
+            <div class="van-cell-title van-cell">
+                <div class="van-cell__value van-cell__value--alone">
+                    需要支付：<em class="color-red">¥{{info.order_amount}}</em></div>
+            </div>
+        </div>
+        <div class="van-cell-noright m-top08 van-cell-group van-hairline--top-bottom">
+            <div class="van-cell-title b-min b-min-b van-cell">
+                <div class="van-cell__title"><span>在线支付方式</span></div>
+            </div>
+            <div class="van-radio-group hide">
+                <div class="van-cell">
+                    <div class="van-cell__value van-cell__value--alone">
+                        <div class="dopay-list dis-box" @click="paycodeInit('alipay')">
+
+                            <div class="pay_left">
+                                <div class="left-icon">
+                                    <img src="/public/wap/static/images/alipay.png" style="width: 20px;height: 20px;">
+                                </div>
+                                <div class="box-flex">
+                                    <h3 class="text-left" style="margin-left: 5px;">支付宝</h3>
+                                </div>
+                            </div>
+
+                            <div class="van-radio" >
+                                <span class="van-radio__input">
+                                    <input type="radio" class="van-radio__control" value="17">
+                                    <i class="van-icon van-icon-check"
+                                       :class="{'van-icon-checked':pay_code=='alipay'}"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="van-radio-group">
+                <div class="van-cell">
+                    <div class="van-cell__value van-cell__value--alone">
+                        <div class="dopay-list dis-box" @click="paycodeInit('weixin')">
+
+                            <div class="pay_left">
+                                <div class="left-icon">
+                                    <img src="/public/wap/static/images/wxpay.png" style="width: 20px;height: 20px;">
+                                </div>
+                                <div class="box-flex">
+                                    <h3 class="text-left" style="margin-left: 5px;">微信支付</h3>
+                                </div>
+                            </div>
+                            <div class="van-radio" >
+                                <span class="van-radio__input">
+                                    <input type="radio" class="van-radio__control" value="17">
+                                    <i class="van-icon van-icon-check"
+                                       :class="{'van-icon-checked':pay_code=='weixin'}"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="van-radio-group hide" id="moneypay">
+                <div class="van-cell">
+                    <div class="van-cell__value van-cell__value--alone">
+                        <div class="dopay-list dis-box">
+                            <template v-if="umoney == 1">
+                                <div class="pay_left" @click="paycodeInit('usermoney')">
+                                    <div class="left-icon">
+                                        <img src="/public/wap/static/images/usermoney.png" style="width: 20px;height: 20px;">
+                                    </div>
+                                    <div class="box-flex">
+                                        <h3 class="text-left" style="margin-left: 5px;margin-bottom: 5px;">余额支付</h3>
+                                        <h6 class="text-left" style="margin-left: 5px;color: #999;">可用余额：￥{{info.user.user_money}}</h6>
+                                    </div>
+                                </div>
+                                <div class="van-radio" @click="paycodeInit('usermoney')">
+                                            <span class="van-radio__input">
+                                                <input type="checkbox" class="van-radio__control" value="17">
+                                                <i class="van-icon van-icon-check" :class="{'van-icon-checked':pay_code=='usermoney'}"></i>
+                                            </span>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <div class="pay_left">
+                                    <div class="left-icon">
+                                        <img src="/public/wap/static/images/usermoney.png" style="width: 20px;height: 20px;">
+                                    </div>
+                                    <div class="box-flex">
+                                        <h3 class="text-left" style="margin-left: 5px;margin-bottom: 5px;">余额支付</h3>
+                                        <h4 class="text-left" style="color: #999;">可用余额：￥{{info.user.user_money}} <span class="color-red">余额不足</span></h4>
+                                    </div>
+                                </div>
+                                <div class="van-radio">
+                                            <span class="van-radio__input">
+                                                <input type="checkbox" class="van-radio__control" value="17" disabled>
+                                                <i class="van-icon van-icon-check" :class="{'van-icon-checked':pay_code=='usermoney'}"></i>
+                                            </span>
+                                </div>
+                            </template>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="filter-btn" @click="pay()">
+            <div><a class="btn btn-submit">立即支付</a></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+
+<script>
+    var wxPay = null;
+    var aliPayPlus = null;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            umoney: 0,
+            order_sn: '201909210937299093',
+            pay_code: 'alipay',
+            info: {
+                user: {
+                    user_money: 0
+                }
+            },
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.orderDetail, {order_sn: vm.order_sn},1).then(function (ret) {
+                    vm.info = ret.data;
+                    if (parseFloat(ret.data.user.user_money) > 0) {
+                        $("#moneypay").removeClass('hide');
+                    }
+                    if(parseFloat(ret.data.user.user_money)>parseFloat(ret.data.order_amount)){
+                        vm.umoney = 1;
+                    }
+                })
+            },
+            paycodeInit: function (code) {
+                vm.pay_code = code;
+            },
+            pay: function () {
+                wxapp.ajax(config.pay, {
+                    order_sn: vm.order_sn,
+                    pay_code: vm.pay_code,
+                    jsapi: 1
+                }).then(function (ret) {
+                    console.log(JSON.stringify(ret));
+                    if (ret.status >0) {
+                        if (vm.pay_code == 'alipay') {
+                            aliPayPlus.payOrder({
+                                orderInfo: ret.data
+                            }, function (res, err) {
+                                var msg = '';
+                                if (res.code == 9000) {
+                                    setTimeout(function () {
+                                        api.openWin({
+                                            name: 'orderlist_win',
+                                            url: 'widget://html/orderlist_win.html'
+                                        });
+                                    }, 100);
+                                    return false;
+                                }
+                                if (res.code == 6001) {
+                                    msg = '取消支付';
+                                }
+                                if (res.code == 4006) {
+                                    msg = '支付失败';
+                                }
+                                api.alert({title: '支付结果', msg: msg, buttons: ['确定']});
+                            });
+                        }
+                        if (vm.pay_code == 'weixin') {
+                            vm.orderinfo = ret.data;
+                            WeixinJSBridge.invoke(
+                                'getBrandWCPayRequest', {
+                                    "appId": vm.orderinfo.appId,     //公众号名称，由商户传入
+                                    "timeStamp": vm.orderinfo.timeStamp,         //时间戳，自1970年以来的秒数
+                                    "nonceStr": vm.orderinfo.nonceStr, //随机串
+                                    "package": vm.orderinfo.package,
+                                    "signType": vm.orderinfo.signType,         //微信签名方式：
+                                    "paySign": vm.orderinfo.paySign //微信签名
+                                },
+                                function (res) {
+                                    console.log(JSON.stringify(res));
+                                    if (res.err_msg == "get_brand_wcpay_request:ok") {
+                                        wxapp.alert('success', '支付成功');
+                                        setTimeout(function () {
+                                            window.location.href = '/wap/index/center'
+                                        }, 1000);
+                                    }else{
+                                        wxapp.alert('fail','支付失败');
+                                    }
+                                }
+                            );
+                        }
+                        if (vm.pay_code == 'usermoney') {
+                            wxapp.alert('success', '支付成功');
+                            setTimeout(function () {
+                                api.openWin({
+                                    name: 'orderlist_win',
+                                    url: 'widget://html/orderlist_win.html'
+                                });
+                            }, 300);
+                        }
+                    } else {
+                        wxapp.alert('fail', ret.msg);
+                    }
+                });
+            }
+        },
+    });
+    window.onload = function () {
+        //aliPayPlus = api.require('aliPayPlus');
+        //wxPay = api.require('wxPay');
+        vm.order_sn = api.pageParam.order_sn ? api.pageParam.order_sn : '';
+        vm.init();
+    };
+</script>

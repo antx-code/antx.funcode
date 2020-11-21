@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="upinit()" v-if="parent_id>0">
+                        <div class="fbutton">
+                            <div class="add" title="返回上一级">
+                                <span><i class="icon icon-reply" aria-hidden="true"></i>返回上一级</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0)" @click="add()">
+                        <div class="fbutton">
+                            <div class="add" title="参数类型"><span>
+                                <i class="icon icon-plus"></i>添加</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keyword" v-model="keywords" class="text nofocus" placeholder="名称">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="10%"><div class="tDiv">级别({{level}}级)</div></th>
+                            <th width="10%">
+                                <div class="tDiv">参数类型</div>
+                            </th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td>
+                                    <div class="tDiv first_setup">
+                                        <div class="setup_span">
+                                            <em>
+                                                <i class="fa fa-cog" aria-hidden="true"></i>
+                                                设置<i class="arrow"></i>
+                                            </em>
+                                            <ul>
+                                                <li>
+                                                    <a href="javascript:void(0)"
+                                                       @click="pageFreash(vo.id)">查看下一级</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.name}}</div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0)" title="编辑" class="btn_edit" @click="add(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="list-page">
+                <div id="turn-page"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var pid = 0;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+            level: 1,
+            parent_id: 0,
+
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+
+            product_attr_list: []
+
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            add: function (vo = {}) {
+                if (vo.id > 0) {
+                    layerOpenwinMid('编辑', '/admin/goods/product_cateadd?id=' + vo.id);
+                } else {
+                    layerOpenwinMid('添加', '/admin/goods/product_cateadd');
+                }
+
+            },
+            upinit: function () {
+                vm.parent_id = pid;
+                vm.level = JSON.parse(JSON.stringify(vm.level-1));
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            pageFreash: function (parent_id = 0) {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.parent_id = parent_id;
+                if(parent_id == 0){
+                    vm.level = 1;
+                }else{
+                    vm.level = JSON.parse(JSON.stringify(vm.level+1));
+                }
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+
+            init: function () {
+                $.post('/admin/goods/product_cate', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    parent_id: vm.parent_id,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/goods/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'product_cate'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

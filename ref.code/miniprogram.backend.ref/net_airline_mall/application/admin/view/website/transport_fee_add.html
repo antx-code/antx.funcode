@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<style>
+    #area_dialog {
+        z-index: 100044;
+        width: 900px;
+        top: 10%;
+        left: 15%;
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak>
+    <div class="content">
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info">
+                    <div class="item">
+                        <div class="label">模板类型：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.template_type" id="template_type1" value="0" class="ui-radio">
+                                    <label for="template_type1" class="ui-radio-label">自定义</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.template_type" id="template_type2" value="1" class="ui-radio">
+                                    <label for="template_type2" class="ui-radio-label">快递模板</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            模板名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.transport_name" placeholder="模板名称" class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">运费标题：</div>
+                        <div class="label_value">
+                            <input name="description" class="text" v-model="info.transport_title" placeholder="显示到商品详情页"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">免费额度：</div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.free_money" value='' class="text"/>
+                            <div class="notic">（商品总价超出此数字后，免费包邮，数字为0时，始终计算运费）</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">计算方式：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.type" id="sex_3" value="0" class="ui-radio">
+                                    <label for="sex_3" class="ui-radio-label">固定运费</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.type" id="sex_4" value="1" class="ui-radio">
+                                    <label for="sex_4" class="ui-radio-label">按商品件数</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" v-model="info.type" id="sex_5" value="2" class="ui-radio">
+                                    <label for="sex_5" class="ui-radio-label">按重量</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">配送地区：</div>
+                        <div class="label_value">
+                            <div>
+                                <table class="t-tab mb10" v-if="shippingArea.length">
+                                    <thead>
+                                    <tr>
+                                        <th width="50%">运送到</th>
+                                        <th width="20%">运费（元）</th>
+                                        <th width="20%" align="center">操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="(vo,index) in shippingArea">
+                                        <td>
+                                            <template v-if="vo.area.length">
+                                                <p v-for="(va,idx) in vo.area"><strong>{{va.province}}</strong>{{va.citys}}</p>
+                                            </template>
+                                            <template v-else>未指定地区</template>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="text w80" v-model="vo.price">
+                                        </td>
+                                        <td align="center">
+                                            <input type="button" value="编辑" class="button" @click="editArea(index)">
+                                            <input type="button" value="删除" class="button" @click="delArea(index)">
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <input type="button" value="添加地区" class="button valid" @click="addArea()">
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>快递方式：</div>
+                        <div class="label_value">
+                            <div>
+
+                            </div>
+                            <input type="button" value="添加快递" class="button valid" @click="addExpress()">
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="area_dialog" class="pb" v-show="show_area_modal">
+        <div class="cboxContent">
+            <div class="pb-hd"><a class="pb-x" @click="show_area_modal=false">✕</a><span class="pb-title">选择地区</span></div>
+            <div class="pb-bd">
+                <div class="pb-ct">
+                    <ul class="area-province">
+                        <li v-for="(vo,index) in region">
+                            <input type="checkbox" name="province" value="2" :id="'province_'+index" class="ui-checkbox">
+                            <label class="ui-label" :for="'province_'+index">
+                                <span>{{vo}}</span>
+                                <span class="'green child_num" v-if="keys(selected).indexOf(index)>-1">({{selected[index].length}})</span>
+                            </label>
+
+                            <i class="icon icon-angle-down"></i>
+                            <ul class="area-city hide">
+                                <li>
+                                    <input type="checkbox" name="city" value="52" id="city_52" class="ui-checkbox">
+                                    <label class="ui-label" for="city_52">
+                                        <span>北京</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <input type="checkbox" name="all" value="" id="all" class="ui-checkbox">
+                            <label class="ui-label" for="all">全选</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pb-ft"><a class="pb-btn pb-ok">确定</a><a class="pb-btn pb-cl">取消</a></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var info = JSON.parse('{:json_encode($info)}');
+    var region = JSON.parse('{:json_encode($region)}');
+    var shippingList = JSON.parse('{:json_encode($shippingList)}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+            region: region,
+            shippingList: shippingList,
+            shippingArea: [],
+            show_area_modal: false,
+            selected: [],//已选择的区域列表
+
+        },
+        methods: {
+            init: function (level, pid, instance) {
+                instance = instance ? instance : vm;
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/website/getregionList',
+                    data: {level: level, parent_id: pid},
+                    dataType: 'json',
+                    success: function (data) {
+
+                    }
+                });
+            },
+            addArea: function () {
+                let item = {
+                    area: [],
+                    price: 0.00
+                };
+                Vue.set(vm.shippingArea, vm.shippingArea.length, item);
+            },
+            editArea: function (index) {
+                this.show_area_modal = true;
+            },
+            delArea: function (index) {
+                vm.shippingArea.splice(index, 1);
+            },
+            addExpress: function () {
+
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<div class="tbar-panel-main" shoptype="tbpl-main">
+    <div class="tbar-panel-content" data-height="48" shoptype="tbpl-content">
+        <div class="order-list">
+            <ul class="s-li-con">
+                {foreach $order_list as $order_id => $orders}
+                <li>
+                    <span class="s-time">{$orders.add_time | date='Y-m-d H:i:s'}</span>
+                    <div class="s-item">
+                        <div class="s-img">
+                            <div class="bd">
+                                <ul>
+                                    {foreach $orders.order_goods as $rec_id => $goods}
+                                    <li><a href="{:url('goods/detail',['id'=>$goods.goods_id])}" target="_blank"><img src="{$goods.original_img}" width="50" height="50"/></a></li>
+                                    {/foreach}
+                                </ul>
+                            </div>
+                            {if count($orders.order_goods)>4}
+                            <a href="javascript:void(0);" class="prev"><b class="iconfont icon-left"></b></a>
+                            <a href="javascript:void(0);" class="next"><b class="iconfont icon-right"></b></a>
+                            {/if}
+                        </div>
+                        <span class="s-pay-info">
+                            <span class="s-price">{$orders.total_amount}</span>
+                            <span class="s-client">{$orders.consignee}</span>
+                            <span class="s-pay">{$orders.pay_name | default='待付款'}</span>
+                        </span>
+                        <span class="s-status-info">
+                            <a href="{:url('member/orderdetail',['order_id'=>$orders.order_id])}" target="_blank" class="s-look-detail">查看</a>
+                        </span>
+                    </div>
+                </li>
+                {/foreach}
+            </ul>
+            <a href="{:url('member/order')}" target="_blank" class="s-btn">查看全部订单</a>
+        </div>
+    </div>
+</div>
+<script>
+    $(".s-img").slide({titCell:"",mainCell:".bd ul",effect:"left",autoPlay:false,autoPage:true,trigger:"click",vis:4,scroll:1});
+</script>

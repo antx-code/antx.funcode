@@ -1,0 +1,110 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">添加/编辑分类</a></li>
+    </ul>
+</div>
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/goods/attr_cate"><i class="icon-reply"></i>属性分类</a>
+</div>
+
+<div class="ecsc-form-goods">
+    <form method="post" name="theForm" id="category_info_form" method="post">
+        <div class="wrapper-list">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;分类名称：</dt>
+                <dd>
+                    <input type="text" class="text" name="name" maxlength="20" value="{$info.name |default=''}" size="27">
+                    <div class="form_prompt"></div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>上级分类：</dt>
+                <dd>
+                    <input type="text" class="text" value="{$info.parent_name}" disabled>
+                    <input type="hidden" value="{$info.parent_id}" name="parent_id">
+                </dd>
+            </dl>
+            <dl>
+                <dt>排序：</dt>
+                <dd><input type="text" class="text text_4" name="sort" value="{$info.sort |default=50}" size="15"></dd>
+            </dl>
+
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="submit" value=" 确定 " class="sc-btn sc-blueBg-btn btn35" id="submitBtn">
+                    <input type="reset" value=" 重置 " class="sc-btn btn35 sc-blue-btn">
+                    <input type="hidden" name="id" value="{$info.id | default=0}">
+                    <input type="hidden" name="level" value="{$info.level}">
+                </dd>
+            </dl>
+        </div>
+    </form>
+</div>
+
+<script type="text/x-template" id="category-seletor">
+    <div class="categorySelect">
+        <div class="selection">
+            <input type="text" class="text w290 valid" id="category_name" v-model="category.parent_name || '顶级分类'" autocomplete="off" readonly="" @click="hidecover=!hidecover">
+            <input type="hidden" name="parent_id" v-model="category.parent_id">
+            <input type="hidden" name="level" v-model="category.level">
+        </div>
+        <div class="select-container w320" :class="{hidden:hidecover}">
+            <div class="select-top">
+                <a href="javascript:" class="categoryTop" @click="resetChoose">重选</a>
+                &gt; <span class="txt">{{category.cat_path.join(' > ')}}</span>
+            </div>
+            <div class="select-list">
+                <ul>
+                    <li class="blue" data-show="1" data-seller="0" v-for="(vo,index) in category.list" @click="choose(index)">
+                        <em v-if="vo.level==2">Ⅱ</em><em v-else-if="vo.level==3">Ⅲ</em><em v-else>Ⅰ</em>
+                        {{vo.cat_name}}
+                    </li>
+                </ul>
+            </div>
+            <div :class="['loading',{hidden:requrest}]"><img src="/public/static/images/ajaxLoader.gif"><i>&nbsp;</i></div>
+        </div>
+    </div>
+</script>
+
+<script>
+
+    $(function () {
+        $('#category_info_form').validate({
+            errorPlacement: function (error, element) {
+                var error_div = element.parents('dl').find('div.form_prompt');
+                error_div.append(error);
+            },
+            rules: {
+                name: {required: true},
+                sort: {required: true, min: 0},
+            },
+            ignore: "",
+            messages: {
+                name: {
+                    required: '<i class="icon icon-exclamation-sign"></i>分类名称不能为空'
+                },
+                sort: {
+                    required: '<i class="icon icon-exclamation-sign"></i>排序不能为空',
+                    min: '<i class="icon icon-exclamation-sign"></i>排序值必须为数字'
+                },
+            },
+            submitHandler: function (form) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/attr_cate_add',
+                    data: $(form).serialize(),
+                    success: function (data) {
+                        location.href = '/seller/goods/attr_cate';
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+{include file="public/footer"}

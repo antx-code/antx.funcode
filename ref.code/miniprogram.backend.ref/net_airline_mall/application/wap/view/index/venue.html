@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>会场详情</title>
+    <style>
+        .poster {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            vertical-align: top;
+        }
+
+        .content {
+            background-position: center;
+            background-size: 100% auto;
+            background-repeat: repeat-y;
+            min-height: 5rem;
+        }
+
+        .venue-goods {
+            padding: .5rem 2rem;
+        }
+
+        .venue-goods:nth-child(1) {
+            padding-top: 0;
+        }
+
+        .goods-cover {
+            width: 100%;
+        }
+
+        .back-btn img {
+            width: 100%;
+            vertical-align: top;
+        }
+    </style>
+</head>
+<body class="">
+<div id="app" v-cloak>
+    <div class="venue">
+        <img class="poster" :src="venue.poster"/>
+        <div class="content" :style="'background-image:url('+venue.background+')'">
+            <div v-for="(vo,index) in venue.goods">
+                <div class="venue-goods" @click="openGoodsdetail(vo)">
+                    <img class="goods-cover" :src="vo.venue_thumb"/>
+                </div>
+            </div>
+        </div>
+        <div v-if="venue.back_btn" class="back-btn" onclick="closeWin()">
+            <img :src="venue.back_btn"/>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            venue: {},
+            venue_id: 0,
+            miniapp: 0
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.venue, {venue_id: vm.venue_id}, 1).then(function (ret) {
+                    if (ret.status) {
+                        vm.venue = ret.data;
+                    } else {
+                        alert(ret.msg);
+                    }
+                });
+            },
+            openGoodsdetail: function (vo) {
+                if (vm.miniapp == 1) {
+                    wx.miniProgram.navigateTo({
+                        url: '/pages/goods/index?goods_id=' + goods_id
+                    });
+                } else {
+                    api.openWin({
+                        name: 'goodsdetail_win',
+                        url: 'widget://html/goodsdetail_win.html',
+
+                        pageParam: {
+                            goods_id: vo.goods_id
+                        }
+                    });
+                }
+            },
+        }
+    });
+    window.onload = function () {
+        var pageparm = getUrlPageparm();
+        if (pageparm.token) {
+            $api.setStorage('token', pageparm.token);
+            vm.miniapp = pageparm.miniapp;
+        }
+        vm.venue_id = pageparm.venue_id;
+        vm.init();
+    };
+</script>

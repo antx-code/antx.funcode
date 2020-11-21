@@ -1,0 +1,104 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+<div class="nav shop-zoom" shoptype="shopNav">
+    <div class="w w1200">
+        {include file="public/categorys"}
+        <div class="nav-main" id="nav">
+            <ul class="navitems">
+                <li><a href="/" class="curr">首页</a></li>
+                {foreach $siteInfo['nav'] as $nav}
+                <li><a href="{$nav.url}" target="{if $nav.is_newwin==1}_blank{else /}_self{/if}">{$nav.name}</a></li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="w w1200">
+        <div class="crumbs-nav">
+            <div class="crumbs-nav-main clearfix">
+                <div class="crumbs-nav-item">
+                    <span><a href="/">首页</a></span><span class="arrow">&gt;</span> <span class="finish">所有分类</span>
+                </div>
+            </div>
+        </div>
+        <div class="catalog-main clearfix">
+            <div class="catalog-side">
+                <div class="catalog-menu">
+                    <ul class="menu-list">
+                        {volist name="list" id="vo" key="k" offset="0" length='30'}
+                        <li class="{if $k==0}current{/if}" ><a href="javascript:void(0);">{if $k<10}0{/if}{$k} {$vo.cat_name}</a></li>
+                        {/volist}
+                    </ul>
+                    <div class="back-top-wp">
+                        <a href="javascript:;" class="back-top" shoptype="returnTop">返回顶部</a>
+                    </div>
+                </div>
+            </div>
+            <div class="catalog-detail">
+                {volist name="list" id="vo" key="k"}
+                <div class="catalog-item">
+                    <h2><a href="/home/category/index?id={$vo.cat_id}" target="_blank">{if $k<10}0{/if}{$k} {$vo.cat_name}</a></h2>
+                    {if isset($vo['children'])}
+                    {volist name="vo['children']" id="vo2" key="k2"}
+                    <h3><a href="/home/category/index?id={$vo2.cat_id}" target="_blank">{$vo2.cat_name}</a></h3>
+                    <ul class="h4 clearfix">
+                        {if isset($vo2['children'])}
+                        {volist name="vo2['children']" id="vo3" key="k3"}
+                        <li><a href="/home/category/index?id={$vo3.cat_id}" target="_blank">{$vo3.cat_name}</a></li>
+                        {/volist}
+                        {/if}
+                    </ul>
+                    {/volist}
+                    {/if}
+                </div>
+                {/volist}
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file='public/footer'}
+{include file='public/right_bar'}
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__STATIC__/js/common.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        var items = $(".catalog-menu");
+        var top = parseInt(items.offset().top);
+        var allFloor = $(".catalog-detail");
+        var floors = allFloor.find(".catalog-item");
+        var height = parseInt(items.height());
+        var IE6 = navigator.userAgent.indexOf("MSIE 6.0") > 0;
+        var IE7 = navigator.userAgent.indexOf("MSIE 7.0") > 0;
+
+        $(window).on('scroll', function () {
+            var scrollTop = $(window).scrollTop();
+            if (scrollTop > top) {
+                items.css({'position': 'fixed', 'top': 0});
+            } else {
+                items.removeAttr("style");
+            }
+
+            for (var i = 0; i < floors.length; i++) {
+                var floorsTop = floors.eq(i).position().top;
+                if (IE6 || IE7) {
+                    floorsTop = floorsTop.toString();
+                    floorsTop = floorsTop.substring(0, floorsTop.length - 2);
+                }
+                if (scrollTop > floorsTop) {
+                    items.find("li").eq(i).addClass("current").siblings().removeClass("current");
+                    floors.eq(i).addClass("curr").siblings().removeClass("curr");
+                }
+            }
+        });
+
+        $(".catalog-menu .menu-list li").on('click', function () {
+            var index = $(this).index();
+            var top = floors.eq(index).offset().top;
+            $("body,html").stop().animate({scrollTop: top});
+        });
+    })
+</script>

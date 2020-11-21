@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>商品分类</title>
+
+
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <link rel="stylesheet" type="text/css" href="/public/wap/css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="/public/wap/css/aui-flex.css" />
+    <style>
+        body { background:#f5f5f5;height:100%;}
+        .aui-ellipsis-2{display:-webkit-box;overflow:hidden;text-overflow:ellipsis;word-wrap:break-word;word-break:break-all;white-space:normal !important;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+        .aui-list-view-cell.aui-active{background:#fff;color:#d83131}
+        .cateList .hd{height:2.4rem;line-height:2.4rem;text-align:center;font-size:0.7rem;color:#333}
+        .cateList .hd .text{position:relative;background:transparent}
+        .cateList .hd .text:after,.cateList .hd .text:before{background-color:#333}
+        .cateList .hd .text:before{left:-1.4rem}
+        .cateList .hd .text:after,.cateList .hd .text:before{position:absolute;content:'';top:0;bottom:0;margin:auto;height:1px;width:0.5rem;background-color:#333;-webkit-transform-origin:50% 100% 0;transform-origin:50% 100% 0}
+        .cateList .hd .text:after{right:-1.4rem}
+        .cateImg{display:block;width:100%;background:#fff;box-shadow:0 0px 6px rgba(0,0,0,.2);border-radius:4px}
+        .aui-list-view.aui-grid-view .aui-list-view-cell .aui-img-body.name{height:1.8rem;font-size:0.6rem;color:#666;text-align:center;line-height:0.8rem}
+        .aui-list-view.aui-grid-view .aui-list-view-cell .aui-img-body.name{height:1.8rem;padding:5px 0}
+        img { width: 100%; }
+        .img-list > div {padding: 2px 2px 0 2px;}
+        .img-list img {display: block;}
+        .aui-list-view-cell { font-size: 0.6rem; position: relative;padding:15px 0px; text-align:center;}
+        .aui-list-view.aui-grid-view .aui-list-view-cell{ padding-top:0;}
+        .aui-list-view-cell img{padding:6px;}
+        .cateImg{ box-shadow: none}
+        #gList{position: relative;width:100%;height;100%;display: flex;overflow-y: auto; justify-content: space-between; background: #fff}
+        #gLeft{overflow-scrolling: touch;height: 100vh;width:25%;overflow-y: auto;position:relative;z-index:1; background: #F0F0F0}
+        #gRight{overflow-scrolling: touch;height: 100vh;width:75%;overflow-y: auto;position:relative;}
+
+    </style>
+
+</head>
+<body>
+<div id="app" v-cloak>
+    <!--分类-->
+    <div class="aui-content" v-if="list.length>0">
+        <div class="aui-flex-col" id="gList" style="border-top: none !important;">
+            <div class="" id="gLeft">
+                <ul class="aui-list-view">
+                    <template v-for="(vo,index) in list">
+                        <li class="aui-list-view-cell"
+                            :class="{'aui-active':index==index_active}" @click="change_right(index)">
+                            {{vo.cat_name}}
+                        </li>
+                    </template>
+                </ul>
+            </div>
+            <div class="" id="gRight" style="border-top: none !important;">
+                <div class="aui-list-view">
+                    <div class="aui-padded-10">
+                        <template v-for="(ob,indexob) in list">
+                            <template v-for="(vo,index) in ob.children">
+                                <div style="display: block;clear:both;overflow:hidden">
+                                    <div class="aui-card-list-content aui-hide">
+                                        <img :src="vo.cat_logo?vo.cat_logo:dimg">
+                                    </div>
+                                    <div class="cateList aui-hide" :class="{'aui-show':index_active == indexob}">
+                                        <div class="hd aui-text-center">
+                                            <span class="text" @click="openGoodList(vo.id)">
+                                                <span >{{vo.cat_name}}</span>
+                                            </span>
+                                        </div>
+                                        <ul class="aui-list-view aui-grid-view" style=" background:transparent; margin-bottom:0;padding-bottom:0;">
+                                            <template v-for="(vo2,index3) in vo.children">
+                                                <li class="aui-list-view-cell aui-img aui-col-xs-4" >
+                                                    <div class="aui-padded-5" @click="openGoodList(vo2.cat_id)">
+                                                        <img class="aui-img-object cateImg" :src="vo2.touch_icon?vo2.touch_icon:dimg">
+                                                        <div class="aui-img-body name aui-ellipsis-2">
+                                                            {{vo2.cat_name}}
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li class="aui-list-view-cell aui-img aui-col-xs-4" v-for="(vo3,index4) in vo2.children">
+                                                    <div class="aui-padded-5" @click="openGoodList(vo3.cat_id)">
+                                                        <img class="aui-img-object cateImg" :src="vo3.touch_icon?vo3.touch_icon:dimg">
+                                                        <div class="aui-img-body name aui-ellipsis-2">
+                                                            {{vo3.cat_name}}
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer data-v-36897c18="" data-v-3aa553e3="" class="tab-down" style="position: fixed;">
+        <ul data-v-36897c18="">
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">首页</span></li>
+            <li data-v-36897c18="" class="active">
+                <a data-v-36897c18="" href="/wap/index/category" class="router-link-exact-active router-link-active"></a><i data-v-36897c18=""></i><span data-v-36897c18="">分类</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/zgchange" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">积分</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/cart" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">购物车</span></li>
+            <li data-v-36897c18="" class="">
+                <a data-v-36897c18="" href="/wap/index/center" class=""></a><i data-v-36897c18=""></i><span data-v-36897c18="">我的</span>
+            </li>
+        </ul>
+    </footer>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            index_active:0,
+
+            dimg: '/public/wap/static/images/nodata-message.png'
+        },
+        methods: {
+            init: function () {
+                //api.showProgress();
+                $.post(config.getChildrenData, {}, function (ret) {
+                    if (ret) {
+                        vm.list = ret.data;
+                        vm.$nextTick(function(){
+                            //api.hideProgress();
+                            //$api.css($api.byId("gLeft"),'height:'+ vm.frameh+'px');
+                            //$api.css($api.byId("gRight"),'height:'+ vm.frameh+'px');
+                        })
+                    }
+                }, 'json');
+
+            },
+            change_right:function (index) {
+                vm.index_active = index;
+            },
+            openGoodList:function (category_id) {
+                api.openWin({
+                    name: 'goodslist_win',
+                    url: 'widget://html/goodslist_win.html',
+                    pageParam: {
+                        cat_id: category_id
+                    }
+                });
+            }
+        },
+    });
+    window.onload = function () {
+        vm.frameh = api.frameHeight;
+        vm.index_active = api.pageParam.index?api.pageParam.index:0;
+        vm.init();
+    };
+</script>

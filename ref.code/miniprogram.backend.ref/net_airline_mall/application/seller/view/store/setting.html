@@ -1,0 +1,417 @@
+{include file="public/header"}
+<div id="app">
+    <div class="tabmenu">
+        <ul class="tab">
+            <li class="active"><a>基本信息</a></li>
+            <li><a>联系我们</a></li>
+            <li><a>图片设置</a></li>
+            <li><a>客服第三方设置</a></li>
+        </ul>
+    </div>
+
+    <div class="ecsc-form-goods items-info">
+        <div class="wrapper-list" data-type="base">
+            <input type="hidden" name="form_submit" value="ok">
+            <dl>
+                <dt>入驻店铺名称：</dt>
+                <dd><input type="text" name="brand_shop_name" :value="store.store_name" disabled="disabled" size="40" class="text text_disabled"></dd>
+            </dl>
+            <dl>
+                <dt>店铺关键字：</dt>
+                <dd><input type="text" v-model="store.store_keyword" class="text"></dd>
+            </dl>
+            <dl>
+                <dt>店铺公告：</dt>
+                <dd><textarea v-model="store.notice" rows="10" cols="60" class="textarea"></textarea></dd>
+            </dl>
+            <dl>
+                <dt>库存变动时机：</dt>
+                <dd>
+                    <select id="" v-model="store.stock_type">
+                        <option value="0">下单减库存</option>
+                        <option value="1">付款减库存</option>
+                    </select>
+                    <div class="notic">
+                        下单减库存：买家提交订单的时候减去对应商品的库存，需要注意恶意下单占用库存；<br>
+                        付款减库存：买家付款后，减去对应商品的库存，需要注意多人下单超出库存，再分先后顺序付款时，库存不足的超卖情况。
+                    </div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>店铺状态：</dt>
+                <dd>
+                    <select v-model="store.status">
+                        <option value="1">正常</option>
+                        <option value="2">停业中</option>
+                        <option value="3">违规整改</option>
+                    </select>
+                </dd>
+            </dl>
+            <dl v-if="store.status==3">
+                <dt>违规信息：</dt>
+                <dd>
+                    {{store.violation_msg}}
+                </dd>
+            </dl>
+        </div>
+        <div class="wrapper-list hide" data-type="contact">
+            <region-dl :source="region" :row="store"></region-dl>
+            <dl>
+                <dt>详细地址：</dt>
+                <dd>
+                    <input type="text" v-model="store.shop_address" class="text">
+                    <div class="notic">注意：无需填写区域，格式如（中山北路3553号伸大厦）</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>经度（Y）：</dt>
+                <dd>
+                    <input type="text" v-model="store.lng" class="text">
+                    <a @click="get_coordinate" class="txtline ml10">点击获取坐标</a>
+                    <div class="notic">坐标根据所在地区 + 详细地址，暂时仅供手机端显示使用</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>纬度（X）：</dt>
+                <dd>
+                    <input type="text" v-model="store.lat" class="text">
+                    <div class="notic">坐标根据所在地区 + 详细地址，暂时仅供手机端显示使用</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>客服手机号码：</dt>
+                <dd>
+                    <input type="text" size="40" v-model="store.mobile" class="text text_2">
+                    <div class="notic">店铺接受平台所发送的短信信息手机号，比如：客户下订单时给商家发短信</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>客服邮件地址：</dt>
+                <dd>
+                    <input type="email" size="40" v-model="store.seller_email" class="text text_2">
+                    <div class="notic">店铺接受平台所发送的邮箱信息，比如：客户下单时给商家发邮件</div>
+                </dd>
+            </dl>
+        </div>
+        <div class="wrapper-list hide" data-type="picture">
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;PC版店铺banner：</dt>
+                <dd>
+                    <div class="type-file-box">
+                        <div class="input">
+                            <input type="text" class="type-file-text" v-model="store.banner_pc" readonly="">
+                            <input type="button" class="type-file-button" value="上传...">
+                            <input type="file" data-field="banner_pc" id="banner_pc" class="type-file-file" size="30">
+                        </div>
+                        <span class="show">
+                            <a :href="store.banner_pc" target="_blank" class="nyroModal"><i class="icon icon-picture" @mouseover="showTip(store.banner_pc)" onmouseout="toolTip()"></i></a>
+                        </span>
+                    </div>
+                    <div class="form_prompt"></div>
+                    <div class="notic">(宽度1920像素以上, 高度128像素)</div>
+                </dd>
+            </dl>
+
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;手机版店铺banner：</dt>
+                <dd>
+                    <div class="type-file-box">
+                        <div class="input">
+                            <input type="text" class="type-file-text" v-model="store.banner_mobile" readonly="">
+                            <input type="button" class="type-file-button" value="上传...">
+                            <input type="file" data-field="banner_mobile" id="banner_mobile" class="type-file-file" size="30">
+                        </div>
+                        <span class="show">
+                            <a :href="store.banner_mobile" target="_blank" class="nyroModal"><i class="icon icon-picture" @mouseover="showTip(store.banner_mobile)" onmouseout="toolTip()"></i></a>
+                        </span>
+                    </div>
+                    <div class="form_prompt"></div>
+                    <div class="notic">(宽度278像素,高度278像素以上)</div>
+                </dd>
+            </dl>
+
+            <dl>
+                <dt><span class="require-field">*</span>&nbsp;店铺Logo：</dt>
+                <dd>
+                    <div class="type-file-box">
+                        <div class="input">
+                            <input type="text" class="type-file-text" v-model="store.logo" readonly="">
+                            <input type="button" class="type-file-button" value="上传...">
+                            <input type="file" data-field="logo" id="logo" class="type-file-file" size="30">
+                        </div>
+                        <span class="show">
+                            <a :href="store.logo" target="_blank" class="nyroModal"><i class="icon icon-picture" @mouseover="showTip(store.logo)" onmouseout="toolTip()"></i></a>
+                        </span>
+                    </div>
+                    <div class="form_prompt"></div>
+                    <div class="notic">(120*120像素),PNG格式透明背景</div>
+                </dd>
+            </dl>
+        </div>
+        <div class="wrapper-list hide" data-type="other">
+            <dl>
+                <dt>客服QQ号码：</dt>
+                <dd>
+                    <textarea name="kf_qq" value="" rows="6" cols="48" class="textarea"></textarea>
+                    <div class="notic">QQ客服名称和号码请用“|”隔开（如：客服1|123456），如果您有多个客服的QQ号码，请换行。</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>客服淘宝旺旺：</dt>
+                <dd>
+                    <textarea name="kf_ww" value="" rows="6" cols="48" class="textarea"></textarea>
+                    <div class="notic">旺旺客服名称和号码请用“|”隔开（如：客服2|654321），如果您有多个客服的旺旺号码，请换行。</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>在线客服账号：</dt>
+                <dd>
+                    <input type="text" size="40" value="" name="kf_touid" class="text">
+                    <div class="notic">在 <a href="http://my.open.taobao.com/app/app_list.htm" target="_blank" class="red"> 淘宝开放平台</a>已开通云旺客服的账号。</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>在线客服appkey：</dt>
+                <dd>
+                    <input type="text" size="40" value="0" name="kf_appkey" class="text">
+                    <div class="notic">在淘宝开放平台创建一个应用(百川无线)即可获得appkey。</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>在线客服secretkey：</dt>
+                <dd>
+                    <input type="text" size="40" value="0" name="kf_secretkey" class="text">
+                    <div class="notic">在淘宝开放平台创建一个应用(百川无线)即可获得secretkey。</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>在线客服头像LOGO：</dt>
+                <dd>
+                    <input type="text" size="40" value="http://" name="kf_logo" class="text">
+                    <div class="notic">直接黏贴图片网址(推荐40 x 40),不填即使用默认头像。</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>在线客服欢迎信息：</dt>
+                <dd>
+                    <input type="text" size="40" value="" name="kf_welcomeMsg" class="text">
+                    <div class="notic">向用户发送的一条欢迎信息。</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>美洽客服：</dt>
+                <dd>
+                    <input type="text" size="40" value="" name="meiqia" class="text text_2">
+                    <div class="notic">&nbsp;&nbsp;此功能仅手机端（wap）使用</div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>客服电话：</dt>
+                <dd>
+                    <input type="text" size="40" value="" name="kf_tel" class="text text_2">
+                    <div class="notic">店铺联系客服号码</div>
+                </dd>
+            </dl>
+        </div>
+        <div class="" data-type="button">
+            <dl class="button_info">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <input type="button" class="sc-btn sc-blueBg-btn btn35" @click="check" value="保存">
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/x-template" id="region-dl">
+    <div class="region">
+        <dl>
+            <dt>所在国家：</dt>
+            <dd>
+                <div id="dlcountry" class="ui-dropdown smartdropdown alien">
+                    <div class="txt" @click="dropdown">{{source.province.hasOwnProperty(row.province)?source.country[row.country]['region_name']:'国家'}}</div>
+                    <i class="down u-dropdown-icon"></i>
+                    <div class="options clearfix">
+                        <span class="liv" :data-text="vo.region_name" :data-type="vo.region_type" :data-value="vo.region_id" v-for="(vo,index) in source.country" @click="choose('country','province')">{{vo.region_name}}</span>
+                    </div>
+                </div>
+            </dd>
+        </dl>
+        <dl>
+            <dt>所在省份：</dt>
+            <dd>
+                <div id="dlProvinces" class="ui-dropdown smartdropdown alien">
+                    <input type="hidden" value="3" name="shop_province" id="selProvinces">
+                    <div class="txt" @click="dropdown">{{source.province.hasOwnProperty(row.province)?source.province[row.province]['region_name']: '省/直辖市'}}</div>
+                    <i class="down u-dropdown-icon"></i>
+                    <div class="options clearfix">
+                        <span class="liv" :data-text="vo.region_name" :data-type="vo.region_type" :data-value="vo.region_id" v-for="(vo,index) in source.province" @click="choose('province','city')">{{vo.region_name}}</span>
+                    </div>
+                </div>
+            </dd>
+        </dl>
+        <dl>
+            <dt>所在城市：</dt>
+            <dd>
+                <div id="dlCity" class="ui-dropdown smartdropdown alien">
+                    <input type="hidden" value="41" name="shop_city" id="selCities">
+                    <div class="txt" @click="dropdown">{{source.city.hasOwnProperty(row.city)?source.city[row.city]['region_name']: '市'}}</div>
+                    <i class="down u-dropdown-icon"></i>
+                    <div class="options clearfix">
+                        <span class="liv" :data-text="vo.region_name" :data-type="vo.region_type" :data-value="vo.region_id" v-for="(vo,index) in source.city" @click="choose('city','district')">{{vo.region_name}}</span>
+                    </div>
+                </div>
+            </dd>
+        </dl>
+        <dl v-show="Object.keys(source.district).length">
+            <dt>所在区域：</dt>
+            <dd>
+                <div id="dlRegion" class="ui-dropdown smartdropdown alien">
+                    <input type="hidden" value="437" name="shop_district" id="selDistricts">
+                    <div class="txt" @click="dropdown">{{source.district.hasOwnProperty(row.district)?source.district[row.district]['region_name']: '区/县'}}</div>
+                    <i class="down u-dropdown-icon"></i>
+                    <div class="options clearfix" style="max-height: 300px; display: none;">
+                        <span class="liv" :data-text="vo.region_name" :data-type="vo.region_type" :data-value="vo.region_id" v-for="(vo,index) in source.district" @click="choose('district')">{{vo.region_name}}</span>
+                    </div>
+                </div>
+            </dd>
+        </dl>
+    </div>
+</script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            store: JSON.parse('{:json_encode($store)}'),
+            region: JSON.parse('{:json_encode($region)}'),
+            layerindex: '',
+            token: ''
+        },
+        components: {
+            /**
+             * 地区组件注释：
+             * 1. 复制组件components、script模板region-dl，绑定数据source及row例如：<region-dl :source="region" :row="store"></region-dl>
+             * 2. 调用common函数getRegionList生成region数据(json格式),store同user_address，单次选择根据parent_id请求口，用common函数getRegionByParentId生成json返回
+             */
+            'region-dl': {
+                template: '#region-dl',
+                props: ['source', 'row'],
+                data: function () {
+                    return {
+                        hidecover: true,
+                        requrest: true
+                    };
+                },
+                methods: {
+                    dropdown: function () {
+                        $('.region .options').hide();
+                        $('.region .smartdropdown').removeClass("visible");
+                        var obj = event.currentTarget;
+                        $(obj).parents().addClass('visible');
+                        $(obj).next().next().show();
+                    },
+                    choose: function (prev, next) {
+                        var _this = this;
+                        var obj = event.currentTarget;
+                        _this.row[prev] = obj.dataset.value;//修改对象，使值反塑至vue根实例
+                        if (next) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/seller/api/get_region_by_parentid',
+                                data: {parent_id: obj.dataset.value},
+                                success: function (res) {
+                                    _this.source[next] = res;
+                                    $(obj).parent().hide();
+                                    $(obj).parents('dl').next().find('.smartdropdown .options').show();
+                                },
+                            });
+                        } else {
+                            $(obj).parent().hide();
+                        }
+                    }
+                },
+                mounted: function () {
+                    //点击任意位置隐藏dropdown
+                    document.onclick = function (e) {
+                        if (e.target.className != 'txt' && !e.target.parentNode.classList.hasOwnProperty('options')) {
+                            $('.region .options').hide();
+                            $('.region .smartdropdown').removeClass("visible");
+                        }
+                    };
+                }
+            }
+        },
+        methods: {
+            get_coordinate: function () {
+                this.layerindex = layer.open({
+                    type: 2,
+                    title: '获取坐标',
+                    area: ['500px', '400px'],
+                    content: "/seller/api/get_coordinate.html?callback=vm.callback"
+                });
+            },
+            callback: function (coordinate) {
+                layer.close(this.layerindex);
+                this.store.lng = coordinate.lng;
+                this.store.lat = coordinate.lat;
+            },
+            showTip: function (src) {
+                if (src.indexOf('http') < 0)
+                    toolTip('<img src="/public/static/' + src + '" >');
+                else
+                    toolTip('<img src="' + src + '" >');
+            },
+            check: function () {
+                var _this = this;
+                if (!_this.store.banner_pc) {
+                    error_div(document.getElementById('banner_pc'), 'PC版店铺banner必须设置');
+                }
+                if (!_this.store.banner_mobile) {
+                    error_div(document.getElementById('banner_mobile'), '手机版店铺banner必须设置');
+                }
+                if (!_this.store.logo) {
+                    error_div(document.getElementById('logo'), '店铺logo必须设置');
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/store/setting',
+                    data: _this.store,
+                    success: function (data) {
+                        easyshow(data);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+        },
+        mounted: function () {
+            var instance = this;
+            $('input[type="file"]').on("change").bind('change', function () {
+                var _this = this;
+                if (!instance.token) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/seller/api/uploadtoken',
+                        async: false,
+                        success: function (data) {
+                            instance.token = data;
+                        },
+                        error: function (xhr, type) {
+                            easyshow(xhr.responseJSON);
+                        }
+                    });
+                }
+                single_upload(_this.files[0], function (res) {
+                    layer.closeAll();
+                    instance.store[_this.dataset.field] = res;
+                }, null, instance.token);
+            });
+        }
+    });
+
+</script>
+{include file="public/footer"}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>请认真填写链接名称、链接地址等信息。</li>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info">
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>广告位名称：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.position_name" class="text" value=""
+                                   id="position_name" autocomplete="off">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>广告位宽度：</div>
+                        <div class="label_value">
+                            <input type="text" name="ad_width" v-model="info.ad_width" class="text" value=""
+                                   id="ad_width" autocomplete="off">
+                            <div class="notic m20">像素</div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>广告位高度：</div>
+                        <div class="label_value">
+                            <input type="text" name="ad_height" v-model="info.ad_height" class="text" value=""
+                                   id="ad_height" autocomplete="off">
+                            <div class="notic m20">像素</div>
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">广告位结构：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_model" v-model="info.position_model" class="text" value=""
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">广告位描述：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_desc" v-model="info.position_desc" class="text" value=""
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">广告位模板：</div>
+                        <div class="label_value">
+                            <textarea name="position_style" cols="60"  v-model="info.position_style"
+                                      rows="4" class="textarea" id="position_style"></textarea>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">是否公共：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="is_public" id="sex_0" value="0"
+                                           v-model="info.is_public">
+                                    <label for="sex_0" class="ui-radio-label">否</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="is_public" id="sex_1" value="1"
+                                           v-model="info.is_public">
+                                    <label for="sex_1" class="ui-radio-label">是</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <a href="javascript:;" class="button" id="submitBtn" @click="init()"> 确定 </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                majax('/admin/website/adpositionadd', vm.info);
+            }
+        }
+    });
+</script>

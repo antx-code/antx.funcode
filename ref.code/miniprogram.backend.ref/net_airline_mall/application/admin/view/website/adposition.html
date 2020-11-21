@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+
+            </div>
+            <ul>
+                <li>展示网站页面所有的广告位置。</li>
+                <li>点击查看可查看广告位置相关广告位的广告。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="add()">
+                        <div class="fbutton">
+                            <div class="add" title="添加广告位"><span>
+                                <i class="icon icon-plus"></i>添加广告位</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keyword" v-model="keywords" class="text nofocus" placeholder="广告位名称"
+                               autocomplete="off">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%" class="sign">
+                                <div class="tDiv">
+                                    <input type="checkbox" name="all_list" class="checkbox" id="all_list"/>
+                                    <label for="all_list" class="checkbox_stars"></label>
+                                </div>
+                            </th>
+                            <th width="5%">
+                                <div class="tDiv">编号</div>
+                            </th>
+                            <th width="20%">
+                                <div class="tDiv">广告位名称</div>
+                            </th>
+                            <th width="5%">
+                                <div class="tDiv">宽度</div>
+                            </th>
+                            <th width="5%">
+                                <div class="tDiv">高度</div>
+                            </th>
+                            <th width="20%">
+                                <div class="tDiv">广告描述</div>
+                            </th>
+
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td class="sign">
+                                    <div class="tDiv">
+                                        <input type="checkbox" name="checkboxes[]" :value="vo.position_id"
+                                               class="checkbox" :id="checkboxitem+vo.position_id">
+                                        <label :for="checkboxitem+vo.position_id" class="checkbox_stars"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.position_id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input name="sort_order" class="text w200" value="4" type="text"
+                                               v-model="vo.position_name" @keyup.enter="doupdate(vo)">
+                                    </div>
+                                </td>
+                                <td>
+
+                                    <div class="tDiv">
+                                        <input name="sort_order" class="text w80" value="4" type="number"
+                                               v-model="vo.ad_width" @keyup.enter="doupdate(vo)">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input name="sort_order" class="text w80" value="4" type="number"
+                                               v-model="vo.ad_height" @keyup.enter="doupdate(vo)">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.position_desc}}</div>
+                                </td>
+                                <td class="hidden">
+                                    <div class="tDiv">
+                                        <input name="sort_order" class="text w40" value="4" type="number"
+                                               v-model="vo.sort_order" @keyup.enter="doupdate(vo)">
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0)" title="查看广告内容" class="btn_see" @click="showad(vo)">
+                                            <i class="sc_icon sc_icon_see"></i>查看
+                                        </a>
+                                        <a href="javascript:void(0)" title="编辑" class="btn_edit" @click="add(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="tfoot_btninfo">
+                                        <input type="submit" value="删除" id="btnSubmit"
+                                               name="btnSubmit" shoptype="btnSubmit" class="btn btn_disabled"
+                                               disabled="disabled" @click="doalldelete()">删除
+                                    </div>
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+
+        },
+        methods: {
+            showad:function(vo){
+                window.parent.addParentTab(
+                    {
+                        title: '子列表',
+                        href: '/admin/website/adlist?position_id=' + vo.position_id
+                    }
+                );
+            },
+            add: function (vo = {}) {
+                if (vo.position_id) {
+                    window.parent.addParentTab(
+                        {
+                            title: '编辑广告位置',
+                            href: '/admin/website/adpositionadd?position_id=' + vo.position_id
+                        }
+                    );
+                } else {
+                    window.parent.addParentTab(
+                        {
+                            title: '添加广告位置',
+                            href: '/admin/website/adpositionadd'
+                        }
+                    );
+                }
+
+            },
+            doupdate: function (vo) {
+                majax('/admin/website/doupdate', vo, 'adposition')
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/website/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'adposition'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            init: function () {
+                $.post('/admin/website/adposition', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            doalldelete: function () {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/website/doalldelete', {
+                            ids: vm.ids,
+                            table: 'adposition'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.log_ids = [];
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

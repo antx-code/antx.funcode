@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>可以针对具体商品设置附加服务，如安装费等。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info">
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            服务名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" name='link_name' v-model="info.insurance_name" value='' class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">服务费用：</div>
+                        <div class="label_value">
+                            <textarea name="description" class="textarea" v-model="info.insurance_price"></textarea>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                majax('/admin/goods/insuranceadd', vm.info);
+            }
+        }
+    });
+</script>

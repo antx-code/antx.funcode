@@ -1,0 +1,169 @@
+{include file="header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="/sr/sale/coupon_type">待结算订单</a></li>
+    </ul>
+</div>
+<div class="explanation clear mb20">
+    <div id="checkZoom" class="ex_tit"><i class="sc_icon"></i><h4>温馨提示</h4></div>
+    <ul>
+        <li>结算周期为确认收货之后<b>&nbsp;{$commission_model}&nbsp;</b>天 自动结算</li>
+        <li>1. <b>商品总价</b> = 商品价格 x 商品数量</li>
+        <li>2. <b>订单总价</b> = 商品总价 + 物流费 - 优惠券 - 订单优惠金额 - 商家调价</li>
+        <li>3. <b>付款金额</b> = 订单总价 - 积分抵扣 - 余额抵扣</li>
+    </ul>
+</div>
+
+<div id="app" v-cloak>
+    <div class="btn-info">
+        <a :href="'/sr/merchants/pendding/download/1/start_time/' + start_time + '/end_time/' + end_time" target="_blank" class="sc-btn sc-blue-btn"><i class="icon-download-alt"></i>导出Excel</a>
+    </div>
+    <div class="order_stats_search">
+        <div class="screeItme">
+            <strong class="fl lh mr10">起始时间：</strong>
+            <div class="text_time" id="text_time1">
+                <input name="end_date" id="start_date" v-model="start_time" class="easyui-datetimebox">
+            </div>
+            <div class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</div>
+            <div class="text_time" id="text_time2">
+                <input name="end_date" id="end_date" v-model="end_time" class="easyui-datetimebox">
+            </div>
+            <input type="button" value="查询" class="sc-btn sc-blueBg-btn btn30 ml10" @click="page=1;getData()">
+        </div>
+    </div>
+
+    <div class="list-div" id="listDiv">
+        <table class="ecsc-default-table goods-default-table mt20">
+            <thead>
+            <tr>
+                <th width="10%">
+                    <div class="first_all">订单编号</div>
+                </th>
+                <th width="12%">付款时间</th>
+                <th width="12%">确认收货时间</th>
+                <th width="8%">商品名称</th>
+                <th width="8%">商品结算价</th>
+                <th width="8%">商品数量</th>
+                <th width="8%">合计</th>
+                <th width="10%">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(vo,index) in list">
+                <td class="first_td_checkbox">
+                    <div class="first_all">{{vo.order_sn}}</div>
+                </td>
+                <td class="first-cell">{{vo.pay_time | timeParse}}</td>
+                <td>{{vo.confirm_time | timeParse}}</td>
+                <td>{{vo.goods_name}}
+                    <div v-if="vo.tempvalue">{{vo.tempvalue}}</div>
+                </td>
+                <td><em>¥</em>{{vo.cost_price}}</td>
+                <td style="color:#179f27"><em>x </em>{{vo.goods_num}}</td>
+                <td style="color:#ff00e9"><p><em>¥</em>{{vo.cost_price * vo.goods_num}}</p></td>
+                <td>
+                    <a :href="'/sr/order/order_detail.html?order_id='+vo.order_id" class="blue">订单详情</a><br>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            start_time: '',
+            end_time: '',
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+        },
+        filters: {
+            timeParse: function (val) {
+                if (val > 0) return moment.unix(val).format('YYYY-MM-DD HH:mm:ss');
+                else return '..';
+            }
+        },
+        methods: {
+            getData(instance) {
+                instance = instance ? instance : vm;
+                var param = {
+                    start_time: instance.start_time,
+                    end_time: instance.end_time,
+                    page: instance.page,
+                    pageSize: instance.pageSize
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/sr/merchants/pendding',
+                    data: param,
+                    success: function (data) {
+                        instance.list = data.order;
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        instance.pageSize = data.pageSize;
+                        instance.start_time = data.start_time;
+                        instance.end_time = data.end_time;
+                        if (data.page == 1) instance.pagerender(instance);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            pagerender(instance) {
+                instance = instance ? instance : vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: parseInt(instance.pageSize),
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+        },
+        created: function () {
+            this.start_time = moment(moment().subtract(30, 'days').format('YYYY-MM-DD')).format('YYYY-MM-DD HH:mm:ss');
+            this.end_time = moment().format('YYYY-MM-DD HH:mm:ss');
+            this.getData(this);
+        },
+        mounted() {
+            var _this = this;
+            $('#start_date').datetimebox({
+                showSeconds: false,
+                onChange: function (date) {
+                    _this.start_time = date;
+                    _this.getData();
+                }
+            });
+            $('#end_date').datetimebox({
+                showSeconds: false,
+                onChange: function (date) {
+                    _this.start_time = date;
+                    _this.getData();
+                }
+            });
+        }
+    });
+
+</script>
+
+{include file="footer"}

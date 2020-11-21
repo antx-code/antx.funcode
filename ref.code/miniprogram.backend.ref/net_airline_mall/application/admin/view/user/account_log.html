@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app" v-cloak="">
+    <div class="content">
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="fl">
+                    <select id="" v-model="order_type" style="width: 172px; height: 30px;">
+                        <option value="0">请选择</option>
+                        <option value="1">增加</option>
+                        <option value="2">减少</option>
+                    </select>
+                </div>
+                <div class="label_value">
+                    <div class="fl" style="margin-left: 30px;line-height: 30px;height: 30px">按时间查询: &nbsp;</div>
+                    <div class="text_time" id="text_time_start">
+                        <input type="text" class="text" name="start_time" value="" id="start_time">
+                    </div>
+                    <span class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</span>
+                    <div class="text_time" id="text_time_end">
+                        <input type="text" class="text" name="end_time" value="" id="end_time">
+                    </div>
+                </div>
+                <div class="search">
+
+                    <button class="layui-btn layui-btn-sm layui-btn-normal" @click="download()">导出表格</button>
+                    <div class="input" style="margin-right: 30px">
+                        <input type="text" placeholder="名称|昵称" class="text nofocus" v-model.trim="keywords" @keyup.enter="secrchInit()">
+                        <input type="submit" name="secrch_btn" value="" class="btn" @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="10%">
+                                <div class="tDiv">会员名称</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">昵称</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">描述</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">金额</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">时间</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">关联订单</div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(vo,index) in list">
+                            <td>
+                                <div class="tDiv">{{vo.user_name}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv">{{vo.nick_name}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv">{{vo.desc}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv"><span v-if="vo.user_money>0">+</span>{{vo.user_money}}</div>
+                            </td>
+                            <td>
+                                <div class="tDiv">{{vo.change_time |timeParse}}</div>
+                            </td>
+
+                            <td>
+                                <div class="tDiv" v-if="vo.order_sn">{{vo.order_sn}}</div>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            order_type: 0,
+            list: [],
+            start_time: '',
+            end_time: ''
+        },
+        filters: {
+            timeParse: function (val) {
+                return moment.unix(val).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        watch: {
+            order_type: function () {
+                vm.init();
+            }
+        },
+        methods: {
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.order_type = 0;
+                vm.keywords = '';
+                $('#start_time').datetimebox('setValue', '');
+                $('#end_time').datetimebox('setValue', '');
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/user/account_log', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    order_type: vm.order_type,
+                    keywords: vm.keywords,
+                    start_time: $('#start_time').datetimebox('getValue'),
+                    end_time: $('#end_time').datetimebox('getValue')
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            download: function () {
+                layer.confirm('要导出 ' + vm.count + ' 条记录?', function (index) {
+                    let load = layer.load(2);
+                    let param = {
+                        page: vm.page,
+                        rows: vm.rows,
+                        order_type: vm.order_type,
+                        keywords: vm.keywords,
+                        start_time: $('#start_time').datetimebox('getValue'),
+                        end_time: $('#end_time').datetimebox('getValue')
+                    };
+                    let form = $('<form id="export" action="/admin/user/account_log" method="post"></form>');
+                    for (let key in param) {
+                        form.append($('<input type="text" name="' + key + '" value="' + param[key] + '">'));
+                    }
+                    form.append($('<input type="text" name="download" value="1">'));
+                    form.appendTo('body').submit().remove();
+                    layer.close(index);
+                    layer.close(load);
+                });
+            }
+        }
+    });
+    $(function () {
+        $('#start_time').datetimebox({
+            value: '',
+            required: false,
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            value: '',
+            required: false,
+            showSeconds: false
+        });
+        vm.init();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>商品详情</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .van-tab--active span:after {
+            background: none !important;
+        }
+    </style>
+</head>
+<body class="">
+<div id="app" v-cloak>
+    <div class="con con_main">
+        <header class="header-nav-content hide">
+            <div class="van-hairline--bottom van-nav-bar" style="z-index: 1;">
+                <div class="van-ellipsis van-nav-bar__title">
+                    <ul class="nav-con-warp">
+                        <li class="active"><span>商品</span></li>
+                    </ul>
+                </div>
+                <div class="van-nav-bar__right hide"><i class="iconfont icon-share-alt"></i></div>
+            </div>
+        </header>
+        <section class="goods_info">
+            <div class="goods_photo d_jump">
+                <div id='slider' class='swipe'>
+                    <div class='swiper-wrapper'>
+                        <template v-for="(vo,index) in info.goods_gallery">
+                            <div class="swiper-slide aui-text-center" @click="openImages(index)">
+                                <img :src="vo.img_original"/>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+            <div class="goods-price">
+                <p class="price">
+                    <em>{{info.goods.exchange_integral}}</em>
+                    <del>¥{{info.goods.shop_price}}</del>
+                </p>
+            </div>
+            <div class="goods_title">
+                <h3 class="twolist-hidden">
+                    <em class="em-promotion">自营</em>
+                    {{info.goods.goods_name}}
+                </h3>
+            </div>
+            <div class="goods_outer">
+                <p class="g-p-tthree dis-box">
+                    <span class="box-flex text-left">{{info.goods.total_sale_num}}人已买</span>
+                    <span class="box-flex text-center">库存<em>{{info.goods.goods_number}}</em></span>
+                    <span class="box-flex text-right">{{info.storeaddress}}</span>
+                </p>
+            </div>
+            <div class="van-cell-noleft van-coupon m-top08 van-cell-group van-hairline--top-bottom">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>服务：</span></div>
+                    <div class="van-cell__value">七天无理由退换</div>
+                </div>
+            </div>
+            <div class="van-cell-noleft m-top08 van-cell-group van-hairline--top-bottom" @click="showattrtypeInit()">
+                <div class="van-cell van-cell--clickable">
+                    <div class="van-cell__title" v-if="spec.tempvalue">
+                        <span>已选：{{spec.tempvalue.substr(0,20)}}...</span></div>
+                    <div class="van-cell__title" v-else><span>已选：</span></div>
+                    <div class="van-cell__value" style="margin-left: 15px;"><span>{{num}}件</span></div>
+                    <i class="van-icon van-icon-arrow van-cell__right-icon"></i></div>
+            </div>
+            <div class="goods_detail m-top08 d_jump van-tabs van-tabs--line">
+                <div class="van-tabs__wrap van-hairline--top-bottom">
+                    <div class="van-tabs__nav van-tabs__nav--line">
+                        <div class="van-tabs__line" style="width: 94px; transform: translateX(47px); transition-duration: 0.2s;"></div>
+                        <div class="van-tab van-tab--active"><span class="van-ellipsis">商品详情</span></div>
+                    </div>
+                </div>
+                <div class="van-tabs__content">
+                    <div class="van-tab__pane" style="padding: 10px 5px;">
+                        <div class="goods_desc" v-html="info.goods.goods_desc"></div>
+                    </div>
+                    <div class="van-tab__pane" style="display: none;"></div>
+                </div>
+            </div>
+            <section class="goods-detail-guess text-center">
+                <h5 class="title-hrbg"><span>猜你喜欢</span>
+                    <hr>
+                </h5>
+                <section class="product-list product-list-medium">
+                    <div class="prolist">
+                        <template v-for="(vo,index) in info.guesslike">
+                            <div class="prolist-item" @click="openGoodsdetail(vo)">
+                                <div class="pro-img">
+                                    <a href="javascript:void(0)" class="">
+                                        <img :src="vo.original_img" class="img" style="height: 150px;">
+                                    </a>
+                                </div>
+                                <div class="pro-info">
+                                    <h4><a href="javascript:void(0)" class="twolist-hidden">{{vo.goods_name}}</a></h4>
+                                    <div class="price">¥{{vo.shop_price}}</div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+            </section>
+        </section>
+        <div class="van-goods-action">
+            <div class="hide">
+                <div class="van-hairline van-goods-action-mini-btn">
+                    <i class="van-icon van-icon-chat van-goods-action-mini-btn__icon"></i>客服
+                </div>
+                <div class="van-hairline van-goods-action-mini-btn" :class="{'curr':info.iscollect==1}"
+                     @click="collectupdate()">
+                    <i class="van-icon van-icon-like-o van-goods-action-mini-btn__icon" v-if="info.iscollect==0"></i>
+                    <i class="van-icon van-icon-like van-goods-action-mini-btn__icon" v-if="info.iscollect==1"></i>
+                    收藏
+                </div>
+            </div>
+
+            <button class="van-button van-button--danger van-button--large van-button--square van-goods-action-big-btn"
+                    @click="addCart()">
+                <span class="van-button__text">立即兑换</span>
+            </button>
+        </div>
+
+        <div class="attr-goods-box van-popup van-popup--bottom" id="arrtdata" style="z-index: 2003;display: none;">
+            <div class="attr-goods-header">
+                <div class="attr-img"><img :src="info.goods.original_img" class="img"></div>
+                <div class="attr-info">
+                    <div class="attr-price">¥{{spec.product_price}}</div>
+                    <div class="attr-stock">库存：{{spec.product_number}}</div>
+                    <div class="attr-other">已选：{{spec.tempvalue}} {{num}}件</div>
+                </div>
+                <i class="iconfont icon-close" @click="hideattrtypeInit()"></i>
+            </div>
+            <div class="attr-goods-content hide" v-if="info.spec.length>0" id="is-attr">
+                <template v-for="(vo,index) in filterSpec">
+                    <div class="sku-item van-radio-group">
+                        <div class="sku-tit">{{index}}</div>
+                        <div class="sku-list">
+                            <template v-for="(vo2,index2) in vo">
+                                <div class="option van-radio" :class="{'active':vo2.active==1}"
+                                     @click="filterSpecInitChange(index,index2)">
+                                    <span class="van-radio__input"><i class="van-icon van-icon-check"></i></span>
+                                    <span class="van-radio__label">{{vo2.attr_value}}</span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <div class="attr-goods-number dis-box"><span class="tit box-flex">数量</span>
+                <div class="stepper">
+                    <div class="van-stepper">
+                        <button class="van-stepper__minus van-stepper__minus--disabled" @click="numInit(0)"></button>
+                        <input type="number" class="van-stepper__input" v-model="num">
+                        <button class="van-stepper__plus" @click="numInit(1)"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="van-sku-actions">
+                <button class="van-button--bottom-action van-button van-button--default van-button--normal"
+                        @click="addCart()">
+                    <span class="van-button__text">立即兑换</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="van-modal" style="z-index: 2000;display: none"></div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            goods_id: 50481,
+            num: 1,
+            attr_keys: '',
+            info: [],
+
+            attrtype: 0,
+
+            spec: {},
+            filterSpec: {},
+        },
+        methods: {
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'exdetail_win' + vo.goods_id,
+                    url: 'widget://html/exdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.goodsdetail, {goods_id: vm.goods_id}).then(function (ret) {
+                    vm.info = ret.data;
+                    if (ret.data.spec.length > 0) {
+                        vm.spec = JSON.parse(JSON.stringify(ret.data.spec[0]));
+                        vm.attr_keys = JSON.parse(JSON.stringify(ret.data.spec[0].attr_keys));
+                        vm.filterSpecInit();
+                    } else {
+                        vm.spec = {
+                            'product_price': vm.info.goods.shop_price,
+                            'product_number': vm.info.goods.goods_number,
+                            'tempvalue': vm.info.goods.goods_name,
+                        };
+                    }
+                    vm.swiperInit();
+                });
+            },
+            //规格选中初始化
+            filterSpecInit: function () {
+                var filterSpec = JSON.parse(JSON.stringify(vm.info.goods.product.filterSpec));
+                for (var i in filterSpec) {
+                    for (var k = 0; k < filterSpec[i].length; k++) {
+                        if (vm.attr_keys.indexOf(filterSpec[i][k].attr_id) != -1) {
+                            filterSpec[i][k].active = 1
+                        } else {
+                            filterSpec[i][k].active = 0
+                        }
+                    }
+                }
+                vm.filterSpec = JSON.parse(JSON.stringify(filterSpec));
+            },
+            filterSpecInitChange: function (index1, index2) {
+                for (var i in vm.filterSpec) {
+                    if (i == index1) {
+                        for (var k = 0; k < vm.filterSpec[i].length; k++) {
+                            if (k == index2) {
+                                vm.filterSpec[i][k].active = 1
+                            } else {
+                                vm.filterSpec[i][k].active = 0
+                            }
+                        }
+                    }
+                }
+                var attr_keys = '';
+                for (var i in vm.filterSpec) {
+                    for (var k = 0; k < vm.filterSpec[i].length; k++) {
+                        if (vm.filterSpec[i][k].active == 1) {
+                            attr_keys += (vm.filterSpec[i][k].attr_id + '_');
+                        }
+                    }
+                }
+                vm.attr_keys = attr_keys.substr(0, attr_keys.length - 1);
+                for (var i = 0; i < vm.info.spec.length; i++) {
+                    if (vm.attr_keys == vm.info.spec[i].attr_keys) {
+                        vm.spec = JSON.parse(JSON.stringify(vm.info.spec[i]))
+                    }
+                }
+            },
+            swiperInit: function () {
+                setTimeout(function () {
+                    slider = new Swiper('#slider', {
+                        autoplay: 3000,
+                        visibilityFullFit: true,
+                        loop: true,
+                        pagination: '.swiper-pagination',
+                        paginationClickable: true
+                    });
+                }, 200);
+            },
+            collectupdate: function () {
+                if (!$api.getStorage('token')) {
+                    wxapp.alert('fail', '未登录');
+                    setTimeout(function () {
+                        longinwin();
+                    });
+                    return false;
+                }
+                wxapp.ajax(config.collectupdate, {
+                    act: 'add',
+                    goods_id: vm.info.goods.goods_id,
+                }).then(function (ret) {
+                    wxapp.alert('success', ret.msg);
+                    vm.init();
+                })
+            },
+            showattrtypeInit: function () {
+                vm.attrtype = 1;
+                $("#arrtdata").show();
+                $(".van-modal").show();
+                $("body").addClass('van-overflow-hidden');
+            },
+            hideattrtypeInit: function () {
+                vm.attrtype = 0;
+                $("#arrtdata").hide();
+                $(".van-modal").hide();
+                $("body").removeClass('van-overflow-hidden');
+            },
+            numInit: function (act) {
+                if (act == 1) {
+                    vm.num++;
+                } else {
+                    if (vm.num == 1) {
+                        return false;
+                    } else {
+                        vm.num--;
+                    }
+                }
+            },
+            addCart: function () {
+                if (!$api.getStorage('token')) {
+                    wxapp.alert('fail', '未登录');
+                    api.openWin({
+                        name: 'login_win',
+                        url: 'widget://html/login_win.html',
+                        useWKWebView: true,
+                    });
+                    return false;
+                }else{
+                    api.openWin({
+                        name: 'exorder_win',
+                        url: 'widget://html/exorder_win.html',
+                        useWKWebView: true,
+                        pageParam: {
+                            goods_id: vm.goods_id,
+                            goods_num: vm.num,
+                        }
+                    });
+                }
+            }
+        }
+    });
+    window.onload = function () {
+        var pageparm = getUrlPageparm();
+        if (pageparm.token) {
+            $api.setStorage('token', pageparm.token);
+        }
+        vm.goods_id = api.pageParam.goods_id ? api.pageParam.goods_id : 0;
+        vm.init();
+    };
+</script>

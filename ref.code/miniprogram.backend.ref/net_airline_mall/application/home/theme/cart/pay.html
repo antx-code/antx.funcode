@@ -1,0 +1,349 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+<style>
+    .p-mode-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .p-mode-item img {
+        width: 30%;
+    }
+
+    .p-mode-item b {
+        position: absolute;
+        background: url("__THEME__/images/shop-icon.png") 0 -50px no-repeat;
+        right: 0;
+        bottom: 0;
+        width: 20px;
+        height: 20px;
+        display: none;
+    }
+
+    .p-mode-item .pay-name {
+        max-width: 70%;
+        overflow: hidden;
+        font-size: 20px;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+
+    .p-mode-item.item-selected {
+        border: 1px solid #24be00;
+    }
+
+    .p-mode-item.item-selected b {
+        display: block;
+    }
+
+    .single-btn {
+        text-align: center;
+    }
+
+    .single-btn button {
+        padding: 5px 30px;
+        font-size: 20px;
+        font-weight: bold;
+        height: auto;
+    }
+
+    #qr-pay-div {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, .7);
+        align-items: center;
+        justify-content: center;
+        top: 0;
+        z-index: 9999;
+    }
+
+    .center {
+        text-align: center;
+    }
+
+    .flex {
+        display: flex;
+    }
+
+    .pay-box {
+        width: 560px;
+        height: 420px;
+        background: #FFF;
+        padding: 25px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    #left {
+        width: 200px;
+        height: 180px;
+        padding-top: 100px;
+        background: url(__THEME__/images/icon-pay.png) 50px 0 no-repeat;
+    }
+
+    #right {
+        width: 200px;
+        height: 180px;
+        padding-top: 100px;
+        background: url(__THEME__/images/icon-pay.png) -220px 0 no-repeat;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    .btn-block {
+        padding: 0 10%;
+    }
+
+    .btn-block button {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    #qr-img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .cart-checkbox {
+        padding-left: 0;
+        float: none;
+    }
+
+    .user_money {
+        margin-left: 20px;
+        color: #888;
+    }
+
+    .use_money {
+        margin-top: 10px;
+        display: none;
+    }
+
+    #user_money {
+        font-size: 18px;
+        color: #f42424;
+    }
+</style>
+<div class="header header-cart">
+    <div class="w w1200">
+        <div class="logo">
+            <div class="logoImg"><a href="/"><img src="{$siteInfo.shop_logo}"></a></div>
+            <div class="tit">结算页</div>
+        </div>
+        <div class="cart-stepflex">
+            <div class="cart-step-item cur">
+                <span>1.我的购物车</span>
+                <i class="iconfont icon-arrow-right-alt"></i>
+            </div>
+            <div class="cart-step-item cur">
+                <span>2.填写订单信息</span>
+                <i class="iconfont icon-arrow-right-alt"></i>
+            </div>
+            <div class="cart-step-item curr">
+                <span>3.成功提交订单</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="w w1200">
+        <div class="payOrder-warp" id="pay_main">
+            <div class="payOrder-desc">
+                <div class="pay-top">
+                    <h3>订单提交成功，去付款咯！</h3>
+                </div>
+                <div class="pay-txt">
+                    <p>订单号：<em id="nku">{$Request.param.sn}</em></p>
+                </div>
+                <div class="pay-total">
+                    <span>应付总额：</span>
+                    <div class="pay-price">￥<span id="amount">{$amount}</span></div>
+                </div>
+                <div class="o-list">
+                    <div class="o-list-info">
+                        <span id="shdz">寄送至：{$order.province_text}  {$order.city_text}  {$order.district_text}  &nbsp;&nbsp;{$order.address}</span>
+                        <span id="shr">收货人：{$order.consignee}</span>
+                        <span id="mobile">{$order.mobile}</span>
+                    </div>
+                </div>
+                <a href="/" target="_blank" class="orderPrint ftx-05">继续购物</a>
+            </div>
+
+            <div class="payOrder-mode">
+                <div class="payOrder-list">
+                    <div class="p-mode-tit">
+                        <h3>在线支付</h3>
+                    </div>
+                    <div class="p-mode-list">
+                        {volist name="payWay" id="item"}
+                        <div class="p-mode-item {if $i==1}item-selected{/if}" data-code="{$key}">
+                            <img src="{$item.pc_logo}">
+                            <span class="pay-name">{$item.pay_name}</span>
+                            <b></b>
+                        </div>
+                        {/volist}
+                    </div>
+                    <div class="p-mode-list">
+                        <div shoptype="ckList" class="cart-checkbox">
+                            <input type="checkbox" name="checkItem" id="checkItem" class="ui-checkbox">
+                            <label for="checkItem" class="ui-label-14">使用余额</label>
+                            <span class="user_money">余额 {$user_money}元</span>
+                        </div>
+                        <div class="use_money">支付 <span id="user_money">0.00</span> 元</div>
+                    </div>
+                </div>
+                <div class="single-btn">
+                    <form id="pay_form" action="{:url('payment/pay')}" method="post" onsubmit="return checkMothed()">
+                        <input type="hidden" name="sn" value="{$Request.param.sn}">
+                        <input type="hidden" name="amount" value="{$amount}">
+                        <input type="hidden" name="pay_code" value="">
+                        <input type="hidden" name="user_money" value="0">
+                        <button type="submit" class="sc-btn sc-redBg-btn">立即支付</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="p-panel-main c-history">
+            <div class="ftit ftit-delr"><h3>继续剁手</h3></div>
+            <div class="gl-list clearfix">
+                <ul class="clearfix" id="guess_goods_love"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="qr-pay-div">
+    <div class="pay-box center">
+        <h3>请打开手机微信,使用扫一扫功能完成付款!</h3>
+        <div class="center gray">付款完成前请不要关闭此窗口.完成付款后请根据您的情况点击下面的按钮.</div>
+        <div class="flex">
+            <div id="left" class="center">
+                支付完成<br><br>
+                <a class="sc-btn sc-redBg-btn" onclick="queryStatus()">支付完成</a>
+            </div>
+            <div class="center">
+                <img src="" alt="微信支付" id="qr-img" class="mt30">
+            </div>
+            <div id="right" class="center">
+                支付遇到问题<br><br>
+                <a class="sc-btn sc-org-btn" onclick="rePay()">支付失败</a>
+            </div>
+        </div>
+        <div class="btn-block">
+            <button type="button" class="sc-btn sc-org-btn" onclick="rePay()">返回选择其他支付方式</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let beforRequest = false, time = 300, timer, user_money = 0;
+    let amount = parseFloat('{$amount}');
+    let available = parseFloat('{$user_money}');
+
+    function guessYouLike() {
+        $.post('/home/index/ajaxGuessYouLike', {limit: 6}, function (res) {
+            $("#guess_goods_love").html(res);
+        });
+    }
+
+    function rePay() {
+        $('#qr-pay-div').hide();
+        $(document.body).css({
+            "overflow-y": "auto"
+        });
+        clearInterval(timer);
+        time = 300;
+    }
+
+    function checkMothed() {
+        var pay_code = $('input[name="pay_code"]').val();
+        if (pay_code.indexOf('wei') < 0) return true;
+        ajaxLoadFunc();
+        $.ajax({
+            type: 'POST',
+            url: '/home/payment/pay',
+            data: $('#pay_form').serialize(),
+            success: function (data, status, xhr) {
+                if (xhr.status == 206) {
+                    location.href = '/home/member/order.html';
+                    return;
+                }
+                beforRequest = false;
+                ajaxLoadClose();
+                $('#qr-img').attr('src', '/api/common/qrcodePay?str=' + data.result);
+                $('#qr-pay-div').css('display', 'flex');
+                $(document.body).css({
+                    "overflow-y": "hidden"
+                });
+                if (pay_code == 'weixin') {
+                    timer = setInterval(function () {
+                        queryStatus();
+                        time--;
+                    }, 1000);
+                }
+            },
+            error: function (xhr) {
+                ajaxLoadClose();
+                layer.msg(xhr.responseJSON);
+            }
+        });
+        return false;
+    }
+
+    function queryStatus() {
+        if (beforRequest) {
+            return;
+        }
+        if (time < 1) {
+            clearInterval(timer);
+        }
+        beforRequest = true;
+        $.ajax({
+            type: 'POST',
+            url: '/home/payment/ajaxQuery.html',
+            data: {order_sn: $('input[name="sn"]').val(), pay_code: $('input[name="pay_code"]').val()},
+            success: function (data) {
+                beforRequest = false;
+                if (data.pay_status == 1) {
+                    location.href = '/home/member/order.html';
+                }
+            }
+        });
+    }
+
+    guessYouLike();
+
+    $(function () {
+        $('input[name="pay_code"]').val($('.p-mode-item.item-selected').data('code'));
+        $('.p-mode-item').on('click', function () {
+            $(this).addClass('item-selected').siblings().removeClass('item-selected');
+            $('input[name="pay_code"]').val($(this).data('code'));
+        });
+
+        $('#checkItem').on('change', function () {
+            if (this.checked) {
+                $('.use_money').slideDown('fast');
+                user_money = amount > available ? available : amount;
+            } else {
+                user_money = 0;
+                $('.use_money').slideUp('fast');
+            }
+            $('#amount').html((amount - user_money).toFixed(2));
+            $('#user_money').html(user_money);
+            $('input[name="user_money"]').val(user_money);
+        });
+    });
+
+</script>
+
+{include file='public/footer'}

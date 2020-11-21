@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>请认真填写链接名称、链接地址等信息。</li>
+                <li>
+                    标识“<em>*</em>
+                    ”的选项为必填项，其余为选填项。
+                </li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info user_basic">
+                    <div class="item">
+                        <div class="label">
+                            <span class="require-field">*</span>
+                            账号名称：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.username" class="text"/>
+                        </div>
+                    </div>
+                    <template v-if="!info.id">
+                        <div class="item">
+                            <div class="label">
+                                <span class="require-field">*</span>
+                                登录密码：
+                            </div>
+                            <div class="label_value">
+                                <input type="password" v-model="info.password" class="text"/>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="item shop_logo">
+                        <div class="label">头像：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="button" class="type-file-button" value="">
+                                <input type="text" name="textfile" class="type-file-text" id="textfield" value=""
+                                       autocomplete="off" readonly v-model="info.avatar">
+                            </div>
+                            <div class="notic m20">图片尺寸100*100</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">
+                            邮箱：
+                        </div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.email" class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">激活状态：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input name="is_default" type="radio" class="ui-radio" value="1" id="is_default_0" v-model="info.enabled">
+                                    <label for="is_default_0" class="ui-radio-label">是</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input name="is_default" type="radio" class="ui-radio" value="0" id="is_default_1" v-model="info.enabled">
+                                    <label for="is_default_1" class="ui-radio-label">否</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="init()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            init: function () {
+                majax('/admin/store/seller_add',vm.info);
+            }
+        }
+    });
+
+    layui.use('upload', function(){
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#button',
+            url: '/admin/uploader/alioss_upload', //上传接口
+            data:{
+                upload: 1
+            },
+            accept: 'file', //允许上传的文件类型
+            done: function(ret){
+                vm.info.avatar = ret.url;
+                if(ret.state == 'SUCCESS'){
+                    $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                }else{
+                    $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                }
+
+            },
+        });
+    });
+</script>

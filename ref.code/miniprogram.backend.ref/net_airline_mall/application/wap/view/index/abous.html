@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>文章详情</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>
+        .article-con p{font-size: 12px;}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="con con_main">
+        <section class="article-main">
+            <div class="article-title">
+                <h3>{{info.title}}</h3><small>
+                <time>{{info.add_time|timeParse}}</time>
+                <span></span></small></div>
+            <div class="article-con">
+                <p v-html="info.content"></p>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            article_id: 4,
+            info: {}
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.article,{article_id: vm.article_id},1).then(function (ret) {
+                    vm.info = ret.data;
+                })
+            }
+        }
+    });
+    window.onload = function () {
+        vm.init();
+    };
+</script>

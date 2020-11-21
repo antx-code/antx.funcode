@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="Keywords" content="{$siteInfo.shop_keywords}">
+    <meta name="Description" content="{$siteInfo.shop_desc}">
+    <title>{$siteInfo.shop_title}</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <script type="text/javascript" src="__STATIC__/js/jquery.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/transport_jquery.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/vue.js"></script>
+    <script type="text/javascript" src="__STATIC__/plugins/moment/moment.min.js"></script>
+    <script type="text/javascript" src="__STATIC__/js/function.js"></script>
+    <script type="text/javascript" src="__THEME__/js/suggest.js"></script>
+    <script type="text/javascript" src="__THEME__/js/scroll_city.js"></script>
+    <script type="text/javascript" src="__THEME__/js/cart_common.js"></script>
+    <script type="text/javascript" src="__THEME__/js/cart_quick_links.js"></script>
+    <script type="text/javascript" src="__THEME__/js/region.js"></script>
+
+    <!--layui库引入开始-->
+    <link href="__STATIC__/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="__STATIC__/plugins/layui/layui.all.js"></script>
+    <!--layui库引入结束-->
+
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/purebox.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/base.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/style.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/user.css"/>
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/quickLinks.css"/>
+    <link rel="stylesheet" type="text/css" href="__THEME__/css/suggest.css"/>
+    <style>
+        .catetop-jiadian .catetop-floor .f-bd .bd-right {float: left;width: 1200px;}
+        .catetop-jiadian .categorys-tab-content {background-color: #2984EB;height: 500px;}
+        .catetop-jiadian .categorys-items-layer{height:450px;overflow-y: auto;padding:15px 0 15px 15px;width:645px;}
+        .catetop-jiadian .categorys-tab-content i.iconfont {color: #fff; margin-right:5px}
+        .catetop-jiadian .categorys-tab-content .categorys-item{height:50px;}
+        .catetop-jiadian .categorys-tab-content .item-content{margin:0;padding:0;width:200px;height: calc(100% - 1px)}
+        .catetop-jiadian .categorys-tab-content .categorys-title strong{line-height:49px}
+        .catetop-jiadian .categorys-tab-content .item-content:before{right:-5px;top:20px}
+        .dl_foreach{clear:both}
+        .dl_foreach dt{float:left;width: 70px;line-height: 30px;font-weight: 700;white-space: nowrap;text-overflow: ellipsis;text-align: justify;text-align-last: justify;}
+        .dl_foreach dd{float:right;width:515px;padding:0 25px 10px 0;line-height:30px;border-bottom: 1px dashed #e5e5e5;margin-left:15px}
+        .dl_foreach dd a{margin-right: 20px;word-break: normal;width: auto;display: inline-block;white-space: pre-wrap;word-wrap: break-word;text-align: left;line-height: 30px;}
+        .categorys-items-layer {overflow-y: auto;}
+    </style>
+</head>
+<body class="catetop-jiadian">
+<input type="hidden" name="user_id" value="{$Think.session.user.user_id|default=0}">
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/right_bar'}
+
+<div class="nav shop-zoom" shoptype='shopNav'>
+    <div class="w w1200">
+        <div class="categorys">
+            <div class="categorys-type">
+                <a href="javascript:;">
+                    {$category.cat_name}
+                </a>
+            </div>
+            <div class="categorys-tab-content">
+                <div class="categorys-items" shoptype="items">
+                    {if isset($category.children)}
+                    {foreach $category.children as $k=>$v}
+                    {if $k<10}
+                    <div class="categorys-item" shoptype="item" data-catid="1115">
+                        <div class="item-content">
+                            <div class="categorys-title">
+                                <strong>
+                                    <i class="iconfont icon-{$v.style_icon}"></i>
+                                    <a href="{:url('category/index',['id'=>$v.cat_id])}"  target="_blank">
+                                        {$v.cat_name}
+                                    </a>
+                                </strong>
+                            </div>
+                        </div>
+                        <div class="categorys-items-layer">
+                            {foreach $v.children as $k3=>$v3}
+                            <dl class="dl_foreach">
+                                <dt>
+                                    <a href="{:url('category/index',['id'=>$v3.cat_id])}" target="_blank">{$v3.cat_name}</a>
+                                </dt>
+                                <dd>
+                                {if isset($v3['children'])}
+                                {foreach $v3.children as $k4=>$v4}
+                                <a href="{:url('category/index',['id'=>$v4.cat_id])}" target="_blank">{$v4.cat_name}</a>
+                                {/foreach}
+                                {else /}
+                                &nbsp;
+                                {/if}
+                                </dd>
+                            </dl>
+                            {/foreach}
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                    {/if}
+                    {/foreach}
+                    {/if}
+                </div>
+            </div>
+        </div>
+        <div class="nav-main" id="nav">
+            <ul class="navitems">
+                <li><a href="/">首页</a></li>
+                {foreach $siteInfo['nav'] as $nav}
+                <li><a href="{$nav.url}" target="{if $nav.is_newwin==1}_blank{else /}_self{/if}">{$nav.name}</a></li>
+                {/foreach}
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="homeindex" shoptype="homeWrap">
+    <div class="content">
+        <!--轮播图-->
+        <div class="visual-item" data-mode="lunbo" data-purebox="banner" data-li="1" data-length="5" shoptype="visualItme"
+             style="display: block;" data-diff="0">
+            <div class="view">
+                <div class="banner home-banner">
+                    <div class="bd">
+                        {if count($carcousel)}
+                        <ul data-type="range" data-slide="fold">
+                            {volist name="carcousel" id="vo"}
+                            <li style="background: url('{$vo.ad_img}') center center no-repeat; background-size: {$vo.ad_width}px {$vo.ad_height}px;">
+                                <div class="banner-width"><a href="{$vo.ad_link}" target="_blank"></a></div>
+                            </li>
+                            {/volist}
+                        </ul>
+                        {/if}
+                        <div class="spec" data-spec=""></div>
+                    </div>
+                    <div class="hd">
+                        <ul></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="catetop-main w w1200" shoptype="catetopWarp">
+
+    <!--热门推荐-->
+    <div class="hotrecommend" id="hotrecommend">
+        <div class="hd">
+            <h2>热门推荐</h2>
+            <div class="extra">
+                <div class="hr-slide-hd">
+                    <ul>
+                        <li class="on">新品首发</li>
+                        <li class="">热销排行</li>
+                        <li class="">精品推荐</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="bd" style="position: relative; width: 1210px; height: 293px;">
+            <ul class="clearfix" style="position: absolute; width: 1210px; left: 0px; top: 0px; display: block;">
+                {volist name='newList' id='vo'}
+                <li>
+                    <div class="p-img">
+                        <a href="{:url('goods/detail',['id'=>$vo.goods_id])}">
+                            <img src="{$vo.original_img}" alt="">
+                        </a>
+                    </div>
+                    <div class="p-price">
+                        <em>¥</em>{$vo.shop_price}
+                    </div>
+                    <div class="p-name"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}" title="{$vo.goods_name}">{$vo.goods_name}</a>
+                    </div>
+                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" class="p-btn">查看详情</a>
+                </li>
+                {/volist}
+
+            </ul>
+            <ul class="clearfix" style="position: absolute; width: 1210px; left: 0px; top: 0px; display: none;">
+                {volist name='hotList' id='vo'}
+                <li>
+                    <div class="p-img"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}"><img
+                            src="{$vo.original_img}" alt=""></a></div>
+                    <div class="p-price">
+                        <em>¥</em>{$vo.shop_price}
+                    </div>
+                    <div class="p-name"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}" title="{$vo.goods_name}">{$vo.goods_name}</a>
+                    </div>
+                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" class="p-btn">查看详情</a>
+                </li>
+                {/volist}
+            </ul>
+            <ul class="clearfix" style="position: absolute; width: 1210px; left: 0px; top: 0px; display: none;">
+                {volist name='bestList' id='vo'}
+                <li>
+                    <div class="p-img"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}"><img
+                            src="{$vo.original_img}" alt=""></a></div>
+                    <div class="p-price">
+                        <em>¥</em>{$vo.shop_price}
+                    </div>
+                    <div class="p-name"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}" title="{$vo.goods_name}">{$vo.goods_name}</a>
+                    </div>
+                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" class="p-btn">查看详情</a>
+                </li>
+                {/volist}
+            </ul>
+
+        </div>
+    </div>
+
+    <!--品牌旗舰-->
+    {if isset($category.brands) && count($category.brands)}
+    <div class="catetop-brand clearfix" id="catBrand">
+        <div class="hd"><h2>品牌旗舰</h2></div>
+        <div class="bd">
+
+            <div class="cb-r">
+                <ul>
+                    {foreach $category.brands as $k=>$v}
+                    <li><a href="{:url('category/index',['id'=>$cat_id,'brand_id'=>$vo.brand_id])}" target="_blank"
+                           title="{$v.brand_name}">
+                        <img src="{$v.brand_logo}" alt=""></a></li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {/if}
+
+    <!--楼层数据-->
+    <div class="catetop-floor-wp" shoptype="goods_cat_level" id="app">
+        <transition-group name="list.children" tag="p">
+        <template v-for="(vo,index) in list.children">
+            <div class="catetop-floor" id="floor_1" shoptype="floorItem" :key="index">
+                <div class="f-hd">
+                    <h2>{{vo.cat_name}}</h2>
+                    <div class="extra">
+                        <div class="fgoods-hd">
+                            <ul>
+                                <template v-for="(vo2,index2) in vo.children" v-if="index2<6">
+                                    <li :class="{'on':index2==vo.checkitem}" @click="goodsListInit(index,vo2.cat_id,index2)">{{vo2.cat_name}}</li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="f-bd">
+                    <div class="bd-right">
+                        <ul class="fgoods-list" style="display: block;">
+                            <template v-for="(vo3,index3) in vo.goods_list">
+                                <li>
+                                    <div class="p-img">
+                                        <a :href="'/home/goods/detail/id/'+vo3.goods_id+'.html'" target="_blank"><img :src="vo3.original_img" alt=""></a>
+                                    </div>
+                                    <div class="p-name">
+                                        <a href="'/home/goods/detail/id/'+vo3.goods_id+'.html'" target="_blank" :title="vo3.goods_name">{{vo3.goods_name}}</a>
+                                    </div>
+                                    <div class="p-price">
+                                        <em>¥</em>{{vo3.shop_price}}
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </template>
+        </transition-group>
+    </div>
+
+    <!---随手购--->
+    <div class="atwillgo" id="atwillgo">
+        <div class="awg-hd">
+            <h2>随手购</h2>
+        </div>
+        <div class="awg-bd">
+            <div class="atwillgo-slide">
+                <a href="javascript:;" class="prev prevStop"><i class="iconfont icon-left"></i></a>
+                <a href="javascript:;" class="next"><i class="iconfont icon-right"></i></a>
+                <div class="hd">
+                    <ul>
+                        <li class="on"></li>
+                        <li></li>
+                        <li></li>
+                    </ul>
+                </div>
+                <div class="bd">
+                    <div class="tempWrap" style="overflow:hidden; position:relative; width:1200px">
+                        <ul style="width: 3600px; left: 0px; position: relative; overflow: hidden; padding: 0px; margin: 0px;">
+                            {volist name='suiList' id='vo'}
+                            <li style="float: left; width: 158px;">
+                                <div class="p-img">
+                                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank">
+                                        <img src="{$vo.original_img}" alt="">
+                                    </a>
+                                </div>
+                                <div class="p-price">
+                                    <em>¥</em>{$vo.shop_price}
+                                </div>
+                                <div class="p-name">
+                                    <a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank"
+                                       title="{$vo.goods_name}">{$vo.goods_name}</a></div>
+                                <div class="p-btn"><a href="{:url('goods/detail',['id'=>$vo.goods_id])}" target="_blank">查看详情</a></div>
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!---楼层悬浮--->
+    <div class="catetop-lift lift-hide" shoptype="lift">
+        <div class="lift-list" shoptype="liftList">
+            <div class="catetop-lift-item lift-item-current" shoptype="liftItem" data-target="#hotrecommend">
+                <span>热门推荐</span>
+            </div>
+            {if isset($category.brands) && count($category.brands)}
+            <div class="catetop-lift-item" shoptype="liftItem" data-target="#catBrand">
+                <span>品牌旗舰</span>
+            </div>
+            {/if}
+            {if isset($category.children)}
+            {foreach $category.children as $k=>$v}
+            {if isset($v.children) && $v.goods_count>0}
+            <div class="catetop-lift-item lift-floor-item" shoptype="liftItem" data-c="{:count($v['goods_list'])}"><span>{$v.cat_name}</span></div>
+            {/if}
+            {/foreach}
+            {/if}
+            <div class="catetop-lift-item lift-item-top" shoptype="liftItem"><span><i class="iconfont icon-up"></i></span>
+            </div>
+        </div>
+    </div>
+</div>
+{include file='public/footer'}
+
+<link rel="stylesheet" type="text/css" href="__THEME__/css/index.css">
+<link rel="stylesheet" type="text/css" href="__THEME__/css/color.css">
+<script type="text/javascript" src="__STATIC__/js/jquery.SuperSlide.2.1.1.js"></script>
+<script type="text/javascript" src="__THEME__/js/asyLoadfloor.js"></script>
+
+<script>
+    $(".hotrecommend").slide({hd: ".hr-slide-hd ul", effect: "fold"});
+    /*首页轮播开始*/
+    $(".nav .site-mast .categorys-tab-content").show();
+    var length = $(".banner .bd").find("li").length;
+    if (length > 1) {
+        $(".banner").slide({
+            titCell: ".hd ul",
+            mainCell: ".bd ul",
+            effect: "fold",
+            interTime: 3500,
+            delayTime: 500,
+            autoPlay: true,
+            autoPage: true,
+            trigger: "click",
+            endFun: function (i, c, s) {
+                $(window).resize(function () {
+                    var width = $(window).width();
+                    s.find(".bd li").css("width", width);
+                });
+            }
+        });
+    } else {
+        $(".banner .hd").hide();
+    }
+    /*首页轮播结束*/
+
+    $(function () {
+        $(window).scroll(function () {
+            var scrollTop = $(document).scrollTop();
+            var navTop = $("*[shoptype='shopNav']").offset().top;
+
+            if (scrollTop > navTop) {
+                $("*[shoptype='suspColumn']").addClass("show");
+            } else {
+                $("*[shoptype='suspColumn']").removeClass("show");
+            }
+        });
+
+    });
+
+    //随手购
+    if ($(".atwillgo-slide .bd").find("li").length > 6) {
+        $(".atwillgo-slide").slide({
+            mainCell: ".bd ul",
+            titCell: ".hd ul",
+            effect: "left",
+            pnLoop: false,
+            vis: 6,
+            scroll: 6,
+            autoPage: "<li></li>"
+        });
+    } else {
+        $(".atwillgo-slide").find(".prev,.next").hide();
+    }
+
+
+    var categoryList = {$categoryList|raw};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: categoryList
+        },
+        methods: {
+            init: function () {
+                for (var i = 0; i < vm.list.children.length; i++) {
+                    if(vm.list.children[i].hasOwnProperty('children')){
+                        $.post('/home/category/categoryGoodsList', {
+                            cat_id: vm.list.children[i].children[0].cat_id,
+                            limit: 12
+                        }, function (ret) {
+                            vm.list.children[i].goods_list = ret.data;
+                        }, 'json');
+                    }
+                }
+                $.ajaxSetup({async : true});
+                setTimeout(function(){
+                    $.catetopLift();
+                },100);
+            },
+            goodsListInit:function (index,cat_id,index2) {
+                vm.list.children[index].checkitem = index2;
+                $.post('/home/category/categoryGoodsList', {
+                    cat_id: cat_id,
+                    limit: 12
+                }, function (ret) {
+                    vm.list.children[index].goods_list = ret.data;
+                }, 'json');
+            }
+        }
+    });
+    $(function () {
+        $.ajaxSetup({async : false});
+        vm.init();
+    });
+
+</script>

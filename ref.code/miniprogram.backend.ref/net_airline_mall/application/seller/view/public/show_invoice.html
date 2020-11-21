@@ -1,0 +1,81 @@
+<style>
+    .sc-btn{
+        padding: 0 10px;
+        height: 28px;
+        background: #fff;
+        line-height: 28px;
+        border-radius: 4px;
+        display: inline-block;
+        font-size: 12px;
+        cursor: pointer;
+        border: 1px solid #139ff0;
+        color: #139ff0;
+        text-decoration: none;
+    }
+</style>
+<div class="layui-card">
+    <div class="layui-card-body">
+        {if $order.invoice_type>0}
+        <div class="flex">
+            <span class="flex-lable">单位名称：</span>
+            <span class="flex-cont">{$vat_invoice.company_name}</span>
+        </div>
+        <div class="flex">
+            <span class="flex-lable">单位税号：</span>
+            <span class="flex-cont">{$vat_invoice.tax_id}</span>
+        </div>
+        <div class="flex">
+            <span class="flex-lable">注册地址：</span>
+            <span class="flex-cont">{$vat_invoice.company_address}</span>
+        </div>
+        <div class="flex">
+            <span class="flex-lable">注册电话：</span>
+            <span class="flex-cont">{$vat_invoice.company_telephone}</span>
+        </div>
+        <div class="flex">
+            <span class="flex-lable">开户银行：</span>
+            <span class="flex-cont">{$vat_invoice.bank_of_deposit}</span>
+        </div>
+        <div class="flex">
+            <span class="flex-lable">银行账号：</span>
+            <span class="flex-cont">{$vat_invoice.bank_account}</span>
+        </div>
+        <div class="flex">
+            <span class="flex-lable">收票人姓名：</span>
+            <span class="flex-cont">{{info.vat_invoice.consignee_name}}</span>
+        </div>
+        <div class="flex">
+            <span class="flex-lable">收票人手机号：</span>
+            <span class="flex-cont">{$vat_invoice.consignee_mobile_phone}</span>
+        </div>
+        <div class="flex">
+            <span class="flex-lable">收票人详细地址：</span>
+            <span class="flex-cont">{$vat_invoice.consignee_address}</span>
+        </div>
+        {else /}
+        <div class="flex">
+            <span class="flex-lable">发票抬头：</span>
+            <span class="flex-cont">{$order.invoice_title}</span>
+        </div>
+        {if $order.invoice_no}
+        <div class="flex">
+            <span class="flex-lable">单位税号：</span>
+            <span class="flex-cont">{$order.invoice_no}</span>
+        </div>
+        {/if}
+        <div class="flex">
+            <span class="flex-lable">发票内容：</span>
+            <span class="flex-cont">{$order.invoice_content}</span>
+        </div>
+        {/if}
+
+        <div class="layui-form-item margin-top-20">
+            <div style="text-align:center;margin-top: 20px">
+                <button class="sc-btn sc-blue-btn" lay-filter="component-form-element"
+                        onclick="parent.layer.closeAll()">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,270 @@
+{include file='public/head'}
+<link rel="stylesheet" type="text/css" href="__STATIC__/plugins/swiper/swiper.min.css">
+<link rel="stylesheet" type="text/css" href="__THEME__/css/store.css">
+<link rel="stylesheet" type="text/css" href="__THEME__/css/preview.css">
+{include file='public/top_nav'}
+{include file='public/store_search_bar'}
+{include file='public/shop_header'}
+<style>
+    .w1200 {
+        width: 1390px;
+    }
+
+    .footer-new-con .fnc-warp {
+        width: 1390px;
+    }
+</style>
+<div class="shop-list-main">
+    <div class="pc-wrapper">
+        {include file='public/shop_nav'}
+        <div class="content tpl2" style="min-height: 891px; background-image: none; background-color: transparent; background-position: 100% 50%; background-repeat: repeat;">
+            <div class="w w1390">
+                <div class="clearfix mt15">
+                    <div class="shop-list-side">
+                        <div class="side-box">
+                            <h2>店铺分类</h2>
+                            <div class="side-menu">
+                                {foreach $cat as $vo}
+                                <dl class="j-slideToggle-wp active">
+                                    <dt class="menu-level-1"><a href="{:url('store/category',['id'=>$store.store_id,'cid'=>$vo.cat_id])}">{$vo.cat_name}</a><i class="iconfont icon-xia j-slideToggle-handle"></i></dt>
+                                    {if isset($vo['children'])}
+                                    {foreach $vo.children as $vo2}
+                                    <dd class="j-slideToggle-con" style="display: block;">
+                                        <p><a href="{:url('store/category',['id'=>$store.store_id,'cid'=>$vo2.cat_id])}">{$vo2.cat_name}</a></p>
+                                    </dd>
+                                    {/foreach}
+                                    {/if}
+                                </dl>
+                                {/foreach}
+                            </div>
+                        </div>
+                        <div class="side-box">
+                            <h2>店内搜索</h2>
+                            <div class="mb30">
+                                <form method="GET" action="{:url('store/category',['id'=>$store.store_id,'cid'=>$Think.param.cid])}" class="" name="listform" onsubmit="return checkSearch()">
+                                    <input type="text" id="sp-keyword" name="keyword" value="" placeholder="商品名称关键字" autocomplete="off">
+                                    <button id="btnShopSearch" type="submit" class="btn mr0">搜索</button>
+                                    <input type="hidden" value="5" id="merchant_id" name="merchant_id">
+                                    <input type="hidden" value="44" id="cat_id" name="cat_id">
+                                </form>
+                            </div>
+                        </div>
+                        <div class="side-box">
+                            <h2>商品排行</h2>
+                            <div class="mb30">
+                                <div class="tabmenu">
+                                    <ul class="tab-head flex jujustify-content-center">
+                                        <li class="active">热销商品</li>
+                                        <li>热门收藏</li>
+                                    </ul>
+                                </div>
+                                <div class="list-div">
+                                    <div class="list-item">
+                                        {foreach $data.goodsList.sale as $goods}
+                                        <a class="flex jujustify-content-center" href="{:url('goods/detail',['id'=>$goods.goods_id])}" target="_blank">
+                                            <div class="goods-img">
+                                                <img src="{$goods.original_img}" alt="{$goods.goods_name}">
+                                            </div>
+                                            <div class="goods-info">
+                                                <div class="goods_name">{$goods.goods_name}</div>
+                                                <div class="price"><em>¥</em><span class="red">{$goods.shop_price}</span></div>
+                                                <div class="">已售出:{$goods.total_sale_num+$goods.virtual_sale_num}</div>
+                                            </div>
+                                        </a>
+                                        {/foreach}
+                                    </div>
+                                    <div class="list-item" style="display: none;">
+                                        {foreach $data.goodsList.favorite as $goods}
+                                        <a class="flex jujustify-content-center" href="{:url('goods/detail',['id'=>$goods.goods_id])}" target="_blank">
+                                            <div class="goods-img">
+                                                <img src="{$goods.original_img}" alt="{$goods.goods_name}">
+                                            </div>
+                                            <div class="goods-info">
+                                                <div class="goods_name">{$goods.goods_name}</div>
+                                                <div class="price"><em>¥</em><span class="red">{$goods.shop_price}</span></div>
+                                                <div class="">收藏:{$goods.collect_count}</div>
+                                            </div>
+                                        </a>
+                                        {/foreach}
+                                    </div>
+                                </div>
+                                <div class="mt30 text-center">
+                                    <a href="{:url('store/category',['id'=>$store.store_id])}" class="btn">本店全部商品</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-list-view">
+                        {if isset($store.carcousel.img)}
+                        <div class="item">
+                            <div class="view">
+                                <div class="swiper-container" id="shop_banner" data-effect="{$store.slide_type}">
+                                    <div class="swiper-wrapper">
+                                        {foreach $store.carcousel.img as $index=>$img}
+                                        <div class="swiper-slide">
+                                            <a href="{$store['carcousel']['url'][$index]}"><img src="{$img}"></a>
+                                        </div>
+                                        {/foreach}
+                                        <div class="swiper-button-prev"></div>
+                                        <div class="swiper-button-next"></div>
+                                    </div>
+                                    <div class="swiper-pagination shop_banner_pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {/if}
+                        <div class="g-view w">
+                            <div class="goods-list floor hot" style="margin-bottom:30px;">
+                                <div class="">
+                                    <div class="flex justify-content-between separate-line pt10 pb10">
+                                        <h2>热销&nbsp;<i class="iconfont"></i></h2>
+                                        <p><a href="{:url('store/category',['id'=>$store.store_id,'tag'=>'store_hot'])}">更多&nbsp;<i class="iconfont icon-right"></i></a></p>
+                                    </div>
+                                </div>
+                                {if count($data.goodsList.hot)}
+                                <ul class="row4 mc">
+                                    {foreach $data.goodsList.hot as $goods}
+                                    <li class="">
+                                        <div class="img">
+                                            <a href="{:url('goods/detail',['id'=>$goods.goods_id])}"><img src="{$goods.original_img}"></a>
+                                        </div>
+                                        <div class="info">
+                                            <div class="name"><a href="{:url('goods/detail',['id'=>$goods.goods_id])}">{$goods.goods_name}</a></div>
+                                            <div class="flex justify-content-between">
+                                                <div class="price"><em>¥</em>{$goods.shop_price}</div>
+                                                <div class="btn_hover"><a href="{:url('goods/detail',['id'=>$goods.goods_id])}">立即购买</a></div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {/foreach}
+                                </ul>
+                                {else /}
+                                <div class="user-order-list user-order-list-special">
+                                    <div id="no_records" class="no_records" style="display: block;"><i class="no_icon"></i>
+                                        <div class="no_info"><h3>本店正在努力上传商品哦~</h3></div>
+                                    </div>
+                                </div>
+                                {/if}
+                            </div>
+
+                            <div class="goods-list floor best" style="margin-bottom:30px;">
+                                <div class="">
+                                    <div class="flex justify-content-between separate-line pt10 pb10">
+                                        <h2>推荐&nbsp;<i class="iconfont"></i></h2>
+                                        <p><a href="{:url('store/category',['id'=>$store.store_id,'tag'=>'store_best'])}">更多&nbsp;<i class="iconfont icon-right"></i></a></p>
+                                    </div>
+                                </div>
+                                {if count($data.goodsList.best)}
+                                <ul class="row5 mc">
+                                    {foreach $data.goodsList.best as $goods}
+                                    <li class="">
+                                        <div class="img">
+                                            <a href="{:url('goods/detail',['id'=>$goods.goods_id])}"><img src="{$goods.original_img}"></a>
+                                        </div>
+                                        <div class="info">
+                                            <div class="name"><a href="{:url('goods/detail',['id'=>$goods.goods_id])}">{$goods.goods_name}</a></div>
+                                            <div class="flex justify-content-between">
+                                                <div class="price"><em>¥</em>{$goods.shop_price}</div>
+                                                <div class="btn_hover"><a href="{:url('goods/detail',['id'=>$goods.goods_id])}">立即购买</a></div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {/foreach}
+                                </ul>
+                                {else /}
+                                <div class="user-order-list user-order-list-special">
+                                    <div class="no_records" style="display: block;"><i class="no_icon"></i>
+                                        <div class="no_info"><h3>本店正在努力上传商品哦~</h3></div>
+                                    </div>
+                                </div>
+                                {/if}
+                            </div>
+
+                            <div class="goods-list floor new">
+                                <div class="">
+                                    <div class="flex justify-content-between separate-line pt10 pb10">
+                                        <h2>新品&nbsp;<i class="iconfont"></i></h2>
+                                        <p><a href="{:url('store/category',['id'=>$store.store_id,'tag'=>'store_new'])}">更多&nbsp;<i class="iconfont icon-right"></i></a></p>
+                                    </div>
+                                </div>
+                                {if count($data.goodsList.new)}
+                                <ul class="row5 mc">
+                                    {foreach $data.goodsList.new as $goods}
+                                    <li class="">
+                                        <div class="img">
+                                            <a href="{:url('goods/detail',['id'=>$goods.goods_id])}"><img src="{$goods.original_img}"></a>
+                                        </div>
+                                        <div class="info">
+                                            <div class="name"><a href="{:url('goods/detail',['id'=>$goods.goods_id])}">{$goods.goods_name}</a></div>
+                                            <div class="flex justify-content-between">
+                                                <div class="price"><em>¥</em>{$goods.shop_price}</div>
+                                                <div class="btn_hover"><a href="{:url('goods/detail',['id'=>$goods.goods_id])}">立即购买</a></div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {/foreach}
+                                </ul>
+                                {else /}
+                                <div class="user-order-list user-order-list-special">
+                                    <div class="no_records" style="display: block;"><i class="no_icon"></i>
+                                        <div class="no_info"><h3>本店正在努力上传商品哦~</h3></div>
+                                    </div>
+                                </div>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{include file='public/right_bar'}
+<script type="text/javascript" src="__STATIC__/plugins/swiper/swiper.min.js"></script>
+<script>
+    function slideToggle() {
+        var wp = $(".j-slideToggle-wp");
+        wp.each(function (i, el) {
+            var $this = $(el);
+            var handle = $this.find(".j-slideToggle-handle");
+            var con = $this.find(".j-slideToggle-con");
+            handle.click(function () {
+                con.slideToggle();
+                $this.toggleClass("active");
+            });
+        });
+    }
+
+    var length = $("#shop_banner .swiper-slide").length;
+
+    if (length > 1) {
+        new Swiper('#shop_banner', {
+            autoplay: {
+                delay: 5000
+            },
+            pagination: {
+                el: '.shop_banner_pagination',
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            effect: $("#shop_banner").data("effect"),
+            loop: true,
+            speed: 500,
+        });
+    }
+
+    $(function () {
+        slideToggle();
+        $('.side-box .tabmenu li').hover(function () {
+            $(this).addClass('active').siblings().removeClass('active');
+            console.log($(this).parents('.list-div'));
+            $(this).parents('.mb30').find('.list-div .list-item').eq($(this).index()).show().siblings().hide();
+        });
+    });
+</script>
+{include file='public/footer'}

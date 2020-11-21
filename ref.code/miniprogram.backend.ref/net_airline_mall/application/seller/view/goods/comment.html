@@ -1,0 +1,168 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">用户评论</a></li>
+    </ul>
+</div>
+
+<div id="app" v-cloak>
+    <div class="search-info">
+        <div class="search-form">
+            <div class="search-key">
+                <input type="text" v-model="keyword" class="text text_2" placeholder="输入评论内容" @change="page=1;getData()">
+                <input type="button" class="submit" value=" 搜索 " @click="page=1;getData()">
+            </div>
+        </div>
+    </div>
+
+    <div class="list-div">
+        <table class="ecsc-default-table">
+            <thead>
+            <tr>
+                <th width="8%">
+                    <div class="first_all">
+                        <input @change="selectAll()" type="checkbox" class="ui-checkbox" id="all">
+                        <label for="all" class="ui-label"><a @click="orderby('comment_id')">编号</a></label>
+                        <img v-if="field=='comment_id'" :src="'/public/static/images/sort_'+sort+'.gif'">
+                    </div>
+                </th>
+                <th width="10%"><a @click="orderby('user_name')">用户名</a>
+                    <div class="img" v-if="field=='user_name'"><img :src="'/public/static/images/sort_'+sort+'.gif'"></div>
+                </th>
+                <th width="10%"><a @click="orderby('parent_id')">类型</a>
+                    <div class="img" v-if="field=='parent_id'"><img :src="'/public/static/images/sort_'+sort+'.gif'"></div>
+                </th>
+                <th width="30%"><a @click="orderby('goods_name')">商品名称</a>
+                    <div class="img" v-if="field=='goods_name'"><img :src="'/public/static/images/sort_'+sort+'.gif'"></div>
+                </th>
+                <th width="10%"><a @click="orderby('ip_address')">IP地址</a>
+                    <div class="img" v-if="field=='ip_address'"><img :src="'/public/static/images/sort_'+sort+'.gif'"></div>
+                </th>
+                <th width="10%"><a @click="orderby('create_time')">评论时间</a>
+                    <div class="img" v-if="field=='create_time'"><img :src="'/public/static/images/sort_'+sort+'.gif'"></div>
+                </th>
+                <th width="10%">状态</th>
+                <th width="10%">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="bd-line" v-for="(vo,index) in list">
+                <td class="first_td_checkbox">
+                    <div class="first_all">
+                        <input :value="vo.comment_id" v-model="checkboxes" type="checkbox" :id="'comment_'+index" class="ui-checkbox">
+                        <label :for="'comment_'+index" class="ui-label">{{vo.comment_id}}</label>
+                    </div>
+                </td>
+                <td align="center">{{vo.user_name}}</td>
+                <td align="center"><span v-if="vo.parent_id>0">管理员回复</span><span v-else>商品</span></td>
+                <td align="center"><a :href="'/home/goods/detail?id='+vo.goods_id" target="_blank">{{vo.goods_name}}</a></td>
+                <td align="center">{{vo.use_ip}}</td>
+                <td align="center">{{vo.create_time |timeParse}}</td>
+                <td align="center"><span v-if="vo.enabled==0">显示</span><span v-else>不显示</span></td>
+                <td class="ecsc-table-handle">
+                    <span v-if="vo.type==0"><a :href="'/seller/goods/comment_reply?id='+vo.comment_id" class="btn-green"><i class="icon icon-edit"></i><p>编辑</p></a></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+</div>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            keyword: '',
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+            field: 'comment_id',
+            sort: 'desc',
+            checkboxes: []
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        watch: {
+            checkboxes: function (news) {
+                document.getElementById('all').checked = news.length == this.list.length;
+            }
+        },
+        methods: {
+            getData: function () {
+                var keywords = vm.keyword;
+                var param = {
+                    page: vm.page,
+                    pageSize: vm.pageSize,
+                    field: vm.field,
+                    sort: vm.sort,
+                };
+                if (keywords) {
+                    param.keywords = keywords;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/goods/comment',
+                    data: param,
+                    success: function (data) {
+                        vm.count = data.count;
+                        vm.page = data.page;
+                        vm.list = data.list;
+                        if (data.page == 1) vm.pagerender();
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            orderby: function (field) {
+                this.field = field;
+                this.sort = this.sort == 'desc' ? 'asc' : 'desc';
+                this.getData();
+            },
+            pagerender: function (instance) {
+                if (!instance) instance = vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: instance.pageSize,
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+            selectAll: function () {
+                if (event.currentTarget.checked) {
+                    vm.checkboxes = [];
+                    vm.list.forEach(function (v) {
+                        vm.checkboxes.push(v.comment_id);
+                    });
+                } else {
+                    vm.checkboxes = [];
+                }
+            }
+        }
+    });
+
+    $(function () {
+        vm.getData();
+    });
+</script>
+{include file="public/footer"}

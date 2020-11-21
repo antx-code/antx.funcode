@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+
+            </div>
+            <ul>
+                <li>展示了拍卖专区商品的相关信息列表。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <div class="fbutton" @click="add()">
+                        <div class="add" title="添加会员">
+                            <span><i class="icon icon-plus"></i>添加商品</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" placeholder="商品名称" class="text nofocus" v-model="keywords">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%">
+                                <div class="tDiv">编号</div>
+                            </th>
+                            <th width="30%">
+                                <div class="tDiv">商品名称</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">最低高价</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">最出高价</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">状态</div>
+                            </th>
+                            <th width="15%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td>
+                                    <div class="tDiv">{{vo.id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.goods_name}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.min_price}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.max_price}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.status==1}" title="是"
+                                             @click="doupdatestatus(vo)">
+                                            <div class="circle"></div>
+                                        </div>
+                                        <input type="hidden" value="0" name="">
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a3">
+                                        <a href="javascript:void(0)" title="编辑" class="btn_edit" @click="add(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="12">
+                                <div class="tDiv">
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+
+        },
+        methods: {
+            add: function (vo = {}) {
+                if (vo.id > 0) {
+                    layerOpenwinMid('拍卖专区 - 编辑商品', '/admin/market/paimaigoodsadd?id=' + vo.id);
+                } else {
+                    layerOpenwinMid('拍卖专区 - 添加商品', '/admin/market/paimaigoodsadd?id=0');
+                }
+            },
+            doupdatestatus: function (vo) {
+                var status = vo.status == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.status = status;
+                majax('/admin/market/doupdate', pageparm, 'paimai_goods')
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/market/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'paimai_goods'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            init: function () {
+                $.post('/admin/market/paimaigoods', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

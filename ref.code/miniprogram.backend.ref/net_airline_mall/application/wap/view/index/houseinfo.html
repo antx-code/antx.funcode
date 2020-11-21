@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>商品详情</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+    <style>.goods_desc img {max-width: 100% !important;}</style>
+</head>
+<body>
+<div id="app" v-cloak="">
+    <div class="con_main goods">
+        <div waterfall-disabled="disabled" waterfall-offset="300" class="goods-li">
+            <div class="show bg-color-write li">
+                <div class="left"><img :src="info.goods.original_img" class="img"></div>
+                <div class="right bg-color-write">
+                    <h4 class="f-04 color-3 twolist-hidden">{{info.goods.goods_name}}</h4>
+                    <div class="dis-box p-r">
+                        <div class="box-flex m-top08">
+                            <div class="f-02">起拍价</div>
+                            <div class="color-red f-06">
+                                <span>¥{{info.goods.min_price}}</span>
+                                <del class="f-02 color-9">¥{{info.goods.max_price}}</del>
+                            </div>
+                            <div class="f-04">
+                                <span>每次加价1元</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="bg-color-write">
+            <div class="user-login-box">
+                <div class="el-form user-login-form">
+                    <div class="user-login-ul">
+                        <div class="el-form-item">
+                            <div class="el-form-item__content">
+                                <div class="item-input dis-box">
+                                    <div class="value box-flex">
+                                        <div class="el-input">
+                                            <input type="number" placeholder="自动开拍人数" class="el-input__inner" v-model="info.paimai_house.autop_num" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="key">
+                                        <label>开拍人数</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="el-form-item">
+                            <div class="el-form-item__content">
+                                <div class="item-input dis-box">
+                                    <div class="value box-flex">
+                                        <div class="el-input">
+                                            <input type="number" placeholder="房间人数" class="el-input__inner" v-model="info.paimai_house.house_num" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="key">
+                                        <label>房间人数</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="el-form-item">
+                            <div class="el-form-item__content">
+                                <div class="item-input dis-box">
+                                    <div class="value box-flex">
+                                        <div class="el-input">
+                                            <input type="number" placeholder="开始倒计时" class="el-input__inner" v-model="info.paimai_house.time_down" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="key">
+                                        <label>开始计时</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="el-form-item">
+                            <div class="el-form-item__content">
+                                <div class="item-input dis-box">
+                                    <div class="value box-flex">
+                                        <div class="el-input">
+                                            <input type="number" placeholder="拍卖时长" class="el-input__inner" v-model="info.paimai_house.time_total" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="key">
+                                        <label>拍卖时长</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            id: 0,
+            info:{}
+        },
+        filters: {
+            timeParse: function (timestamp) {
+                return moment.unix(timestamp).format('HH:mm');
+            }
+        },
+        methods: {
+            init: function () {
+                wxapp.ajax(config.houseinfo, {id: vm.id}, 0).then(function (ret) {
+                    console.log(JSON.stringify(ret));
+                    if (ret) {
+                        vm.info = ret.data;
+                    }
+                });
+            },
+        }
+    });
+    window.onload = function () {
+        vm.id = api.pageParam.id ? api.pageParam.id : 0;
+        vm.init();
+    };
+</script>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<link rel="stylesheet" type="text/css" href="/public/static/theme/css/color.css">
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>首页楼层广告设置。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info user_basic">
+                    <div class="item">
+                        <div class="label">hometheme：</div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.hometheme" class="text"/>
+                            <div class="notic">模板代码,关联config表hometheme字段，例：themes2019</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">商品分类ID：</div>
+                        <div class="label_value">
+                            <input type="number" v-model="info.cat_id" class="text"/>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">楼层名称：</div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.title" class="text"/>
+                        </div>
+                    </div>
+                    <div :class="['item','floorOne',info.style]">
+                        <div class="label">楼层样式：</div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.style" class="text"/>
+                            <div class="notic"><span class="floor-hd" style="padding:2px; 10px">&nbsp;</span>样式颜色floor-color-type-1 ~ floor-color-type-26</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">first_tab_title：</div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.first_tab_title" class="text"/>
+                            <div class="notic">楼层第一个tab标签名称</div>
+                        </div>
+
+                    </div>
+                    <div class="item">
+                        <div class="label">tab_num：</div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.tab_num" class="text"/>
+                            <div class="notic">楼层tab标签默认显示4个二级分类</div>
+                        </div>
+
+                    </div>
+
+                    <div class="item">
+                        <div class="label">floor_mode：</div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.floor_mode" class="text"/>
+                            <div class="notic">对应楼层视图文件名</div>
+                        </div>
+
+                    </div>
+                    <div class="item">
+                        <div class="label">排序：</div>
+                        <div class="label_value">
+                            <input type="text" v-model="info.sort" class="text"/>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label">显示：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="sex" id="sex_0" value="1" v-model="info.is_show">
+                                    <label for="sex_0" class="ui-radio-label">显示</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="sex" id="sex_1" value="0" v-model="info.is_show">
+                                    <label for="sex_1" class="ui-radio-label">隐藏</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="add()"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = {$info|raw};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+        },
+        methods: {
+            add: function () {
+                majax('/admin/website/home_floor_add',vm.info);
+            }
+        }
+    });
+</script>

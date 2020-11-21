@@ -1,0 +1,319 @@
+{include file="public/header"}
+<link rel="stylesheet" type="text/css" href="/public/static/plugins/swiper/swiper.min.css">
+<style>
+    .advertising ul.row1 li {
+        width: 98%;
+    }
+
+    .advertising ul.row2 li {
+        width: 49%;
+    }
+
+    .advertising ul.row3 li {
+        width: 32%;
+    }
+
+    .advertising ul.row4 li {
+        width: 24%;
+    }
+
+    .advertising ul.row5 li {
+        width: 19%;
+    }
+
+    .advertising ul.row6 li {
+        width: 15.7%;
+    }
+
+    .advertising li {
+        float: left;
+        margin-right: 9px;
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .advertising li a {
+        position: relative;
+        top: 31px;
+    }
+
+    .del {
+        width: 24px;
+        height: 24px;
+        padding: 2px;
+        background: url('/public/static/images/close.png') center no-repeat;
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 9999;
+        cursor: pointer;
+        border: 1px solid #b2b2b2;
+        border-radius: 50%;
+    }
+
+    .del:hover {
+        border: 1px solid red;
+    }
+
+    .advertising li img {
+        width: 100%;
+        height: 337px;
+    }
+
+    .advertising li img:hover, .flexcenter img:hover {
+        filter: brightness(50%);
+    }
+
+    .advertising li .url {
+        position: relative;
+        bottom: -40px;
+    }
+
+    .swiper-slide img {
+        max-width: 100%;
+        max-height: 320px;
+    }
+
+    .border {
+        border: 1px solid #139ff0;
+    }
+
+    .border img {
+        max-width: 200px;
+    }
+
+    .flexcenter {
+        display: flex;
+        position: relative;
+        align-items: center;
+    }
+
+    .flexcenter img {
+        max-width: 300px;
+        max-height: 100px;
+        margin: 10px 20px 0 0;
+        cursor: pointer;
+    }
+
+    .flexcenter .del {
+        position: unset;
+        margin-left: 20px;
+    }
+</style>
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:;">二楼广告</a></li>
+        <li class=""><a href="javascript:;">三楼广告</a></li>
+    </ul>
+</div>
+
+<div class="ecsc-form-goods items-info" id="app" v-cloak>
+    <div class="wrapper-list" data-pos="top">
+        <div class="explanation clear mb20">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>温馨提示</h4></div>
+            <ul>
+                <li>点击广告图片,上传新图片编辑操作,最多上传6张图片。</li>
+                <li>二楼为图片广告支持gif动态图片。图片尺寸: <b>1200 * 300</b>效果最佳</li>
+            </ul>
+        </div>
+        <div class="btn-info">
+            <a class="sc-btn sc-blue-btn" @click="add()"><i class="icon-plus"></i>添加图片</a>
+            <a class="sc-btn btn-orange" @click="toggleShow()">
+                <span v-if="list.top.is_show"><i class="icon-eye-close"></i>隐藏广告</span>
+                <span v-else><i class="icon-eye-open"></i>显示广告</span>
+            </a>
+        </div>
+        <div class="clear"></div>
+        <div class="advertising">
+            <ul :class="'row'+list.top.img.length">
+                <li v-for="(vo,index) in list.top.img">
+                    <div class="del" title="删除" @click="del(index)"></div>
+                    <a @click="instead(index)"><img :src="vo"></a>
+                    <div class="url"><input class="text text_2" @change="edit()" v-model="list.top.url[index]"></div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="wrapper-list hide" data-pos="bottom">
+        <div class="btn-info">
+            <a class="sc-btn sc-blue-btn" @click="add()"><i class="icon-plus"></i>添加图片</a>
+            <a class="sc-btn btn-orange" @click="toggleShow()">
+                <span v-if="list.bottom.is_show"><i class="icon-eye-close"></i>隐藏广告</span>
+                <span v-else><i class="icon-eye-open"></i>显示广告</span>
+            </a>
+        </div>
+        <div class="explanation clear mb20">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>温馨提示</h4></div>
+            <ul>
+                <li>此广告位是 <b>轮播形式</b> , 最多上传6张图片。</li>
+                <li>大图预览效果,请点击蓝框区域编辑广告图片。图片尺寸: <b>1200 * 400</b>效果最佳</li>
+                <li></li>
+            </ul>
+        </div>
+        <div class="advertising">
+            <div class="relative">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide" v-for="(vo,idx) in list.bottom.img"><img :src="vo"></div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+            <div class="border mt10 pb10">
+                <div class="mt10">
+                    <label for="effect">切换效果:
+                        <select id="effect" v-model="effect" @change="edit();carsousel_run('effect')">
+                            <option value="slide">滑动</option>
+                            <option value="fade">淡入</option>
+                            <option value="cube">方块</option>
+                            <option value="coverflow">3D流</option>
+                            <option value="flip">3D翻转</option>
+                        </select>
+                    </label>
+                </div>
+                <div v-for="(vo,index) in list.bottom.img" class="flexcenter">
+                    <img :src="vo" alt="点击更换图片" @click="instead(index)">
+                    <input type="text" class="text text_7" v-model="list.bottom.url[index]" @change="edit()">
+                    <div class="del" @click="del(index)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/public/static/plugins/swiper/swiper.min.js"></script>
+<script>
+    var mySwiper;
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            list: JSON.parse('{:json_encode($adv)}'),
+            token: '',
+            effect: 'slide',
+        },
+        methods: {
+            getKey: function () {
+                return $(event.currentTarget).parents('.wrapper-list').data('pos');
+            },
+            del: function (index) {
+                var key = this.getKey();
+                if (!window.confirm('您确定要删除吗?')) {
+                    return false;
+                }
+                vm.list[key].img.splice(index, 1);
+                vm.list[key].url.splice(index, 1);
+                vm.updateImg(key);
+            },
+            instead: function (index) {
+                var key = this.getKey();
+                var input = document.createElement('input');
+                input.type = 'file';
+                input.style.opacity = 0;
+                input.onchange = function () {
+                    single_upload(this.files[0], function (res) {
+                        layer.closeAll();
+                        Vue.set(vm.list[key].img, index, res);
+                        vm.updateImg(key);
+                    }, null, vm.token);
+                    $(input).remove();
+                };
+                document.body.append(input);
+                $(input).trigger('click');
+            },
+            updateImg(key, callback) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/store/advertising',
+                    data: {type: key, img: vm.list[key].img, url: vm.list[key].url, effect: vm.effect},
+                    success: function (res) {
+                        if (typeof callback == 'function') callback(res);
+                        else easyshow('保存成功~');
+                        if (key == 'bottom') {
+                            setTimeout(function () {
+                                vm.carsousel_run();
+                            }, 100);
+                        }
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            add: function () {
+                var key = this.getKey();
+                if (vm.list[key].img.length > 5) {
+                    easyshow('广告图片最多添加6张');
+                    return;
+                }
+                vm.list[key].img.push('http://shangxing.heimicms.com/Fuuzz9lFfD077J98PlZQlb-N4GML');
+                vm.list[key].url.push('/');
+            },
+            toggleShow() {
+                var key = this.getKey();
+                $.ajax({
+                    type: 'GET',
+                    url: '/seller/store/advertising',
+                    data: {type: key, is_show: vm.list[key].is_show},
+                    success: function (data) {
+                        vm.list[key].is_show = data;
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            edit: function () {
+                this.updateImg(this.getKey());
+            },
+            carsousel_run() {
+                if (mySwiper) {
+                    mySwiper.destroy();
+                    mySwiper = null;
+                }
+                mySwiper = new Swiper('.swiper-container', {
+                    autoplay: true,
+                    effect: vm.effect,
+                    speed: 500,
+                    grabCursor: true,
+                    pagination: {
+                        el: '.swiper-pagination',
+                    },
+                    loop: true,
+                });
+                mySwiper.params.autoplay.delay = 5000;
+            }
+        },
+        created: function () {
+            if (!this.list.top || !this.list.top.img) {
+                Vue.set(this.list, 'top', {img: ['http://shangxing.heimicms.com/Fuuzz9lFfD077J98PlZQlb-N4GML'], url: ['/']});
+            }
+            if (!this.list.bottom || !this.list.bottom.img) {
+                Vue.set(this.list, 'bottom', {img: ['http://shangxing.heimicms.com/Fuuzz9lFfD077J98PlZQlb-N4GML'], url: ['/']});
+            }
+        },
+        mounted: function () {
+            var instance = this;
+            $.ajax({
+                type: 'POST',
+                url: '/seller/api/uploadtoken',
+                success: function (data) {
+                    instance.token = data;
+                },
+                error: function (xhr, type) {
+                    easyshow(xhr.responseJSON);
+                }
+            });
+            if (instance.list.bottom.img) {
+                instance.effect = instance.list.bottom.effect;
+            }
+        }
+    });
+
+    $('.tab li').eq(1).click(function () {
+        setTimeout(function () {
+            vm.carsousel_run();
+        }, 50);
+    });
+</script>
+{include file="public/footer"}

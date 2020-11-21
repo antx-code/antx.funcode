@@ -1,0 +1,54 @@
+{include file='public/head'}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+
+<div class="container">
+    <div class="w w1200 h-margin-20">
+        <div class="err-404 flex jujustify-content-center">
+            <img src="__THEME__/images/error_ts.png">
+            <div class="flex align-item-center ml10">
+                <div class="text-center">
+                    <h3>{$msg}</h3>
+                    <p class="mt10">
+                    <span class="ts" id="redirectionMsg">
+                        <span id="wait">{$wait}</span> 秒后自动跳转到
+                        <a id="href" href="{$url}">{if $code==1} {$url}{else /} 前一个页面{/if}</a>
+                    </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="w w1200">
+        <div class="goods-main-layout">
+            <div class="rection">
+                <div class="ftit"><h3>逛逛其它吧</h3></div>
+                <ul id="guess_goods_love"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file='public/right_bar'}
+<script>
+    (function () {
+        var wait = document.getElementById('wait'),
+            href = document.getElementById('href').href;
+        var interval = setInterval(function () {
+            var time = --wait.innerHTML;
+            if (time <= 0) {
+                location.href = href;
+                clearInterval(interval);
+            }
+        }, 1000);
+    })();
+    function guessYouLike() {
+        $.post('/home/index/ajaxGuessYouLike', {limit: 20}, function (res) {
+            $("#guess_goods_love").html(res);
+        });
+    }
+
+    guessYouLike();
+</script>
+{include file='public/footer'}

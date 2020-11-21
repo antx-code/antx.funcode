@@ -1,0 +1,162 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+        <div class="user-mod" style="min-height: 1150px;" id="app" v-cloak="">
+            <div class="type">
+                <div class="user-title">
+                    <h2>支付密码管理</h2>
+                </div>
+                <div class="stepflex">
+                    <dl class="first doing" :class="{'doing':doing==1}">
+                        <dt class="s-num">1</dt>
+                        <dd class="s-text">验证身份<s></s><b></b></dd>
+                        <dd></dd>
+                    </dl>
+                    <dl class="normal" :class="{'doing':doing==2}">
+                        <dt class="s-num">2</dt>
+                        <dd class="s-text">启用支付<s></s><b></b></dd>
+                    </dl>
+                    <dl class="normal" :class="{'doing':doing==3}">
+                        <dt class="s-num">3</dt>
+                        <dd class="s-text">完成<s></s><b></b></dd>
+                    </dl>
+                </div>
+                <div class="form">
+                    <div class="security-warp">
+                        <template v-if="doing==1">
+                            <div name="formUser" class="user-form user-form-safe" shoptype="user_security_from">
+                                <div class="form-row">
+                                    <div class="form-label">已验证手机：</div>
+                                    <div class="form-value">
+                                        <span>{{info.mobile}}</span>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-label">手机验证码：</div>
+                                    <div class="form-value">
+                                        <input class="itxt" name="mobile_phone" id="mobile_phone" v-model="info.mobile" type="hidden">
+                                        <input class="form-input" type="text" name="mobile_code" tabindex="1" id="mobile_code" v-model="smscode">
+                                        <a href="javascript:void(0)" id="zphone" class="sms-btn" @click="sendsms()">获取验证码</a>
+                                        <div class="form_prompt" id="phone_captcha"></div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-label">验证码：</div>
+                                    <div class="form-value">
+                                        <input class="form-input authCode txt-4" name="authCode" id="authCode" type="text" v-model="captcha">
+                                        <img src="/home/login/verify" alt="captcha" id="captcha_img" class="fl mr10"
+                                             onclick="this.src='/home/login/verify?time='+Math.random()"
+                                             width="100" height="40">
+                                        <div class="form_prompt" id="code_notice"></div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-label">&nbsp;</div>
+                                    <div class="form-value form-value-btn">
+                                        <input type="submit" class="form-btn form-btn-line" value="确定" id="submitMobile" shoptype="submitBtn" @click="checkoperation()">
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template v-if="doing==2">
+                            <div name="formUser" class="user-form user-form-safe" shoptype="user_security_from">
+                                <div class="form-row">
+                                    <div class="form-label">支付密码：</div>
+                                    <div class="form-value">
+                                        <input class="form-input authCode txt-4" v-model="info.pay_password">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-label">&nbsp;</div>
+                                    <div class="form-value form-value-btn">
+                                        <input type="submit" class="form-btn form-btn-line" value="确定" shoptype="submitBtn" @click="updatepwd()">
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="public:footer"}
+
+
+<script>
+    var info = JSON.parse('{$info|raw}');
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            doing: 1,
+            captcha: '',
+            smscode: '',
+            info: info,
+
+            oldpwd:'',
+            newpwd:'',
+
+        },
+        methods: {
+            sendsms: function () {
+                $.post('/home/member/sendsms', {
+                    captcha: vm.captcha
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        pbDialog(ret.msg, '', 1, '', '', '', false);
+                        RemainTime();
+                    } else {
+                        pbDialog(ret.msg, '', 0, '', '', '', false);
+                    }
+                }, 'json');
+            },
+            checkoperation:function () {
+                var pageparm = {
+                    captcha:vm.captcha,
+                    smscode:vm.smscode,
+                };
+                $.post('/home/member/checkoperation', {
+                    pageparm: JSON.stringify(pageparm),
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        pbDialog(ret.msg, '', 1, '', '', '', false);
+                        vm.doing = 2;
+                    } else {
+                        pbDialog(ret.msg, '', 0, '', '', '', false);
+                    }
+                }, 'json');
+            },
+            updatepay:function () {
+                var pageparm = {
+                    pay_password:vm.info.pay_password,
+                    smscode:vm.smscode,
+                };
+                $.post('/home/member/updatepay', {
+                    pageparm: JSON.stringify(pageparm),
+                }, function (ret) {
+                    if (ret.status == 1) {
+                        pbDialog(ret.msg, '', 1, '', '', '', false);
+                        setTimeout(function () {
+                            location.reload();
+                        },1500);
+                    } else {
+                        pbDialog(ret.msg, '', 0, '', '', '', false);
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        fmoreUploadFile("avatar");
+    })
+</script>
+

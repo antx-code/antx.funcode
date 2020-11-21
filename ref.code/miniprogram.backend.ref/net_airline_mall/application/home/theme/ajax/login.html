@@ -1,0 +1,108 @@
+<div class="login-wrap">
+
+    <div class="login-form">
+        <div class="coagent">
+            <div class="tit"><h3>用第三方账号直接登录</h3><span></span></div>
+            <div class="coagent-warp">
+                <a href="javascript:" class="qq"><b class="third-party-icon qq-icon"></b></a>
+            </div>
+        </div>
+        <div class="login-box">
+            <div class="tit"><h3>账号登录</h3><span></span></div>
+            <div class="msg-wrap">
+                <div class="msg-error hide"></div>
+            </div>
+            <div class="form">
+                <form name="formLogin" onsubmit="userLogin();return false;">
+                    <div class="item">
+                        <div class="item-info">
+                            <i class="iconfont icon-name"></i>
+                            <input type="text" id="loginname" name="username" class="text" value="" placeholder="用户名/邮箱/手机" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="item-info">
+                            <i class="iconfont icon-password"></i>
+                            <input type="password" style="display:none">
+                            <input type="password" id="nloginpwd" name="password" value="" class="text" placeholder="密码" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <input id="remember" name="remember" type="checkbox" class="ui-checkbox" onclick="rememberMe()">
+                        <label for="remember" class="ui-label">请保存我这次的登录信息。</label>
+                    </div>
+                    <div class="item item-button">
+                        <input type="hidden" name="token" value="{$Request.token.token}">
+                        <input type="submit" name="submit" value="登&nbsp;&nbsp;录" class="btn sc-redBg-btn">
+                    </div>
+                    <div class="lie">
+                        <a href="{:url('login/forget')}" class="notpwd gary fl" target="_blank">忘记密码？</a>
+                        <a href="{:url('login/register')}" class="notpwd red fr" target="_blank">免费注册</a></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            var storage = window.localStorage;
+            if("yes" == storage["isstorename"]){
+                $("#remember").attr("checked", true);
+                $("#loginname").val(storage["username"]);
+                $("#nloginpwd").val(storage["password"]);
+            }
+        });
+        function rememberMe() {
+            var storage = window.localStorage;
+            if ($("#remember").is(':checked')) {
+                storage["username"] = $("#loginname").val();
+                storage["password"] = $("#nloginpwd").val();
+                storage["isstorename"] = "yes";
+            } else {
+                storage["username"] = "";
+                storage["password"] = "";
+                storage["isstorename"] = "no";
+            }
+        }
+        function userLogin() {
+            var frm = $("form[name='formLogin']");
+            var username = frm.find("input[name='username']");
+            var password = frm.find("input[name='password']");
+            var remember = frm.find("input[name='remember']");
+            var token = frm.find("input[name='token']");
+            var error = frm.find(".msg-error");
+
+            if (username.val() == "") {
+                error.show();
+                username.parents(".item").addClass("item-error");
+                showMesInfo('<i class="iconfont icon-minus-sign"></i>请输入用户名');
+                return false;
+            }
+
+            if (password.val() == "") {
+                error.show();
+                password.parents(".item").addClass("item-error");
+                showMesInfo('<i class="iconfont icon-minus-sign"></i>请输入密码');
+                return false;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: "{:url('login/ajaxLogin')}",
+                data: {username: username.val(), password: password.val(),remember:remember.val(),token:token.val()},
+                success: function (data) {
+                    location.href = '{$refer}';
+                },
+                error: function (xhr, type) {
+                    token.val(xhr.responseJSON.token);
+                    showMesInfo(xhr.responseJSON.msg);
+                }
+            });
+        }
+
+        function showMesInfo(msg) {
+            $('.login-wrap .msg-wrap').empty();
+            var info = '<div class="msg-error"><b></b><i class="iconfont icon-minus-sign"></i>' + msg + '</div>';
+            $('.login-wrap .msg-wrap').append(info);
+        }
+    </script>
+</div>

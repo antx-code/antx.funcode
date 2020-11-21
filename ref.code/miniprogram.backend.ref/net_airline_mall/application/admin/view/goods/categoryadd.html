@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>标识“<em>*</em>”的选项为必填项，其余为选填项。请按提示信息填写每一个字段。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-content">
+                <div class="mian-info">
+                    <div class="switch_info">
+                        <div class="item">
+                            <div class="label">
+                                <span class="require-field">*</span>
+                                &nbsp;分类名称：
+                            </div>
+                            <div class="label_value">
+                                <input type="text" class="text text_4" name='cat_name'
+                                       v-model="info.cat_name"/>
+                                <div class="notic bf100">如需批量添加分类，格式：分类名称一,分类名称二,分类名称三 （注：以英文逗号分隔开）</div>
+                                <div class="form_prompt"></div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">分类别名：</div>
+                            <div class="label_value">
+                                <input type='text' name='cat_alias_name' v-model="info.cat_alias_name" class="text"
+                                       id="cat_alias_name" maxlength="20" value='' size='27'/>
+                                <div class="notic">（注：分类名过长设置别名方便显示，字数设置为2-4个汉字字符）</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">手机小图标：</div>
+                            <div class="label_value">
+                                <div class="type-file-box">
+                                    <input type="button" name="button" id="button" class="type-file-button" value=""/>
+                                    <input type="text" name="textfile" class="type-file-text" id="textfield" value="" readonly v-model="info.touch_icon">
+                                </div>
+                                <div class="form_prompt"></div>
+                                <div class="notic m20" id="AdCodeImg">（注：手机端专用,建议上传正方形图片（100*100））</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">手机banner图：</div>
+                            <div class="label_value">
+                                <div class="type-file-box">
+                                    <input type="button" name="button" id="cat_banner" class="type-file-button" value=""/>
+                                    <input type="text" name="textfile" class="type-file-text" value="" readonly v-model="info.cat_banner">
+                                </div>
+                                <div class="form_prompt"></div>
+                                <div class="notic m20" id="AdCodeImg2">（注：手机端专用,建议上传长方形图片（600*240））</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">分类菜单图标：</div>
+                            <div class="label_value">
+                                <div class="checkbox-items checkbox-cateicon-items" shoptype="style_icon">
+                                    {foreach $iconlist as $key=>$vo }
+                                    <div class="checkbox-item">
+                                        <input type="radio" name="style_icon" class="ui-radio"
+                                               id="radio_{$key}" data-name="{$key}" value="{$key}"
+                                               {if $cat_info.style_icon == $key}checked{/if} />
+                                        <label class="ui-radio-label" for="radio_{$key}">
+                                            <span></span><i class="iconfont icon-{$key}"></i>
+                                        </label>
+                                    </div>
+                                    {/foreach}
+
+                                    <div class="checkbox-other">
+                                        <div class="checkbox-item">
+                                            <input type="radio" name="style_icon" class="ui-radio" id="radio_other"
+                                                   data-name="other" value="other"
+                                                   {if $cat_info.style_icon == 'other'}checked{/if} />
+                                            <label class="ui-radio-label" for="radio_other">
+                                                <span>自定义</span>
+                                            </label>
+                                        </div>
+                                        <div class="type-file-box ml10 {if $cat_info.style_icon neq 'other'}hide{/if}" shoptype="cat_icon">
+                                            <input type="button" name="button"  id="cat_icon" class="type-file-button" value="" />
+                                            {if $cat_info.cat_icon}
+                                            <span class="show">
+                                                <a href="{$cat_info.cat_icon}" target="_blank" class="nyroModal">
+                                                    <i class="icon icon-picture" data-tooltipimg="{$cat_info.cat_icon}" shoptype="tooltip" title="tooltip"></i>
+                                                </a>
+                                            </span>
+                                            {/if}
+                                            <input type="text" name="textfile" class="type-file-text" v-model="info.cat_icon" readonly />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--商品分类聚合选择开始-->
+                        <div class="item">
+                            <div class="label">上级分类：</div>
+                            <div class="label_value">
+                                <div class="search_select">
+                                    <div class="categorySelect">
+                                        <div class="selection">
+                                            <input type="text" name="category_name" id="category_name" class="text w290 valid" v-model="category_name" readonly/>
+                                            <input type="hidden" name="parent_id" id="category_id" v-model="parent_id"/>
+                                        </div>
+                                        <div class="select-container w319" style="display:none;">
+                                            <div class="select-top">
+                                                <a href="javascript:;" class="categoryTop"
+                                                   @click="getcategoryListInitReset()">重选</a>
+                                                &gt<span>{{category_tip}}</span>
+                                            </div>
+                                            <div class="select-list">
+                                                <ul>
+                                                    <template v-for="(vo,index) in categoryList">
+                                                        <li @click="getcategoryListInit(vo.cat_id,vo.cat_name)">
+                                                            <em>
+                                                                <template v-if="catlevel==1">Ⅰ</template>
+                                                                <template v-if="catlevel==2">Ⅱ</template>
+                                                                <template v-if="catlevel==3">Ⅲ</template>
+                                                                <template v-if="catlevel==4">Ⅳ</template>
+                                                            </em>
+                                                            {{vo.cat_name}}
+                                                        </li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="notic">不选择分类默认为顶级分类</div>
+                            </div>
+                        </div>
+                        <!--商品分类聚合选择结束-->
+                        <div class="item">
+                            <div class="label">分类模板：</div>
+                            <div class="label_value">
+                                <div class="imitate_select select_w170">
+                                    <div class="cite">设置模板</div>
+                                    <ul style="display: none;" class="ps-container">
+                                        <li><a href="javascript:;" data-value="default" class="ftx-01">默认模板</a></li>
+                                        {volist name='templateList' id="vo"}
+                                        <li><a href="javascript:;" data-value="{$vo.template_file}" class="ftx-01">{$vo.Name}</a></li>
+                                        {/volist}
+
+                                        <div class="ps-scrollbar-x-rail" style="width: 120px; display: none; left: 0px; bottom: 3px;">
+                                            <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                                        </div>
+                                        <div class="ps-scrollbar-y-rail" style="top: 0px; height: 112px; display: none; right: 0px;">
+                                            <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                                        </div>
+                                    </ul>
+                                     <input name="template_file" type="hidden" v-model="info.template_file">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item hide">
+                            <div class="label">数量单位：</div>
+                            <div class="label_value">
+                                <input type="text" class="text text_4" name='measure_unit' v-model="info.measure_unit"
+                                       value='' size="12" />
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">排序：</div>
+                            <div class="label_value">
+                                <input type="text" class="text text_4" name='sort_order' v-model="info.sort_order"
+                                       value="50" size="15" />
+                            </div>
+                        </div>
+                        <div class="item hide">
+                            <div class="label">佣金比率：</div>
+                            <div class="label_value">
+                                <input type="text" class="text text_2" name='commission_rate'
+                                       v-model="info.commission_rate" value='' size="12" />
+                                <div class="notic">% （请输入0-100以内的整数）</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">是否显示：</div>
+                            <div class="label_value">
+                                <div class="checkbox_items">
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="is_show" id="is_show_1" value="1"
+                                               v-model="info.is_show"/>
+                                        <label for="is_show_1" class="ui-radio-label">是</label>
+                                    </div>
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="is_show" id="is_show_0" value="0"
+                                               v-model="info.is_show"/>
+                                        <label for="is_show_0" class="ui-radio-label">否</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">首页推荐：</div>
+                            <div class="label_value">
+                                <div class="checkbox_items">
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="is_home_show" id="is_show_100" value="1"
+                                               v-model="info.is_home_show"/>
+                                        <label for="is_show_100" class="ui-radio-label">是</label>
+                                    </div>
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="is_home_show" id="is_show_101" value="0"
+                                               v-model="info.is_home_show"/>
+                                        <label for="is_show_101" class="ui-radio-label">否</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item hide">
+                            <div class="label">是否显示在导航栏：</div>
+                            <div class="label_value">
+                                <div class="checkbox_items">
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="show_in_nav" id="show_in_nav_1"
+                                               value="1" v-model="info.show_in_nav"/>
+                                        <label for="show_in_nav_1" class="ui-radio-label">是</label>
+                                    </div>
+                                    <div class="checkbox_item">
+                                        <input type="radio" class="ui-radio" name="show_in_nav" id="show_in_nav_0"
+                                               value="0" checked="true" v-model="info.show_in_nav"/>
+                                        <label for="show_in_nav_0" class="ui-radio-label">否</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item" style="display:none">
+                            <div class="label">分类跳转链接：</div>
+                            <div class="label_value">
+                                <textarea name='category_links' rows="6" cols="48" class="textarea"
+                                          v-model="info.category_links"></textarea>
+                                <div class="notic">请根据分类名称顺序填写链接地址，每行一条；此功能只支持PC端。</div>
+                            </div>
+                        </div>
+                        <div class="item" style=" display:none">
+                            <div class="label">分类树顶级分类模块内容：</div>
+                            <div class="label_value">
+                                <textarea name='category_topic' rows="6" cols="48" class="textarea"
+                                          v-model="info.category_topic"></textarea>
+                                <div class="notic">(格式：名称+"英文竖线"+链接地址)，每行一条数据。</div>
+                            </div>
+                        </div>
+
+                        <!-- 商品分类聚合选择模板开始-->
+                        <div class="item hide">
+                            <div class="label">筛选属性：</div>
+                            <div class="label_value">
+                                <template v-for="(v,k) in filter_attr" v-if="v.isshow==1">
+                                    <div class="lv-item">
+                                        <div class="imitate_select select_w170">
+                                            <div class="cite">请选择商品类型</div>
+                                            <ul style="display: none;">
+                                                <template v-for="(vo,index) in goodstypeList">
+                                                    <li @click="filter_attr_attributeListInit(index,k)">
+                                                        <a href='javascript:void(0)' class='ftx-01'>
+                                                            {{vo.cat_name}}
+                                                        </a>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                        <div class="imitate_select select_w120">
+                                            <div class="cite">请选择商品属性</div>
+                                            <ul style="display: none;">
+                                                <template v-for="(attrobj,attrindex) in attributeList[k]">
+                                                    <li>
+                                                        <a href='javascript:void(0)' class='ftx-01'
+                                                           @click="filter_attr_value(k,attrobj)">
+                                                            {{attrobj.attr_name}}
+                                                        </a>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                        <a href="javascript:void(0)" class="fl mr10" shoptype="operation"
+                                           @click="filter_attr_add()">[+]</a>
+                                        <a href="javascript:void(0)" class="fl mr10" shoptype="operation"
+                                           @click="filter_attr_reduce(k)">[-]</a>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </div>
+                        <!-- 商品分类聚合选择模板结束-->
+
+                        <div class="item">
+                            <div class="label">价格区间个数：</div>
+                            <div class="label_value">
+                                <input type="text" name="grade" value="0" size="40" class="text mr10"
+                                       v-model="info.grade"/>
+                                <div class="form_prompt"></div>
+                                <div class="notic">该选项表示该分类下商品最低价与最高价之间的划分的等级个数，填0表示不做分级，最多不能超过10个。</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">关键字：</div>
+                            <div class="label_value">
+                                <input type="text" name="keywords" size="50" class="text mr10"
+                                       v-model="info.keywords"/>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">分类描述：</div>
+                            <div class="label_value">
+                                <textarea name='cat_desc' rows="6" cols="48" class="textarea"
+                                          v-model="info.cat_desc"></textarea>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label">&nbsp;</div>
+                            <div class="label_value info_btn">
+                                <input type="submit" value=" 确定 " class="button" id="submitBtn" @click="add()"/>
+                                <input type="reset" value=" 重置 " class="button button_reset" @click="infoReset()"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = {$info|raw};
+    var infoColumn = JSON.parse('{$infoColumn|raw}');
+    var filter_attr_item = {attr_id: 0, attr_name: '', isshow: 1};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+
+            //商品分类聚合选择开始
+            categoryList: [],
+            catlevel: 0,
+            category_name: '{$category_name}',
+            category_tip: '请选择分类',
+            parent_id: info.parent_id>0?info.parent_id:0,
+            //商品分类聚合选择结束
+
+            //商品类型聚合选择开始
+            filter_attr: info.filter_attr.length>0?info.filter_attr:[filter_attr_item],
+            goodstypeList: [],
+            attributeList: [],
+            //商品类型聚合选择结束
+
+            info: info,
+        },
+        methods: {
+
+            //商品分类聚合选择开始
+            getcategoryListInit: function (parent_id, cat_name) {
+                if (cat_name) {
+                    vm.category_name += '>' + cat_name;
+                    vm.category_tip += '>' + cat_name;
+                }
+                vm.parent_id = parent_id;
+                vm.info.parent_id = parent_id;
+                $.post('/admin/goods/getcategoryList', {
+                    parent_id: parent_id,
+                    table: 'category'
+                }, function (ret) {
+                    if (ret.data.length > 0) {
+                        vm.categoryList = ret.data;
+                        vm.catlevel++;
+                    } else {
+                        $(".select-container").hide();
+                    }
+                }, 'json');
+            },
+            getcategoryListInitReset: function () {
+                vm.catlevel = 0;
+                vm.category_name = '顶级分类';
+                vm.category_tip = '请选择分类';
+                vm.parent_id = 0;
+                vm.getcategoryListInit(vm.parent_id, '');
+            },
+            //商品分类聚合选择结束
+
+
+            infoReset: function () {
+                vm.info = infoColumn;
+            },
+            add: function () {
+                var filter_attr_arr = [];
+                for (var i = 0; i < vm.filter_attr.length; i++) {
+                    if (vm.filter_attr[i].isshow && vm.filter_attr[i].attr_id > 0) {
+                        filter_attr_arr.push(vm.filter_attr[i].attr_id);
+                    }
+                }
+                vm.info.filter_attr = filter_attr_arr.join(',');
+                if (!vm.info.cat_name) {
+                    $.messager.alert('提示', imgtips, 'warning');
+                    return false;
+                }
+                vm.info.template_file = $("input[name='template_file']").val();
+                vm.info.style_icon = $("input[name='style_icon']:checked").val();
+                majax('/admin/goods/categoryadd', vm.info);
+            },
+
+
+            //商品类型聚合选择开始
+            filter_attr_value: function (k, vo) {
+                vm.filter_attr[k].attr_id = vo.attr_id;
+                vm.filter_attr[k].attr_name = vo.attr_name;
+            },
+            filter_attr_add: function () {
+                vm.filter_attr.push({attr_id: 0, attr_name: '', isshow: 1});
+            },
+            filter_attr_reduce: function (k) {
+                vm.filter_attr[k].isshow = 0;
+                //vm.attributeList.splice(k,1);
+                //vm.filter_attr.splice(k,1);
+
+            },
+            filter_attr_goodstypeListInit: function () {
+                //初始化商品类型属性筛选条件
+                $.post('/admin/goods/goodstype_ajax', {
+                    pageparm: ''
+                }, function (ret) {
+                    vm.goodstypeList = ret.data;
+                }, 'json');
+            },
+            filter_attr_attributeListInit: function (index, k) {
+                $.post('/admin/goods/attribute_ajax', {
+                    cat_id: vm.goodstypeList[index].cat_id,
+                }, function (ret) {
+                    Vue.set(vm.attributeList, k, ret.data);//变异数组动态监测
+                }, 'json');
+            }
+            //商品类型聚合选择结束
+        }
+    });
+
+    layui.use('upload', function () {
+        var upload = layui.upload;
+
+        //执行实例
+       upload.render({
+            elem: '#button',
+            url: '/admin/uploader/alioss_upload', //上传接口
+            data: {
+                upload: 1
+            },
+            accept: 'file', //允许上传的文件类型
+            done: function (ret) {
+                vm.info.touch_icon = ret.url;
+                if (ret.state == 'SUCCESS') {
+                    $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                } else {
+                    $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                }
+
+            },
+        });
+        upload.render({
+            elem: '#cat_banner',
+            url: '/admin/uploader/alioss_upload', //上传接口
+            data: {
+                upload: 1
+            },
+            accept: 'file', //允许上传的文件类型
+            done: function (ret) {
+                vm.info.cat_banner = ret.url;
+                if (ret.state == 'SUCCESS') {
+                    $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                } else {
+                    $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                }
+
+            },
+        });
+        upload.render({
+            elem: '#cat_icon',
+            url: '/admin/uploader/alioss_upload', //上传接口
+            data: {
+                upload: 1
+            },
+            accept: 'file', //允许上传的文件类型
+            done: function (ret) {
+                vm.info.cat_icon = ret.url;
+                if (ret.state == 'SUCCESS') {
+                    $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                } else {
+                    $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                }
+
+            },
+        });
+    });
+    $(function () {
+        vm.getcategoryListInit(vm.parent_id, '');
+        vm.filter_attr_goodstypeListInit();
+        //自定义图标
+        $("*[shoptype=style_icon] input:radio").click(function(){
+            if($(this).val() == 'other'){
+                $("*[shoptype=cat_icon]").removeClass('hide');
+            }else{
+                $("*[shoptype=cat_icon]").addClass('hide');
+            }
+        });
+        setTimeout(function () {
+            $('.nyroModal').nyroModal();
+        }, 300);
+    });
+
+</script>
+

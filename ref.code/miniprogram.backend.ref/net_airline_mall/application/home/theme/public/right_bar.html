@@ -1,0 +1,79 @@
+<div class="mui-mbar-tabs">
+    <div class="quick_links_wrap" style="width: 40px;">
+        <div class="quick_link_mian" data-userid="123">
+            <div class="quick_links_panel">
+                <div id="quick_links" class="quick_links">
+                    <ul>
+                        <li>
+                            <a href="{:url('member/index')}"><i class="setting"></i></a>
+                            <div class="ibar_login_box status_login" style="display: none;">
+                                <div class="avatar_box">
+                                    <p class="avatar_imgbox">
+                                        <img src="{$user.avatar |default='__THEME__/images/touxiang.jpg'}" width="100" height="100">
+                                    </p>
+                                    <ul class="user_info">
+                                        <li>用户名： {if $user} {$user.nick_name ? $user.nick_name: $user.user_name} {else /} 未登录 {/if}</li>
+                                        <!--<li>级&nbsp;别：铜牌</li>-->
+                                    </ul>
+                                </div>
+                                <div class="login_btnbox">
+                                    <a href="{:url('member/order')}" class="login_order">我的订单</a>
+                                    <a href="{:url('member/favorite')}" class="login_favorite">我的收藏</a>
+                                </div>
+                                <i class="icon_arrow_white"></i>
+                            </div>
+                        </li>
+
+                        <li id="shopCart">
+                            <a href="javascript:" class="cart_list">
+                                <i class="message"></i>
+                                <div class="span">购物车</div>
+                                <span class="cart_num">{$Think.session.cart_num | default=0}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:" class="mpbtn_order"><i class="chongzhi"></i></a>
+                            <div class="mp_tooltip">
+                                <em>我的订单</em>
+                                <i class="icon_arrow_right_black"></i>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="javascript:" class="mpbtn_yhq"><i class="yhq"></i></a>
+                            <div class="mp_tooltip">
+                                <em id="mpbtn_money">优惠券</em>
+                                <i class="icon_arrow_right_black"></i>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="javascript:" class="mpbtn_history"><i class="zuji"></i></a>
+                            <div class="mp_tooltip" style="left: -121px; visibility: hidden;">
+                                <em id="mpbtn_histroy">我的足迹</em>
+                                <i class="icon_arrow_right_black"></i>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="javascript:" class="mpbtn_collection"><i class="shop-favorite"></i></a>
+                            <div class="mp_tooltip" style="left: -121px; visibility: hidden;">
+                                <em id="btn_my_favorite">我的收藏</em>
+                                <i class="icon_arrow_right_black"></i>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="quick_toggle quick_links_allow_gotop">
+                    <ul>
+                        <li>
+                            <a id="IM" data-url="{:url('index/im','uid=admin-1')}" onclick="openIm(this)" data-mobile="{$siteInfo.service_phone}"><i class="kfzx"></i></a>
+                            <div class="mp_tooltip">客服中心<i class="icon_arrow_right_black"></i></div>
+                        </li>
+                        <li class="returnTop">
+                            <a href="javascript:" class="return_top"><i class="top"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="quick_links_pop" class="quick_links_pop"></div>
+        </div>
+    </div>
+</div>

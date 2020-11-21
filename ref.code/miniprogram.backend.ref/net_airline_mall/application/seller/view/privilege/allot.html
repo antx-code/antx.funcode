@@ -1,0 +1,96 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="javascript:">分派权限[ {$user.username} ]</a></li>
+    </ul>
+</div>
+
+<div class="btn-info">
+    <a class="sc-btn sc-blue-btn" href="/seller/privilege/admin_list"><i class="icon-reply"></i>下级管理员列表</a>
+</div>
+
+<div class="clear"></div>
+
+<div class="ecsc-qx-list">
+    <form method="POST" id="form">
+        {foreach $auth_list as $ctrl=>$vo }
+        <div class="step">
+            <div class="tit">
+                <div class="checkbox_items">
+                    <div class="checkbox_item">
+                        <input type="checkbox" data-group="group" class="ui-checkbox" id="{$ctrl}">
+                        <label for="{$ctrl}" class="ui-label blod">{$vo.privilege_title}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="qx_items">
+                <div class="qx_item">
+                    <div class="checkbox_items">
+                        {foreach $vo.privilege_list as $method=>$vc }
+                        <div class="checkbox_item">
+                            <input type="checkbox" value="{$method}" name="{$ctrl}[]" class="ui-checkbox" data-item="list" id="{$ctrl.'-'.$method}" {php}if (isset($user['action'][$ctrl]) && !array_diff(explode(',', $method), $user['action'][$ctrl])) echo 'checked';{/php}>
+                            <label for="{$ctrl.'-'.$method}" class="ui-label">{$vc}</label>
+                        </div>
+                        {/foreach}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {/foreach}
+
+        <div class="steplast">
+            <div class="all">
+                <input type="checkbox" class="ui-checkbox" id="checkall">
+                <label for="checkall" class="ui-label">全选</label>
+            </div>
+            <div class="info_btn">
+                <input type="submit" value=" 保存 " class="sc-btn sc-blueBg-btn btn35 mr0 fn">
+                <input type="hidden" name="id" value="{$user.id}">
+                <input type="hidden" name="token" value="{$Request.token.token}"/>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $("#checkall").click(function () {
+        var checkbox = $(this).parents(".ecsc-qx-list").find('input:checkbox[type="checkbox"]');
+        if ($(this).prop("checked") == true) {
+            checkbox.prop("checked", true);
+        } else {
+            checkbox.prop("checked", false);
+        }
+    });
+
+    $("input[data-group='group']").click(function () {
+        var checkbox = $(this).parents(".tit").next(".qx_items").find('input:checkbox[type="checkbox"]');
+        if ($(this).prop("checked") == true) {
+            checkbox.prop("checked", true);
+        } else {
+            checkbox.prop("checked", false);
+        }
+    });
+
+    $("input[data-item='list']").click(function () {
+        var qx_items = $(this).parents(".qx_items");
+        var length = qx_items.find("input[data-item='list']").length;
+        var length2 = qx_items.find("input[data-item='list']:checked").length;
+        if (length == length2) {
+            qx_items.prev().find("input[data-group='group']").prop("checked", true);
+        } else {
+            qx_items.prev().find("input[data-group='group']").prop("checked", false);
+        }
+    });
+
+    $(".qx_items").each(function (index, element) {
+        var length = $(this).find("input[data-item='list']").length;
+        var length2 = $(this).find("input[data-item='list']:checked").length;
+
+        if (length == length2) {
+            $(this).prev().find("input[data-group='group']").prop("checked", true);
+        } else {
+            $(this).prev().find("input[data-group='group']").prop("checked", false);
+        }
+    });
+</script>
+{include file="public/footer"}

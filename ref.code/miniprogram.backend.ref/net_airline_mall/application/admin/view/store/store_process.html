@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="tabs_info">
+            <ul>
+                <li class="curr">
+                    <a href="javascript:window.parent.addParentTab({href:'/admin/store/store_process',title:'店铺设置'})">入驻流程</a>
+                </li>
+                <li>
+                    <a href="javascript:window.parent.addParentTab({href:'/admin/store/store_grade',title:'店铺等级'})">
+                        店铺等级
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="explanation" id="explanation">
+            <div class="ex_tit">
+                <i class="sc_icon"></i>
+                <h4>操作提示-入驻流程</h4>
+                <span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>商家入驻申请流程步骤信息管理。</li>
+                <li>平台按实际业务需要设定流程步骤。</li>
+                <li>如不清楚流程设定请谨慎删除通用流程。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="fl">
+                    <a href="javascript:void(0)" @click="add()">
+                        <div class="fbutton">
+                            <div class="add" title="添加流程">
+                                <span>
+                                    <i class="icon icon-plus"></i>
+                                    添加流程
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" placeholder="流程信息标题" class="text nofocus" v-model="keywords">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="3%" class="sign">
+                                <div class="tDiv">
+                                    <input type="checkbox" name="all_list" class="checkbox" id="all_list"/>
+                                    <label for="all_list" class="checkbox_stars"></label>
+                                </div>
+                            </th>
+                            <th width="5%">
+                                <div class="tDiv">编号</div>
+                            </th>
+                            <th width="15%">
+                                <div class="tDiv">流程信息标题</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">排序</div>
+                            </th>
+                            <th width="10%">
+                                <div class="tDiv">是否显示</div>
+                            </th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td class="sign">
+                                    <div class="tDiv">
+                                        <input type="checkbox" name="checkboxes[]" :value="vo.id"
+                                               class="checkbox" :id="checkboxitem+vo.id">
+                                        <label :for="checkboxitem+vo.id" class="checkbox_stars"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.id}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">{{vo.process_title}}</div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <input name="sort_order" class="text w100" value="0" type="number"
+                                               v-model="vo.sort_order" @keyup.enter="doupdate(vo)">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="switch" :class="{'active':vo.is_show==1}"
+                                             @click="showinnav(index)">
+                                            <div class="circle"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="handle">
+                                    <div class="tDiv a2">
+                                        <a href="javascript:void(0)" class="btn_see" title="查看" @click="showlist(vo)">
+                                            <i class="sc_icon sc_icon_see"></i>
+                                            查看表单
+                                        </a>
+                                        <a href="javascript:void(0)" title="编辑" class="btn_edit" @click="add(vo)">
+                                            <i class="icon icon-edit"></i>
+                                            编辑
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="10">
+                                <div class="tDiv">
+                                    <div class="tfoot_btninfo">
+                                        <input type="submit" value="删除" id="btnSubmit"
+                                               name="btnSubmit" shoptype="btnSubmit" class="btn btn_disabled"
+                                               disabled="disabled" @click="doalldelete()">删除
+                                    </div>
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+            all_list: [],
+            checkboxitem: 'checkbox_',
+
+            ids: [],
+
+        },
+        methods: {
+            showlist: function (vo) {
+                window.parent.addParentTab(
+                    {
+                        title: vo.process_title,
+                        href: '/admin/store/store_process_steps?process_id=' + vo.id
+                    }
+                );
+            },
+            add: function (vo = {}) {
+                if (vo.id >0) {
+                    layerOpenwin('编辑流程', '/admin/store/store_process_add?id=' + vo.id);
+                } else {
+                    layerOpenwin('添加流程', '/admin/store/store_process_add');
+                }
+            },
+            showinnav: function (index) {
+                if (vm.list[index].is_show == 0) {
+                    vm.list[index].is_show = 1;
+                } else {
+                    vm.list[index].is_show = 0;
+                }
+                vm.doupdate(vm.list[index]);
+            },
+            doupdate: function (vo) {
+                majax('/admin/store/doupdate', vo, 'store_process')
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/store/store_process', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/store/dodelete', {
+                            pageparm: JSON.stringify(vm.list[index]),
+                            table: 'store_process'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            doalldelete: function () {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.messager.confirm('提示', '确定操作吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/store/doalldelete', {
+                            ids: vm.ids,
+                            table: 'store_process'
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.log_ids = [];
+                                vm.pageFreash();
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

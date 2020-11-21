@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+{include file="public:head"}
+<style>
+    .contentWarp .sys-section .sc_icon {
+        background-position: -108px -286px;
+    }
+
+    .sys-section ul.sys {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .sys-section ul.sys li {
+        width: 25%;
+        text-align: center;
+        padding: 10px;
+    }
+
+    .sys-section ul.sys li span {
+        display: inline-block;
+        margin: 0 auto;
+        font-size: 16px;
+        font-weight: bold;
+        color: #0d8ddb;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .sys-section ul.sys li span:hover {
+        background-color: rgba(13, 141, 219, .2);
+    }
+</style>
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content start_content">
+        <div class="contentWarp">
+            <div class="contentWarp_item clearfix">
+                <div class="section_select">
+                    <div class="item item_price">
+                        <i class="icon">
+                            <img src="/public/static/images/1.png" width="71" height="74"/>
+                        </i>
+                        <div class="desc">
+                            <div class="tit">
+                                <!---->
+                                <em>¥</em>
+                                {$info.orderTodaySum}
+                                <!---->
+                            </div>
+                            <span>今日销售总额</span>
+                        </div>
+                    </div>
+                    <div class="item item_order">
+                        <i class="icon">
+                            <img src="/public/static/images/2.png"/>
+                        </i>
+                        <div class="desc">
+                            <div class="tit">{$info.orderTodayCount}</div>
+                            <span>今日订单总数</span>
+                        </div>
+                        <i class="icon"></i>
+                    </div>
+                    <div class="item item_comment">
+                        <i class="icon">
+                            <img src="/public/static/images/3.png" width="90" height="86"/>
+                        </i>
+                        <div class="desc">
+                            <div class="tit">{$info.commentTodayCount}</div>
+                            <span>今日评论数</span>
+                        </div>
+                    </div>
+                    <div class="item item_flow">
+                        <i class="icon">
+                            <img src="/public/static/images/4.png" width="86"/>
+                        </i>
+                        <div class="desc">
+                            <div class="tit">{$info.storeCount}</div>
+                            <span>店铺数量</span>
+                        </div>
+                        <i class="icon"></i>
+                    </div>
+                </div>
+                {if count($info.auth)}
+                <div class="section sys-section">
+                    <div class="sc_title">
+                        <i class="sc_icon"></i>
+                        <h3>其它系统</h3>
+                        <cite>（快捷登录）</cite>
+                    </div>
+                    <div class="sc_warp">
+                        <ul class="sys">
+                            {foreach $info.auth as $item}
+                            <li>
+                                <span data-href="{$item.login}">{$item.name}</span>
+                            </li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+                {/if}
+                <div class="section user_section">
+                    <div class="sc_title">
+                        <i class="sc_icon"></i>
+                        <h3>个人会员信息</h3>
+                        <cite>（单位：个）</cite>
+                    </div>
+                    <div class="sc_warp">
+                        <div class="user_item user_today_new">
+                            <div class="num">{$info.userTodayAdd}</div>
+                            <span class="tit">今日新增</span>
+                        </div>
+                        <div class="user_item user_yest_new">
+                            <div class="num">{$info.userYesdayAdd}</div>
+                            <span class="tit">昨日新增</span>
+                        </div>
+                        <div class="user_item user_month_new">
+                            <div class="num">{$info.userMonthAdd}</div>
+                            <span class="tit">本月新增</span>
+                        </div>
+                        <div class="user_item user_total">
+                            <div class="num">{$info.userCount}</div>
+                            <span class="tit">会员总数</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="section goods_section">
+                    <div class="sc_title">
+                        <i class="sc_icon"></i>
+                        <h3>商品一览</h3>
+                        <cite>（单位：件）</cite>
+                    </div>
+                    <div class="sc_warp">
+                        <div class="goods_item">
+                            <div class="tit">自营商品</div>
+                            <div class="number">
+                                <div class="st">
+                                    实体：<a href="javascript:void(0)" data-url="/admin/goods/goods"
+                                          data-param="menushopping|01_goods_list" shoptype="iframeHref">
+                                    {$info.goodsCountSelf}</a>
+                                </div>
+                                <div class="xn">
+                                    虚拟：
+                                    <a href="javascript:void(0)"
+                                          data-url="/admin/goods/goods"
+                                          data-param="menushopping|01_goods_list" shoptype="iframeHref">0
+                                </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="goods_item">
+                            <div class="tit">商家商品</div>
+                            <div class="number">
+                                <div class="st">
+                                    实体：<a href="javascript:void(0)"
+                                          data-url="/admin/goods/goods"
+                                          data-param="menushopping|01_goods_list" shoptype="iframeHref">{$info.goodsCountStore}</a>
+                                </div>
+                                <div class="xn">
+                                    虚拟：<a href="javascript:void(0)"
+                                          data-url="/admin/goods/goods"
+                                          data-param="menushopping|01_goods_list" shoptype="iframeHref">0</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="contentWarp_item clearfix">
+                <div class="section_order_select">
+                    <ul>
+                        <li>
+                            <a
+                               href="javascript:void(0);" data-url="/admin/order/index"
+                               data-param="menushopping|02_order_list">
+                                <i class="ice ice_w"></i>
+                                <div class="t">未确认订单</div>
+                                <span class="number">{$info.orderStatus0Sum}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                               href="javascript:void(0);" data-url="/admin/order/index"
+                               data-param="menushopping|02_order_list">
+                                <i class="ice ice_d"></i>
+                                <div class="t">待支付订单</div>
+                                <span class="number">{$info.orderpayStatus0Sum}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                               href="javascript:void(0);" data-url="/admin/order/index"
+                               data-param="menushopping|02_order_list">
+                                <i class="ice ice_n"></i>
+                                <div class="t">待发货订单</div>
+                                <span class="number">{$info.orderDaifahuo}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" data-url="order.php?act=list&seller_list=0&serch_type=3" data-param="menushopping|02_order_list" shoptype="iframeHref">
+                                <i class="ice ice_f"></i>
+                                <div class="t">已成交订单数</div>
+                                <span class="number">{$info.orderComplete}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="clear"></div>
+                <div class="section section_order_count">
+                    <div class="sc_title">
+                        <i class="sc_icon"></i>
+                        <h3>订单统计</h3>
+                        <div class="filter_date">
+                            <a href="javascript:;" onclick="set_statistical_chart(this, 'order', 'week')">七天</a>
+                            <a href="javascript:;" onclick="set_statistical_chart(this, 'order', 'month')">一月</a>
+                            <a href="javascript:;" onclick="set_statistical_chart(this, 'order', 'year')">半年</a>
+                        </div>
+                    </div>
+                    <div class="sc_warp">
+                        <div id="order_main" style="height:274px;"></div>
+                    </div>
+                </div>
+                <div class="section section_total_count">
+                    <div class="sc_title">
+                        <i class="sc_icon"></i>
+                        <h3>销售统计</h3>
+                        <div class="filter_date">
+                            <a href="javascript:;" onclick="set_statistical_chart(this, 'sale', 'week')">七天</a>
+                            <a href="javascript:;" onclick="set_statistical_chart(this, 'sale', 'month')">一月</a>
+                            <a href="javascript:;" onclick="set_statistical_chart(this, 'sale', 'year')">半年</a>
+                        </div>
+                    </div>
+                    <div class="sc_warp">
+                        <div id="total_main" style="height:274px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="contentWarp">
+            <div class="section system_section w190">
+                <div class="system_section_con">
+                    <div class="sc_title">
+                        <i class="sc_icon"></i>
+                        <h3>系统信息</h3>
+                        <span class="stop stop_jia" title="展开详情"></span>
+                    </div>
+                    <div class="sc_warp">
+                        <table cellpadding="0" cellspacing="0" class="system_table">
+                            <tbody><tr>
+                                <td class="gray_bg">服务器操作系统:</td>
+                                <td>Linux (127.0.0.1)</td>
+                                <td class="gray_bg">Web 服务器:</td>
+                                <td>Apache</td>
+                            </tr>
+                            <tr>
+                                <td class="gray_bg">PHP 版本:</td>
+                                <td>5.6.29</td>
+                                <td class="gray_bg">MySQL 版本:</td>
+                                <td>5.5.54</td>
+                            </tr>
+                            <tr>
+                                <td class="gray_bg">安全模式:</td>
+                                <td>否</td>
+                                <td class="gray_bg">安全模式GID:</td>
+                                <td>否</td>
+                            </tr>
+                            <tr>
+                                <td class="gray_bg">Socket 支持:</td>
+                                <td>是</td>
+                                <td class="gray_bg">时区设置:</td>
+                                <td>Asia/Shanghai</td>
+                            </tr>
+                            <tr>
+                                <td class="gray_bg">GD 版本:</td>
+                                <td>GD2 ( JPEG GIF PNG)</td>
+                                <td class="gray_bg">Zlib 支持:</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td class="gray_bg">IP 库版本:</td>
+                                <td>20071024</td>
+                                <td class="gray_bg">文件上传的最大大小:</td>
+                                <td>10M</td>
+                            </tr>
+                            <tr>
+                                <td class="gray_bg">程序版本:</td>
+                                <td>v2.7.3.1 RELEASE 20181214</td>
+                                <td class="gray_bg">安装日期:</td>
+                                <td>2017-05-02</td>
+                            </tr>
+                            <tr>
+                                <td class="gray_bg">编码:</td>
+                                <td>UTF-8</td>
+                                <td class="gray_bg"></td>
+                                <td></td>
+                            </tr>
+                            </tbody></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="guide_dialog" shoptype="guide_dialog" style="display:none;">
+    <div class="guide_content" shoptype="guide_content">
+        <div class="guide_step">
+            <div class="item current">
+                <h2>基本信息配置</h2>
+                <div class="spliy">
+                    ••••••••••••••••<i class="gicon"></i>
+                </div>
+            </div>
+            <div class="item">
+                <h2>清理数据</h2>
+                <div class="spliy">
+                    ••••••••••••••••<i class="gicon"></i>
+                </div>
+            </div>
+            <div class="item">
+                <h2>维护基础数据</h2>
+                <div class="spliy">
+                    ••••••••••••••••<i class="gicon"></i>
+                </div>
+            </div>
+            <div class="item">
+                <h2>可视化装修</h2>
+            </div>
+        </div>
+        <div class="guide_list">
+            <div class="guide_item guide_one">
+                <a href="shop_config.php?act=list_edit" target="_blank">
+                    <img src="/public/static/images/guide_img_1.jpg"/>
+                </a>
+            </div>
+            <div class="guide_item guide_two" style="display:none;">
+                <a href="index.php?act=clear_cache" target="_blank">
+                    <img src="/public/static/images/guide_img_2.jpg"/>
+                </a>
+            </div>
+            <div class="guide_item guide_three" style="display:none;">
+                <a href="goods.php?act=step_up" target="_blank" class="a_left"></a>
+                <a href="merchants_steps.php?act=step_up" target="_blank" class="a_right"></a>
+                <img src="/public/static/images/guide_img_3.jpg"/>
+            </div>
+            <div class="guide_item guide_four" style="display:none;">
+                <a href="visualhome.php?act=list" target="_blank" class="a_top"></a>
+                <a href="../mobile/index.php?r=admin/editor" target="_blank" class="a_bot"></a>
+                <img src="/public/static/images/guide_img_4.jpg"/>
+            </div>
+        </div>
+        <div class="guide_btn" data-type="0">
+            <a href="javascript:void(0);" class="btn_next" shoptype="btnNext">了解了，下一步</a>
+            <a href="javascript:void(0);" class="btn_prev btn_disabled" shoptype="btnPrev">上一步</a>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <p>版权所有 &copy;2005-2018 并保留所有权利。</p>
+</div>
+
+</body>
+</html>
+<script type="text/javascript" src="/public/static/js/echarts-all.js"></script>
+
+<script>
+    $(function () {
+        $.upDown(".stop", ".sc_title", ".system_section", 73);
+        set_statistical_chart(".section_order_count .filter_date a:first", "order", "week"); //初始设置
+        set_statistical_chart(".section_total_count .filter_date a:first", "sale", "week"); //初始设置
+        $('.sys-section ul.sys span').on('click', function () {
+            let _herf = this.dataset.href;
+            $.ajax({
+                type: 'POST',
+                url: '/admin/index/makeJwt',
+                success: function (data) {
+                    window.parent.location.href = _herf + '?auth=' + data.jwt;
+                },
+                error: function (xhr, type) {
+                    console.log(xhr);
+                    alert(xhr.responseJSON);
+                }
+            });
+        });
+    });
+    function set_statistical_chart(obj, type, date)
+    {
+        var obj = $(obj);
+        obj.addClass("active");
+        obj.siblings().removeClass("active");
+
+        $.post('/admin/index/home', {
+            type: type,
+            date: date
+        }, function (ret) {
+            if(type == 'order'){
+                var div_id = "order_main";
+            }
+            if(type == 'sale'){
+                var div_id = "total_main";
+            }
+            var myChart = echarts.init(document.getElementById(div_id));
+            myChart.setOption(ret);
+        }, 'json');
+    }
+
+    setTimeout(function () {
+        layer.open({
+            type: 2,
+            title: '最新通知',
+            area: ['400px', '500px'],
+            content: '/admin/index/hometip',
+            offset: 'rb',
+            shade: 0,
+        });
+    },2000);
+</script>
+

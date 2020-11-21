@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>该页面展示了商品库的所有商品信息，可对商品进行编辑、删除操作。</li>
+                <li>可进行批量上传、按店铺导入商品、搜索操作。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <!--商品列表-->
+            <div class="common-head">
+                <div class="fl">
+                    <div class="fbutton" @click="goodsadd()">
+                        <div class="add" title="添加商品">
+                                <span>
+                                    <i class="icon icon-plus"></i>
+                                    添加商品
+                                </span>
+                        </div>
+                    </div>
+                    <div class="fbutton" @click="trashList()">
+                        <div title="回收站" class="add">
+                            <span><i aria-hidden="true" class="icon icon-trash"></i>回收站</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" name="keyword" class="text nofocus w140" placeholder="商品名称/货号/条形码"
+                               autocomplete="off" v-model="keywords">
+                        <input type="submit" class="btn" name="secrch_btn" shoptype="secrch_btn" value=""
+                               @click="secrchInit()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <form method="post" action="" name="listForm" onsubmit="return confirmSubmit(this)">
+                    <div class="list-div" id="listDiv">
+                        <div class="flexigrid ht_goods_list">
+                            <table cellpadding="0" cellspacing="0" border="0">
+                                <thead>
+                                <tr>
+                                    <th width="3%" class="sign"></th>
+                                    <th width="5%" class="sky_id">
+                                        <template v-if="sort_order=='desc'">
+                                            <div class="tDiv" @click="secrchInit('asc')">
+                                                <a href="javascript:void(0);">编号</a>
+                                                <img src="/public/static/images/sort_desc.gif"/>
+                                            </div>
+                                        </template>
+                                        <template v-if="sort_order=='asc'">
+                                            <div class="tDiv" @click="secrchInit('desc')">
+                                                <a href="javascript:void(0);">编号</a>
+                                                <img src="/public/static/images/sort_asc.gif"/>
+                                            </div>
+                                        </template>
+                                    </th>
+                                    <th width="25%">
+                                        <div class="tDiv"><a href="javascript:void(0)">商品名称</a></div>
+                                    </th>
+                                    <th width="10%">
+                                        <div class="tDiv"><a href="javascript:void(0)">价格</a></div>
+                                    </th>
+                                    <th width="10%">
+                                        <div class="tDiv"><a href="javascript:void(0)">货号</a></div>
+                                    </th>
+                                    <th width="10%">
+                                        <div class="tDiv"><a href="javascript:void(0)">标签</a></div>
+                                    </th>
+                                    <th width="17%" class="handle">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <template v-for="(vo,index) in list">
+                                    <tr>
+                                        <td class="sign">
+                                            <div class="tDiv">
+                                                <input type="checkbox" name="checkboxes[]" :value="vo.goods_id"
+                                                       class="checkbox"
+                                                       :id="checkbox+vo.goods_id"/>
+                                                <label :for="checkbox+vo.goods_id" class="checkbox_stars"></label>
+                                            </div>
+                                        </td>
+                                        <td class="sky_id">
+                                            <div class="tDiv">{{vo.goods_id}}</div>
+                                        </td>
+                                        <td>
+                                            <div class="tDiv goods_list_info">
+                                                <div class="desc">
+                                                    <div class="name">
+                                                        <span class="span">{{vo.goods_name}}</span>
+                                                    </div>
+                                                    <p class="brand">
+                                                        品牌：<em>{{vo.brand_name}}</em>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="sky_id">
+                                            <div class="tDiv">{{vo.shop_price}}</div>
+                                        </td>
+                                        <td class="sky_id">
+                                            <div class="tDiv">{{vo.goods_sn}}</div>
+                                        </td>
+                                        <td>
+                                            <div class="tDiv">
+                                                <div class="tlist">
+                                                    <span>精品：</span>
+                                                    <div class="switch" title="是"
+                                                         :class="{'active':vo.is_best==1}"
+                                                         @click="goodsupdate_is_best(vo)">
+                                                        <div class="circle"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="tlist">
+                                                    <span>新品：</span>
+                                                    <div class="switch" title="是"
+                                                         :class="{'active':vo.is_new==1}"
+                                                         @click="goodsupdate_is_new(vo)">
+                                                        <div class="circle"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="tlist">
+                                                    <span>热销：</span>
+                                                    <div class="switch" title="是"
+                                                         :class="{'active':vo.is_hot==1}"
+                                                         @click="goodsupdate_is_hot(vo)">
+                                                        <div class="circle"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="tlist tlist-last">
+                                                    <span>上架：</span>
+                                                    <div class="switch" title="是"
+                                                         :class="{'active':vo.is_on_sale==1}"
+                                                         @click="goodsupdate_is_on_sale(vo)">
+                                                        <div class="circle"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="handle">
+                                            <div class="tDiv ht_tdiv" style="padding-bottom:0px;">
+                                                <p>
+                                                    <a href="javascript:void(0)" @click="goodsedit(vo)"
+                                                       class="btn_edit">
+                                                        <i class="icon icon-edit"></i>
+                                                        编辑
+                                                    </a>
+                                                    <a href="javascript:void(0)" class="btn_trash"
+                                                       @click="goodsupdate_is_delete(vo,index,1)"
+                                                       v-if="vo.is_delete==0">
+                                                        <i class="icon icon-trash"></i>
+                                                        删除
+                                                    </a>
+                                                    <a href="javascript:void(0)" class="btn_trash"
+                                                       @click="goodsupdate_is_delete(vo,index,0)"
+                                                       v-if="vo.is_delete==1">
+                                                        <i class="fa fa-recycle"></i>
+                                                        还原
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="tDiv">
+                                            <div class="tfoot_btninfo">
+                                                <div class="checkbox_item fl font12 mt5 mr5">
+                                                    <input type="checkbox" name="all_list" class="ui-checkbox"
+                                                           id="all_list">
+                                                    <label for="all_list" class="ui-label">全选</label>
+                                                </div>
+                                                <input type="hidden" name="act" value="batch"/>
+                                                <!-- 操作类型 start -->
+                                                <div class="imitate_select select_w120">
+                                                    <div class="cite">请选择</div>
+                                                    <ul>
+                                                        <li>
+                                                            <a href="javascript:void(0)"
+                                                               class="ftx-01">请选择...</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:void(0);" data-value="trash"
+                                                               @click="libgoodsallexecute('trash')" class="ftx-01">回收站</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:void(0);" data-value="on_sale"
+                                                               @click="libgoodsallexecute('on_sale')" class="ftx-01">上架</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:void(0);"
+                                                               data-value="not_on_sale"
+                                                               @click="libgoodsallexecute('not_on_sale')" class="ftx-01">下架</a>
+                                                        </li>
+
+                                                    </ul>
+                                                    <input name="type" type="hidden" value="">
+                                                </div>
+                                            </div>
+                                            <div class="list-page">
+                                                <div id="turn-page"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!--商品列表end-->
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            checkbox: 'checkbox_',
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            sort_order: 'desc',
+            is_delete: 0,
+            brand_id: 0,
+            list: [],
+
+            brand_name_show: '请选择',
+            brand_name: '',
+            brandfirstcharList: brandfirstcharList,
+            brandList: [],
+
+            //商品分类聚合选择开始
+            categoryList: [],
+            catlevel: 0,
+            category_name: '顶级分类',
+            category_tip: '请选择分类',
+            cat_id: 0,
+            //商品分类聚合选择结束
+
+            ids:''
+        },
+        methods: {
+            pageFreash: function () {
+                vm.page = 1;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.is_delete = '';
+
+                vm.brand_id = 0;
+                vm.brand_name = '';
+                vm.brand_name_show = '请选择';
+
+                vm.category_name = '请选择分类';
+                vm.category_tip = '请选择分类';
+                vm.cat_id = 0;
+                vm.catlevel = 0;
+                vm.init();
+            },
+            trashList: function () {
+                vm.is_delete = 1;
+                vm.page = 1;
+                vm.count = 1;
+                vm.init();
+            },
+            secrchInit: function (sort_order = 'asc') {
+                vm.page = 1;
+                vm.count = 0;
+                vm.sort_order = sort_order;
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/goods/libgoods', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    sort_order: vm.sort_order,
+                    is_delete: vm.is_delete,
+                    brand_id: vm.brand_id,
+                    cat_id: vm.cat_id,
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                    setTimeout(function () {
+                        $('.nyroModal').nyroModal();
+                    }, 300);
+                }, 'json');
+            },
+            goodsadd: function () {
+                window.parent.addParentTab({title: '本地库-添加商品', href: '/admin/goods/libgoodsadd'});
+            },
+            goodsedit: function (vo) {
+                window.parent.addParentTab({title: '本地库-编辑商品', href: '/admin/goods/libgoodsadd?goods_id=' + vo.goods_id});
+            },
+            goodsupdate: function (index) {
+                majax('/admin/goods/doupdate', vm.list[index], 'goods_lib')
+            },
+            goodsupdate_is_best: function (vo) {
+                var is_best = vo.is_best == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_best = is_best;
+                majax('/admin/goods/doupdate', pageparm, 'goods_lib')
+            },
+            goodsupdate_is_new: function (vo) {
+                var is_new = vo.is_new == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_new = is_new;
+                majax('/admin/goods/doupdate', pageparm, 'goods_lib')
+            },
+            goodsupdate_is_hot: function (vo) {
+                var is_hot = vo.is_hot == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_hot = is_hot;
+                majax('/admin/goods/doupdate', pageparm, 'goods_lib')
+            },
+            goodsupdate_is_on_sale: function (vo) {
+                var is_on_sale = vo.is_on_sale == 0 ? 1 : 0;
+                var pageparm = vo;
+                pageparm.is_on_sale = is_on_sale;
+                majax('/admin/goods/doupdate', pageparm, 'goods_lib')
+            },
+            goodsupdate_is_delete: function (vo, index, isdelete = 1) {
+
+                $.messager.confirm('提示', '确认操作吗？', function (r) {
+                    if (r == true) {
+                        var pageparm = vo;
+                        pageparm.is_delete = isdelete;
+                        $.post('/admin/goods/doupdate', {
+                            pageparm: JSON.stringify(pageparm),
+                            table: 'goods_lib'
+                        }, function (ret) {
+                            $.messager.progress('close');
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            },
+            //批量操作
+            libgoodsallexecute: function (index = null) {
+                var arr = new Array();
+                $(".list-div").find("input[name='checkboxes[]']:checked").each(function (i) {
+                    arr[i] = $(this).val();
+                });
+                vm.ids = arr.join(",");
+                $.post('/admin/goods/goodsallexecute', {
+                    ids: vm.ids,
+                    table: 'goods_lib',
+                    index: index
+                }, function (ret) {
+                    $.messager.progress('close');
+                    if (ret.status == 1) {
+                        $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                        vm.pageFreash();
+                    } else {
+                        $.messager.alert('提示', ret.msg, 'warning');
+                    }
+                }, 'json');
+            }
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span>
+            </div>
+            <ul>
+                <li>用户申请开店数据列表。</li>
+            </ul>
+        </div>
+        <div class="flexilist mt30">
+            <div class="common-content">
+                <div class="mian-info sale_info">
+                    <div class="switch_info">
+
+                        <div class="items pb10 bor_bt_das">
+                            <div class="item">
+                                <div class="label">审核状态：</div>
+                                <div class="label_value">
+                                    <div class="checkbox_items">
+                                        <div class="checkbox_item">
+                                            <input type="checkbox" name="status" value="0" class="ui-checkbox"
+                                                   id="shipping_status_00">
+                                            <label for="shipping_status_00" class="ui-label">申请中</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input type="checkbox" name="status" value="1" class="ui-checkbox"
+                                                   id="shipping_status_05">
+                                            <label for="shipping_status_05" class="ui-label">待审核</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input type="checkbox" name="status" value="2" class="ui-checkbox"
+                                                   id="shipping_status_04">
+                                            <label for="shipping_status_04" class="ui-label">审核通过</label>
+                                        </div>
+                                        <div class="checkbox_item">
+                                            <input type="checkbox" name="status" value="3" class="ui-checkbox"
+                                                   id="shipping_status_03">
+                                            <label for="shipping_status_03" class="ui-label">审核拒绝</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item mt20">
+                                <div class="label">&nbsp;</div>
+                                <div class="label_value">
+                                    <a href="javascript:void(0);" class="btn btn30 blue_btn" shoptype="query"
+                                       @click="secrchInit()"><i class="icon icon-search"></i>查询</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flexilist">
+            <div class="common-head">
+                <div class="refresh">
+                    <div class="refresh_tit" title="刷新数据" @click="pageFreash()">
+                        <i class="icon icon-refresh"></i>
+                    </div>
+                    <div class="refresh_span">刷新 - 共{{count}}条记录</div>
+                </div>
+                <div class="search">
+                    <div class="input">
+                        <input type="text" placeholder="申请人用户名|手机号" class="text nofocus" v-model="keywords">
+                        <input type="submit" name="secrch_btn" shoptype="secrch_btn" value="" class="btn"
+                               @click="secrchInit()">
+                    </div>
+                </div>
+            </div>
+            <div class="common-content">
+                <div class="list-div" id="listDiv">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                        <thead>
+                        <tr>
+                            <th width="5%"><div class="tDiv">编号</div></th>
+                            <th width="10%"><div class="tDiv">用户名</div></th>
+                            <th width="10%"><div class="tDiv">手机号</div></th>
+                            <th width="10%"><div class="tDiv">邮箱</div></th>
+                            <th width="10%"><div class="tDiv">审核状态</div></th>
+                            <th width="10%"><div class="tDiv">创建时间</div></th>
+                            <th width="20%" class="handle">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="(vo,index) in list">
+                            <tr>
+                                <td><div class="tDiv">{{vo.apply_id}}</div></td>
+                                <td><div class="tDiv">{{vo.user_name}}</div></td>
+                                <td><div class="tDiv">{{vo.mobile}}</div></td>
+                                <td><div class="tDiv">{{vo.email}}</div></td>
+                                <td>
+                                    <div class="tDiv">
+                                        <div class="tlist">
+                                            <template v-if="vo.status==0">申请中</template>
+                                            <template v-if="vo.status==1">未处理 </template>
+                                            <template v-if="vo.status==2"><span class="green">通过</span> </template>
+                                            <template v-if="vo.status==3"><span class="red">拒绝</span> </template>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><div class="tDiv">{{vo.add_time_cn}}</div></td>
+                                <td class="handle">
+                                    <div class="tDiv a2">
+                                        <a href="javascript:void(0)" title="查看资料" class="btn_edit" @click="add(vo)">
+                                            <i class="sc_icon sc_icon_see"></i>
+                                            查看资料
+                                        </a>
+                                        <a href="javascript:void(0);" @click="dodelete(index)" class="btn_trash">
+                                            <i class="icon icon-trash"></i>
+                                            删除
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                        <tfoot>
+                        <template v-if="count===0">
+                            <tr class="">
+                                <td colspan="12" class="no_record"><div class="tDiv">没有找到任何记录</div></td>
+                            </tr>
+                        </template>
+                        <tr>
+                            <td colspan="10">
+                                <div class="tDiv">
+                                    <div class="list-page">
+                                        <div id="turn-page"></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+
+
+
+            statusIDS: '',
+
+        },
+        methods: {
+            add: function (vo = {}) {
+                layerOpenwin('查看资料--审核操作', '/admin/store/applydetail?apply_id=' + vo.apply_id);
+            },
+            storeaudit: function (index) {
+                if (vm.list[index].status == 0) {
+                    vm.list[index].status = 1;
+                } else {
+                    vm.list[index].status = 0;
+                }
+                vm.doupdate(vm.list[index]);
+            },
+            doupdate: function (vo) {
+                majax('/admin/store/doupdate', vo, 'store')
+            },
+            pageFreash: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.keywords = '';
+                vm.init();
+            },
+            secrchInit: function () {
+                vm.page = 1;
+                vm.rows = 10;
+                vm.count = 0;
+                vm.init();
+            },
+            init: function () {
+                $.post('/admin/store/storeapply', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                    statusIDS: getstatus(),
+                }, function (ret) {
+                    vm.list = ret.data.list;
+                    vm.count = ret.data.total;
+                    if (vm.page == 1) {
+                        pageinit();
+                    }
+                }, 'json');
+            },
+            dodelete: function (index) {
+                $.messager.confirm('提示', '确定删除吗？', function (r) {
+                    if (r == true) {
+                        $.post('/admin/store/storeapplyDelete', {
+                            apply_id: vm.list[index].apply_id,
+                        }, function (ret) {
+                            if (ret.status == 1) {
+                                vm.list.splice(index, 1);
+                                $.messager.show({title: '提示', msg: ret.msg, timeout: 3000, showType: 'slide'});
+                            } else {
+                                $.messager.alert('提示', ret.msg, 'warning');
+                            }
+                        }, 'json');
+                    }
+                });
+            }
+        }
+    });
+    $(function () {
+        vm.init();
+    });
+    function getstatus() {
+        var order_status = [];
+        $("input[name='status']:checked").each(function(){
+            order_status.push($(this).val());
+        });
+        return order_status.join(',');
+    }
+
+</script>

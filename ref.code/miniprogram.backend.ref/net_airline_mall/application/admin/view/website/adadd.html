@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body class="iframe_body">
+<div class="warpper" id="app">
+    <div class="content">
+        <div class="explanation" id="explanation">
+            <div class="ex_tit"><i class="sc_icon"></i><h4>操作提示</h4><span class="explanationZoom" title="收起提示"></span></div>
+            <ul>
+                <li>上传广告图片时请注意图片尺寸问题。</li>
+                <li>标识“<em>*</em>”的选项为必填项，其余为选填项。</li>
+            </ul>
+        </div>
+        <div class="flexilist">
+            <div class="mian-info">
+                <div class="switch_info user_basic">
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>广告名称：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.ad_name" class="text">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>楼层ID：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.floor_id" class="text">
+                            <div class="form_prompt">此字段应用于首页</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>标识码：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.ad_code" class="text">
+                            <div class="form_prompt">此字段应用于首页</div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>广告位置：</div>
+                        <div class="label_value">
+                            <div class="date-item year">
+                                <div id="position_id_div" class="imitate_select select_w320">
+                                    <div class="cite">选择广告位</div>
+                                    <ul style="display: none;">
+                                        <template v-for="(vo,index) in positionList">
+                                            <li @click="info.position_id=vo.position_id">
+                                                <a href="javascript:void(0)" :data-value="vo.postion_id" class="ftx-01">
+                                                    {{vo.position_name}}
+                                                </a>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span class="require-field">*</span>起止日期：</div>
+                        <div class="label_value">
+                            <div class="text_time" id="text_time_start">
+                                <input type="text" name="start_time" id="start_time" value="" class="text mr0">
+                            </div>
+                            <span class="bolang">~</span>
+                            <div class="text_time" id="text_time_end">
+                                <input type="text" name="end_time" id="end_time" value=""class="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">广告链接：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.ad_link" class="text" value="">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item shop_logo">
+                        <div class="label"><span class="require-field">*</span>上传广告图片：</div>
+                        <div class="label_value">
+                            <div class="type-file-box">
+                                <input type="button" name="button" id="button" class="type-file-button" value="">
+                                <input type="text" name="textfile" class="type-file-text" id="textfield" value=""
+                                       autocomplete="off" readonly v-model="info.ad_img">
+                            </div>
+                            <div class="notic m20">上传该广告的图片文件,或者你也可以指定一个远程URL地址为广告的图片</div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label">广告大标题：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.b_title" class="text" value="">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">广告小标题：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.s_title" class="text" value="">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">是否开启：</div>
+                        <div class="label_value">
+                            <div class="checkbox_items">
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="is_public" id="sex_0" value="0"
+                                           v-model="info.enabled">
+                                    <label for="sex_0" class="ui-radio-label">否</label>
+                                </div>
+                                <div class="checkbox_item">
+                                    <input type="radio" class="ui-radio" name="is_public" id="sex_1" value="1"
+                                           v-model="info.enabled">
+                                    <label for="sex_1" class="ui-radio-label">是</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label">广告联系人：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.link_man" class="text" value="">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">联系人Email：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.link_email" class="text" value="">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">联系电话：</div>
+                        <div class="label_value">
+                            <input type="text" name="position_name" v-model="info.link_phone" class="text" value="">
+                            <div class="form_prompt"></div>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label">&nbsp;</div>
+                        <div class="label_value info_btn">
+                            <a href="javascript:;" class="button" id="submitBtn" @click="init()"> 确定 </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="win"></div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var info = {$info|raw};
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: info,
+            positionList:[]
+        },
+        methods: {
+            init: function () {
+                vm.info.start_time = $('#start_time').datetimebox('getValue');
+                vm.info.end_time = $('#end_time').datetimebox('getValue');
+                majax('/admin/website/adadd', vm.info);
+            },
+            positionListInit:function () {
+                $.post('/admin/website/adpositionlistAjax', {
+                    pageparm: '',
+                }, function (ret) {
+                    vm.positionList = ret.data;
+                }, 'json');
+            }
+        }
+    });
+    layui.use('upload', function(){
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#button',
+            url: '/admin/uploader/alioss_upload', //上传接口
+            data:{
+                upload: 1
+            },
+            accept: 'file', //允许上传的文件类型
+            done: function(ret){
+                vm.info.ad_img = ret.url;
+                if(ret.state == 'SUCCESS'){
+                    $.messager.show({title: '提示', msg: '操作成功', timeout: 1000, showType: 'slide'});
+                }else{
+                    $.messager.show({title: '提示', msg: '操作失败', timeout: 1000, showType: 'slide'});
+                }
+
+            },
+        });
+    });
+    $(function () {
+        vm.positionListInit();
+        $('#start_time').datetimebox({
+            value: info.start_time_cn?info.start_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+        $('#end_time').datetimebox({
+            value: info.end_time_cn?info.end_time_cn:getNowFormatDate(),
+            required: true,
+            showSeconds: false
+        });
+    });
+</script>

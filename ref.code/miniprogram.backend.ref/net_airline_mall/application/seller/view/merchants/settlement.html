@@ -1,0 +1,169 @@
+{include file="public/header"}
+<div class="tabmenu">
+    <ul class="tab">
+        <li class="active"><a href="/seller/sale/coupon_type">店铺结算记录</a></li>
+    </ul>
+</div>
+
+<div id="app" v-cloak>
+    <div class="btn-info">
+        <a :href="'/seller/merchants/settlement/download/1/start_time/'+start_time+'/end_time/' +end_time" target="_blank" class="sc-btn sc-blue-btn"><i class="icon-download-alt"></i>导出Excel</a>
+    </div>
+    <div class="order_stats_search">
+        <div class="screeItme">
+            <strong class="fl lh mr10">起始时间：</strong>
+            <div class="text_time" id="text_time1">
+                <input name="end_date" id="start_date" v-model="start_time" class="easyui-datetimebox">
+            </div>
+            <div class="bolang">&nbsp;&nbsp;~&nbsp;&nbsp;</div>
+            <div class="text_time" id="text_time2">
+                <input name="end_date" id="end_date" v-model="end_time" class="easyui-datetimebox">
+            </div>
+            <input type="button" value="查询" class="sc-btn sc-blueBg-btn btn30 ml10" @click="page=1;getData()">
+        </div>
+    </div>
+
+    <div class="list-div" id="listDiv">
+        <table class="ecsc-default-table goods-default-table mt20">
+            <thead>
+            <tr>
+                <th class="tl">
+                    <div class="pl10">金额</div>
+                </th>
+                <th>订单优惠</th>
+                <th>优惠券</th>
+                <th>平台佣金</th>
+                <th>结算金额</th>
+                <th>结算日期</th>
+                <th width="10%" class="tc">订单编号</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr :class="{row_header:index%2}" v-for="(vo,index) in list">
+                <td class="tl">
+                    <div class="tc_items pl10">
+                        <div class="item">订单金额：&nbsp;&nbsp;<em>¥</em>{{vo.order_totals}}&nbsp;<em class="org2">(含运费)</em></div>
+                        <div class="item">收入积分：+<em>¥</em>{{vo.integral}}</div>
+                        <div class="item">退单金额：- <em>¥</em>{{vo.return_totals}}</div>
+                        <div class="item">送出积分：- <em>¥</em>{{vo.give_integral}}</div>
+                    </div>
+                </td>
+                <td>- <em>¥</em>{{vo.order_prom_amount}}</td>
+                <td>
+                    <em>¥</em>{{vo.coupon_price}}<br>
+                </td>
+                <td>
+                    <div class="tc_items">
+                        <div class="item">收取比例：{{vo.commis_rate}}%</div>
+                        <div class="item">平台抽成：- <em>¥</em>{{vo.commis_totals}}</div>
+                    </div>
+                </td>
+                <td>
+                    <p><strong class="red">{{vo.result_totals}}</strong></p>
+                </td>
+                <td>{{vo.add_time | timeParse}}</td>
+                <td>
+                    <div><a :href="'/seller/order/order_detail.html?order_sn='+vo.order_sn">{{vo.order_sn}}</a></div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div id="page-bar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            start_time: '',
+            end_time: '',
+            list: [],
+            page: 1,
+            pageSize: 15,
+            count: 0,
+        },
+        filters: {
+            timeParse: function (val) {
+                return moment.unix(val).format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        methods: {
+            getData(instance) {
+                instance = instance ? instance : vm;
+                var param = {
+                    start_time: instance.start_time,
+                    end_time: instance.end_time,
+                    page: instance.page,
+                    pageSize: instance.pageSize
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/seller/merchants/settlement',
+                    data: param,
+                    success: function (data) {
+                        instance.list = data.list;
+                        instance.count = data.count;
+                        instance.page = data.page;
+                        instance.pageSize = data.pageSize;
+                        instance.start_time = data.start_time;
+                        instance.end_time = data.end_time;
+                        if (data.page == 1) instance.pagerender(instance);
+                    },
+                    error: function (xhr, type) {
+                        easyshow(xhr.responseJSON);
+                    }
+                });
+            },
+            pagerender(instance) {
+                instance = instance ? instance : vm;
+                layui.use('laypage', function () {
+                    var laypage = layui.laypage;
+                    laypage.render({
+                        elem: 'page-bar',
+                        count: parseInt(instance.count), //数据总数，从服务端得到
+                        limit: parseInt(instance.pageSize),
+                        limits: [10, 20, 30, 40, 50],
+                        groups: 5,
+                        theme: '#139ff0',
+                        layout: ['prev', 'page', 'next'],
+                        jump: function (obj, first) {
+                            instance.page = obj.curr;
+                            instance.pageSize = obj.limit;
+                            if (!first) {
+                                instance.getData();
+                            }
+                        }
+                    });
+                });
+            },
+        },
+        created: function () {
+            this.start_time = moment(moment().subtract(30, 'days').format('YYYY-MM-DD')).format('YYYY-MM-DD HH:mm:ss');
+            this.end_time = moment().format('YYYY-MM-DD HH:mm:ss');
+            this.getData(this);
+        },
+        mounted() {
+            var _this=this;
+            $('#start_date').datetimebox({
+                showSeconds: false,
+                onChange: function (date) {
+                    _this.start_time = date;
+                    _this.getData();
+                }
+            });
+            $('#end_date').datetimebox({
+                showSeconds: false,
+                onChange: function (date) {
+                    _this.end_time = date;
+                    _this.getData();
+                }
+            });
+        }
+    });
+
+</script>
+{include file="public/footer"}

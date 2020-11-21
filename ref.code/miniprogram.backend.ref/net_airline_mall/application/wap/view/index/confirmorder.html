@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>结算页</title>
+    <link rel="stylesheet" href="/public/wap/static/css/font_u366719ytlat6gvi.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_60vzt3bweh.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/font_242849_d1e6kntzwv.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-common.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-vendors.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/index.css" />
+    <link rel="stylesheet" href="/public/wap/static/css/chunk-311e.css" />
+    <link rel="stylesheet" href="/public/wap/css/swiper.min.css" />
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="con con_main">
+        <div class="flow-checkout">
+            <section class="flow-checkout-item flow-checkout-adr m-b10" @click="addeditwin(0)">
+                <div class="van-cell-group van-hairline--top-bottom">
+                    <div class="van-cell van-cell--clickable"><i
+                            class="van-icon van-icon-location van-cell__left-icon"></i>
+                        <template v-if="useraddress.address_id>0">
+                            <div class="van-cell__title">
+                                <span>{{useraddress.consignee}} {{useraddress.mobile}}</span>
+                                <div class="van-cell__label">{{useraddress.region_name}} {{useraddress.address}}</div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div class="van-cell__title"><span>设置收货地址</span></div>
+                        </template>
+                        <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                    </div>
+                </div>
+            </section>
+
+            <section class="checkout-goods-list m-b10">
+                <template v-for="(vo,index) in info.orderInfo.data">
+                    <section class="section-list">
+                        <div class="detail-title">{{vo.store.store_name?vo.store.store_name:'平台自营'}}</div>
+                        <div class="product-list dis-box">
+                            <ul class="box-flex">
+                                <template v-for="(vo2,index2) in vo.goods">
+                                    <li @click="openGoodsdetail(vo2)">
+                                        <div class="product-div">
+                                            <a href="javascript:void(0)" class="product-div-link"></a>
+                                            <div class="product-list-img">
+                                                <img :src="vo2.original_img" class="img">
+                                            </div>
+                                            <div class="product-info">
+                                                <h4>
+                                                    <em class="em-promotion">秒杀</em>
+                                                    {{vo2.goods_name}}
+                                                </h4>
+                                                <div class="price">
+                                                    <em>¥{{vo2.goods_price}}</em><span>x{{vo2.goods_num}}</span></div>
+                                                <div class="p-attr">￥{{vo2.market_price}}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </template>
+
+                            </ul>
+                        </div>
+                    </section>
+                </template>
+                <div class="van-cell-noright m-top08 van-cell-group van-hairline--top-bottom">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>配送费用</span>
+                        </div>
+                        <div class="van-cell__value">
+                            <div><em class="color-red">¥{{info.orderInfo.shipping_price}}</em></div>
+                        </div>
+                    </div>
+                    <div class="b-min b-min-t van-cell">
+                        <div class="van-cell__title"><span>买家留言</span>
+                        </div>
+                        <div class="van-cell__value">
+                            <div>
+                                <div class="van-cell-ptb0 van-cell van-field">
+                                    <div class="van-cell__value van-cell__value--alone">
+                                        <div class="van-field__body">
+                                            <input type="text" placeholder="选填（50）" class="van-field__control"
+                                                   v-model="user_note">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="b-min b-min-t van-cell">
+                        <div class="van-cell__value van-cell__value--alone">
+                            <div><span>共 {{info.orderInfo.goods_count}} 件商品 合计：</span><em class="color-red">¥{{info.orderInfo.order_amount}}</em>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="checkout-goods-other">
+                <div class="van-cell-noright van-cell-group van-hairline--top-bottom">
+                    <div class="van-cell van-cell--clickable">
+                        <div class="van-cell__title"><span>支付方式</span>
+                        </div>
+                        <div class="van-cell__value"><span>在线支付</span></div>
+                        <i class="van-icon van-icon-arrow van-cell__right-icon"></i></div>
+                    <div class="b-min b-min-t van-cell van-cell--clickable" @click="opengiftcard()" v-if="info.mixture==0">
+                        <div class="van-cell__title"><span>礼品卡</span></div>
+                        <div class="van-cell__value">
+                            <div solt="value" class="box-flex">
+                                <p class="receipt-title">选择</p>
+                            </div>
+                        </div>
+                        <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                    </div>
+                </div>
+                <div class="van-cell-noright m-top08 van-cell-total van-cell-group van-hairline--top-bottom">
+                    <div class="van-cell-title b-min b-min-b van-cell">
+                        <div class="van-cell__title"><span>商品总计</span></div>
+                        <div class="van-cell__value">
+                            <div><em class="color-red">¥{{info.orderInfo.goods_price}}</em></div>
+                        </div>
+                    </div>
+                    <div class="van-cell hide">
+                        <div class="van-cell__title"><span>配送费用</span>
+                        </div>
+                        <div class="van-cell__value">
+                            <div><em class="color-red">+ ¥{{info.orderInfo.shipping_price}}</em></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="order-detail-submit order-checkout-submit">
+                <div class="van-submit-bar">
+                    <div class="van-submit-bar__bar">
+                        <div class="van-submit-bar__text">
+                            <span>应付总额：</span>
+                            <span class="van-submit-bar__price">¥ {{info.orderInfo.order_amount}}</span>
+                        </div>
+                        <button class="van-button van-button--danger van-button--large van-button--square" @click="createOrder()">
+                            <span class="van-button__text">立即付款</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/public/wap/script/api.js"></script>
+<script src="/public/wap/script/app.js"></script>
+<script src="/public/wap/script/common.js"></script>
+<!--layui库引入开始-->
+<link href="/public/static/plugins/layui/css/layui.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="/public/static/plugins/layui/layui.all.js"></script>
+<!--layui库引入结束-->
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            info: [],
+
+            user_note: '',
+            pay_type: '',
+
+            useraddress: {
+                mobile: '',
+                consignee: '',
+                address: '',
+            },
+
+            giftcardList:[],//使用礼品卡
+
+        },
+        methods: {
+            giftcardListInit:function(giftcardList){
+                vm.giftcardList = giftcardList;
+                layer.closeAll();
+            },
+            opengiftcard:function(){
+                layer.open({
+                    type: 2,
+                    title: false,
+                    closeBtn: 0, //不显示关闭按钮
+                    shade: [0],
+                    area: ['100%', '80%'],
+                    offset: 'rb', //右下角弹出
+                    time: 0, //2秒后自动关闭
+                    anim: 2,
+                    resize: false,
+                    move: false,
+                    content: ['/wap/index/giftcard', 'no'],//iframe的url，no代表不显示滚动条
+                    resizing: function(layero){
+                        return false;
+                    }
+                });
+            },
+            addeditwin: function (address_id) {
+                api.openWin({
+                    name: 'addselect_win',
+                    url: 'widget://html/addselect_win.html',
+                });
+            },
+            openGoodsdetail: function (vo) {
+                api.openWin({
+                    name: 'goodsdetail_win',
+                    url: 'widget://html/goodsdetail_win.html',
+                    pageParam: {
+                        goods_id: vo.goods_id
+                    }
+                });
+            },
+            init: function () {
+                wxapp.ajax(config.confirmOrder, {
+                    goods_id: vm.goods_id,
+                    number: vm.number,
+                    buyNow: vm.buyNow,
+                    promtype: vm.promtype,
+                },1).then(function (ret) {
+                    vm.info = ret.data;
+                    vm.useraddress = ret.data.address;
+                });
+            },
+            createOrder: function () {
+                if (!vm.info.address.address_id) {
+                    api.openWin({
+                        name: 'address_win',
+                        url: 'widget://html/address_win.html',
+                    });
+                    return false;
+                }
+                param = {
+                    address_id: vm.useraddress.address_id,
+                    user_note: vm.user_note,
+                    giftcardList: JSON.stringify(vm.giftcardList)
+                };
+                wxapp.ajax(config.createOrder, param).then(function (ret) {
+                    if (ret.status == 1) {
+                        alert(ret.msg);
+                        if(ret.data.order_amout == 0){
+                            api.openWin({
+                                name: 'orderlist_win',
+                                url: 'widget://html/orderlist_win.html'
+                            });
+                        }else{
+                            api.openWin({
+                                name: 'payorder_win',
+                                url: 'widget://html/payorder_win.html',
+                                pageParam: {
+                                    order_sn: ret.data.sn
+                                }
+                            });
+                        }
+
+                    } else {
+                        wxapp.alert('fail', ret.msg);
+                    }
+                })
+            }
+        }
+    });
+    window.onload = function () {
+
+        vm.goods_id = api.pageParam.goods_id ? api.pageParam.goods_id : 0;
+        vm.number = api.pageParam.number ? api.pageParam.number : 0;
+        vm.buyNow = api.pageParam.buyNow ? api.pageParam.buyNow : '';
+        vm.promtype = api.pageParam.promtype ? api.pageParam.promtype : '';
+        vm.init();
+    };
+</script>

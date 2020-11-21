@@ -1,0 +1,200 @@
+{include file="public:head"}
+{include file='public/top_nav'}
+{include file='public/search_bar'}
+{include file='public/header'}
+<div class="user-content clearfix">
+    {include file="public:user_side"}
+    <div class="user-main" shoptype="userMain" data-action="noDefault">
+        <div class="user-crumbs"><span><a href="/">首页</a></span>
+            <span class="arrow">&gt;</span>
+            <span class="finish"><a href="/home/member/index">会员中心</a></span>
+        </div>
+
+        <div class="user-main" shoptype="userMain" data-action="noDefault">
+            <div class="user-crumbs hide">
+                <span><a href=".">首页</a></span><span class="arrow">&gt;</span> <span class="finish">进入会员中心</span>
+            </div>
+
+            <div class="user-mod" shoptype="tabSection" style="min-height: 1047px;">
+                <div class="user-title">
+                    <h2>优惠券列表</h2>
+                    <ul class="tabs" shoptype="tabs">
+                        <li class="active"><a href="javascript:void(0);">未使用({php}echo count($alist);{/php})</a></li>
+                        <li class=""><a href="javascript:void(0);">已使用({php}echo count($blist);{/php})</a></li>
+                        <li class=""><a href="javascript:void(0);">已过期({php}echo count($clist);{/php})</a></li>
+                    </ul>
+                </div>
+                <div class="user-coupons-warp" shoptype="tabContent">
+                    <div id="coupons_list0" style="display: block;" class="coupons_content_list" >
+                        <div class="coupons-items ps-container ps-active-y">
+                            {if count($alist) > 0}
+                            {volist name="alist" id="vo"}
+                            <div class="coupons-item ">
+                                <div class="c-type">
+                                    <i class="i-left"></i>
+                                    <div class="c-t-cont">
+                                        <div class="c-t-c-top">
+                                            <strong><em>￥</em>{$vo.money}</strong> <span>{$vo.name};可用</span>
+                                        </div>
+                                        <div class="c-t-c-bot">
+                                            {if $vo.store_id>0}
+                                            <p>{$store[$vo.store_id]} 店内专用</p>
+                                            {else /}
+                                            <p>{$siteInfo.shop_name} 自营</p>
+                                            {/if}
+                                            <p>{$vo.use_start_time|date='Y-m-d H:i'} ~ {$vo.use_end_time|date='Y-m-d H:i'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="c-msg">
+                                    {if $vo.store_id>0}
+                                    <a href="{:url('store/index',['id'=>$vo.store_id])}">
+                                        <span class="lj">立即使用</span>
+                                        <i class="iconfont icon-down"></i>
+                                    </a>
+                                    {else /}
+                                    <a href="/">
+                                        <span class="lj">立即使用</span>
+                                        <i class="iconfont icon-down"></i>
+                                    </a>
+                                    {/if}
+                                </div>
+                            </div>
+                            {/volist}
+                            <div class="ps-scrollbar-x-rail" style="width: 880px; display: none; left: 0px; bottom: 3px;">
+                                <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                            </div>
+                            <div class="ps-scrollbar-y-rail" style="top: 0px; height: 320px; display: inherit; right: 0px;">
+                                <div class="ps-scrollbar-y" style="top: 0px; height: 294px;"></div>
+                            </div>
+                            {else /}
+                            <div class="no_records">
+                                <i class="no_icon_two"></i>
+                                <div class="no_info"><h3>主人，您还没有优惠券~</h3></div>
+                            </div>
+                            <div class="ps-scrollbar-x-rail" style="width: 880px; display: none; left: 0px; bottom: 3px;">
+                                <div class="ps-scrollbar-x" style="left: 0px; width: 0px;">
+                                </div>
+                            </div>
+                            <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; display: none; right: 0px;">
+                                <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                            </div>
+                            {/if}
+                        </div>
+                    </div>
+                    <div id="coupons_list1" style="display: none;" class="coupons_content_list">
+                        <div class="coupons-items coupons-item-disabled ps-container">
+                            {if count($blist) > 0}
+                            {volist name="blist" id="vo"}
+                            <div class="coupons-item coupons-item-disabled">
+                                <div class="c-type">
+                                    <i class="i-left"></i>
+                                    <div class="c-t-cont">
+                                        <div class="c-t-c-top">
+                                            <strong><em>￥</em>{$vo.money}</strong> <span>{$vo.name};可用</span>
+                                        </div>
+                                        <div class="c-t-c-bot">
+                                            <p>平台限制：自营</p>
+                                            <p>范 围：[全场券][全品类通用]</p>
+                                            <p>{$vo.use_start_time|date='Y-m-d H:i'} ~ {$vo.use_end_time|date='Y-m-d H:i'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/volist}
+                            <div class="ps-scrollbar-x-rail"
+                                 style="width: 880px; display: none; left: 0px; bottom: 3px;">
+                                <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                            </div>
+                            <div class="ps-scrollbar-y-rail"
+                                 style="top: 0px; height: 320px; display: inherit; right: 0px;">
+                                <div class="ps-scrollbar-y" style="top: 0px; height: 294px;"></div>
+                            </div>
+                            {else /}
+                            <div class="no_records">
+                                <i class="no_icon_two"></i>
+                                <div class="no_info"><h3>主人，您还没有使用优惠券~</h3></div>
+                            </div>
+                            <div class="ps-scrollbar-x-rail"
+                                 style="width: 880px; display: none; left: 0px; bottom: 3px;">
+                                <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                            </div>
+                            <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; display: none; right: 0px;">
+                                <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                            </div>
+                            {/if}
+                        </div>
+                    </div>
+                    <div id="coupons_list2" style="display: none;" class="coupons_content_list">
+                        <div class="coupons-items ps-container">
+                            {if count($clist) > 0}
+                            {volist name="clist" id="vo"}
+                            <div class="coupons-item coupons-item-disabled">
+                                <div class="c-type">
+                                    <i class="i-left"></i>
+                                    <div class="c-t-cont">
+                                        <div class="c-t-c-top">
+                                            <strong><em>￥</em>{$vo.money}</strong> <span>{$vo.name};可用</span>
+                                        </div>
+                                        <div class="c-t-c-bot">
+                                            <p>平台限制：自营</p>
+                                            <p>范 围：[全场券][全品类通用]</p>
+                                            <p>{$vo.use_start_time|date='Y-m-d H:i'} ~ {$vo.use_end_time|date='Y-m-d H:i'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/volist}
+                            <div class="ps-scrollbar-x-rail"
+                                 style="width: 880px; display: none; left: 0px; bottom: 3px;">
+                                <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                            </div>
+                            <div class="ps-scrollbar-y-rail"
+                                 style="top: 0px; height: 320px; display: inherit; right: 0px;">
+                                <div class="ps-scrollbar-y" style="top: 0px; height: 294px;"></div>
+                            </div>
+                            {else /}
+                            <div class="no_records">
+                                <i class="no_icon_two"></i>
+                                <div class="no_info"><h3>主人，您还没有过期优惠券~</h3></div>
+                            </div>
+                            <div class="ps-scrollbar-x-rail"
+                                 style="width: 880px; display: none; left: 0px; bottom: 3px;">
+                                <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+                            </div>
+                            <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; display: none; right: 0px;">
+                                <div class="ps-scrollbar-y" style="top: 0px; height: 0px;"></div>
+                            </div>
+                            {/if}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+{include file="public:footer"}
+
+<script type="text/javascript" src="/public/static/js/jquery.SuperSlide.2.1.1.js"></script>
+<script>
+
+    $(function () {
+        //tab切换
+        $("*[shoptype='tabSection']").slide({
+            titCell: "*[shoptype='tabs'] li",
+            mainCell: "*[shoptype='tabContent']",
+            trigger: "click",
+            titOnClassName: "active"
+        });
+
+        //优惠券列表数量过多时添加滚动轴
+        $(".coupons-items").perfectScrollbar("destroy");
+        $(".coupons-items").perfectScrollbar();
+    });
+
+</script>
+

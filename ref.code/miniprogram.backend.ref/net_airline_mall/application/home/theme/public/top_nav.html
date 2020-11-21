@@ -1,0 +1,64 @@
+<div class="site-nav" id="site-nav">
+    <div class="w w1200">
+        <div class="fl">
+
+            <div class="txt-info" id="ECS_MEMBERZONE">
+                {if $user.user_name}
+                    <span>您好 &nbsp;<a href="{:url('member/index')}">{$user.user_name}</a></span>
+                    <span>，欢迎来到&nbsp;<a alt="首页" title="首页" href="/">{$siteInfo.shop_name}</a></span>
+                    <span>[<a href="{:url('member/logout')}">退出</a>]</span>
+                {else/}
+                    <a href="{:url('login/index')}" class="link-login red">请登录{$user.user_name}</a>
+                    <a href="{:url('login/register')}" class="link-regist">免费注册</a>
+                {/if}
+            </div>
+
+        </div>
+        <ul class="quick-menu fr">
+            {if $user.user_name}
+            <li>
+                <div class="dt"><a href="{:url('seller/login/index')}">我是商家</a></div>
+            </li>
+            <li class="spacer"></li>
+            {/if}
+            <li>
+                <div class="dt"><a href="{:url('member/order')}">我的订单</a></div>
+            </li>
+            <li class="spacer"></li>
+            <li>
+                <div class="dt"><a href="{:url('index/history')}">我的浏览</a></div>
+            </li>
+            <li class="spacer"></li>
+            <li>
+                <div class="dt"><a href="{:url('member/favorite')}">我的收藏</a></div>
+            </li>
+            <li class="spacer"></li>
+            <li>
+                <div class="dt"><a href="{:url('member/feedbkadd')}">客户服务</a></div>
+            </li>
+            <li class="spacer"></li>
+            <li class="li_dorpdown" data-shoptype="dorpdown">
+                <div class="dt shop-cm">网站导航<i class="iconfont icon-down"></i></div>
+                <div class="dd dorpdown-layer">
+                    <dl class="fore1">
+                        <dt>特色分类</dt>
+                        <dd>
+                            <div class="item"><a href="/home/category/all.html" target="_blank">全部分类</a></div>
+                            {if isset($category[0])}
+                            <div class="item"><a href="/home/category/index?id={$category[0]['cat_id']}" target="_blank">{$category[0]['cat_name']}</a></div>
+                            {/if}
+                        </dd>
+                    </dl>
+                    <dl class="fore2">
+                        <dt>推荐主题</dt>
+                        <dd>
+                            {volist name="$siteInfo['nav']" id="vo"}
+                            <div class="item"><a href="{$vo.url}">{$vo.name}</a></div>
+                            {/volist}
+                        </dd>
+                    </dl>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

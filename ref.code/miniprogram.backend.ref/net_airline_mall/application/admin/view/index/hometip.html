@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+{include file="public:head"}
+<body style="min-width:300px;">
+<div class="" id="app">
+    <div class="common-content">
+        <div class="list-div" id="listDiv">
+            <table cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                <template v-for="(vo,index) in list">
+                    <tr>
+                        <td>
+                            <div class="tDiv">
+                                <a :href="'/home/article/content?article_id='+vo.article_id" class="red2 font14" target="_blank">{{vo.title}}</a>
+                            </div>
+                        </td>
+                    </tr>
+                </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            page: 1,
+            rows: 10,
+            count: 0,
+            keywords: '',
+            list: [],
+        },
+        methods: {
+            init: function () {
+                $.post('/admin/index/hometip', {
+                    page: vm.page,
+                    rows: vm.rows,
+                    keywords: vm.keywords,
+                }, function (ret) {
+                    vm.list = ret.data;
+                }, 'json');
+            },
+        },
+    });
+    $(function () {
+        vm.init();
+    });
+</script>
