@@ -36,15 +36,15 @@ def buff163_login_auth():
     print(resp)
     json_resp = json.loads(resp)['data']
     print(len(json_resp))
-    for each_trade in json_resp:
-        steam_trade_url = each_trade['url']
-        verify_code = each_trade['verify-code'].split(' ')[1]
-        buyer_name = each_trade['bot_name']
-        buyer_datetime = each_trade['bot_extra_info']
-        game_id = each_trade['appid']
-        game_name = each_trade['game']
-        good_info = each_trade['items_to_trade']
-    return trade_url
+    # for each_trade in json_resp:
+    #     steam_trade_url = each_trade['url']
+    #     verify_code = each_trade['verify-code'].split(' ')[1]
+    #     buyer_name = each_trade['bot_name']
+    #     buyer_datetime = each_trade['bot_extra_info']
+    #     game_id = each_trade['appid']
+    #     game_name = each_trade['game']
+    #     good_info = each_trade['items_to_trade']
+    # return trade_url
 
 
 def monitor_buff():
@@ -56,16 +56,26 @@ def monitor_buff():
 
 
 def steam_login_auth(username, passwd):
-    requests.
+    # requests.
     user = wa.WebAuth(username, passwd)
     session = user.login(twofactor_code=input('请输入 2FA Code:'), language='schinese')
     return session
 
-def deal_exchange():
+def deal_exchange(trade_id):
+    steam_trade_url = f'https://steamcommunity.com/tradeoffer/{trade_id}'
     pass
 
 def alarm():
     pass
 
+def test_steam():
+    goods_info_url = 'https://steamcommunity.com/profiles/76561198179582527/inventory/json/730/2/?trading=1'
+    tar = 'https://steamcommunity.com/tradeoffer/4331700462'
+    cookie = {'Cookie': 'sessionid=6bced180bca8b8cc9900b6f7; steamCountry=JP%7C9ea4339f554b6c8f88fde3c1ea0a8849; timezoneOffset=28800,0; _ga=GA1.2.1405874360.1607442989; _gid=GA1.2.986278078.1607442989; steamMachineAuth76561198179582527=3B49C91B4A551B448557655D001C26D439B76179; steamRememberLogin=76561198179582527%7C%7C4974f82bd8298d21240f59cfa579120c; browserid=2150996258583710385; webTradeEligibility=%7B%22allowed%22%3A1%2C%22allowed_at_time%22%3A0%2C%22steamguard_required_days%22%3A15%2C%22new_device_cooldown_days%22%3A7%2C%22time_checked%22%3A1607605399%7D; steamLoginSecure=76561198179582527%7C%7CF11A6E32ED22EF11BA1E2027B13470AE2DEAE30A'}
+    header = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'}
+    resp = requests.get(url=tar, headers=header,cookies=cookie).content.decode('utf-8')
+    print(resp)
+
 if __name__ == '__main__':
-    buff163_login_auth()
+    # buff163_login_auth()
+    test_steam()
