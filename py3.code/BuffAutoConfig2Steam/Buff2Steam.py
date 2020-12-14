@@ -9,6 +9,7 @@ from random import randint as randt
 from Naked.toolshed.shell import muterun_js
 import json
 from redis import Redis
+import subprocess
 
 header = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36 Aoyou/VnN1RG0qQ1hkKz0iT1h0WW39_ebQ7Og6EiMFYYb9HbCN9c3PheedkDIN'}
 
@@ -68,7 +69,13 @@ if __name__ == '__main__':
     print('正在跳转......')
     buff163_login_auth()
     steam_session = steam_login_auth(input('请输入Steam账号：'), input('请输入Steam密码：'))
+    expire_time = time.strftime('%Y-%m-%d', time.localtime(time.time() + 691200))
     while True:
         steam_trade_list = monitor_buff()
         deal_exchange(steam_session, steam_trade_list)
+        today = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        if today == expire_time:
+            subprocess.run('rm cookies.json', shell=True)
+            print('cookie is expire, loguout')
+            break
 
