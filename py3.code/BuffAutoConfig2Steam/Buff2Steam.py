@@ -17,7 +17,6 @@ def buff163_login_auth():
     print('准备登录buff163......')
     muterun_js('buff_login.js')
     print('登录完成......')
-    # cookie = {'Cookie': 'Id=ksrKqrhnXI3IbCO86D7w; _ga=GA1.2.470761462.1607086108; mail_psc_fingerprint=45b1e99d012b773f63c65a533c20153a; _ntes_nnid=04439bfec1d965edc0aeb61194697258,1607086284303; _ntes_nuid=04439bfec1d965edc0aeb61194697258; Locale-Supported=zh-Hans; game=csgo; _gid=GA1.2.1096537323.1607878503; _gat_gtag_UA_109989484_1=1; NTES_YD_SESS=XrouU0N_.PqdNRe1rZfR0HBLLr_7FBeNj7vaUPyLU4jVAZ_WA7Kw6gH8JA0uTL1PgcVb7E1zWhh8nIKNmPStW7PPL5vvqjQ3HLcoYxYckWviINz9SgCLB1dWtrSxdcbQtQVXXRyypnLKgXa17C9T3iadf6lbk_jaSKjwPhfr9hOo0VNIsFwQpA7Szy_M4yimVFlzD2McqOZMaNdSUrWgE9fSEWDsBTr1v6s6z768CkOD3; S_INFO=1607878526|0|3&80##|13613905817; P_INFO=13613905817|1607878526|1|netease_buff|00&99|hen&1607528515&netease_buff#hen&410100#10#0#0|&0|null|13613905817; remember_me=U1094423637|jnrmtSRxKq6V60MTkoPAaNyLpkn83Zwe; session=1-p9xAC_fzWxoTw2bcjtwO2oyEtiFC1DPf7jPP898LuhLM2046102285; csrf_token=IjE3N2JkN2I0MzBjZjNlMmZhYzcxNDdkZTk1Nzk3ZjI5Y2EzZTc3YWMi.ErfZCQ.A-PY5D0ZMgCtI0QDCu6rY6nHydo'}
 
 
 def monitor_buff():
@@ -77,4 +76,4 @@ if __name__ == '__main__':
         if today == expire_time:
             subprocess.run('rm cookie.json', shell=True)
             print('cookie is expire, loguout')
-
+            break
