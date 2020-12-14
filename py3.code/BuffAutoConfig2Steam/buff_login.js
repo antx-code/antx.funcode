@@ -7,7 +7,7 @@ var fs = require('fs');
 (async ()=>{
     const browser = await puppeteer.launch({
         // executablePath:'/opt/google/chrome/google-chrome',
-		slowMo:100,                                     // 在有输入的情况下的输入文本速度
+	slowMo:100,                                     // 在有输入的情况下的输入文本速度
         headless: false,                                 // 启用无头模式，默认启用
         defaultViewport :{                              // 浏览器窗体的大小设置
             width: 1280,
