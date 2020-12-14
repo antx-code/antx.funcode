@@ -75,7 +75,7 @@ if __name__ == '__main__':
         deal_exchange(steam_session, steam_trade_list)
         today = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         if today == expire_time:
-            subprocess.run('rm cookies.json', shell=True)
+            subprocess.run('rm cookie.json', shell=True)
             print('cookie is expire, loguout')
             break
 
