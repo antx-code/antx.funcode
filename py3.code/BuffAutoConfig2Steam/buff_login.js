@@ -18,7 +18,8 @@ var fs = require('fs');
             '--disable-bundled-ppapi-flash',
             '--mute-audio',
             '--disable-gpu',
-            '--disable-infobars'
+            '--disable-infobars',
+            // '--lang=zh-CN'
         ],
         ignoreDefaultArgs:[
             '--enable-automation'
@@ -26,25 +27,26 @@ var fs = require('fs');
     });
     const page = await browser.newPage();               // 打开浏览器的一个新的page页面
     try{
-        fs.access('cookie.json', fs.constants.F_OK | fs.constants.W_OK, (err) => {
+        await fs.accessSync('cookie.json', fs.constants.F_OK | fs.constants.W_OK, (err) => {
             if (err) {
+                // const tag = 1;
                 throw err;
             } else {
+                // const tag = -1;
                 console.log('Json-DB中cookie有效，直接进行监控......')
             }
         });
-    }catch (error){
+    }catch (err){
         await console.log('Json-DB中cookie已过期，请重新登录并获取......')
         await page.goto('https://buff.163.com/',);   // Input your target url
-        await page.waitFor(3000);
+        await page.waitForSelector('[onclick="loginModule.showLogin()"]',{timeout:0});
         await page.click('[onclick="loginModule.showLogin()"]');
         await console.log('请点击登录， 并勾选10天免登陆......');
-        await page.waitForSelector('[class="j_drop-handler"]', {timeout:0});    // 登录成功后再进行后面的动作
-    }finally {
+        await page.waitForSelector('[id="j_myselling"]', {timeout:0});    // 登录成功后再进行后面的动作
         pre_cookie = await page.cookies();
         af_cookie = []
-        for (var i=0; i<pre_cookie.length;i++){
-            await af_cookie.push({'name':pre_cookie[i]['name'], 'value':pre_cookie[i]['value']})
+        for (var i = 0; i < pre_cookie.length; i++) {
+            await af_cookie.push({'name': pre_cookie[i]['name'], 'value': pre_cookie[i]['value']})
         }
         await console.log(af_cookie)
         fs.readFile('cookie.json', 'utf8', function (err, data) {   // 判断文件是否存在，不存在就创建
@@ -56,6 +58,22 @@ var fs = require('fs');
             });
         });
     }
+    // finally {
+    //         pre_cookie = await page.cookies();
+    //         af_cookie = []
+    //         for (var i = 0; i < pre_cookie.length; i++) {
+    //             await af_cookie.push({'name': pre_cookie[i]['name'], 'value': pre_cookie[i]['value']})
+    //         }
+    //         await console.log(af_cookie)
+    //         fs.readFile('cookie.json', 'utf8', function (err, data) {   // 判断文件是否存在，不存在就创建
+    //             if (err) console.log(err);
+    //             data = JSON.stringify(af_cookie)
+    //             fs.writeFileSync('cookie.json', data, 'utf8', (err) => {    // 获取登录过后的cookie并保存
+    //                 if (err) throw err;
+    //                 console.log('done');
+    //             });
+    //         });
+    // }
 
     await page.close();
     await console.log('页面已关闭')
