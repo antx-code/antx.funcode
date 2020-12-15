@@ -58,6 +58,7 @@ var arg = process.argv.slice(2);
                 console.log('done');
             });
         });
+    }
 
     await page.close();
     await console.log('页面已关闭')
