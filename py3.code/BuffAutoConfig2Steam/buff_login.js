@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer-extra')
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 puppeteer.use(StealthPlugin())
 var fs = require('fs');
+var arg = process.argv.slice(2);
 
 (async ()=>{
     const browser = await puppeteer.launch({
@@ -27,7 +28,7 @@ var fs = require('fs');
     });
     const page = await browser.newPage();               // 打开浏览器的一个新的page页面
     try{
-        await fs.accessSync('cookie.json', fs.constants.F_OK | fs.constants.W_OK, (err) => {
+        await fs.accessSync(arg[0] + '_cookie.json', fs.constants.F_OK | fs.constants.W_OK, (err) => {
             if (err) {
                 // const tag = 1;
                 throw err;
@@ -49,31 +50,14 @@ var fs = require('fs');
             await af_cookie.push({'name': pre_cookie[i]['name'], 'value': pre_cookie[i]['value']})
         }
         await console.log(af_cookie)
-        fs.readFile('cookie.json', 'utf8', function (err, data) {   // 判断文件是否存在，不存在就创建
+        fs.readFile(arg[0] + '_cookie.json', 'utf8', function (err, data) {   // 判断文件是否存在，不存在就创建
             if (err) console.log(err);
             data = JSON.stringify(af_cookie)
-            fs.writeFileSync('cookie.json', data, 'utf8', (err) => {    // 获取登录过后的cookie并保存
+            fs.writeFileSync(arg[0] + '_cookie.json', data, 'utf8', (err) => {    // 获取登录过后的cookie并保存
                 if (err) throw err;
                 console.log('done');
             });
         });
-    }
-    // finally {
-    //         pre_cookie = await page.cookies();
-    //         af_cookie = []
-    //         for (var i = 0; i < pre_cookie.length; i++) {
-    //             await af_cookie.push({'name': pre_cookie[i]['name'], 'value': pre_cookie[i]['value']})
-    //         }
-    //         await console.log(af_cookie)
-    //         fs.readFile('cookie.json', 'utf8', function (err, data) {   // 判断文件是否存在，不存在就创建
-    //             if (err) console.log(err);
-    //             data = JSON.stringify(af_cookie)
-    //             fs.writeFileSync('cookie.json', data, 'utf8', (err) => {    // 获取登录过后的cookie并保存
-    //                 if (err) throw err;
-    //                 console.log('done');
-    //             });
-    //         });
-    // }
 
     await page.close();
     await console.log('页面已关闭')

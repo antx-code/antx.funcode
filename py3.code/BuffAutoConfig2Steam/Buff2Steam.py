@@ -3,15 +3,17 @@
 import steam.webauth as wa
 from requests import Session
 import re
-from decimal import Decimal
 import time
-from random import randint as randt
 from Naked.toolshed.shell import muterun_js
 import json
-from redis import Redis
 import subprocess
+import random
+import string
 
 header = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36 Aoyou/VnN1RG0qQ1hkKz0iT1h0WW39_ebQ7Og6EiMFYYb9HbCN9c3PheedkDIN'}
+letters = string.ascii_lowercase
+random_str = ''.join(random.choice(letters) for i in range(20))
+
 
 def buff163_login_auth():
     """
@@ -20,7 +22,7 @@ def buff163_login_auth():
 
     """
     print('准备登录buff163......')
-    muterun_js('buff_login.js')
+    muterun_js('buff_login.js', arguments=random_str)
     time.sleep(5)
     print('登录完成......')
 
@@ -31,7 +33,7 @@ def monitor_buff(timer: int=3600):
     Monitor new order trade requests every hour
 
     """
-    with open('cookie.json', 'r+') as f:
+    with open(f'{random_str}_cookie.json', 'r+') as f:
         js_cook = json.loads(f.readline())
         cookie = ''
         for each in js_cook:
@@ -114,6 +116,6 @@ if __name__ == '__main__':
         deal_exchange(steam_session, steam_trade_list)
         today = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         if today == expire_time:
-            subprocess.run('rm cookie.json', shell=True)
+            subprocess.run(f'rm {random_str}_cookie.json', shell=True)
             print('cookie is expire, loguout')
             break
