@@ -252,14 +252,17 @@ class Buff2SteamGui(tk.Frame):
 		tk.Label(self.master, text="二次验证码  :").place(x=75, y=310, anchor='nw')
 
 		# 两个输入框
-		usr_name_var = self.usr_name_var
-		password_var = self.password_var
-		auth = self.auth2fa
+		usr_name_var = tk.StringVar()
+		password_var = tk.StringVar()
+		auth = tk.StringVar()
 
 		def res():
 			nk = nk_input.get()
 			pd = pd_input.get()
 			auth = auth_input.get()
+			self.Receive_Window.insert('end', f'username: {nk}' + '\n')
+			self.Receive_Window.insert('end', f'password: {pd}' + '\n')
+			self.Receive_Window.insert('end', f'fa2code: {auth}' + '\n')
 			if not nk or not pd or not auth:
 				messagebox.showerror(title='登录错误', message='验证失败，请输入有效值...')
 				self.Receive_Window.insert('end', '验证失败，请输入有效值......' + '\n')
@@ -272,9 +275,12 @@ class Buff2SteamGui(tk.Frame):
 					messagebox.showerror(title='登录错误', message='验证失败，请重新输入正确的账号密码和二次验证码...')
 					self.Receive_Window.insert('end', '验证失败，请重新输入正确的账号密码和二次验证码......' + '\n')
 
-		nk_input = tk.Entry(self.master, textvariable=usr_name_var).place(x=150, y=250, anchor='nw')
-		pd_input = tk.Entry(self.master, textvariable=password_var, show='*').place(x=150, y=280, anchor='nw')
-		auth_input = tk.Entry(self.master, textvariable=auth).place(x=150, y=310, anchor='nw')
+		nk_input = tk.Entry(self.master, textvariable=usr_name_var)
+		nk_input.place(x=150, y=250, anchor='nw')
+		pd_input = tk.Entry(self.master, textvariable=password_var, show='*')
+		pd_input.place(x=150, y=280, anchor='nw')
+		auth_input = tk.Entry(self.master, textvariable=auth)
+		auth_input.place(x=150, y=310, anchor='nw')
 
 		tk.Button(self.master, text='登录Steam', command=lambda: thread_it(res)).place(x=150, y=350)
 		self.Receive_Window.see('end')
