@@ -10,6 +10,8 @@ from random import randint as randt
 COMMUNITY_URL = 'https://steamcommunity.com'
 CREATE_BUY_ORDER = '/market/createbuyorder/'
 GAME_DIC = {'STEAM':'753','CS':'730','DOTA':'570'}
+# Currency price code ref -> https://github.com/ValvePython/steam/blob/master/steam/enums/common.py
+# Currency ISO 4217 code -> https://partner.steamgames.com/doc/store/pricing/currencies
 CURRENCY = {
     'CNY': 23,
     'USD': 1,
@@ -18,6 +20,8 @@ CURRENCY = {
     'AUD': 21,
     'CAD': 20,
     'RUB': 5,
+    'NOK': 9,
+    'NZD': 22
 }
 SEARCH_URL = f'https://steamcommunity.com/market/search?q='
 
