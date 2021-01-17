@@ -33,6 +33,11 @@ def read_excel(xl_name):
     game_names = frame['游戏类型']
     return good_names, good_nums, good_prices, game_names
 
+def del_excel(xl_name, line):
+    frame = pd.read_excel(xl_name)
+    result = frame.drop(line)
+    return result
+
 def login_auth(username, passwd):
     user = wa.WebAuth(username, passwd)
     session = user.login(twofactor_code=input('请输入 2FA Code:'), language='schinese')
@@ -86,6 +91,11 @@ if __name__ == '__main__':
         if resp:
             if resp["success"] == 1:
                 print(f'第{i+1}件商品挂单成功')
+                result = del_excel('表格1.xls', i)
+                if result:
+                    print('删除已成功订单')
+                else:
+                    print('删除已成功订单失败')
             elif resp["success"] == 42:
                 print(f'第{i+1}件商品挂单失败，请检查您的订单是否已创建，即将跳过，请稍后重试...')
                 time.sleep(5)
