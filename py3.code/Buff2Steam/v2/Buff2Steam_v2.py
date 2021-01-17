@@ -129,7 +129,7 @@ class Buff2SteamGui(tk.Frame):
             steam_trade_list.append(
                 {
                     'steam_trade_id': each_data['tradeofferid'],
-                    'join_steam_date': each_data['bot_extra_info'].split('：')[1].strip(),
+                    'join_steam_date': each_data['bot_extra_info'],
                     'game_id': each_data['appid'],
                     'verify_code': each_data['verify_code'].split(' ')[1],
                     'trade_item_info': each_data['items_to_trade']
@@ -165,7 +165,7 @@ class Buff2SteamGui(tk.Frame):
             steam_ex_date = f'{buyer_join_date_list[0]}-{int(buyer_join_date_list[1]):02d}-{int(buyer_join_date_list[2]) + 1:02d}'
             self.Receive_Window.insert('end', f'steam_ex_date -> {steam_ex_date}' + '\n')
             self.Receive_Window.insert('end', f'buff_ex_date -> {buff_ex_date}' + '\n')
-            if buff_ex_date == steam_ex_date:
+            if steam_ex_date in buff_ex_date:
                 self.Receive_Window.insert('end', '新订单是来自于buff163的订单，订单有效......' + '\n')
                 post_data = {
                     'sessionid': session_id,
