@@ -36,7 +36,7 @@ def read_excel(xl_name):
 def del_excel(xl_name, line):
     frame = pd.read_excel(xl_name)
     result = frame.drop(line)
-    return result
+    result.to_excel(xl_name)
 
 def login_auth(username, passwd):
     user = wa.WebAuth(username, passwd)
@@ -91,11 +91,7 @@ if __name__ == '__main__':
         if resp:
             if resp["success"] == 1:
                 print(f'第{i+1}件商品挂单成功')
-                result = del_excel('表格1.xls', i)
-                if result:
-                    print('删除已成功订单')
-                else:
-                    print('删除已成功订单失败')
+                del_excel('表格1.xls', 0)
             elif resp["success"] == 42:
                 print(f'第{i+1}件商品挂单失败，请检查您的订单是否已创建，即将跳过，请稍后重试...')
                 time.sleep(5)
