@@ -14,6 +14,7 @@ from tkinter import scrolledtext, messagebox
 from redis import Redis
 import ctypes
 from loguru import logger
+from random import randint as rant
 
 header = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36 Aoyou/VnN1RG0qQ1hkKz0iT1h0WW39_ebQ7Og6EiMFYYb9HbCN9c3PheedkDIN'}
 letters = string.ascii_lowercase
@@ -175,7 +176,12 @@ class Buff2SteamGui(tk.Frame):
                     'captcha': ''
                 }
                 headers = {'Referer': steam_order_url}
-                response = steam_session.post(url=steam_trade_url, data=post_data, headers=headers).json()
+                while True:
+                    response = steam_session.post(url=steam_trade_url, data=post_data, headers=headers).json()
+                    if 'tradeid' in response.keys():
+                        break
+                    time.sleep(rant(10, 15))
+                # response = steam_session.post(url=steam_trade_url, data=post_data, headers=headers).json()
                 if response.get('needs_mobile_confirmation', False):
                     return 1
                 return 0
@@ -298,17 +304,18 @@ class Buff2SteamGui(tk.Frame):
                 break
             else:
                 self.Receive_Window.insert('end', '成功确认buff订单......' + '\n')
-            for each in monitor_trade_id_list:
-                if each in all_trade_ids:
-                    continue
-                else:
-                    all_trade_ids.append(each)
+            # for each in monitor_trade_id_list:
+            #     if each in all_trade_ids:
+            #         continue
+            #     else:
+            #         all_trade_ids.append(each)
             today = time.strftime('%Y-%m-%d', time.localtime(time.time()))
             if today == expire_time:
                 subprocess.run(f'rm {random_str}_cookie.json', shell=True)
                 self.Receive_Window.insert('end', 'Buff163登录有效期已过，准备登出......' + '\n')
                 messagebox.showerror(title='登录错误', message='Buff163登录有效期已过，准备登出...')
                 break
+            time.sleep(rant(10, 15))
         self.Receive_Window.see('end')
         self.master.destroy()
 
