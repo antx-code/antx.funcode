@@ -295,9 +295,9 @@ class Buff2SteamGui(tk.Frame):
             result = self.deal_exchange(steam_session, steam_trade_list, all_trade_ids)
             if result == -1:
                 self.Receive_Window.insert('end', '不是来自buff的有效订单，订单作废，继续监测......' + '\n')
-                for each in monitor_trade_id_list:
-                    all_trade_ids.remove(each)
-                continue
+                # for each in monitor_trade_id_list:
+                #     all_trade_ids.remove(each)
+                # continue
             elif result == 0:
                 self.Receive_Window.insert('end', '确认buff订单出错，请查看订单......' + '\n')
                 messagebox.showerror(title='登录错误', message='确认buff订单出错，请查看订单...')
