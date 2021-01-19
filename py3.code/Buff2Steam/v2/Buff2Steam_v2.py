@@ -166,27 +166,27 @@ class Buff2SteamGui(tk.Frame):
             steam_ex_date = f'{buyer_join_date_list[0]}-{int(buyer_join_date_list[1]):02d}-{int(buyer_join_date_list[2]) + 1:02d}'
             self.Receive_Window.insert('end', f'steam_ex_date -> {steam_ex_date}' + '\n')
             self.Receive_Window.insert('end', f'buff_ex_date -> {buff_ex_date}' + '\n')
-            if steam_ex_date in buff_ex_date:
-                self.Receive_Window.insert('end', '新订单是来自于buff163的订单，订单有效......' + '\n')
-                post_data = {
-                    'sessionid': session_id,
-                    'serverid': '1',
-                    'tradeofferid': trade_id,
-                    'partner': partner_id,
-                    'captcha': ''
-                }
-                headers = {'Referer': steam_order_url}
-                while True:
-                    response = steam_session.post(url=steam_trade_url, data=post_data, headers=headers).json()
-                    if 'tradeid' in response.keys():
-                        break
-                    time.sleep(rant(10, 15))
-                # response = steam_session.post(url=steam_trade_url, data=post_data, headers=headers).json()
-                if response.get('needs_mobile_confirmation', False):
-                    return 1
-                return 0
-            else:
-                return -1
+            #if steam_ex_date in buff_ex_date:
+            self.Receive_Window.insert('end', '新订单是来自于buff163的订单，订单有效......' + '\n')
+            post_data = {
+                'sessionid': session_id,
+                'serverid': '1',
+                'tradeofferid': trade_id,
+                'partner': partner_id,
+                'captcha': ''
+            }
+            headers = {'Referer': steam_order_url}
+            while True:
+                response = steam_session.post(url=steam_trade_url, data=post_data, headers=headers).json()
+                if 'tradeid' in response.keys():
+                    break
+                time.sleep(rant(10, 15))
+            # response = steam_session.post(url=steam_trade_url, data=post_data, headers=headers).json()
+            if response.get('needs_mobile_confirmation', False):
+                return 1
+            return 0
+            #else:
+            #    return -1
         self.Receive_Window.see('end')
 
     @logger.catch(level='ERROR')
