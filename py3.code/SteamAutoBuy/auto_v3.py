@@ -21,7 +21,11 @@ CURRENCY = {
     'CAD': 20,
     'RUB': 5,
     'NOK': 9,
-    'NZD': 22
+    'NZD': 22,
+    'KRW': 16,
+    'HKD': 29,
+    'TWD': 30,
+    'INR': 24
 }
 SEARCH_URL = f'https://steamcommunity.com/market/search?q='
 
@@ -72,7 +76,7 @@ def post_auto_buy(session, currency, g_name, g_price, g_num, game):
 
 if __name__ == '__main__':
     print('******请先选择货币区******')
-    print('人民币区-CNY   美元区-USD   欧元区-EUR   日元区-JPY   澳元区-AUD   加元区-CAD   卢布区-RUB')
+    print('人民币区-CNY   美元区-USD   欧元区-EUR   日元区-JPY   澳元区-AUD   加元区-CAD   卢布区-RUB   挪威区-NOK   新西兰区-NZD   韩元区-KRW   港元区-HKD   新台币区-TWD   印度卢布区-INR')
     currency = input('请输入货币区英文简写代码：')
     session = login_auth(input('请输入Steam账号：'), input('请输入Steam密码：'))
     good_names, good_nums, good_prices, game_names = read_excel('表格1.xls')
@@ -83,9 +87,11 @@ if __name__ == '__main__':
             en_g_name = zh2en(session, good_names[i]).encode('utf-8')
             if en_g_name == -1:
                 print('准备跳过该商品')
+                del_excel('表格1.xls', 0)
                 continue
         except Exception as e:
             print(f'没有匹配到该商品,准备跳过')
+            del_excel('表格1.xls', 0)
             continue
         resp = post_auto_buy(session,currency,en_g_name,str(good_prices[i]),int(good_nums[i]),GAME_DIC[game_names[i]])
         if resp:
@@ -94,10 +100,12 @@ if __name__ == '__main__':
                 del_excel('表格1.xls', 0)
             elif resp["success"] == 42:
                 print(f'第{i+1}件商品挂单失败，请检查您的订单是否已创建，即将跳过，请稍后重试...')
+                del_excel('表格1.xls', 0)
                 time.sleep(5)
                 continue
             elif resp["success"] == 29:
                 print(f'第{i+1}件商品挂单失败，已对该物品提交有效的订购单。在提交新的订单之前，您需要取消该订单，或等待交易完成。即将跳过...')
+                del_excel('表格1.xls', 0)
                 time.sleep(5)
                 continue
             else:
