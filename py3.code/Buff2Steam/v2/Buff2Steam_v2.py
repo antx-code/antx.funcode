@@ -156,16 +156,22 @@ class Buff2SteamGui(tk.Frame):
             steam_order_url = f'https://steamcommunity.com/tradeoffer/{trade_id}'
             steam_trade_url = f'https://steamcommunity.com/tradeoffer/{trade_id}/accept'
 
-            resp = steam_session.get(steam_order_url).text
-            partner_id = self.text_between(resp, "var g_ulTradePartnerSteamID = '", "';")
+            while True:
+                try:
+                    resp = steam_session.get(steam_order_url).text
+                    partner_id = self.text_between(resp, "var g_ulTradePartnerSteamID = '", "';")
+                    break
+                except Exception as e:
+                    time.sleep(10)
+                    continue
             session_id = steam_session.cookies.get_dict()['sessionid']
-            buff_ex_date = each_deal['join_steam_date']
+            #buff_ex_date = each_deal['join_steam_date']
 
-            buyer_join_date = re.findall('trade_partner_member_since trade_partner_info_text ">(.*?)</div>', resp)[0]
-            buyer_join_date_list = re.findall('(.*?)年(.*?)月(.*?)日', buyer_join_date)[0]
-            steam_ex_date = f'{buyer_join_date_list[0]}-{int(buyer_join_date_list[1]):02d}-{int(buyer_join_date_list[2]) + 1:02d}'
-            self.Receive_Window.insert('end', f'steam_ex_date -> {steam_ex_date}' + '\n')
-            self.Receive_Window.insert('end', f'buff_ex_date -> {buff_ex_date}' + '\n')
+            #buyer_join_date = re.findall('trade_partner_member_since trade_partner_info_text ">(.*?)</div>', resp)[0]
+            #buyer_join_date_list = re.findall('(.*?)年(.*?)月(.*?)日', buyer_join_date)[0]
+            #steam_ex_date = f'{buyer_join_date_list[0]}-{int(buyer_join_date_list[1]):02d}-{int(buyer_join_date_list[2]) + 1:02d}'
+            #self.Receive_Window.insert('end', f'steam_ex_date -> {steam_ex_date}' + '\n')
+            #self.Receive_Window.insert('end', f'buff_ex_date -> {buff_ex_date}' + '\n')
             #if steam_ex_date in buff_ex_date:
             self.Receive_Window.insert('end', '新订单是来自于buff163的订单，订单有效......' + '\n')
             post_data = {
@@ -263,7 +269,13 @@ class Buff2SteamGui(tk.Frame):
                 try:
                     steam_session = self.steam_login_auth(nk, pd, auth)
                     if steam_session:
-                        self.main_monitor(steam_session=steam_session)  # 通过多线程解决调用函数处理时间过长导致窗体卡死问题
+                        while True:
+                            try:
+                                self.main_monitor(steam_session=steam_session)  # 通过多线程解决调用函数处理时间过长导致窗体卡死问题
+                                break
+                            except Exception as e:
+                                time.sleep(10)
+                                continue
                 except Exception as e:
                     messagebox.showerror(title='登录错误', message='验证失败，请重新输入正确的账号密码和二次验证码...')
                     self.Receive_Window.insert('end', '验证失败，请重新输入正确的账号密码和二次验证码......' + '\n')
