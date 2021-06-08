@@ -1,0 +1,56 @@
+- 手机端功能
+    - 注册
+        - fastapi-users
+        - router: /api/app/users/register
+        - email register
+        - sms register
+    - 登录
+        - fastapi-users
+        - router: /api/app/users/login
+        - router: /api/app/users/logout
+        - router: /api/app/users/forgot-password
+        - router: /api/app/users/reset-password
+    - 购买
+        - router: /api/app/buy
+        - router: /api/app/sale
+    - 发布
+        - router:api/app/publish
+    - 个人信息
+        - 基础信息
+            - router: /api/app/user-info/profile
+            - content: 
+                - 头像
+                - 昵称
+                - 性别
+                - 地区
+                - 个性签名
+        - 资产信息
+        - 矿机信息
+        - 团队信息
+        - 
+    - 充值
+        - router: /api/app/spot
+    - 提现
+        - router: /api/app/withdraw
+    - 推广
+        - router: /api/app/share
+    - 团队
+        - router: /api/app/teams
+    - 资产
+        - 交易明细
+        - 可售币明细
+        - 矿池资产明细
+        - 冻结可售明细
+        - 积分兑换明细
+
+- 后台管理功能
+    - 会员管理
+    - 等级管理
+    - 用户管理
+    - 矿机管理
+    - 活动管理
+    - 资金明细
+    - 积分明细
+    - 公告
+    - 权限管理
+    - 系统配置
