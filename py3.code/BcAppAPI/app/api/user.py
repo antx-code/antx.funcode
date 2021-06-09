@@ -30,58 +30,17 @@ mongodb = db_connection('bc-app', 'users')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
-@router.post('/register_email')
-async def register_email(user_info: UserRegisterEmail, request: Request):
+@router.post('/register')
+async def register(user_info: UserRegister, request: Request):
     # 判断两次密码是否一致
     # 判断email是否已经注册
     # 判断昵称是否已经被占用
+    if not user_info.password or not user_info.repassword:
+        return msg(status='error', data='Password cannot be empty!')
     if user_info.password != user_info.repassword:
-        return msg(status='error', data="两次密码不一致")
-    if user_info.email in mongodb.dep_data('email'):
-        return msg(status='error', data="邮箱已注册")
+        return msg(status='error', data="Two password are not the same!")
     if user_info.nickname in mongodb.dep_data('nickname'):
-        return msg(status='error', data="昵称已被占用")
-
-    now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-    user_id = id_worker.get_id()   # 生成唯一用户id
-    save_info = {
-        'user_id': user_id,
-        'nickname': user_info.nickname,
-        'email': user_info.email,
-        'phone': user_info.phone,
-        'password': result_hash(user_info.password),
-        'invite_code': user_info.invite_code,
-        'promo_code': promo_code(user_id),
-        'created_time': now_time,
-        'last_login_time': '',
-        'last_login_ip': request.client.host,
-        'access_token': '',
-        'is_active': False,
-        'is_verified': False,
-        'is_superuser': False,
-        'is_logged_in': False
-    }
-    mongodb.insert_one_data(save_info)
-    generate_qrcode(user_id, promo_code(user_id))
-    return msg(status='success', data=after_register(user_info.email, user_info.nickname, user_id))
-
-@logger.catch(level='ERROR')
-@router.post('/register_phone')
-async def register_phone(user_info: UserRegisterPhone, request: Request):
-    # 判断两次密码是否一致
-    # 判断email是否已经注册
-    # 判断昵称是否已经被占用
-    # 判断验证码是否正确
-    if user_info.password != user_info.repassword:
-        return msg(status='error', data="两次密码不一致")
-    if user_info.phone in mongodb.dep_data('phone'):
-        return msg(status='error', data="手机号已被注册")
-    if user_info.nickname in mongodb.dep_data('nickname'):
-        return msg(status='error', data="昵称已被占用")
-    if user_info.verify_code == '':
-        return msg(status='error', data="验证码不能为空")
-    # if user_info.verify_code != '':
-    #     return msg(status='注册失败', data="验证码不正确，请重新获取")
+        return msg(status='error', data="nickname was already used!")
 
     now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     user_id = id_worker.get_id()  # 生成唯一用户id
@@ -89,22 +48,35 @@ async def register_phone(user_info: UserRegisterPhone, request: Request):
         'user_id': user_id,
         'nickname': user_info.nickname,
         'email': '',
-        'phone': user_info.phone,
+        'phone': '',
         'password': result_hash(user_info.password),
-        'invite_code': user_info.invite_code,
-        'promo_code': promo_code(user_id),
         'created_time': now_time,
         'last_login_time': '',
         'last_login_ip': request.client.host,
         'access_token': '',
-        'is_active': False,
-        'is_verified': False,
+        'is_active': True,
+        'is_verified': True,
         'is_superuser': False,
         'is_logged_in': False
     }
+
+    if not user_info.phone:
+        if user_info.email in mongodb.dep_data('email'):
+            return msg(status='error', data="Email was already used!")
+        username = user_info.email
+        save_info['email'] = username
+    else:
+        if len(user_info.phone) != 11:
+            return msg(status='error', data='Please enter right phone number!')
+        if user_info.phone in mongodb.dep_data('phone'):
+            return msg(status='error', data="Phone was already used!")
+        username = user_info.phone
+        save_info['phone'] = username
+
     mongodb.insert_one_data(save_info)
     generate_qrcode(user_id, promo_code(user_id))
-    return msg(status='success', data=after_register(user_info.phone, user_info.nickname, user_id))
+    dnetworks(user_id=user_id, promo_code=promo_code(user_id), invite_code=user_info.invite_code)
+    return msg(status='success', data=after_register(username, user_info.nickname, user_id))
 
 @logger.catch(level='ERROR')
 @router.post('/login')
@@ -116,9 +88,9 @@ async def login(user_info: UserLogin, request: Request):
         user_id = mongodb.find_one({'email': user_info.email})['user_id']
         update_login_info = {'email': user_info.email}
         if user_info.email in redis_service.read_redis(redis_key='locked_account'):
-            return msg(status="error", data="账户已被锁定，请联系客服")
+            return msg(status="error", data="Account was locked，please contact customer service!")
         if user_info.email not in mongodb.dep_data('email'):
-            return msg(status='error', data="用户不存在，请先进行注册")
+            return msg(status='error', data="User does not exist, please register first!")
         if result_hash(user_info.password) != mongodb.find_one({'email': user_info.email})['password']:
 
             failed_login_count = redis_service.redis_client.incr(name=user_id, amount=1)
@@ -126,8 +98,8 @@ async def login(user_info: UserLogin, request: Request):
             if failed_login_count == 5:
                 redis_service.new_insert_content(redis_key='locked_account', new_content=user_info.email)
                 mongodb.update_one({'user_id': user_id}, {'is_active': False})
-                return msg(status="error", data="登录次数已超出限制，账户已被锁定")
-            return msg(status='error', data=f"密码不正确，请重新输入，还有{5-failed_login_count}次机会")
+                return msg(status="error", data="The number of login times has exceeded the limit, and the account has been locked")
+            return msg(status='error', data=f"Password was incorrect，only {5-failed_login_count} times to retry!")
 
     elif user_info.phone:
         user_id = mongodb.find_one({'phone': user_info.phone})['user_id']
@@ -139,8 +111,8 @@ async def login(user_info: UserLogin, request: Request):
             if failed_login_count == 5:
                 redis_service.new_insert_content(redis_key='locked_account', new_content=user_info.phone)
                 mongodb.update_one({'user_id': user_id}, {'is_active': False})
-                return msg(status="error", data="登录次数已超出限制，账户已被锁定")
-            return msg(status='error', data=f"密码不正确，请重新输入，还有{5 - failed_login_count}次机会")
+                return msg(status="error", data="The number of login times has exceeded the limit, and the account has been locked")
+            return msg(status='error', data=f"Password was incorrect，only {5 - failed_login_count} times to retry!")
 
     # user_id = mongodb.find_one({'email': user_info.email})['user_id']
     now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -154,22 +126,22 @@ async def login(user_info: UserLogin, request: Request):
 async def logout(user_info: UserLogout, dep=Depends(antx_auth)):
     is_logged_in = mongodb.find_one({'user_id': dep})['is_logged_in']
     if not is_logged_in:
-        raise InvalidPermissions("账号已登出，token失效")
+        raise InvalidPermissions("Account have been logged out，token is unavailable!")
     if user_info.email:
         mongodb.update_one({'email': user_info.email}, {'is_logged_in': False})
-        return msg(status='success', data='已退出登录')
+        return msg(status='success', data='Signout')
     mongodb.update_one({'phone': user_info.phone}, {'is_logged_in': False})
-    return msg(status='success', data='已退出登录')
+    return msg(status='success', data='Signout')
 
 @logger.catch(level='ERROR')
 @router.post('/forgot_password')
 async def forgot_password(user_info: UserResetPassword, dep=Depends(antx_auth)):
     is_logged_in = mongodb.find_one({'user_id': dep})['is_logged_in']
     if not is_logged_in:
-        raise InvalidPermissions("账号已登出，请重新登陆")
+        raise InvalidPermissions("Account have been logged out，please log in again!")
 
     if result_hash(user_info.new_password) != result_hash(user_info.new_repassword):
-        return msg(status="error", data="两次输入新密码不一致，请检查后重新输入")
+        return msg(status="error", data="Two passwords are not the same，please check!")
 
     update_info = {"password": result_hash(user_info.new_password), 'is_logged_in': False}
     mongodb.update_one({'phone': user_info.phone}, update_info)
@@ -182,12 +154,12 @@ async def forgot_password(user_info: UserResetPassword, dep=Depends(antx_auth)):
 async def reset_password(user_info: UserResetPassword, dep=Depends(antx_auth)):
     is_logged_in = mongodb.find_one({'user_id': dep})['is_logged_in']
     if not is_logged_in:
-        raise InvalidPermissions("账号已登出，请重新登陆")
+        raise InvalidPermissions("Account have been logged out，please log in again!")
 
     if result_hash(user_info.old_password) != mongodb.find_one({'user_id': dep})['password']:
-        return msg(status="error", data="旧密码错误，请重新输入")
+        return msg(status="error", data="Old password was incorrect, please try again")
     if result_hash(user_info.new_password) != result_hash(user_info.new_repassword):
-        return msg(status="error", data="两次输入新密码不一致，请检查后重新输入")
+        return msg(status="error", data="Two passwordsare not the same, please check!")
 
     update_info = {"password": result_hash(user_info.new_password), 'is_logged_in': False}
     mongodb.update_one({'phone': user_info.phone}, update_info)
@@ -202,7 +174,7 @@ async def get_verify_code(verify_info: UserVerify, dep=Depends(antx_auth)):
         pass
     else:
         pass
-    return msg(status="success", data="验证码已发送，请注意查收")
+    return msg(status="success", data="verify code has been send, please check!")
 
 @logger.catch(level='ERROR')
 @router.post('/verify')
@@ -211,4 +183,4 @@ async def verify(verify_info: UserVerify, dep=Depends(antx_auth)):
         pass
     else:
         pass
-    return msg(status="success", data="账号已通过安全认证")
+    return msg(status="success", data="Account has been verified!")

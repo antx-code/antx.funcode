@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from loguru import logger
 import bson
-from PIL import Image
+# from PIL import Image
 from io import StringIO, BytesIO
 from bson.objectid import ObjectId
 import base64
@@ -136,18 +136,19 @@ class MongoDB():
         return True
 
     @logger.catch(level='ERROR')
-    def save_img(self, user_id, img, img_name='img', img_content=None):
+    def save_img(self, user_id, img, img_name='img', qr_code=False):
         """
-        Save the images of the data into mongodb by using bson.
-        :param img_content: the response of the images url.->promo code
-        :return: The saved data which insert into mongodb.
-        """
+		Save the images of the data into mongodb by using bson.
+		:param img_content: the response of the images url.->promo code
+		:return: The saved data which insert into mongodb.
+		"""
         # save_data = self.collection.save(dict(user_id = user_id, img = bson.binary.Binary(img_content.getvalue())))
         save_data = base64.b64encode(bson.binary.Binary(img.getvalue())).decode('ascii')
-        if not img_content:
-            self.collection.update_one({'user_id': user_id}, {"$set":{f'{img_name}': save_data}}, upsert=True)
+        if not qr_code:
+            self.collection.update_one({'user_id': user_id}, {"$set": {f'{img_name}': save_data}}, upsert=True)
         else:
-            self.collection.update_one({'user_id': user_id}, {"$set":{'img_content': img_content, f'{img_name}': save_data}}, upsert=True)
+            self.collection.update_one({'user_id': user_id},
+                                       {"$set": {f'promo_code': img_name, 'promo_qrcode': save_data}}, upsert=True)
         return save_data
 
 
