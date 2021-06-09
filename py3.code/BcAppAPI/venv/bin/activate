@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/Users/antx/Code/prm/BcAppAPI/venv"
+VIRTUAL_ENV="/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

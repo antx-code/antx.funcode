@@ -6,8 +6,8 @@ import time
 from io import BytesIO
 from utils.exceptions.customs import InvalidPermissions, UnauthorizedAPIRequest, RecordNotFound
 from utils.services.base.base_func import *
+from utils.services.redis_db_connect.connect import *
 from app.models.user_info_models import *
-from app.handler.user_info_handler import *
 
 # logger.add(sink='logs/user_info_api.log',
 #            level='ERROR',

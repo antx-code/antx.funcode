@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/antx/Code/prm/BcAppAPI/venv"
+set -gx VIRTUAL_ENV "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

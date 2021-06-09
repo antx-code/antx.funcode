@@ -43,6 +43,27 @@
         - 冻结可售明细
         - 积分兑换明细
 
+- Code Ref:
+    - Error Code:
+        - 200: User does not exist, please register first!
+        - 201: Account was locked，please contact customer service!
+        - 203: Password cannot be empty!
+        - 204: Two password are not the same, please check!!
+        - 205: 
+            - Nickname was already used!
+            - Email was already used!
+            - Phone was already used!
+        - 206:
+            - Please enter right email address!
+            - Please enter right phone number! 
+        - 207:
+            - The number of login times has exceeded the limit, and the account has been locked!
+            - Password was incorrect，only xxx times to retry!
+        - 208:
+            - Old password was incorrect, please try again!
+    - Success Code:
+        - 
+
 - 后台管理功能
     - 会员管理
     - 等级管理

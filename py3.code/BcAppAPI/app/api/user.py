@@ -36,11 +36,11 @@ async def register(user_info: UserRegister, request: Request):
     # 判断email是否已经注册
     # 判断昵称是否已经被占用
     if not user_info.password or not user_info.repassword:
-        return msg(status='error', data='Password cannot be empty!')
+        return msg(status='error', data='Password cannot be empty!', code=203)
     if user_info.password != user_info.repassword:
-        return msg(status='error', data="Two password are not the same!")
+        return msg(status='error', data="Two password are not the same, please check!!", code=204)
     if user_info.nickname in mongodb.dep_data('nickname'):
-        return msg(status='error', data="nickname was already used!")
+        return msg(status='error', data="Nickname was already used!", code=205)
 
     now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     user_id = id_worker.get_id()  # 生成唯一用户id
@@ -61,15 +61,17 @@ async def register(user_info: UserRegister, request: Request):
     }
 
     if not user_info.phone:
+        if '@' not in user_info.email or 'com' not in user_info.email:
+            return msg(status='error', data='Please enter right email address!', code=206)
         if user_info.email in mongodb.dep_data('email'):
-            return msg(status='error', data="Email was already used!")
+            return msg(status='error', data="Email was already used!", code=205)
         username = user_info.email
         save_info['email'] = username
     else:
         if len(user_info.phone) != 11:
-            return msg(status='error', data='Please enter right phone number!')
+            return msg(status='error', data='Please enter right phone number!', code=206)
         if user_info.phone in mongodb.dep_data('phone'):
-            return msg(status='error', data="Phone was already used!")
+            return msg(status='error', data="Phone was already used!", code=205)
         username = user_info.phone
         save_info['phone'] = username
 
@@ -88,9 +90,9 @@ async def login(user_info: UserLogin, request: Request):
         user_id = mongodb.find_one({'email': user_info.email})['user_id']
         update_login_info = {'email': user_info.email}
         if user_info.email in redis_service.read_redis(redis_key='locked_account'):
-            return msg(status="error", data="Account was locked，please contact customer service!")
+            return msg(status="error", data="Account was locked，please contact customer service!", code=201)
         if user_info.email not in mongodb.dep_data('email'):
-            return msg(status='error', data="User does not exist, please register first!")
+            return msg(status='error', data="User does not exist, please register first!", code=200)
         if result_hash(user_info.password) != mongodb.find_one({'email': user_info.email})['password']:
 
             failed_login_count = redis_service.redis_client.incr(name=user_id, amount=1)
@@ -98,8 +100,8 @@ async def login(user_info: UserLogin, request: Request):
             if failed_login_count == 5:
                 redis_service.new_insert_content(redis_key='locked_account', new_content=user_info.email)
                 mongodb.update_one({'user_id': user_id}, {'is_active': False})
-                return msg(status="error", data="The number of login times has exceeded the limit, and the account has been locked")
-            return msg(status='error', data=f"Password was incorrect，only {5-failed_login_count} times to retry!")
+                return msg(status="error", data="The number of login times has exceeded the limit, and the account has been locked!", code=207)
+            return msg(status='error', data=f"Password was incorrect，only {5-failed_login_count} times to retry!", code=207)
 
     elif user_info.phone:
         user_id = mongodb.find_one({'phone': user_info.phone})['user_id']
@@ -111,8 +113,8 @@ async def login(user_info: UserLogin, request: Request):
             if failed_login_count == 5:
                 redis_service.new_insert_content(redis_key='locked_account', new_content=user_info.phone)
                 mongodb.update_one({'user_id': user_id}, {'is_active': False})
-                return msg(status="error", data="The number of login times has exceeded the limit, and the account has been locked")
-            return msg(status='error', data=f"Password was incorrect，only {5 - failed_login_count} times to retry!")
+                return msg(status="error", data="The number of login times has exceeded the limit, and the account has been locked", code=207)
+            return msg(status='error', data=f"Password was incorrect，only {5 - failed_login_count} times to retry!", code=207)
 
     # user_id = mongodb.find_one({'email': user_info.email})['user_id']
     now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -141,7 +143,7 @@ async def forgot_password(user_info: UserResetPassword, dep=Depends(antx_auth)):
         raise InvalidPermissions("Account have been logged out，please log in again!")
 
     if result_hash(user_info.new_password) != result_hash(user_info.new_repassword):
-        return msg(status="error", data="Two passwords are not the same，please check!")
+        return msg(status="error", data="Two passwords are not the same，please check!", code=204)
 
     update_info = {"password": result_hash(user_info.new_password), 'is_logged_in': False}
     mongodb.update_one({'phone': user_info.phone}, update_info)
@@ -157,9 +159,9 @@ async def reset_password(user_info: UserResetPassword, dep=Depends(antx_auth)):
         raise InvalidPermissions("Account have been logged out，please log in again!")
 
     if result_hash(user_info.old_password) != mongodb.find_one({'user_id': dep})['password']:
-        return msg(status="error", data="Old password was incorrect, please try again")
+        return msg(status="error", data="Old password was incorrect, please try again!", code=208)
     if result_hash(user_info.new_password) != result_hash(user_info.new_repassword):
-        return msg(status="error", data="Two passwordsare not the same, please check!")
+        return msg(status="error", data="Two passwordsare not the same, please check!", code=204)
 
     update_info = {"password": result_hash(user_info.new_password), 'is_logged_in': False}
     mongodb.update_one({'phone': user_info.phone}, update_info)
@@ -169,7 +171,7 @@ async def reset_password(user_info: UserResetPassword, dep=Depends(antx_auth)):
 
 @logger.catch(level='ERROR')
 @router.post('/get_verify_code')
-async def get_verify_code(verify_info: UserVerify, dep=Depends(antx_auth)):
+async def get_verify_code(verify_info: UserVerify):
     if verify_info.verify_type == 'email':
         pass
     else:
@@ -178,7 +180,7 @@ async def get_verify_code(verify_info: UserVerify, dep=Depends(antx_auth)):
 
 @logger.catch(level='ERROR')
 @router.post('/verify')
-async def verify(verify_info: UserVerify, dep=Depends(antx_auth)):
+async def verify(verify_info: UserVerify):
     if verify_info.verify_type == 'email':
         pass
     else:
