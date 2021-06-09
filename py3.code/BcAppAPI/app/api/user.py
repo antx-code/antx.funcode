@@ -44,6 +44,7 @@ async def register(user_info: UserRegister, request: Request):
 
     now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     user_id = id_worker.get_id()  # 生成唯一用户id
+    pcode = promo_code(user_id)
     save_info = {
         'user_id': user_id,
         'nickname': user_info.nickname,
@@ -54,6 +55,7 @@ async def register(user_info: UserRegister, request: Request):
         'last_login_time': '',
         'last_login_ip': request.client.host,
         'access_token': '',
+        'promo_code': pcode,
         'is_active': True,
         'is_verified': True,
         'is_superuser': False,
@@ -76,8 +78,8 @@ async def register(user_info: UserRegister, request: Request):
         save_info['phone'] = username
 
     mongodb.insert_one_data(save_info)
-    generate_qrcode(user_id, promo_code(user_id))
-    dnetworks(user_id=user_id, promo_code=promo_code(user_id), invite_code=user_info.invite_code)
+    generate_qrcode(user_id, pcode)
+    dnetworks(user_id=user_id, promo_code=pcode, invite_code=user_info.invite_code)
     return msg(status='success', data=after_register(username, user_info.nickname, user_id))
 
 @logger.catch(level='ERROR')

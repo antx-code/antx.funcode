@@ -66,7 +66,6 @@ async def setup_profile(request: Request, user_profile: SetupProfile):
 			'intro': user_profile.intro
 		},
 		'share':{
-			'invite_code': user_info['invite_code'],
 			'promo_code': user_info['promo_code'],
 		}
 	}}

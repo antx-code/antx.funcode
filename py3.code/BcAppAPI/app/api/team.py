@@ -6,8 +6,8 @@ import time
 from io import BytesIO
 from utils.exceptions.customs import InvalidPermissions, UnauthorizedAPIRequest, RecordNotFound
 from utils.services.base.base_func import *
+from utils.services.redis_db_connect.connect import *
 from app.models.user_info_models import *
-from app.handler.user_info_handler import *
 
 # logger.add(sink='logs/user_info_api.log',
 #            level='ERROR',
@@ -25,14 +25,24 @@ router = APIRouter(dependencies=[Depends(antx_auth)])
 # router = APIRouter()
 
 user_info_db = db_connection('bc-app', 'user-info')
-user_db = db_connection('bc-app', 'users')
+promo_db = db_connection('bc-app', 'promo_qrcode')
+dnk_db = db_connection('bc-app', 'dnetworks')
 avatar_db = db_connection('bc-app', 'avatar')
-promo_qrcode_db = db_connection('bc-app', 'promo_qrcode')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
 @router.get('/members')
-async def get_team_members():
-	pass
-
+async def get_team_members(request: Request, dep=Depends(antx_auth)):
+	user_id = dep
+	af_info = dnk_db.find_one({'user_id': user_id})
+	af1_code = af_info['af1_code']
+	af2_code = af_info['af2_code']
+	af1_user_info = promo_db.find_one({'base_info.share.promo_code': af1_code})
+	af1_user_id = af1_user_info['user_id']
+	af1_nickname = af1_user_info['base_info']['profile']['nickname']
+	af1_avatar = avatar_db.find_one({'user_id': af1_user_id})
+	af2_user_info = promo_db.find_one({'base_info.share.promo_code': af2_code})
+	af2_user_id = af2_user_info['user_id']
+	af2_nickname = af2_user_info['base_info']['profile']['nickname']
+	af2_avatar = avatar_db.find_one({'user_id': af2_user_id})
 
