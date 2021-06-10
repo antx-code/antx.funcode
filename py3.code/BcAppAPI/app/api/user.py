@@ -108,7 +108,10 @@ async def login(user_info: UserLogin, request: Request):
             return msg(status='error', data=f"Password was incorrect，only {5-failed_login_count} times to retry!", code=207)
 
     elif user_info.phone:
-        user_id = mongodb.find_one({'phone': user_info.phone})['user_id']
+        try:
+            user_id = mongodb.find_one({'phone': user_info.phone})['user_id']
+        except Exception as e:
+            return msg(status='error', data='Please enter right phone number!', code=206)
         update_login_info = {'phone': user_info.phone}
         if result_hash(user_info.password) != mongodb.find_one({'phone': user_info.phone})['password']:
 
