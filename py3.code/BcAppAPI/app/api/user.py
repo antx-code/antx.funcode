@@ -70,7 +70,9 @@ async def register(user_info: UserRegister, request: Request):
         username = user_info.email
         save_info['email'] = username
     else:
-        if len(user_info.phone) != 11:
+        try:
+            ph = int(user_info.phone[1:])
+        except Exception as e:
             return msg(status='error', data='Please enter right phone number!', code=206)
         if user_info.phone in mongodb.dep_data('phone'):
             return msg(status='error', data="Phone was already used!", code=205)

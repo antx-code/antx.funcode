@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request
 from starlette.middleware.cors import CORSMiddleware
 from app.api.user import router as user_router
 from app.api.user_info import router as user_info_router
+from app.api.team import router as team_router
+from app.api.miner import router as miner_router
 from utils.exceptions.customs import InvalidPermissions, UnauthorizedAPIRequest, RecordNotFound, InvalidAPIRequest, ServerError, DatabaseError, InvalidContentType, RecordAlreadyExists
 from fastapi.responses import JSONResponse
 from loguru import logger
@@ -32,6 +34,20 @@ def generate_application() -> FastAPI:
         user_info_router,
         prefix="/api/app/user_info",
         tags=["APP-USER-INFO API"],
+        responses={404: {"description": "Not found"}}
+    )
+
+    application.include_router(
+        team_router,
+        prefix="/api/app/team",
+        tags=["APP-TEAM API"],
+        responses={404: {"description": "Not found"}}
+    )
+
+    application.include_router(
+        miner_router,
+        prefix="/api/app/miner",
+        tags=["APP-MINER API"],
         responses={404: {"description": "Not found"}}
     )
 

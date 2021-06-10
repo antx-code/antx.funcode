@@ -93,16 +93,21 @@ def restore_img(data=None):
 	r = mon.read_img(3470044405556051968, 'test2.png', save_local=True)
 	print(r)
 
+def test_phone():
+	regre = '\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*\d\W*(\d{1,2})$'
+	phone_number = re.findall(regre, '+8615738368019')
+	logger.info(phone_number)
 
 if __name__ == '__main__':
+	test_phone()
 	# test_redis_incr()
 	# test_get_user_id()
 	# test_create_token()
 	# test_mongodb_update_one()
 	# number2hex()
 	# res = p64(test_snow_flake())
-	res = p64(3470044405556051968)
-	print(res)
-	test_qrcode(res)
+	# res = p64(3470044405556051968)
+	# print(res)
+	# test_qrcode(res)
 	# save_img()
 	# restore_img()

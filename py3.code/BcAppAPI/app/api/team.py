@@ -34,15 +34,22 @@ redis_service = redis_connection(redis_db=0)
 @router.get('/members')
 async def get_team_members(request: Request, dep=Depends(antx_auth)):
 	user_id = dep
+	members = []
 	af_info = dnk_db.find_one({'user_id': user_id})
-	af1_code = af_info['af1_code']
-	af2_code = af_info['af2_code']
-	af1_user_info = promo_db.find_one({'base_info.share.promo_code': af1_code})
-	af1_user_id = af1_user_info['user_id']
-	af1_nickname = af1_user_info['base_info']['profile']['nickname']
-	af1_avatar = avatar_db.find_one({'user_id': af1_user_id})
-	af2_user_info = promo_db.find_one({'base_info.share.promo_code': af2_code})
-	af2_user_id = af2_user_info['user_id']
-	af2_nickname = af2_user_info['base_info']['profile']['nickname']
-	af2_avatar = avatar_db.find_one({'user_id': af2_user_id})
+	af1_codes = af_info['af1_code']
+	af2_codes = af_info['af2_code']
+	for af1_code in af1_codes:
+		af1_user_info = promo_db.find_one({'base_info.share.promo_code': af1_code})
+		af1_user_id = af1_user_info['user_id']
+		af1_nickname = af1_user_info['base_info']['profile']['nickname']
+		af1_avatar = avatar_db.find_one({'user_id': af1_user_id})
+		members.append({'nickname': af1_nickname, 'avatar': af1_avatar})
+
+	for af2_code in af2_codes:
+		af2_user_info = promo_db.find_one({'base_info.share.promo_code': af2_code})
+		af2_user_id = af2_user_info['user_id']
+		af2_nickname = af2_user_info['base_info']['profile']['nickname']
+		af2_avatar = avatar_db.find_one({'user_id': af2_user_id})
+		members.append({'nickname': af2_nickname, 'avatar': af2_avatar})
+	return msg(status='success', data=members)
 

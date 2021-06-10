@@ -4,7 +4,7 @@ from fastapi_users import models
 
 class UserRegister(models.BaseUser):
     email: Optional[str]
-    phone: Optional[int]
+    phone: Optional[str]
     password: str
     repassword: str
     nickname: str
@@ -12,16 +12,16 @@ class UserRegister(models.BaseUser):
 
 class UserLogin(models.BaseUser):
     email: Optional[str]
-    phone: Optional[int]
+    phone: Optional[str]
     password: str
     phone_code: Optional[str]
 
 class UserLogout(models.BaseUser):
     email: Optional[str]
-    phone: Optional[int]
+    phone: Optional[str]
 
 class UserResetPassword(models.BaseUser):
-    phone: int
+    phone: str
     old_password: Optional[str]
     new_password: str
     new_repassword: str

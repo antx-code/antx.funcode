@@ -10,10 +10,11 @@ def after_register(email_phone, nickname, user_id):
 		'nickname': nickname,
 		'user_id': user_id
 	}
-	if isinstance(email_phone, str):
-		after_register_info['email'] = email_phone
-	else:
+	try:
+		ph = int(email_phone.phone[1:])
 		after_register_info['phone'] = email_phone
+	except Exception as e:
+		after_register_info['email'] = email_phone
 	return after_register_info
 
 @logger.catch(level='ERROR')
@@ -40,7 +41,7 @@ def generate_qrcode(user_id, promo_code):
 	img.save(f'{promo_code}_qrcode.png')  # 保存二维码make()
 	with open(f'{promo_code}_qrcode.png', 'rb') as f:
 		img_png = BytesIO(f.read())
-	mongodb.save_img(user_id, img_png, promo_code)
+	mongodb.save_img(user_id=user_id, img=img_png, img_name=promo_code, qr_code=True)
 	subprocess.run(f'rm {promo_code}_qrcode.png', shell=True)
 
 @logger.catch(level='ERROR')
