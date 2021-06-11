@@ -32,11 +32,11 @@ def auth_required(request):
         identify = auth_token['identity']
         user_id = auth_token['user_id']
         if identify not in CONFIG['IDENTITY']:
-            raise InvalidPermissions('未被授权的请求对象，拒绝访问')
+            raise InvalidPermissions('Unauthorized user, rejecting request!')
         if user_id not in app_db.dep_data('user_id') and user_id not in web_db.dep_data('user_id'):
-            raise RecordNotFound('不存在该用户，拒绝访问')
+            raise RecordNotFound('User is not exist, rejecting request!')
         if int(exp_time) < int(time.time()):
-            raise UnauthorizedAPIRequest('Token失效，请重新登陆')
+            raise UnauthorizedAPIRequest('Token was expired, Please re-login!')
         return user_id
     else:
-        raise UnauthorizedAPIRequest("Token验证失败，拒绝访问")
+        raise UnauthorizedAPIRequest("Verify token failed, rejecting request!")

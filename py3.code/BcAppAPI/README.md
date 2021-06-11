@@ -61,6 +61,8 @@
             - Password was incorrect，only xxx times to retry!
         - 208:
             - Old password was incorrect, please try again!
+        - 209:
+            - Order created failed, your balance is not enough to buy, please recharge!
     - Success Code:
         - 
 LjqnN2TOHOsl

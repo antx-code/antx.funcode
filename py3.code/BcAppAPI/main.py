@@ -4,6 +4,7 @@ from app.api.user import router as user_router
 from app.api.user_info import router as user_info_router
 from app.api.team import router as team_router
 from app.api.miner import router as miner_router
+from app.api.exchange import router as exchange_router
 from utils.exceptions.customs import InvalidPermissions, UnauthorizedAPIRequest, RecordNotFound, InvalidAPIRequest, ServerError, DatabaseError, InvalidContentType, RecordAlreadyExists
 from fastapi.responses import JSONResponse
 from loguru import logger
@@ -48,6 +49,13 @@ def generate_application() -> FastAPI:
         miner_router,
         prefix="/api/app/miner",
         tags=["APP-MINER API"],
+        responses={404: {"description": "Not found"}}
+    )
+
+    application.include_router(
+        exchange_router,
+        prefix="/api/app/exchange",
+        tags=["APP-EXCHANGE API"],
         responses={404: {"description": "Not found"}}
     )
 

@@ -27,6 +27,7 @@ router = APIRouter()
 
 id_worker = IdWorker(0, 0)
 mongodb = db_connection('bc-app', 'users')
+asset_db = db_connection('bc-app', 'assets')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
@@ -61,6 +62,29 @@ async def register(user_info: UserRegister, request: Request):
         'is_superuser': False,
         'is_logged_in': False
     }
+    asset_info = {
+        'user_id': user_id,
+        'asset': {
+            'usdt': {
+                'all': 0,
+                'today_reward': 0,
+            },
+            'miner': [{
+                'miner_id': 0,
+                'alive_time': '00:00:00',
+                'all': 0,
+                'today_reward': 0,
+            }],
+            'team_miner': [{
+                'miner_id': 0,
+                'alive_time': '00:00:00',
+                'members': [],  # nickname
+                'all': 0,
+                'today_rewards': 0,
+                'today_reward': 0
+            }]
+        }
+    }
 
     if not user_info.phone:
         if '@' not in user_info.email or 'com' not in user_info.email:
@@ -80,6 +104,7 @@ async def register(user_info: UserRegister, request: Request):
         save_info['phone'] = username
 
     mongodb.insert_one_data(save_info)
+    asset_db.insert_one_data(asset_info)
     generate_qrcode(user_id, pcode)
     dnetworks(user_id=user_id, promo_code=pcode, invite_code=user_info.invite_code)
     return msg(status='success', data=after_register(username, user_info.nickname, user_id))

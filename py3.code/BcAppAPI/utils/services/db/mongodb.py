@@ -137,13 +137,11 @@ class MongoDB():
 
     @logger.catch(level='ERROR')
     def save_img(self, user_id, img, img_name='img', qr_code=False):
-        """
-		Save the images of the data into mongodb by using bson.
-		:param img_content: the response of the images url.->promo code
-		:return: The saved data which insert into mongodb.
-		"""
         # save_data = self.collection.save(dict(user_id = user_id, img = bson.binary.Binary(img_content.getvalue())))
-        save_data = base64.b64encode(bson.binary.Binary(img.getvalue())).decode('ascii')
+        try:
+            save_data = base64.b64encode(bson.binary.Binary(img.getvalue())).decode('ascii')
+        except Exception as e:
+            save_data = base64.b64encode(bson.binary.Binary(img)).decode('ascii')
         if not qr_code:
             self.collection.update_one({'user_id': user_id}, {"$set": {f'{img_name}': save_data}}, upsert=True)
         else:

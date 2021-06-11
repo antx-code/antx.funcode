@@ -28,6 +28,7 @@ user_info_db = db_connection('bc-app', 'user-info')
 user_db = db_connection('bc-app', 'users')
 avatar_db = db_connection('bc-app', 'avatar')
 promo_qrcode_db = db_connection('bc-app', 'promo_qrcode')
+asset_db = db_connection('bc-app', 'assets')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
@@ -43,7 +44,10 @@ async def avatar_upload(request: Request, file: UploadFile = File(...)):
 @router.get('/avatar')
 async def get_avatar(request: Request):
 	user_id = antx_auth(request)
-	avatar = avatar_db.find_one({'user_id': user_id})['avatar']
+	try:
+		avatar = avatar_db.find_one({'user_id': user_id})['avatar']
+	except Exception as e:
+		avatar = avatar_db.find_one({'user_id': 'default'})['img']
 	return msg(status='success', data={'avatar': avatar})
 
 @logger.catch(level='ERROR')
@@ -86,7 +90,13 @@ async def get_promo_code(request: Request):
 	share_info = promo_qrcode_db.find_one({'user_id': user_id})
 	promo_code = share_info['img_content']
 	promo_qrcode = share_info['img']
-	share_info = {'promo_code': promo_code, 'qrcode':promo_qrcode}
+	share_info = {'promo_code': promo_code, 'qrcode': promo_qrcode}
 	return msg(status="success", data=share_info)
 
-
+@logger.catch(level='ERROR')
+@router.get('/simple_info')
+async def simple_info(request: Request):
+	user_id = antx_auth(request)
+	nickname = user_db.find_one({'user_id': user_id})['nickname']
+	asset = asset_db.find_one({'user_id': user_id})['asset']['usdt']['all']
+	return msg(status='success', data={'nickname': nickname, 'asset': asset})

@@ -7,7 +7,7 @@ import bson
 from bson import  ObjectId
 from io import BytesIO
 import base64
-from PIL import Image
+# from PIL import Image
 from io import StringIO
 
 def test_redis_incr():
@@ -98,8 +98,61 @@ def test_phone():
 	phone_number = re.findall(regre, '+8615738368019')
 	logger.info(phone_number)
 
+def generate_init_miners():
+	from utils.services.redis_db_connect.connect import db_connection
+	mongodb = db_connection('bc-app', 'miners')
+	miner_info = {
+		'miner_name': 'MinerMonkey',
+		'miner_month_reward': 1000,
+		'miner_power': '4THS',
+		'miner_price': 2000,
+		'miner_team_price': 1800,
+		'miner_manage_price': 0.1,
+		'miner_numbers': 10000
+	}
+	mongodb.insert_one_data(miner_info)
+
+def set_default_avatar():
+	from utils.services.redis_db_connect.connect import db_connection
+	mongodb = db_connection('bc-app', 'avatar')
+	with open('default.png', 'rb') as f:
+		png_content = f.read()
+	mongodb.save_img(user_id='default', img=png_content)
+
+def init_asset():
+	from utils.services.redis_db_connect.connect import db_connection
+	asset_db = db_connection('bc-app', 'assets')
+
+	asset_info = {
+		'user_id': 3471749054516428800,
+		'asset': {
+			'usdt': {
+				'all': 1000,
+				'today_reward': 10,
+			},
+			'miner': [{
+				'miner_id': 0,
+				'alive_time': '00:00:00',
+				'all': 0,
+				'today_reward': 0,
+			}],
+			'team_miner': [{
+				'miner_id': 0,
+				'alive_time': '00:00:00',
+				'members': [],  # nickname
+				'all': 0,
+				'today_rewards': 0,
+				'today_reward': 0
+			}]
+		}
+	}
+	asset_db.update_one({'user_id': 3471749054516428800}, asset_info)
+
 if __name__ == '__main__':
-	test_phone()
+	# generate_init_miners()
+	# set_default_avatar()
+	init_asset()
+	# test_phone()
 	# test_redis_incr()
 	# test_get_user_id()
 	# test_create_token()
