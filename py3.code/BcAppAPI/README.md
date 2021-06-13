@@ -13,6 +13,7 @@
     - 购买
         - router: /api/app/buy
         - router: /api/app/sale
+        - 购买记录
     - 发布
         - router:api/app/publish
     - 个人信息
@@ -30,8 +31,10 @@
         - 
     - 充值
         - router: /api/app/spot
+        - 充值记录
     - 提现
         - router: /api/app/withdraw
+        - 提现记录
     - 推广
         - router: /api/app/share
     - 团队
@@ -42,6 +45,8 @@
         - 矿池资产明细
         - 冻结可售明细
         - 积分兑换明细
+    - 收益
+        - 收益记录(单位：天)
 
 - Code Ref:
     - Error Code:
@@ -65,7 +70,9 @@
             - Order created failed, your balance is not enough to buy, please recharge!
     - Success Code:
         - 
+
 LjqnN2TOHOsl
+
 - 后台管理功能
     - 会员管理
     - 等级管理

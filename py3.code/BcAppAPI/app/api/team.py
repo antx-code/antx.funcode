@@ -22,34 +22,51 @@ from app.models.user_info_models import *
 
 router = APIRouter(dependencies=[Depends(antx_auth)])
 
-# router = APIRouter()
-
+user_db = db_connection('bc-app', 'users')
 user_info_db = db_connection('bc-app', 'user-info')
 promo_db = db_connection('bc-app', 'promo_qrcode')
 dnk_db = db_connection('bc-app', 'dnetworks')
 avatar_db = db_connection('bc-app', 'avatar')
+asset_db = db_connection('bc-app', 'assets')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
 @router.get('/members')
 async def get_team_members(request: Request, dep=Depends(antx_auth)):
 	user_id = dep
+	logger.info(user_id)
 	members = []
 	af_info = dnk_db.find_one({'user_id': user_id})
-	af1_codes = af_info['af1_code']
-	af2_codes = af_info['af2_code']
+	af1_codes = af_info.get('af1_code', [])
+	af2_codes = af_info.get('af2_code', [])
+	all_reward = 0
 	for af1_code in af1_codes:
-		af1_user_info = promo_db.find_one({'base_info.share.promo_code': af1_code})
+		logger.info(f'query af1_code->{af1_code}')
+		af1_user_info = user_db.find_one({'promo_code': af1_code})
 		af1_user_id = af1_user_info['user_id']
-		af1_nickname = af1_user_info['base_info']['profile']['nickname']
-		af1_avatar = avatar_db.find_one({'user_id': af1_user_id})
-		members.append({'nickname': af1_nickname, 'avatar': af1_avatar})
+		af1_nickname = af1_user_info['nickname']
+		try:
+			af1_avatar = avatar_db.find_one({'user_id': af1_user_id})['avatar']
+		except Exception as e:
+			af1_avatar = avatar_db.find_one({'user_id': 'default'})['img']
+		reward = asset_db.find_one({'user_id': user_id})['asset']['share']
+		all_reward += reward
+		members.append({'nickname': af1_nickname, 'avatar': af1_avatar, 'reward': reward})
 
 	for af2_code in af2_codes:
-		af2_user_info = promo_db.find_one({'base_info.share.promo_code': af2_code})
+		af2_user_info = user_db.find_one({'promo_code': af2_code})
 		af2_user_id = af2_user_info['user_id']
-		af2_nickname = af2_user_info['base_info']['profile']['nickname']
-		af2_avatar = avatar_db.find_one({'user_id': af2_user_id})
-		members.append({'nickname': af2_nickname, 'avatar': af2_avatar})
-	return msg(status='success', data=members)
+		af2_nickname = af2_user_info['nickname']
+		try:
+			af2_avatar = avatar_db.find_one({'user_id': af2_user_id})['avatar']
+		except Exception as e:
+			af2_avatar = avatar_db.find_one({'user_id': 'default'})['img']
+		reward = asset_db.find_one({'user_id': user_id})['asset']['share']
+		all_reward += reward
+		members.append({'nickname': af2_nickname, 'avatar': af2_avatar, 'reward': reward})
+	final_result = {
+		'all_reward': all_reward,
+		'members': members
+	}
+	return msg(status='success', data=final_result)
 

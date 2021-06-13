@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends, BackgroundTasks, Request, UploadFile, File
+from fastapi.responses import RedirectResponse
 from loguru import logger
+import json
+import time
+from io import BytesIO
+from utils.exceptions.customs import InvalidPermissions, UnauthorizedAPIRequest, RecordNotFound
 from utils.services.base.base_func import *
-from app.handler.miner_handler import *
 from utils.services.redis_db_connect.connect import *
-from app.models.miner_models import *
 
 # logger.add(sink='logs/user_info_api.log',
 #            level='ERROR',
@@ -18,31 +21,18 @@ from app.models.miner_models import *
 
 router = APIRouter(dependencies=[Depends(antx_auth)])
 
-# router = APIRouter()
-
-user_info_db = db_connection('bc-app', 'user-info')
-promo_db = db_connection('bc-app', 'promo_qrcode')
-dnk_db = db_connection('bc-app', 'dnetworks')
-miner_db = db_connection('bc-app', 'miner')
-redis_service = redis_connection(redis_db=0)
-
-CONFIG = redis_service.hget_redis(redis_key='config', content_key='app')
-
+announcement_db = db_connection('bc-app', 'announcement')
 
 @logger.catch(level='ERROR')
-@router.get('/rewards')
-async def get_team_members(request: Request, dep=Depends(antx_auth), ressponse_model=MinerReward):
-	user_id = dep
-	miner_reward = {
-		'miner_id': '1234',
-		'created_time': '2021-01-01 21:20:12',
-		'sum_rewards': 0.0003,
-		'alive_time': '23:11:21'
-	}
-	return miner_reward
+@router.get('/list')
+async def get_announcement_list():
+	alist = []
+	all_announcement = announcement_db.query_data({})
+	for adb in all_announcement:
+		alist.append({'aid': adb['aid'], 'title': adb['title']})
+	return alist
 
 @logger.catch(level='ERROR')
-@router.get('/team_rewards')
-async def get_team_members(request: Request, dep=Depends(antx_auth)):
-	user_id = dep
-	return TeamMineReward
+@router.get('/{announcement_id}')
+async def get_announcement_detail(announcement_id):
+	return announcement_db.find_one({'aid': int(announcement_id)})

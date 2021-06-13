@@ -30,6 +30,8 @@ mongodb = db_connection('bc-app', 'users')
 asset_db = db_connection('bc-app', 'assets')
 redis_service = redis_connection(redis_db=0)
 
+CONFIG = redis_service.hget_redis('config', 'app')
+
 @logger.catch(level='ERROR')
 @router.post('/register')
 async def register(user_info: UserRegister, request: Request):
@@ -69,20 +71,9 @@ async def register(user_info: UserRegister, request: Request):
                 'all': 0,
                 'today_reward': 0,
             },
-            'miner': [{
-                'miner_id': 0,
-                'alive_time': '00:00:00',
-                'all': 0,
-                'today_reward': 0,
-            }],
-            'team_miner': [{
-                'miner_id': 0,
-                'alive_time': '00:00:00',
-                'members': [],  # nickname
-                'all': 0,
-                'today_rewards': 0,
-                'today_reward': 0
-            }]
+            'miner': [],
+            'team_miner': [],
+            'share': 0
         }
     }
 

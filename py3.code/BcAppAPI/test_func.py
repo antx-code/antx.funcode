@@ -124,20 +124,24 @@ def init_asset():
 	asset_db = db_connection('bc-app', 'assets')
 
 	asset_info = {
-		'user_id': 3471749054516428800,
+		'user_id': 3470934271785435136,
 		'asset': {
 			'usdt': {
-				'all': 1000,
+				'all': 10000,
 				'today_reward': 10,
 			},
 			'miner': [{
 				'miner_id': 0,
+				'miner_name': 'MinerSnow',
+				'created_time': '2021-06-12 12:12:32',
 				'alive_time': '00:00:00',
 				'all': 0,
 				'today_reward': 0,
 			}],
 			'team_miner': [{
 				'miner_id': 0,
+				'miner_name': 'MinerSnow',
+				'created_time': '2021-06-12 12:12:32',
 				'alive_time': '00:00:00',
 				'members': [],  # nickname
 				'all': 0,
@@ -146,12 +150,69 @@ def init_asset():
 			}]
 		}
 	}
-	asset_db.update_one({'user_id': 3471749054516428800}, asset_info)
+	asset_db.update_one({'user_id': 3470934271785435136}, asset_info)
+
+def genarate_miner_pics():
+	from utils.services.redis_db_connect.connect import db_connection
+	mongodb = db_connection('bc-app', 'miner_pics')
+	with open('miner.png', 'rb') as f:
+		png_content = f.read()
+	mongodb.save_img(user_id='MinerMonkey', img=png_content)
+
+def init_redis_config():
+	import json
+	from utils.services.redis_db_connect.connect import redis_connection
+	config = {
+		'MinerReward':10,
+		'Level1Reward':0.2,
+		'Level2Reward':0.3,
+		'Level3Reward':0.5,
+		'MinerManageFee':2,
+		'MinerLife':100,
+		'ShareReward': 1000
+	}
+	redis = redis_connection()
+	redis.hset_redis(redis_key='config', content_key='app', content_value=json.dumps(config, ensure_ascii=False))
+
+def test_init_announcement():
+	from utils.services.base.SnowFlake import IdWorker
+	from utils.services.redis_db_connect.connect import db_connection
+	announcement_db = db_connection('bc-app', 'announcement')
+	id_worker = IdWorker(0, 0)
+	ids = []
+	for i in range(5):
+		ids.append(id_worker.get_id())
+	for inx, id in enumerate(ids):
+		now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+		announcement = {
+			'aid': id,
+			'author': 'antx',
+			'created_time': now_time,
+			'title': f'test for bc app {inx + 1} announcement',
+			'content': 'sdfjklhvkjhasnflkjaslkfehfhsladkjfinasljdfjaksm.mcas',
+		}
+		announcement_db.insert_one_data(announcement)
+
+def test_dnks():
+	from utils.services.redis_db_connect.connect import db_connection
+	from app.handler.user_handler import dnetworks
+	dnetworks(3470934271785435136, '30Hf5ikw', 'ASDF8778')
+
+def test_promo_code():
+	from app.handler.user_handler import generate_qrcode
+	generate_qrcode(3472912957086629888, '30Og-YD0')
 
 if __name__ == '__main__':
-	# generate_init_miners()
+	generate_init_miners()
+	# genarate_miner_pics()
+	# init_redis_config()
+
 	# set_default_avatar()
-	init_asset()
+	# init_asset()
+	# test_init_announcement()
+	# test_dnks()
+	# test_promo_code()
+
 	# test_phone()
 	# test_redis_incr()
 	# test_get_user_id()

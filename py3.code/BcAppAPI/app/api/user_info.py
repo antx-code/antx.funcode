@@ -54,6 +54,8 @@ async def get_avatar(request: Request):
 @router.post('/sprofile')
 async def setup_profile(request: Request, user_profile: SetupProfile):
 	user_id = antx_auth(request)
+	nicknames = user_info_db.dep_data('base_info.profile.nickname')
+	print(nicknames)
 	user_info = user_db.find_one({'user_id': user_id})
 
 	if not user_profile.nickname:
@@ -61,6 +63,9 @@ async def setup_profile(request: Request, user_profile: SetupProfile):
 	else:
 		nickname = user_profile.nickname
 		user_db.update_one({'user_id': user_id}, {'nickname': nickname})
+
+	if nickname in nicknames:
+		return msg(status='error', data="Nickname was already used!", code=205)
 
 	save_info = {'user_id': user_id, 'base_info':{
 		'profile': {
