@@ -69,6 +69,7 @@ async def register(user_info: UserRegister, request: Request):
         'asset': {
             'usdt': {
                 'all': 0,
+                'sum_reward': 0,
                 'today_reward': 0,
             },
             'miner': [],

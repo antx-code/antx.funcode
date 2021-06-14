@@ -202,8 +202,117 @@ def test_promo_code():
 	from app.handler.user_handler import generate_qrcode
 	generate_qrcode(3472912957086629888, '30Og-YD0')
 
+def time2seconds(st):
+	h, m, s = st.strip().split(":")
+	time2sec = int(h) * 3600 + int(m) * 60 + int(s)
+	print(time2sec)
+	return time2sec
+
+def seconds2time(st):
+	m, s = divmod(st, 60)
+	h, m = divmod(m, 60)
+	return h, m, s
+
+def get_recent7date(n=7):
+	dates = []
+	today = datetime.datetime.now()
+	# print(today)
+	for i in range(n):
+		dates.append((today - datetime.timedelta(days=i)).strftime("%Y-%m-%d"))
+	# print(dates)
+	return dates
+
+def generate_miner_rewaqd():
+	from utils.services.redis_db_connect.connect import db_connection
+	miner_reward_db = db_connection('bc-app', 'miner_reward')
+	miner_reward = {
+		'user_id': 3470934271785435136,
+		'miner_type': 'personal',
+		'miner_id': 'NO.3472794787',
+		'miner_name': 'MinerSnow',
+		'miner_created_time': '2021-06-13 02:06:38',
+		'miner_except_month_reward': 1000,
+		'miner_manage_price': 0.1,
+		'miner_power': '4THS',
+		'miner_sum_reward': 800,
+		'miner_today_reward': 200,
+		'miner_running_time': '580:48:00',
+		'miner_status': 'running'
+	}
+	team_miner_reward = {
+		'user_id': 3470934271785435136,
+		'miner_type': 'team',
+		'miner_members': ['leo', 'antxww'],
+		'miner_member_count': 2,
+		'miner_id': 'NO.3472809053',
+		'miner_name': 'MinerMonkey',
+		'miner_created_time': '2021-06-13 03:03:20',
+		'miner_except_month_reward': 1000,
+		'miner_manage_price': 0.1,
+		'miner_power': '4THS',
+		'miner_sum_reward': 800,
+		'miner_today_reward': 200,
+		'miner_running_time': '580:48:00',
+		'miner_status': 'running'
+	}
+	miner_reward_db.insert_one_data(miner_reward)
+	miner_reward_db.insert_one_data(team_miner_reward)
+
+def generate_miner_reward_record():
+	from utils.services.redis_db_connect.connect import db_connection
+	reward_record_db = db_connection('bc-app', 'miner_reward_record')
+	record = {
+		'user_id': 3470934271785435136,
+		'miner_type': 'personal',
+		'miner_id': 'NO.3472794787',
+		'miner_name': 'MinerSnow',
+		'miner_reward_record': '2021-06-11',
+		'miner_reward': 200,
+	}
+	team_record = {
+		'user_id': 3470934271785435136,
+		'miner_type': 'team',
+		'miner_members': ['leo', 'antxww'],
+		'miner_member_count': 2,
+		'miner_id': 'NO.3472809053',
+		'miner_name': 'MinerMonkey',
+		'miner_reward_record': '2021-06-11',
+		'miner_reward': 200,
+		'miner_per_reward': 100,
+	}
+	reward_record_db.insert_one_data(record)
+	reward_record_db.insert_one_data(team_record)
+
+def test_query_reward_record():
+	from utils.services.redis_db_connect.connect import db_connection
+	miner_reward_record_db = db_connection('bc-app', 'miner_reward_record')
+	final_records = []
+	print(f'gte -> {get_recent7date()[-1]}')
+	print(f'lte -> {get_recent7date()[0]}')
+	records = miner_reward_record_db.query_data({
+		'$and': [{
+			'miner_reward_record': {'$gte': get_recent7date()[-1], '$lte': get_recent7date()[0]},
+			'user_id': 3470934271785435136,
+			'miner_type': 'personal'
+		}]
+	})
+	for record in records:
+		del record['_id']
+		del record['user_id']
+		final_records.append(record)
+	print(final_records)
+
 if __name__ == '__main__':
-	generate_init_miners()
+	# generate_init_miners()
+	# st = time2seconds('12:21:11')
+	# h, m, s = seconds2time(2090880)
+	# print(f'{h:02d}:{m:02d}:{s:02d}')
+	# get_recent7date()
+	generate_miner_rewaqd()
+	# generate_miner_reward_record()
+
+	# test_query_reward_record()
+
 	# genarate_miner_pics()
 	# init_redis_config()
 
