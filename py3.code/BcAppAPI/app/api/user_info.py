@@ -93,8 +93,8 @@ async def get_profile(request: Request):
 async def get_promo_code(request: Request):
 	user_id = antx_auth(request)
 	share_info = promo_qrcode_db.find_one({'user_id': user_id})
-	promo_code = share_info['img_content']
-	promo_qrcode = share_info['img']
+	promo_code = share_info['promo_code']
+	promo_qrcode = share_info['promo_qrcode']
 	share_info = {'promo_code': promo_code, 'qrcode': promo_qrcode}
 	return msg(status="success", data=share_info)
 

@@ -35,4 +35,4 @@ async def get_announcement_list():
 @logger.catch(level='ERROR')
 @router.get('/{announcement_id}')
 async def get_announcement_detail(announcement_id):
-	return announcement_db.find_one({'aid': int(announcement_id)})
+	return announcement_db.find_one({'aid': announcement_id})
