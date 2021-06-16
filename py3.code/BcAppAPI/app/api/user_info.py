@@ -29,6 +29,7 @@ user_db = db_connection('bc-app', 'users')
 avatar_db = db_connection('bc-app', 'avatar')
 promo_qrcode_db = db_connection('bc-app', 'promo_qrcode')
 asset_db = db_connection('bc-app', 'assets')
+address_db = db_connection('bc-app', 'address')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
@@ -105,3 +106,17 @@ async def simple_info(request: Request):
 	nickname = user_db.find_one({'user_id': user_id})['nickname']
 	asset = asset_db.find_one({'user_id': user_id})['asset']['usdt']['all']
 	return msg(status='success', data={'nickname': nickname, 'asset': asset})
+
+@logger.catch(level='ERROR')
+@router.post('/add_update_address')
+async def add_update_address(request: Request, address_info: WithdrawAddress):
+	user_id = antx_auth(request)
+	address_db.update_one({'user_id': user_id}, {'address': address_info.address})
+	return msg(status='success', data=f'Success binding withdraw address: {address_info.address}!')
+
+@logger.catch(level='ERROR')
+@router.get('/delete_address')
+async def delete_address(request: Request):
+	user_id = antx_auth(request)
+	address_db.delete_one({'user_id': user_id})
+	return msg(status='success', data='Success unbinding address!')
