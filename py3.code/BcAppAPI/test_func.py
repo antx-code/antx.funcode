@@ -302,14 +302,24 @@ def test_query_reward_record():
 		final_records.append(record)
 	print(final_records)
 
+def customer_services():
+	from utils.services.redis_db_connect.connect import db_connection
+	cs_db = db_connection('bc-app', 'customer_urls')
+	url1 = 'http://127.0.0.1:888'
+	url2 = 'http://127.0.0.1:999'
+	cs_db.insert_one_data({'url': url1})
+	cs_db.insert_one_data({'url': url2})
+
 if __name__ == '__main__':
 	# generate_init_miners()
 	# st = time2seconds('12:21:11')
 	# h, m, s = seconds2time(2090880)
 	# print(f'{h:02d}:{m:02d}:{s:02d}')
 	# get_recent7date()
-	generate_miner_rewaqd()
+	# generate_miner_rewaqd()
 	# generate_miner_reward_record()
+
+	customer_services()
 
 	# test_query_reward_record()
 

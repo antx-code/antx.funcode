@@ -22,9 +22,10 @@ from utils.services.redis_db_connect.connect import *
 router = APIRouter(dependencies=[Depends(antx_auth)])
 
 announcement_db = db_connection('bc-app', 'announcement')
+cs_db = db_connection('bc-app', 'customer_urls')
 
 @logger.catch(level='ERROR')
-@router.get('/list')
+@router.get('/announcement/list')
 async def get_announcement_list():
 	alist = []
 	all_announcement = announcement_db.query_data({})
@@ -33,6 +34,16 @@ async def get_announcement_list():
 	return alist
 
 @logger.catch(level='ERROR')
-@router.get('/{announcement_id}')
+@router.get('/announcement/{announcement_id}')
 async def get_announcement_detail(announcement_id):
 	return announcement_db.find_one({'aid': announcement_id})
+
+@logger.catch(level='ERROR')
+@router.get('/customer_urls')
+async def get_customer_urls():
+	cs_urls = []
+	results = cs_db.query_data()
+	for url in results:
+		logger.info(url)
+		cs_urls.append(url['url'])
+	return msg(status='success', data=cs_urls)
