@@ -68,6 +68,16 @@ async def get_team_miners():
 async def get_one_miner(miner_name):
 	miner_info = miner_db.find_one({'miner_name': miner_name})
 	miner_pic = get_miner_pic(miner_name)['img']
+	del miner_info['miner_team_price']
+	miner_info['miner_pic'] = miner_pic
+	return msg(status='success', data=miner_info)
+
+@logger.catch(level='ERROR')
+@router.get('/team_miner/{miner_name}')
+async def get_one_miner(miner_name):
+	miner_info = miner_db.find_one({'miner_name': miner_name})
+	miner_pic = get_miner_pic(miner_name)['img']
+	del miner_info['miner_price']
 	miner_info['miner_pic'] = miner_pic
 	return msg(status='success', data=miner_info)
 
