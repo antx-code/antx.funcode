@@ -142,7 +142,7 @@ async def share_buy(request: Request):
 			'member_count': 0
 		}
 	}
-	
+
 	return share_code, share_url
 
 @logger.catch(level='ERROR')

@@ -115,6 +115,17 @@ async def add_update_address(request: Request, address_info: WithdrawAddress):
 	return msg(status='success', data=f'Success binding withdraw address: {address_info.address}!')
 
 @logger.catch(level='ERROR')
+@router.get('/get_address')
+async def get_address(request: Request):
+	user_id = antx_auth(request)
+	try:
+		address = address_db.find_one({'user_id': user_id})['address']
+		return msg(status='success', data=address)
+	except Exception as e:
+		return msg(status='error', data='Unbinding address!', code=210)
+
+
+@logger.catch(level='ERROR')
 @router.get('/delete_address')
 async def delete_address(request: Request):
 	user_id = antx_auth(request)
