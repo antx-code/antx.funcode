@@ -45,3 +45,9 @@ def record_buy(user_id, buy_miner_name, buy_miner_id, pay_money, buy_type):
 		'created_time': now_time
 	}
 	return buy_info
+
+@logger.catch(level='ERROR')
+def generate_share_code_url():
+	share_code = str(id_worker.get_id())
+	share_url = f'http://74.211.103.41:8889/api/app/exchange/share/{share_code}'
+	return share_code, share_url

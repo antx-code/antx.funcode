@@ -169,7 +169,8 @@ def init_redis_config():
 		'Level3Reward':0.5,
 		'MinerManageFee':2,
 		'MinerLife':100,
-		'ShareReward': 1000
+		'ShareReward': 1000,
+		'TeamBuyNumber': 7
 	}
 	redis = redis_connection()
 	redis.hset_redis(redis_key='config', content_key='app', content_value=json.dumps(config, ensure_ascii=False))
@@ -319,12 +320,12 @@ if __name__ == '__main__':
 	# generate_miner_rewaqd()
 	# generate_miner_reward_record()
 
-	customer_services()
+	# customer_services()
 
 	# test_query_reward_record()
 
 	# genarate_miner_pics()
-	# init_redis_config()
+	init_redis_config()
 
 	# set_default_avatar()
 	# init_asset()

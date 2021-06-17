@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, BackgroundTasks, Request, UploadFile, File
 from loguru import logger
+import json
 from utils.services.base.base_func import *
 from app.handler.miner_handler import *
 from utils.services.redis_db_connect.connect import *
@@ -127,6 +128,30 @@ async def buy_miner(request: Request, buy_info: BuyMiner):
 	asset_db.collection.update_one({'user_id': user_id}, {'$push': {'asset.miner': asset_miner}}, upsert=True)
 	record_db.insert_one_data(record_buy(user_id, buy_info.miner_name, miner_id, buy_info.miner_price, buy_type='personal'))
 	return msg(status='success', data=return_info)
+
+
+@logger.catch(level='ERROR')
+@router.get('/share_buy')
+async def share_buy(request: Request):
+	user_id = antx_auth(request)
+	share_code, share_url = generate_share_code_url()
+	share_info = {
+		'share_code': {
+			'team_header': user_id,
+			'members': [],  # 不包括团长
+			'member_count': 0
+		}
+	}
+	
+	return share_code, share_url
+
+@logger.catch(level='ERROR')
+@router.get('/share/{share_code}')
+async def share_buy_code(request: Request):
+	user_id = antx_auth(request)
+
+	share_code, share_url = generate_share_code_url()
+	return share_code, share_url
 
 @logger.catch(level='ERROR')
 @router.post('/team_buy_miner')
