@@ -1,93 +1,218 @@
 - 手机端功能
-    - 注册
-        - fastapi-users
-        - router: /api/app/users/register
-        - email register
-        - sms register
-    - 登录
-        - fastapi-users
-        - router: /api/app/users/login
-        - router: /api/app/users/logout
-        - router: /api/app/users/forgot-password
-        - router: /api/app/users/reset-password
-    - 购买
-        - router: /api/app/buy
-        - router: /api/app/sale
-        - 购买记录
-    - 发布
-        - router:api/app/publish
-    - 个人信息
-        - 基础信息
-            - router: /api/app/user-info/profile
-            - content: 
-                - 头像
-                - 昵称
-                - 性别
-                - 地区
-                - 个性签名
-        - 资产信息
-        - 矿机信息
-        - 团队信息
-        - 
-    - 充值
-        - router: /api/app/spot
-        - 充值记录
-    - 提现
-        - router: /api/app/withdraw
-        - 提现记录
-    - 推广
-        - router: /api/app/share
-    - 团队
-        - router: /api/app/teams
-    - 资产
-        - 交易明细
-        - 可售币明细
-        - 矿池资产明细
-        - 冻结可售明细
-        - 积分兑换明细
-    - 收益
-        - 收益记录(单位：天)
+    - 用户功能
+        - 注册
+            - dependency
+                - fastapi-users
+            - router
+                - /api/app/users/register
+                - POST
+                - 手机或邮箱注册
+                - email register
+                - phone register
+            - router
+                - /api/app/get_verify_code
+                - POST
+                - 获取验证码
+            - router
+                - /api/app/verify
+                - POST
+                - 进行验证
+        - 登陆
+            - dependency
+                - fastapi-users
+            - router
+                - /api/app/users/login
+                - POST
+                - 用户登陆
+            - router
+                - /api/app/users/logout
+                - POST
+                - 注销登陆/退出登陆
+        - 忘记密码和修改密码
+            - router
+                - /api/app/users/forgot-password
+                - POST
+                - 忘记密码
+            - router
+                - /api/app/users/reset-password
+                - POST
+                - 重置密码
+    - 用户信息功能
+        - 头像
+            - router 
+                - /api/app/user_info/avatar
+                - GET
+                - 获取用户头像
+            - router
+                - /api/app/user_info/avatar/upload
+                - POST
+                - 上传用户头像
+        - 个人信息
+            - 基础信息
+                - router
+                    - /api/app/user_info/gprofile
+                    - GET
+                    - 获取个人信息
+                - router
+                    - /api/app/user_info/set_profile
+                    - POST
+                    - 设置修改个人信息
+                - content
+                    - 头像
+                    - 昵称
+                    - 性别
+                    - 地区
+                    - 个性签名   
+            - 资产信息概况
+                - router
+                    - /api/app/user_info/simple_info
+                    - GET
+                    - 获取昵称和资产
+            - 分享邀请码
+                - router
+                    - /api/app/user_info/share
+                    - GET
+                    - 邀请码
+            - 地址信息
+                - router
+                    - /api/app/user_info/add_update_address
+                    - POST
+                    - 添加或更换地址
+                - router
+                    - /api/app/user_info/get_address
+                    - GET
+                    - 获取用户地址
+                - router
+                    - /api/app/user_info/delete_address
+                    - GET
+                    - 删除用户地址
+        - 团队
+            - router
+                - /api/app/team/members
+                - GET
+                - 获取团队成员
+        - 收益
+            - router
+                - /api/app/reward/home_reward
+                - GET
+                - 首页收益
+            - route
+                - /api/app/reward/abs_reward
+                - GET
+                - 收益概况
+            - router
+                - /api/app/reward/my_miner
+                - GET
+                - 我的矿机
+            - router
+                - /api/app/reward/miner_reward
+                - GET
+                - 矿机收益
+            - router
+                - /api/app/reward/team_miner_reward
+                - GET
+                - 团队矿机收益
+        - 客户服务
+            - router
+                - /api/app/csc/announcement/list
+                - GET
+                - 获取公告列表
+            - router
+                - /api/app/csc/announcement/{announcement_id}
+                - GET
+                - 获取公告详情
+            - router
+                - /api/app/csc/customer_urls
+                - GET
+                - 获取客服服务链接
+        - 交易
+            - router
+                - /api/app/exchange/personal_miner
+                - GET
+                - 获取个人矿机
+            - router
+                - /api/app/exchange/team_miners
+                - GET
+                - 获取参与的团队矿机
+            - router
+                - /api/app/exchange/miner/{miner_name}
+                - GET
+                - 获取个人购买矿机详情
+            - router
+                - /api/app/exchange/team_miner/{miner_name}
+                - GET
+                - 获取组团购买矿机详情
+            - router
+                - /api/app/exchange/buy_miner
+                - POST
+                - 个人购买矿机
+            - router
+                - /api/app/exchange/share_buy
+                - POST
+                - 生成组团购买邀请码和邀请链接
+            - router
+                - /api/app/exchange/share/{share_code}
+                - GET
+                - 点击组团购买邀请链接
+            - router
+                - /api/app/exchange/share_monitor/{share_code}
+                - GET
+                - 主动获取拼团购买状态
+            - router
+                - /api/app/exchange/team_share_buy
+                - POST
+                - 拼团购买矿机付款
+            - router
+                - /api/app/exchange/recharge
+                - POST
+                - 充值
+            - router
+                - /api/app/exchange/withdraw
+                - POST
+                - 提现
+            - router
+                - /api/app/exchange/record
+                - POST
+                - 记录查询(充值、提现、个人矿机收益、拼团矿机收益)
 
-- Code Ref:
-    - Error Code:
-        - 200: User does not exist, please register first!
-        - 201: Account was locked，please contact customer service!
-        - 203: Password cannot be empty!
-        - 204: Two password are not the same, please check!!
-        - 205: 
-            - Nickname was already used!
-            - Email was already used!
-            - Phone was already used!
-        - 206:
-            - Please enter right email address!
-            - Please enter right phone number! 
-        - 207:
-            - The number of login times has exceeded the limit, and the account has been locked!
-            - Password was incorrect，only xxx times to retry!
-        - 208:
-            - Old password was incorrect, please try again!
-        - 209:
-            - Order created failed, your balance is not enough to buy, please recharge!
-        - 210:
-            - Unbinding address!
-        - 211:
-            - Number of buyers exceeded!
-        - 212:
-            - Share buy url was expired!
-    - Success Code:
-        - 
-
-LjqnN2TOHOsl
-3473029241065439232
+    - Code Ref:
+        - Error Code:
+            - 200: User does not exist, please register first!
+            - 201: Account was locked，please contact customer service!
+            - 203: Password cannot be empty!
+            - 204: Two password are not the same, please check!!
+            - 205: 
+                - Nickname was already used!
+                - Email was already used!
+                - Phone was already used!
+            - 206:
+                - Please enter right email address!
+                - Please enter right phone number! 
+            - 207:
+                - The number of login times has exceeded the limit, and the account has been locked!
+                - Password was incorrect，only xxx times to retry!
+            - 208:
+                - Old password was incorrect, please try again!
+            - 209:
+                - Order created failed, your balance is not enough to buy, please recharge!
+            - 210:
+                - Unbinding address!
+            - 211:
+                - Number of buyers exceeded!
+            - 212:
+                - Share buy url was expired!
 
 - 后台管理功能
-    - 会员管理
-    - 等级管理
-    - 用户管理
+    - 用户管理(加入会员标识和等级标识，支持修改默认密码，存储为密文，故只能用来重置初始密码)
+    - 会员管理(暂时不需要，融合进用户管理)
+    - 等级管理(暂时不需要，融合进用户管理)
     - 矿机管理
-    - 活动管理
     - 资金明细
-    - 积分明细
+    - 积分明细(暂时不需要)
+    - 活动管理
     - 公告
     - 权限管理
     - 系统配置
+
+LjqnN2TOHOsl
+3473029241065439232
