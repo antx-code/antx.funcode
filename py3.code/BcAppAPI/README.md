@@ -86,12 +86,12 @@
                     - /api/app/user_info/delete_address
                     - GET
                     - 删除用户地址
-    - 团队
+    - 团队功能
         - router
             - /api/app/team/members
             - GET
             - 获取团队成员
-    - 收益
+    - 收益功能
         - router
             - /api/app/reward/home_reward
             - GET
@@ -112,7 +112,7 @@
             - /api/app/reward/team_miner_reward
             - GET
             - 团队机器收益
-    - 客户服务
+    - 客户服务功能
         - router
             - /api/app/csc/announcement/list
             - GET
