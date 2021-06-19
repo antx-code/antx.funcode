@@ -3,11 +3,13 @@ from typing import Optional, List
 
 class BuyMiner(BaseModel):
 	miner_name: str
-	miner_price: int
+	miner_price: float
 
-class TeamBuyMiner(BuyMiner):
-	miner_members: List[str] # 包含发起人本身
-	miner_member_count: int
+class TeamBuyMiner(BaseModel):
+	miner_name: str
+	miner_sum_price: float
+	miner_per_price: float
+	share_buy_code: str
 
 class RecordInfo(BaseModel):
 	record_type: str
@@ -15,3 +17,6 @@ class RecordInfo(BaseModel):
 
 class WithdrawInfo(BaseModel):
 	withdraw_usdt: float
+
+class ShareBuy(BaseModel):
+	miner_name: str

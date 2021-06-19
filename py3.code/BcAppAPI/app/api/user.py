@@ -30,7 +30,7 @@ mongodb = db_connection('bc-app', 'users')
 asset_db = db_connection('bc-app', 'assets')
 redis_service = redis_connection(redis_db=0)
 
-CONFIG = redis_service.hget_redis('config', 'app')
+# CONFIG = redis_service.hget_redis('config', 'app')
 
 @logger.catch(level='ERROR')
 @router.post('/register')

@@ -70,6 +70,10 @@
             - Order created failed, your balance is not enough to buy, please recharge!
         - 210:
             - Unbinding address!
+        - 211:
+            - Number of buyers exceeded!
+        - 212:
+            - 'Share buy url was expired!'
     - Success Code:
         - 
 

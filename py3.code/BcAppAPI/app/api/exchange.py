@@ -29,6 +29,7 @@ miner_db = db_connection('bc-app', 'miners')
 asset_db = db_connection('bc-app', 'assets')
 miner_pic_db = db_connection('bc-app', 'miner_pics')
 record_db = db_connection('bc-app', 'records')
+share_buy_db = db_connection('bc-app', 'share_buy_code')
 redis_service = redis_connection(redis_db=0)
 
 CONFIG = redis_service.hget_redis(redis_key='config', content_key='app')
@@ -131,78 +132,139 @@ async def buy_miner(request: Request, buy_info: BuyMiner):
 
 
 @logger.catch(level='ERROR')
-@router.get('/share_buy')
-async def share_buy(request: Request):
+@router.post('/share_buy')
+async def share_buy(request: Request, share_buy: ShareBuy):
 	user_id = antx_auth(request)
 	share_code, share_url = generate_share_code_url()
-	share_info = {
+	redis_share_info = {
 		'team_header': user_id,
-		'members': [],  # 不包括团长
-		'member_count': 0
+		'members': [user_id],  # 包括团长
+		'member_count': 1,
+		'team_buy_number': CONFIG['TeamBuyNumber'],
+		'miner_name': share_buy.miner_name
 	}
+	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+	db_share_info = {
+		'team_header': user_id,
+		'created_time': now_time,
+		'update_time': '',
+		'members': [],
+		'member_count': 0,
+		'team_buy_number': CONFIG['TeamBuyNumber'],
+		'miner_name': share_buy.miner_name,
+		'status': 'Created'
+	}
+
 	redis = redis_connection(redis_db=1)
-	redis.set_dep_key(key_name=share_code, key_value=share_info, expire_secs=1800)
-	return msg(status='success', data=f'share_buy_code:{share_code}, share_buy_url:{share_url}')
+	redis.set_dep_key(key_name=share_code, key_value=json.dumps(redis_share_info, ensure_ascii=False), expire_secs=1800)
+	share_buy_db.insert_one_data({'share_code': share_code, 'share_info': db_share_info})
+	return msg(status='success', data={'share_code': share_code, 'share_url': share_url})
 
 @logger.catch(level='ERROR')
 @router.get('/share/{share_code}')
 async def share_buy_code(request: Request, share_code):
 	user_id = antx_auth(request)
 	redis = redis_connection(redis_db=1)
-	share_info = redis.get_key_expire_content(key_name=share_code)
-	share_info['members'].extend([user_id])
-	share_info['member_count'] += 1
 	expires = redis.redis_client.ttl(name=share_code)
-	redis.set_dep_key(key_name=share_code, key_value=share_info, expire=expires)
+	db_share_info = share_buy_db.find_one({'share_code': share_code})['share_info']
+	if expires == -2:
+		now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+		db_share_info['update_time'] = now_time
+		db_share_info['status'] = 'Cannel'
+		share_buy_db.update_one({'share_code': share_code}, {'share_info': db_share_info})
+		refund = miner_db.find_one({'miner_name': db_share_info['miner_name']})['miner_team_price']
+		refund_money(share_code, round((refund/CONFIG['TeamBuyNumber']), 2))
+		return msg(status='error', data='Share buy url was expired!', code=212)
+	redis_share_info = redis.get_key_expire_content(key_name=share_code)
+	redis_share_info = json.loads(redis_share_info)
+	redis_share_info['members'].append(user_id)
+	share_buy_count = redis_share_info['member_count']
+	if share_buy_count > CONFIG['TeamBuyNumber']:
+		return msg(status='error', data='Number of buyers exceeded!', code=211)
+	redis_share_info['member_count'] += 1
+	redis.set_dep_key(key_name=share_code, key_value=json.dumps(redis_share_info, ensure_ascii=False), expire_secs=expires)
+	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+	db_share_info['update_time'] = now_time
+	db_share_info['members'].append(user_id)
+	db_share_info['member_count'] += 1
+	db_share_info['status'] = 'Active'
+	share_buy_db.update_one({'share_code': share_code}, {'share_info': db_share_info})
 	return msg(status='success', data='Click success')
 
 @logger.catch(level='ERROR')
 @router.get('/share_monitor/{share_code}')
 async def share_monitor(request: Request, share_code):
+	redis = redis_connection(redis_db=1)
+	expires = redis.redis_client.ttl(name=share_code)
+	db_share_info = share_buy_db.find_one({'share_code': share_code})['share_info']
+	if expires == -2:
+		now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+		db_share_info['update_time'] = now_time
+		db_share_info['status'] = 'Cannel'
+		share_buy_db.update_one({'share_code': share_code}, {'share_info': db_share_info})
+		refund = miner_db.find_one({'miner_name': db_share_info['miner_name']})['miner_team_price']
+		refund_money(share_code, round((refund / CONFIG['TeamBuyNumber']), 2))
+		return msg(status='error', data='Share buy url was expired!', code=212)
+	redis_share_info = redis.get_key_expire_content(key_name=share_code)
+	redis_share_info = json.loads(redis_share_info)
+	share_buy_count = redis_share_info['member_count']
+	if share_buy_count > CONFIG['TeamBuyNumber']:
+		return msg(status='error', data='Number of buyers exceeded!', code=211)
+	elif share_buy_count ==CONFIG['TeamBuyNumber']:
+		return msg(status='success', data='Congratulations, team share buy number is full!')
+	else:
+		return msg(status='success', data='Wating for more team share buy member!')
 
+def refund_money(share_buy_code, miner_per_price):
+	share_buy_info = share_buy_db.find_one({'share_code': share_buy_code})['share_info']
+	members = share_buy_info['members']
+	# member_count = share_buy_info['member_count']
+	for member in members:
+		logger.info(member)
+		user_asset = asset_db.find_one({'user_id': member})['asset']
+		user_asset_all = user_asset['usdt']['all']
+		logger.info(user_asset_all)
+		logger.info(user_asset_all + miner_per_price)
+		asset_db.update_one({'user_id': member}, {'asset.usdt.all': user_asset_all + miner_per_price})
 
 @logger.catch(level='ERROR')
-@router.post('/team_buy_miner')
-async def team_buy_miner(request: Request, buy_info: TeamBuyMiner):
+@router.post('/team_share_buy')
+async def team_share_buy_miner(request: Request, buy_info: TeamBuyMiner):
 	user_id = antx_auth(request)
-	members_id = []
-	all_asset = []
-	for member in buy_info.miner_members:
-		members_id.append(user_info_db.find_one({'base_info.profile.nickname': member})['user_id'])
-	logger.info(members_id)
-	for member_id in members_id:
-		all_asset.append(asset_db.find_one({'user_id': member_id})['asset']['usdt']['all'])
-	if min(all_asset) < buy_info.miner_price:
-		return msg(status='error', data='Order created failed, team member\'s balance is not enough to buy, please recharge!', code=209)
+	user_asset = asset_db.find_one({'user_id': user_id})['asset']
+	redis = redis_connection(redis_db=1)
+	share_buy_info = redis.get_key_expire_content(buy_info.share_buy_code)
+	share_buy_info = json.loads(share_buy_info)
+	members = share_buy_info['members']
+	member_count = share_buy_info['member_count']
+	if user_asset['usdt']['all'] < buy_info.miner_per_price:
+		return msg(status='error', data='Order created failed, your wallet balance is not enough to buy, please recharge!', code=209)
 
 	miner_id = generate_miner_id()
 	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-	per_pay_money = round((buy_info.miner_price / buy_info.miner_member_count), 2)
+	# per_pay_money = round((buy_info.miner_sum_price / CONFIG['TeamBuyNumber']), 2)
 	return_info = {
 		'miner_id': miner_id,
 		'miner_name': buy_info.miner_name,
-		'members': buy_info.miner_members,
-		'member_count': buy_info.miner_member_count,
-		'pay_money': buy_info.miner_price,
-		'per_pay_money': per_pay_money,
-		'created_time': now_time
+		'pay_money': buy_info.miner_per_price,
+		'wallet_balance': user_asset['usdt']['all'] - buy_info.miner_per_price,
+		'order_created_time': now_time
 	}
 	asset_miner = {
 		'miner_id': miner_id,
 		'miner_name': buy_info.miner_name,
 		'created_time': now_time,
+		'update_time': '',
 		'alive_time': '00:00:00',
-		'members': buy_info.miner_members,  # nickname
-		'member_count': buy_info.miner_member_count,
+		'members': members,  # nickname
+		'member_count': member_count,
 		'all': 0,
 		'today_rewards': 0, # 今日总收益
 		'today_reward': 0   # 今日个人收益 = 今日总收益 / 团队人数
 	}
-	for member_id in members_id:
-		member_asset = asset_db.find_one({'user_id': member_id})['asset']['usdt']['all']
-		asset_db.update_one({'user_id': member_id}, {'asset.usdt.all': member_asset - per_pay_money})
-		asset_db.collection.update_one({'user_id': member_id}, {'$push': {'asset.team_miner': asset_miner}}, upsert=True)
-		record_db.insert_one_data(record_buy(member_id, buy_info.miner_name, miner_id, per_pay_money, buy_type='team'))
+	asset_db.update_one({'user_id': user_id}, {'asset.usdt.all': user_asset['usdt']['all'] - buy_info.miner_per_price})
+	asset_db.collection.update_one({'user_id': user_id}, {'$push': {'asset.team_miner': asset_miner}}, upsert=True)
+	record_db.insert_one_data(record_buy(user_id, buy_info.miner_name, miner_id, buy_info.miner_per_price, buy_type='team'))
 
 	miner_info = miner_db.find_one({'miner_name': buy_info.miner_name})
 	miner_numbers = miner_info['miner_numbers']
