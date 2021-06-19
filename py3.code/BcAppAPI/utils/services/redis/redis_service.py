@@ -54,8 +54,11 @@ class RedisService():
 
     @logger.catch(level='ERROR')
     def get_key_expire_content(self, key_name):
-        result = self.redis_client.get(key_name)
-        return result.decode()
+        try:
+            result = self.redis_client.get(key_name).decode()
+        except Exception as e:
+            result = self.redis_client.get(key_name)
+        return result
 
     @logger.catch('ERROR')
     def hset_redis(self, redis_key, content_key, content_value):

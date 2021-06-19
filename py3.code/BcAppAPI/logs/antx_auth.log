@@ -1,0 +1,150 @@
+2021-06-18  :42:59 - ERROR - test_func.py - 318 - An error has been caught in function 'test_redis_ttl', process 'MainProcess' (53904), thread 'MainThread' (4599211456):
+Traceback (most recent call last):
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/utils/services/redis/redis_service.py", line 58, in get_key_expire_content
+    result = self.redis_client.get(key_name).decode()
+             │    │            │   └ 'config'
+             │    │            └ <function Redis.get at 0x10ec88f70>
+             │    └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+             └ <utils.services.redis.redis_service.RedisService object at 0x10e041fa0>
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 1606, in get
+    return self.execute_command('GET', name)
+           │    │                      └ 'config'
+           │    └ <function Redis.execute_command at 0x10ec86670>
+           └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           │    │              │     │               └ {}
+           │    │              │     └ 'GET'
+           │    │              └ Connection<host=localhost,port=6379,db=0>
+           │    └ <function Redis.parse_response at 0x10ec86700>
+           └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               │          └ <function Connection.read_response at 0x10ec6df70>
+               └ Connection<host=localhost,port=6379,db=0>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+          └ ResponseError('WRONGTYPE Operation against a key holding the wrong kind of value')
+
+redis.exceptions.ResponseError: WRONGTYPE Operation against a key holding the wrong kind of value
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/test_func.py", line 336, in <module>
+    test_redis_ttl()
+    └ <function test_redis_ttl at 0x1101d3940>
+
+> File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/test_func.py", line 318, in test_redis_ttl
+    result = redis.get_key_expire_content('config')
+             │     └ <function RedisService.get_key_expire_content at 0x10ed63550>
+             └ <utils.services.redis.redis_service.RedisService object at 0x10e041fa0>
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/utils/services/redis/redis_service.py", line 60, in get_key_expire_content
+    result = self.redis_client.get(key_name)
+             │    │            │   └ 'config'
+             │    │            └ <function Redis.get at 0x10ec88f70>
+             │    └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+             └ <utils.services.redis.redis_service.RedisService object at 0x10e041fa0>
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 1606, in get
+    return self.execute_command('GET', name)
+           │    │                      └ 'config'
+           │    └ <function Redis.execute_command at 0x10ec86670>
+           └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           │    │              │     │               └ {}
+           │    │              │     └ 'GET'
+           │    │              └ Connection<host=localhost,port=6379,db=0>
+           │    └ <function Redis.parse_response at 0x10ec86700>
+           └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               │          └ <function Connection.read_response at 0x10ec6df70>
+               └ Connection<host=localhost,port=6379,db=0>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+          └ ResponseError('WRONGTYPE Operation against a key holding the wrong kind of value')
+
+redis.exceptions.ResponseError: WRONGTYPE Operation against a key holding the wrong kind of value
+2021-06-18  :47:23 - ERROR - test_func.py - 318 - An error has been caught in function 'test_redis_ttl', process 'MainProcess' (53929), thread 'MainThread' (4491859392):
+Traceback (most recent call last):
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/utils/services/redis/redis_service.py", line 58, in get_key_expire_content
+    result = self.redis_client.get(key_name).decode()
+             │    │            │   └ 'locked_account'
+             │    │            └ <function Redis.get at 0x103f35f70>
+             │    └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+             └ <utils.services.redis.redis_service.RedisService object at 0x1032eefa0>
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 1606, in get
+    return self.execute_command('GET', name)
+           │    │                      └ 'locked_account'
+           │    └ <function Redis.execute_command at 0x103f33670>
+           └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           │    │              │     │               └ {}
+           │    │              │     └ 'GET'
+           │    │              └ Connection<host=localhost,port=6379,db=0>
+           │    └ <function Redis.parse_response at 0x103f33700>
+           └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               │          └ <function Connection.read_response at 0x103f1af70>
+               └ Connection<host=localhost,port=6379,db=0>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+          └ ResponseError('WRONGTYPE Operation against a key holding the wrong kind of value')
+
+redis.exceptions.ResponseError: WRONGTYPE Operation against a key holding the wrong kind of value
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/test_func.py", line 336, in <module>
+    test_redis_ttl()
+    └ <function test_redis_ttl at 0x105480940>
+
+> File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/test_func.py", line 318, in test_redis_ttl
+    result = redis.get_key_expire_content('locked_account')
+             │     └ <function RedisService.get_key_expire_content at 0x104010550>
+             └ <utils.services.redis.redis_service.RedisService object at 0x1032eefa0>
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/utils/services/redis/redis_service.py", line 60, in get_key_expire_content
+    result = self.redis_client.get(key_name)
+             │    │            │   └ 'locked_account'
+             │    │            └ <function Redis.get at 0x103f35f70>
+             │    └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+             └ <utils.services.redis.redis_service.RedisService object at 0x1032eefa0>
+
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 1606, in get
+    return self.execute_command('GET', name)
+           │    │                      └ 'locked_account'
+           │    └ <function Redis.execute_command at 0x103f33670>
+           └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 901, in execute_command
+    return self.parse_response(conn, command_name, **options)
+           │    │              │     │               └ {}
+           │    │              │     └ 'GET'
+           │    │              └ Connection<host=localhost,port=6379,db=0>
+           │    └ <function Redis.parse_response at 0x103f33700>
+           └ Redis<ConnectionPool<Connection<host=localhost,port=6379,db=0>>>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/client.py", line 915, in parse_response
+    response = connection.read_response()
+               │          └ <function Connection.read_response at 0x103f1af70>
+               └ Connection<host=localhost,port=6379,db=0>
+  File "/Users/antx/Code/antx.funcode/py3.code/BcAppAPI/venv/lib/python3.8/site-packages/redis/connection.py", line 756, in read_response
+    raise response
+          └ ResponseError('WRONGTYPE Operation against a key holding the wrong kind of value')
+
+redis.exceptions.ResponseError: WRONGTYPE Operation against a key holding the wrong kind of value

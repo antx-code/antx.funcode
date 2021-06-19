@@ -311,6 +311,15 @@ def customer_services():
 	cs_db.insert_one_data({'url': url1})
 	cs_db.insert_one_data({'url': url2})
 
+def test_redis_ttl():
+	from utils.services.redis_db_connect.connect import redis_connection
+	redis = redis_connection()
+	expir = redis.redis_client.ttl('aaa')
+	print(expir)
+	print(type(expir))
+	# result = redis.get_key_expire_content('l11')
+	# print(result)
+
 if __name__ == '__main__':
 	# generate_init_miners()
 	# st = time2seconds('12:21:11')
@@ -325,7 +334,8 @@ if __name__ == '__main__':
 	# test_query_reward_record()
 
 	# genarate_miner_pics()
-	init_redis_config()
+	# init_redis_config()
+	test_redis_ttl()
 
 	# set_default_avatar()
 	# init_asset()

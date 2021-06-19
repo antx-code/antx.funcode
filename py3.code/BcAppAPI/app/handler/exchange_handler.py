@@ -1,5 +1,6 @@
 from loguru import logger
 import time
+from utils.services.redis_db_connect.connect import redis_connection
 from utils.services.base.SnowFlake import IdWorker
 
 id_worker = IdWorker(0, 0)
@@ -51,3 +52,20 @@ def generate_share_code_url():
 	share_code = str(id_worker.get_id())
 	share_url = f'http://74.211.103.41:8889/api/app/exchange/share/{share_code}'
 	return share_code, share_url
+
+@logger.catch(level='ERROR')
+def share_code_monitor(share_code):
+	redis = redis_connection(redis_db=1)
+	redis_config = redis_connection()
+	CONFIG = redis_config.hget_redis('config', 'app')
+	try:
+		share_info = redis.get_key_expire_content(key_name=share_code)
+		share_code_expire = redis.redis_client.ttl(name=share_code)
+		if share_code_expire == -2:
+			pass
+		else:
+			pass
+		if share_info['member_count'] == CONFIG['TeamBuyNumber']:
+			return True
+	except Exception as e:
+		pass

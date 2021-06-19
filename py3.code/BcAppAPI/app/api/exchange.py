@@ -136,22 +136,30 @@ async def share_buy(request: Request):
 	user_id = antx_auth(request)
 	share_code, share_url = generate_share_code_url()
 	share_info = {
-		'share_code': {
-			'team_header': user_id,
-			'members': [],  # 不包括团长
-			'member_count': 0
-		}
+		'team_header': user_id,
+		'members': [],  # 不包括团长
+		'member_count': 0
 	}
-
-	return share_code, share_url
+	redis = redis_connection(redis_db=1)
+	redis.set_dep_key(key_name=share_code, key_value=share_info, expire_secs=1800)
+	return msg(status='success', data=f'share_buy_code:{share_code}, share_buy_url:{share_url}')
 
 @logger.catch(level='ERROR')
 @router.get('/share/{share_code}')
-async def share_buy_code(request: Request):
+async def share_buy_code(request: Request, share_code):
 	user_id = antx_auth(request)
+	redis = redis_connection(redis_db=1)
+	share_info = redis.get_key_expire_content(key_name=share_code)
+	share_info['members'].extend([user_id])
+	share_info['member_count'] += 1
+	expires = redis.redis_client.ttl(name=share_code)
+	redis.set_dep_key(key_name=share_code, key_value=share_info, expire=expires)
+	return msg(status='success', data='Click success')
 
-	share_code, share_url = generate_share_code_url()
-	return share_code, share_url
+@logger.catch(level='ERROR')
+@router.get('/share_monitor/{share_code}')
+async def share_monitor(request: Request, share_code):
+
 
 @logger.catch(level='ERROR')
 @router.post('/team_buy_miner')
