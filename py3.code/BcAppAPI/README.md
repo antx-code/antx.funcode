@@ -103,15 +103,15 @@
             - router
                 - /api/app/reward/my_miner
                 - GET
-                - 我的矿机
+                - 我的机器
             - router
                 - /api/app/reward/miner_reward
                 - GET
-                - 矿机收益
+                - 机器收益
             - router
                 - /api/app/reward/team_miner_reward
                 - GET
-                - 团队矿机收益
+                - 团队机器收益
         - 客户服务
             - router
                 - /api/app/csc/announcement/list
@@ -129,23 +129,23 @@
             - router
                 - /api/app/exchange/personal_miner
                 - GET
-                - 获取个人矿机
+                - 获取个人机器
             - router
                 - /api/app/exchange/team_miners
                 - GET
-                - 获取参与的团队矿机
+                - 获取参与的团队机器
             - router
                 - /api/app/exchange/miner/{miner_name}
                 - GET
-                - 获取个人购买矿机详情
+                - 获取个人购买机器详情
             - router
                 - /api/app/exchange/team_miner/{miner_name}
                 - GET
-                - 获取组团购买矿机详情
+                - 获取组团购买机器详情
             - router
                 - /api/app/exchange/buy_miner
                 - POST
-                - 个人购买矿机
+                - 个人购买机器
             - router
                 - /api/app/exchange/share_buy
                 - POST
@@ -161,7 +161,7 @@
             - router
                 - /api/app/exchange/team_share_buy
                 - POST
-                - 拼团购买矿机付款
+                - 拼团购买机器付款
             - router
                 - /api/app/exchange/recharge
                 - POST
@@ -173,7 +173,7 @@
             - router
                 - /api/app/exchange/record
                 - POST
-                - 记录查询(充值、提现、个人矿机收益、拼团矿机收益)
+                - 记录查询(充值、提现、个人机器收益、拼团机器收益)
 
     - Code Ref:
         - Error Code:
@@ -206,7 +206,7 @@
     - 用户管理(加入会员标识和等级标识，支持修改默认密码，存储为密文，故只能用来重置初始密码)
     - 会员管理(暂时不需要，融合进用户管理)
     - 等级管理(暂时不需要，融合进用户管理)
-    - 矿机管理
+    - 机器管理
     - 资金明细
     - 积分明细(暂时不需要)
     - 活动管理
