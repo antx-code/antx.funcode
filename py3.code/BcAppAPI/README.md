@@ -204,6 +204,8 @@
                 - Number of buyers exceeded!
             - 212:
                 - Share buy url was expired!
+            - 213:
+                - Out of level range!
 
 - 后台管理功能
     - 用户管理(加入会员标识和等级标识，支持修改默认密码，存储为密文，故只能用来重置初始密码)
@@ -218,4 +220,5 @@
     - 系统配置
 
 LjqnN2TOHOsl
-3473029241065439232
+online->3473029241065439232
+local->3471983369066119168
