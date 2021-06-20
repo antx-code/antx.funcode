@@ -149,11 +149,11 @@ async def get_my_miner_reward(request: Request):
 	asset_info = asset_db.find_one({'user_id': user_id})
 	miner_records = asset_info['asset']['miner']
 	team_miner_records = asset_info['asset']['team_miner']
-	for record in miner_records:
-		del record['miner_name']
+	# for record in miner_records:
+		# del record['miner_name']
 	final_records.extend(miner_records)
 	for record in team_miner_records:
-		del record['miner_name']
+		# del record['miner_name']
 		del record['member_count']
 		# record['members_img'] = []
 		# for member in record['members']:

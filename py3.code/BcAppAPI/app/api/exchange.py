@@ -164,13 +164,20 @@ async def share_buy(request: Request, share_buy: ShareBuy):
 @router.get('/get_share_code')
 async def get_share_code(request: Request):
 	user_id = antx_auth(request)
-	share_code = share_buy_db.find_one({'share_info.team_header': user_id})['share_code']
-	logger.info(share_code)
+	share_codes = []
+	results = []
 	redis = redis_connection(redis_db=1)
-	expires = redis.redis_client.ttl(name=share_code)
-	if expires == -2:
-		return msg(status='error', data='Share buy url was expired!', code=212)
-	return msg(status='success', data={'share_code': share_code})
+	share_infos = share_buy_db.query_data({'share_info.team_header': user_id})
+	for share_info in share_infos:
+		share_codes.append(share_info['share_code'])
+	logger.info(share_codes)
+	for code in share_codes:
+		expires = redis.redis_client.ttl(name=code)
+		if expires == -2:
+			results.append({'share_code': code, 'status': 'Share buy url was expired!'})
+		else:
+			results.append({'share_code': code, 'status': 'Active'})
+	return msg(status='success', data=results)
 
 
 @logger.catch(level='ERROR')
@@ -271,6 +278,7 @@ async def team_share_buy_miner(request: Request, buy_info: TeamBuyMiner):
 		'alive_time': '00:00:00',
 		'members': members,  # nickname
 		'member_count': member_count,
+		'share_code': buy_info.share_buy_code,
 		'all': 0,
 		'today_rewards': 0, # 今日总收益
 		'today_reward': 0   # 今日个人收益 = 今日总收益 / 团队人数
