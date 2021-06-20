@@ -161,6 +161,19 @@ async def share_buy(request: Request, share_buy: ShareBuy):
 	return msg(status='success', data={'share_code': share_code, 'share_url': share_url})
 
 @logger.catch(level='ERROR')
+@router.get('/get_share_code')
+async def get_share_code(request: Request):
+	user_id = antx_auth(request)
+	share_code = share_buy_db.find_one({'share_info.team_header': user_id})['share_code']
+	logger.info(share_code)
+	redis = redis_connection(redis_db=1)
+	expires = redis.redis_client.ttl(name=share_code)
+	if expires == -2:
+		return msg(status='error', data='Share buy url was expired!', code=212)
+	return msg(status='success', data={'share_code': share_code})
+
+
+@logger.catch(level='ERROR')
 @router.get('/share/{share_code}')
 async def share_buy_code(request: Request, share_code):
 	user_id = antx_auth(request)

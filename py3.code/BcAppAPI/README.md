@@ -151,6 +151,10 @@
             - POST
             - 生成组团购买邀请码和邀请链接
         - router
+            - /api/app/exchange/get_share_code
+            - GET
+            - 获取组团邀请码
+        - router
             - /api/app/exchange/share/{share_code}
             - GET
             - 点击组团购买邀请链接
