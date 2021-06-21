@@ -71,34 +71,43 @@ redis_service = redis_connection(redis_db=0)
 # 	return msg(status='success', data=final_result)
 
 def level_deal(af_codes):
+	logger.info(af_codes)
 	results = []
-	for code in af_codes:
-		af_dnk_info = dnk_db.find_one({'own_code': code})
-		af_id = af_dnk_info['user_id']
-		af_info = user_db.find_one({'user_id': af_id})
-		af1_code = af_dnk_info['af1_code']
-		af2_code = af_dnk_info['af2_code']
-		af12_codes = af1_code + af2_code
-		nickname = af_info['nickname']
-		register_time = af_info['created_time']
-		last_login_time = af_info['last_login_time']
-		recommend_number = len(af12_codes)
-		team_reward = 0
-		for af12_code in af12_codes:
-			af12_id = dnk_db.find_one({'own_code': af12_code})
-			each_asset = asset_db.find_one({'user_id': af12_id})['asset']
-			team_reward += each_asset.get('share', 0)
-		af_asset_info = asset_db.find_one({'user_id': af_id})
-		personal_reward = af_asset_info['asset'].get('share', 0)
-		results.append({
-			'nickname': nickname,
-			'recommend_munber': recommend_number,
-			'team_reward': team_reward,
-			'personal_reward': personal_reward,
-			'register_time': register_time,
-			'last_login_time': last_login_time
-		})
-		return results
+	try:
+		for code in af_codes:
+			af_dnk_info = dnk_db.find_one({'own_code': code})
+			af_id = af_dnk_info['user_id']
+			af_info = user_db.find_one({'user_id': af_id})
+			af1_code = af_dnk_info['af1_code']
+			af2_code = af_dnk_info['af2_code']
+			af12_codes = af1_code + af2_code
+			nickname = af_info['nickname']
+			register_time = af_info['created_time']
+			last_login_time = af_info['last_login_time']
+			recommend_number = len(af12_codes)
+			team_reward = 0
+			af_asset_info = asset_db.find_one({'user_id': af_id})
+			personal_reward = af_asset_info['asset'].get('share', 0)
+			logger.info(f'af12_codes->{af12_codes}')
+			for af12_code in af12_codes:
+				af12_id = dnk_db.find_one({'own_code': af12_code})['user_id']
+				try:
+					each_asset = asset_db.find_one({'user_id': af12_id})['asset']
+				except Exception as e:
+					each_asset = {'share': 0}
+				team_reward += each_asset.get('share', 0)
+			af_final_info = {
+				'nickname': nickname,
+				'recommend_munber': recommend_number,
+				'team_reward': team_reward,
+				'personal_reward': personal_reward,
+				'register_time': register_time,
+				'last_login_time': last_login_time
+			}
+			results.append(af_final_info)
+	except Exception as e:
+		results = []
+	return results
 
 @logger.catch(level='ERROR')
 @router.get('/member/{level}')

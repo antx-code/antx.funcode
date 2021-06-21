@@ -143,7 +143,7 @@ async def login(user_info: UserLogin, request: Request):
     # user_id = mongodb.find_one({'email': user_info.email})['user_id']
     now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     access_token = create_authtoken(user_id=user_id, identity='bc-app')['access_token']
-    login_info = {'last_login_time:': now_time, 'last_login_ip': request.client.host, 'is_logged_in': True, 'access_token': access_token}
+    login_info = {'last_login_time': now_time, 'last_login_ip': request.client.host, 'is_logged_in': True, 'access_token': access_token}
     mongodb.update_one(update_login_info, login_info)
     return msg(status='success', data={'access_token': access_token})
 
