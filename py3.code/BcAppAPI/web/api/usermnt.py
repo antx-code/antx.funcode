@@ -22,8 +22,28 @@ from web.models.usermnt_models import *
 
 router = APIRouter(dependencies=[Depends(antx_auth)])
 
+user_info_db = db_connection('bc-app', 'user-info')
+promo_db = db_connection('bc-app', 'promo_qrcode')
+dnk_db = db_connection('bc-app', 'dnetworks')
+miner_db = db_connection('bc-app', 'miners')
+asset_db = db_connection('bc-app', 'assets')
+miner_pic_db = db_connection('bc-app', 'miner_pics')
+record_db = db_connection('bc-app', 'records')
+share_buy_db = db_connection('bc-app', 'share_buy_code')
+redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
-@router.get('/user_info')
-async def get_user_info():
+@router.get('/users')
+async def get_all_user_infos():
 	pass
+
+@logger.catch(level='ERROR')
+@router.get('/user/{user_id}')
+async def get_uer_info(user_id):
+	pass
+
+@logger.catch(level='ERROR')
+@router.post('/')
+async def update_user_info():
+	pass
+
