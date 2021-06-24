@@ -32,14 +32,19 @@ asset_db = db_connection('bc-app', 'assets')
 miner_pic_db = db_connection('bc-app', 'miner_pics')
 record_db = db_connection('bc-app', 'records')
 share_buy_db = db_connection('bc-app', 'share_buy_code')
+admin_db = db_connection('bc-app', 'admin_users')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
 @router.post('/login')
+async def login(login_info: AdminLogin):
+	admin_infos = admin_db.query_data({})
+
+	if login_info.username not in
 
 @logger.catch(level='ERROR')
 @router.post('/logout')
-async def get_uer_info(user_id):
+async def loggout(user_id):
 	pass
 
 @logger.catch(level='ERROR')
