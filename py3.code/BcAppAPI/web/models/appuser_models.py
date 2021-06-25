@@ -1,8 +1,18 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class User(BaseModel):
-    email: str
-    phone: str
+class AddUser(BaseModel):
+    email: Optional[str]
+    phone: Optional[str]
     nickname: str
-    invite_code: str
+    init_password: str = '123456789'
+
+class GetUser(BaseModel):
+    user_id: int
+
+class UpdateUser(BaseModel):
+    user_id: int
+    update_info: dict
+
+class DeleteUser(BaseModel):
+    user_id: int

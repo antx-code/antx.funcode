@@ -22,6 +22,7 @@ from web.models.appuser_models import *
 
 router = APIRouter(dependencies=[Depends(antx_auth)])
 
+user_db = db_connection('bc-app', 'users')
 user_info_db = db_connection('bc-app', 'user-info')
 promo_db = db_connection('bc-app', 'promo_qrcode')
 dnk_db = db_connection('bc-app', 'dnetworks')
@@ -33,17 +34,27 @@ share_buy_db = db_connection('bc-app', 'share_buy_code')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
-@router.get('/users')
-async def get_all_user_infos():
+@router.get('/all')
+async def get_all_users():
 	pass
 
 @logger.catch(level='ERROR')
-@router.get('/user/{user_id}')
-async def get_uer_info(user_id):
+@router.post('/add_user')
+async def add_user(request: Request, add_info: AddUser):
 	pass
 
 @logger.catch(level='ERROR')
-@router.post('/')
-async def update_user_info():
+@router.get('/{user_id}')
+async def get_user(user_id):
+	user_info = user_db.find_one({'user_id': user_id})
 	pass
 
+@logger.catch(level='ERROR')
+@router.post('/update_user')
+async def update_user():
+	pass
+
+@logger.catch(level='ERROR')
+@router.post('/delete_user')
+async def delete_user():
+	pass
