@@ -67,8 +67,19 @@ async def forgot_password():
 
 @logger.catch(level='ERROR')
 @router.post('/add_admin_user')
-async def add_admin_user():
-	pass
+async def add_admin_user(request: Request, add_info: AddNewAdminAcount):
+	admin_user_id = antx_auth(request)
+	admin_user_info = admin_db.find_one({'user_id': admin_user_id})
+	privilege = admin_user_info['is_superuser']
+	if not privilege:
+		return msg(status='error', data='Account was not superuser, hava not privilege!')
+	new_info = {
+		'username': add_info.username,
+		'password': add_info.init_password,
+		'privilege': add_info.privilege,
+		'created_time':
+	}
+	admin_db.insert_one_data(new_info)
 
 @logger.catch(level='ERROR')
 @router.post('/delete_admin_user')

@@ -23,12 +23,8 @@ class ForgotPassword(BaseModel):
 
 class AddNewAdminAcount(BaseModel):
 	username: str
-	password: str
-	re_password: str
-	identity: str
+	init_password: str
 	privilege: str
 
 class DeleteAdminAcount(BaseModel):
 	username: str
-	identity: str
-	privilege: str
