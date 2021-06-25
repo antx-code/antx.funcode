@@ -15,7 +15,7 @@ class ForgotPassword(BaseModel):
 	username: str
 	new_password: str
 	new_repassword: str
-	identity: str
+	auth_code: str
 
 class AddNewAdminAcount(BaseModel):
 	username: str

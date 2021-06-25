@@ -78,9 +78,17 @@ async def reset_password(request: Request, reset_info: ResetPassword, dep=Depend
 
 @logger.catch(level='ERROR')
 @router.post('/forgot_password')
-async def forgot_password(request: Request, forgot_info: ForgotPassword, dep=Depends(antx_auth)):
-	user_id = antx_auth(request)
-	pass
+async def forgot_password(forgot_info: ForgotPassword):
+	if forgot_info.auth_code != 'antx':
+		return msg(status='error', data='Not allowed to operate!')
+	username_infos = admin_db.dep_data('username')
+	if forgot_info.username not in username_infos:
+		return msg(status='error', data='Not a available username!')
+	if result_hash(forgot_info.new_password) != result_hash(forgot_info.new_repassword):
+		return msg(status='error', data='Two passwords were not equal!')
+	update_info = {'password': result_hash(forgot_info.new_password)}
+	admin_db.update_one({'username': forgot_info.username}, update_info)
+	return msg(status='success', data='Reset password successfully')
 
 @logger.catch(level='ERROR')
 @router.post('/add_user')
