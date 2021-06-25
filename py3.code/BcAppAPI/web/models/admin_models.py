@@ -6,11 +6,7 @@ class AdminLogin(BaseModel):
 	username: str
 	password: str
 
-class AdminLogout(BaseModel):
-	username: str
-
 class ResetPassword(BaseModel):
-	username: str
 	old_password: str
 	new_password: str
 	new_repassword: str

@@ -26,7 +26,7 @@ def auth_required(request):
     # 获取token 内容
     status, auth_token = Auth.verify_request(request)
     app_db = db_connection('bc-app', 'users')
-    web_db = db_connection('bc-web', 'users')
+    web_db = db_connection('bc-web', 'admin_users')
     if status:
         exp_time = auth_token['exp']
         identify = auth_token['identity']

@@ -155,9 +155,9 @@ async def logout(user_info: UserLogout, dep=Depends(antx_auth)):
         raise InvalidPermissions("Account have been logged out，token is unavailable!")
     if user_info.email:
         mongodb.update_one({'email': user_info.email}, {'is_logged_in': False})
-        return msg(status='success', data='Signout')
+        return msg(status='success', data='Logout')
     mongodb.update_one({'phone': user_info.phone}, {'is_logged_in': False})
-    return msg(status='success', data='Signout')
+    return msg(status='success', data='Logout')
 
 @logger.catch(level='ERROR')
 @router.post('/forgot_password')
