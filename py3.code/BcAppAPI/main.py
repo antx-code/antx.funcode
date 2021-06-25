@@ -76,14 +76,14 @@ def generate_application() -> FastAPI:
     application.include_router(
         admin_router,
         prefix="/api/web/admin",
-        tags=["BC-WEB API"],
+        tags=["BC-ADMIN API"],
         responses={404: {"description": "Not found"}}
     )
 
     application.include_router(
-        usermnt_router,
-        prefix="/api/web/usermnt",
-        tags=["BC-WEB API"],
+        appuser_router,
+        prefix="/api/web/app_user",
+        tags=["BC-APPUSER API"],
         responses={404: {"description": "Not found"}}
     )
 

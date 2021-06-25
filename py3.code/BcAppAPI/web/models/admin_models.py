@@ -24,3 +24,16 @@ class AddNewAdminAcount(BaseModel):
 
 class DeleteAdminAcount(BaseModel):
 	username: str
+
+class BussinessConfig(BaseModel):
+	MinerReward: float = 1000
+	Level1Reward: float = 0.2
+	Level2Reward: float = 0.3
+	Level3Reward: float = 0.5
+	MinerManageFee: float = 200
+	MinerLife: int = 10000
+	ShareReward: float = 100
+	TeamBuyNumber: int = 5
+
+class SystemSettings(BaseModel):
+	pass

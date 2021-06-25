@@ -155,3 +155,23 @@ async def init_admin():
 	}
 	admin_db.insert_one_data(new_info)
 	return msg(status='success', data='Add new admin user: admin')
+
+@logger.catch(level='ERROR')
+@router.post('/bussiness_config')
+async def set_bussiness_config(request: Request, config_info: BussinessConfig, dep=Depends(antx_auth)):
+	user_id = antx_auth(request)
+	user_info = admin_db.find_one({'user_id': user_id})
+	if not user_info['privilege'] or not user_info['is_superuser']:
+		return msg(status='error', data='Have not enough privilege to operate!')
+	redis_service.hset_redis(redis_key='config', content_key='app', content_value=json.dumps(dict(config_info), ensure_ascii=False))
+	return msg(status='success', data='Setting up configuration successfully')
+
+@logger.catch(level='ERROR')
+@router.post('/system_settings')
+async def set_system_settings(request: Request, config_info: SystemSettings, dep=Depends(antx_auth)):
+	user_id = antx_auth(request)
+	user_info = admin_db.find_one({'user_id': user_id})
+	if not user_info['privilege'] or not user_info['is_superuser']:
+		return msg(status='error', data='Have not enough privilege to operate!')
+	redis_service.hset_redis(redis_key='config', content_key='web', content_value=json.dumps(dict(config_info), ensure_ascii=False))
+	return msg(status='success', data='Setting up system configuration successfully')

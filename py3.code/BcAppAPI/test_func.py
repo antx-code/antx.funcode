@@ -334,7 +334,7 @@ if __name__ == '__main__':
 	# test_query_reward_record()
 
 	# genarate_miner_pics()
-	# init_redis_config()
+	init_redis_config()
 	test_redis_ttl()
 
 	# set_default_avatar()
