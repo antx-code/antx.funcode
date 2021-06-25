@@ -12,7 +12,7 @@ from app.api.customer_services import router as csc_router
 from app.api.exchange import router as exchange_router
 # 后台管理接口
 from web.api.admin import router as admin_router
-from web.api.usermnt import router as usermnt_router
+from web.api.app_user import router as appuser_router
 
 @logger.catch(level='ERROR')
 def generate_application() -> FastAPI:
@@ -37,8 +37,8 @@ def generate_application() -> FastAPI:
     )
 
     application.include_router(
-        user_info_router,
-        prefix="/api/app/user_info",
+        appuser_router,
+        prefix="/api/app/app_user",
         tags=["APP-USER-INFO API"],
         responses={404: {"description": "Not found"}}
     )

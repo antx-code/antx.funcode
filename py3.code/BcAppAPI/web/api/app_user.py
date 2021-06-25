@@ -7,9 +7,9 @@ from io import BytesIO
 from utils.exceptions.customs import InvalidPermissions, UnauthorizedAPIRequest, RecordNotFound
 from utils.services.base.base_func import *
 from utils.services.redis_db_connect.connect import *
-from web.models.usermnt_models import *
+from web.models.appuser_models import *
 
-# logger.add(sink='logs/user_management.log',
+# logger.add(sink='logs/app_user.log',
 #            level='ERROR',
 #            # colorize=True,     # 设置颜色
 #            format='{time:YYYY-MM-DD HH:mm:ss} - {level} - {file} - {line} - {message}',
