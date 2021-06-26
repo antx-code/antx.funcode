@@ -37,15 +37,14 @@ redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
 @router.post('/get_record')
-async def get_record():
-	pass
-
-@logger.catch(level='ERROR')
-@router.post('/delete_record')
-async def delete_record():
-	pass
-
-@logger.catch(level='ERROR')
-@router.post('/export_record')
-async def export_record():
-	pass
+async def get_record(get_record: GetRecord):
+	records = []
+	pref = (get_record.page - 1) * get_record.size
+	af = get_record.size
+	try:
+		record_info = record_db.collection.find({'type': get_record.type, 'user_id': get_record.user_id}, {"_id": 0}).skip(pref).limit(af)
+		for record in record_info:
+			records.append(record)
+	except Exception as e:
+		pass
+	return msg(status='success', data=records)
