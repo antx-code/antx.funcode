@@ -16,6 +16,7 @@ from web.api.app_user import router as appuser_router
 from web.api.app_miner import router as appminer_router
 from web.api.app_record import router as apprecord_router
 from web.api.app_article import router as apparticle_router
+from web.api.privilege import router as privilege_router
 
 @logger.catch(level='ERROR')
 def generate_application() -> FastAPI:
@@ -108,6 +109,13 @@ def generate_application() -> FastAPI:
         apparticle_router,
         prefix="/api/web/app_article",
         tags=["BC-APPARTICLE API"],
+        responses={404: {"description": "Not found"}}
+    )
+
+    application.include_router(
+        privilege_router,
+        prefix="/api/web/privilege",
+        tags=["BC-APPPRIVILEGE API"],
         responses={404: {"description": "Not found"}}
     )
 

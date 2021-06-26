@@ -59,6 +59,7 @@ async def register(user_info: UserRegister, request: Request):
         'last_login_ip': request.client.host,
         'access_token': '',
         'promo_code': pcode,
+        'privilege': 'user',
         'is_active': True,
         'is_verified': True,
         'is_superuser': False,
