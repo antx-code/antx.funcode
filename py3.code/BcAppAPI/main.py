@@ -13,6 +13,7 @@ from app.api.exchange import router as exchange_router
 # 后台管理接口
 from web.api.admin import router as admin_router
 from web.api.app_user import router as appuser_router
+from web.api.app_miner import router as appminer_router
 
 @logger.catch(level='ERROR')
 def generate_application() -> FastAPI:
@@ -84,6 +85,13 @@ def generate_application() -> FastAPI:
         appuser_router,
         prefix="/api/web/app_user",
         tags=["BC-APPUSER API"],
+        responses={404: {"description": "Not found"}}
+    )
+
+    application.include_router(
+        appminer_router,
+        prefix="/api/web/app_miner",
+        tags=["BC-APPMINER API"],
         responses={404: {"description": "Not found"}}
     )
 

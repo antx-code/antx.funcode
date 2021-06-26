@@ -34,6 +34,7 @@ class BussinessConfig(BaseModel):
 	MinerLife: int = 10000
 	ShareReward: float = 100
 	TeamBuyNumber: int = 5
+	MinerSumCount: int = 10000
 
 class SystemSettings(BaseModel):
 	pass

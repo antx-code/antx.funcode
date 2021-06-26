@@ -33,6 +33,7 @@ asset_db = db_connection('bc-app', 'assets')
 miner_pic_db = db_connection('bc-app', 'miner_pics')
 record_db = db_connection('bc-app', 'records')
 share_buy_db = db_connection('bc-app', 'share_buy_code')
+address_db = db_connection('bc-app', 'address')
 redis_service = redis_connection(redis_db=0)
 
 id_worker = IdWorker(0, 0)
