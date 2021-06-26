@@ -40,7 +40,7 @@ id_worker = IdWorker(0, 0)
 
 @logger.catch(level='ERROR')
 @router.post('/all')
-async def get_all_users(request: Request, get_info: GetAllUsers):
+async def get_all_users(get_info: GetAllUsers):
 	users = []
 	pref = (get_info.page - 1) * get_info.size
 	af = get_info.size
@@ -73,7 +73,7 @@ async def get_all_users(request: Request, get_info: GetAllUsers):
 
 @logger.catch(level='ERROR')
 @router.post('/add_user')
-async def add_user(request: Request, add_info: AddUser):
+async def add_user(add_info: AddUser):
 	user_id = id_worker.get_id()  # 生成唯一用户id
 	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 	if add_info.nickname in user_db.dep_data('nickname'):
@@ -171,7 +171,7 @@ async def get_user(user_id):
 
 @logger.catch(level='ERROR')
 @router.post('/update_user')
-async def update_user(request: Request, update_info: UpdateUser):
+async def update_user(update_info: UpdateUser):
 	updates = {}
 	if update_info.update_info:
 		for inx, (k, v) in enumerate(dict(update_info.update_info).items()):
@@ -182,7 +182,7 @@ async def update_user(request: Request, update_info: UpdateUser):
 
 @logger.catch(level='ERROR')
 @router.post('/delete_user')
-async def delete_user(request: Request, delete_info: DeleteUser):
+async def delete_user(delete_info: DeleteUser):
 	if delete_info.user_id not in user_db.dep_data('user_id'):
 		return msg(status='error', data='User not exist!')
 	user_db.delete_one({'user_id': delete_info.user_id})
