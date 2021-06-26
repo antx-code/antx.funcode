@@ -47,7 +47,23 @@ async def add_user(request: Request, add_info: AddUser):
 @router.get('/{user_id}')
 async def get_user(user_id):
 	user_info = user_db.find_one({'user_id': user_id})
-	pass
+	promo_invite_info = user_info_db.find_one({'user_id': user_id})
+	return_info = {
+		'user_id': user_id,
+		'nickname': user_info['nickname'],
+		'phone': user_info['phone'],
+		'email': user_info['email'],
+		'invite_code': promo_invite_info['share']['invite_code'],
+		'promo_code': user_info['share']['promo_code'],
+		'register_time': user_info['created_time'],
+		'last_login_time': user_info['last_login_time'],
+		'last_login_ip': user_info['last_login_ip'],
+		'is_logged_in': user_info['is_logged_in'],
+		'is_verified': user_info['is_verified'],
+		'level_status': '',
+		'member_status': ''
+	}
+	return msg(status='success', data=return_info)
 
 @logger.catch(level='ERROR')
 @router.post('/update_user')
