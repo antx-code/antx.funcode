@@ -38,9 +38,37 @@ redis_service = redis_connection(redis_db=0)
 id_worker = IdWorker(0, 0)
 
 @logger.catch(level='ERROR')
-@router.get('/all')
-async def get_all_users():
-	pass
+@router.post('/all')
+async def get_all_users(request: Request, get_info: GetAllUsers):
+	users = []
+	pref = (get_info.page - 1) * get_info.size
+	af = get_info.size
+	all_users = user_db.collection.find({}, {"_id": 0}).skip(pref).limit(af)
+	for user in all_users:
+		promo_invite_info = user_info_db.find_one({'user_id': user['user_id']})
+		if not promo_invite_info:
+			invite_code = ''
+			promo_code = ''
+		else:
+			invite_code = promo_invite_info['base_info']['share'].get('invite_code', '')
+			promo_code = promo_invite_info['base_info']['share'].get('promo_code', '')
+		user_info = {
+			'user_id': user['user_id'],
+			'nickname': user['nickname'],
+			'phone': user['phone'],
+			'email': user['email'],
+			'invite_code': invite_code,
+			'promo_code': promo_code,
+			'register_time': user['created_time'],
+			'last_login_time': user['last_login_time'],
+			'last_login_ip': user['last_login_ip'],
+			'is_logged_in': user['is_logged_in'],
+			'is_verified': user['is_verified'],
+			'level_status': '',
+			'member_status': ''
+		}
+		users.append(user_info)
+	return msg(status='susscss', data=users)
 
 @logger.catch(level='ERROR')
 @router.post('/add_user')
@@ -117,13 +145,19 @@ async def get_user(user_id):
 		return msg(status='error', data='User was not exist!')
 	user_info = user_db.find_one({'user_id': user_id})
 	promo_invite_info = user_info_db.find_one({'user_id': user_id})
+	if not promo_invite_info:
+		invite_code = ''
+		promo_code = ''
+	else:
+		invite_code = promo_invite_info['base_info']['share']['invite_code']
+		promo_code = promo_invite_info['base_info']['share']['promo_code']
 	return_info = {
 		'user_id': user_id,
 		'nickname': user_info['nickname'],
 		'phone': user_info['phone'],
 		'email': user_info['email'],
-		'invite_code': promo_invite_info['base_info']['share']['invite_code'],
-		'promo_code': promo_invite_info['base_info']['share']['promo_code'],
+		'invite_code': invite_code,
+		'promo_code': promo_code,
 		'register_time': user_info['created_time'],
 		'last_login_time': user_info['last_login_time'],
 		'last_login_ip': user_info['last_login_ip'],

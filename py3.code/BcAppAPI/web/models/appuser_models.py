@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional
 
+class GetAllUsers(BaseModel):
+    page: int
+    size: int
+
 class AddUser(BaseModel):
     email: Optional[str] = ''
     phone: Optional[str] = ''
