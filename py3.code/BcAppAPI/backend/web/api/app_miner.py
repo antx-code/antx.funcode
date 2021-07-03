@@ -49,7 +49,14 @@ async def get_all_miners(get_info: GetAllMiners):
 			'miner_sale_count': miner_sum_count - miner['miner_numbers']
 		}
 		miners.append(user_info)
-	return msg(status='susscss', data=miners)
+	total_count = miner_db.collection.find({}, {"_id": 0}).count()
+	page_tmp = total_count % af
+	if page_tmp != 0:
+		all_pages = (total_count // af) + 1
+	else:
+		all_pages = total_count // af
+	rep_data = {'filter_count': len(miners), 'record': miners, 'total_count': total_count, 'total_pages': all_pages}
+	return msg(status='susscss', data=rep_data)
 
 @logger.catch(level='ERROR')
 @router.get('/{miner_name}')

@@ -68,8 +68,8 @@ async def get_all_users(get_info: GetAllUsers):
 		all_pages = (total_count // af) + 1
 	else:
 		all_pages = total_count // af
-	resp_data = {'filter_count': len(users), 'record': users, 'total_count': total_count, 'total_pages': all_pages}
-	return msg(status='susscss', data=resp_data)
+	rep_data = {'filter_count': len(users), 'record': users, 'total_count': total_count, 'total_pages': all_pages}
+	return msg(status='susscss', data=rep_data)
 
 @logger.catch(level='ERROR')
 @router.post('/add_user')

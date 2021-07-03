@@ -4,7 +4,7 @@ from typing import Optional
 class GetAllArticle(BaseModel):
     page: int
     size: int
-    type: str
+    type: Optional[str]
 
 class AddArticle(BaseModel):
 	article_title: str

@@ -40,19 +40,32 @@ async def get_record(get_info: GetAllArticle):
 	articles = []
 	pref = (get_info.page - 1) * get_info.size
 	af = get_info.size
-	try:
-		article_info = article_db.collection.find({'type': get_info.type}, {"_id": 0}).skip(pref).limit(af)
+	if not get_info.type:
+		article_info = article_db.query_data()
 		for article in article_info:
+			del article['_id']
 			articles.append(article)
-	except Exception as e:
-		if get_info.type == 'announcement':
-			try:
-				article_info = announcement_db.collection.find({}, {"_id": 0}).skip(pref).limit(af)
-				for article in article_info:
-					articles.append(article)
-			except Exception as e:
-				pass
-	return msg(status='success', data=articles)
+	else:
+		try:
+			article_info = article_db.collection.find({'type': get_info.type}, {"_id": 0}).skip(pref).limit(af)
+			for article in article_info:
+				articles.append(article)
+		except Exception as e:
+			if get_info.type == 'announcement':
+				try:
+					article_info = announcement_db.collection.find({}, {"_id": 0}).skip(pref).limit(af)
+					for article in article_info:
+						articles.append(article)
+				except Exception as e:
+					pass
+	total_count = article_db.collection.find({}, {"_id": 0}).count()
+	page_tmp = total_count % af
+	if page_tmp != 0:
+		all_pages = (total_count // af) + 1
+	else:
+		all_pages = total_count // af
+	rep_data = {'filter_count': len(articles), 'record': articles, 'total_count': total_count, 'total_pages': all_pages}
+	return msg(status='success', data=rep_data)
 
 @logger.catch(level='ERROR')
 @router.post('/add_article')
