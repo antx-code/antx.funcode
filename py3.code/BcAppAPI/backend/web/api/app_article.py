@@ -58,7 +58,10 @@ async def get_record(get_info: GetAllArticle):
 						articles.append(article)
 				except Exception as e:
 					pass
-	total_count = article_db.collection.find({}, {"_id": 0}).count()
+	if not get_info.type:
+		total_count = article_db.collection.find({}, {"_id": 0}).count()
+	else:
+		total_count = article_db.collection.find({'type': get_info.type}, {"_id": 0}).count()
 	page_tmp = total_count % af
 	if page_tmp != 0:
 		all_pages = (total_count // af) + 1
