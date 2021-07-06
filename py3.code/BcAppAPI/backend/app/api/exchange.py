@@ -292,12 +292,12 @@ async def team_share_buy_miner(request: Request, buy_info: TeamBuyMiner):
 
 @logger.catch(level='ERROR')
 @router.post('/recharge')
-async def recharge(request: Request):
+async def recharge(request: Request, recharge_info: RechargeInfo):
 	user_id = antx_auth(request)
 	asset = asset_db.find_one({'user_id': user_id})['asset']['usdt']['all']
-	asset_db.update_one({'user_id': user_id}, {'asset.usdt.all': asset + 10000})
-	record_db.insert_one_data(record_recharge_withdraw(user_id, 'recharge', 10000))
-	return msg(status='success', data="Recharge success, please wait a moment!")
+	asset_db.update_one({'user_id': user_id}, {'asset.usdt.all': asset + recharge_info.recharge_usdt})
+	record_db.insert_one_data(record_recharge_withdraw(user_id, 'recharge', recharge_info.recharge_usdt))
+	return msg(status='success', data="Recharge request success, please waiting for process!")
 
 @logger.catch(level='ERROR')
 @router.post('/withdraw')
@@ -306,7 +306,7 @@ async def withdraw(request: Request, withdraw_info: WithdrawInfo):
 	asset = asset_db.find_one({'user_id': user_id})['asset']['usdt']['all']
 	asset_db.update_one({'user_id': user_id}, {'asset.usdt.all': asset - withdraw_info.withdraw_usdt})
 	record_db.insert_one_data(record_recharge_withdraw(user_id, 'withdraw', withdraw_info.withdraw_usdt))
-	return msg(status='success', data="Withdraw success, please wait a moment!")
+	return msg(status='success', data="Withdraw request success, please waiting for process!")
 
 @logger.catch(level='ERROR')
 @router.post('/record')

@@ -18,6 +18,8 @@ def record_recharge_withdraw(user_id, type, count): #
 		'record_id': id_worker.get_id(),
 		'type': type,
 		'created_time': now_time,
+		'update_time': '',
+		'status': 'pending',
 		'count': count
 	}
 	return exchange_info

@@ -15,6 +15,9 @@ class RecordInfo(BaseModel):
 	record_type: str
 	record_scope: dict
 
+class RechargeInfo(BaseModel):
+	recharge_usdt: float
+
 class WithdrawInfo(BaseModel):
 	withdraw_usdt: float
 
