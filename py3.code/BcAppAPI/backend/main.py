@@ -17,6 +17,7 @@ from web.api.app_miner import router as appminer_router
 from web.api.app_record import router as apprecord_router
 from web.api.app_article import router as apparticle_router
 from web.api.privilege import router as privilege_router
+from web.api.rw_management import router as rwm_router
 
 @logger.catch(level='ERROR')
 def generate_application() -> FastAPI:
@@ -116,6 +117,13 @@ def generate_application() -> FastAPI:
         privilege_router,
         prefix="/api/web/privilege",
         tags=["BC-APPPRIVILEGE API"],
+        responses={404: {"description": "Not found"}}
+    )
+
+    application.include_router(
+        rwm_router,
+        prefix="/api/web/rwm",
+        tags=["BC-APPPRWMANAGEMENT API"],
         responses={404: {"description": "Not found"}}
     )
 
