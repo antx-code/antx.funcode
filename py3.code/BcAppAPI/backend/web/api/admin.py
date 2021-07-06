@@ -24,7 +24,7 @@ admin_db = db_connection('bc-web', 'admin_users')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
-@router.post('/login')
+@router.post('/login', summary='管理员登陆')
 async def login(request: Request, login_info: AdminLogin):
 	admin_username_infos = admin_db.dep_data('username')
 	if login_info.username not in admin_username_infos:
