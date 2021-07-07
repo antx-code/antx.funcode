@@ -23,3 +23,8 @@ class WithdrawInfo(BaseModel):
 
 class ShareBuy(BaseModel):
 	miner_name: str
+
+class PostNotice(BaseModel):
+	phone: Optional[str]
+	email: Optional[str]
+	miner_name: str

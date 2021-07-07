@@ -20,6 +20,7 @@ router = APIRouter(dependencies=[Depends(antx_auth)])
 
 # router = APIRouter()
 
+user_db = db_connection('bc-app', 'users')
 user_info_db = db_connection('bc-app', 'user-info')
 promo_db = db_connection('bc-app', 'promo_qrcode')
 dnk_db = db_connection('bc-app', 'dnetworks')
@@ -29,6 +30,7 @@ miner_pic_db = db_connection('bc-app', 'miner_pics')
 record_db = db_connection('bc-app', 'records')
 share_buy_db = db_connection('bc-app', 'share_buy_code')
 redis_service = redis_connection(redis_db=0)
+notice_db = db_connection('bc-app', 'notices')
 
 CONFIG = redis_service.hget_redis(redis_key='config', content_key='app')
 
@@ -128,6 +130,57 @@ async def buy_miner(request: Request, buy_info: BuyMiner):
 	record_db.insert_one_data(record_buy(user_id, buy_info.miner_name, miner_id, buy_info.miner_price, buy_type='personal'))
 	return msg(status='success', data=return_info)
 
+@logger.catch(level='ERROR')
+@router.post('/post_notice')
+async def post_notice(request: Request, post_info: PostNotice):
+	user_id = antx_auth(request)
+	if not post_info.phone:
+		noticed_id = user_db.find_one({'email': post_info.email})['user_id']
+	else:
+		noticed_id = user_db.find_one({'phone': post_info.phone})['user_id']
+	share_code, share_url = generate_share_code_url()
+	redis_share_info = {
+		'team_header': user_id,
+		'members': [user_id],  # 包括团长
+		'member_count': 1,
+		'team_buy_number': CONFIG['TeamBuyNumber'],
+		'miner_name': share_buy.miner_name
+	}
+	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+	db_share_info = {
+		'team_header': user_id,
+		'created_time': now_time,
+		'update_time': '',
+		'members': [],
+		'member_count': 0,
+		'team_buy_number': CONFIG['TeamBuyNumber'],
+		'miner_name': share_buy.miner_name,
+		'status': 'Created'
+	}
+	notice_info = {
+		'team_header': user_id,
+		'noticed_id': noticed_id,
+		'noticed_detail': f'Please click the share team buy url: {share_url} to pay money for the team miner!',
+		'share_code': share_code,
+		'share_url': share_url,
+		'created_time': now_time,
+	}
+
+	redis = redis_connection(redis_db=1)
+	redis.set_dep_key(key_name=share_code, key_value=json.dumps(redis_share_info, ensure_ascii=False), expire_secs=1800)
+	share_buy_db.insert_one_data({'share_code': share_code, 'share_info': db_share_info})
+	notice_db.insert_one_data(notice_info)
+	return msg(status='success', data='Invite request was send, please wait for it.')
+
+@logger.catch(level='ERROR')
+@router.get('/get_notice')
+async def get_notice(request: Request):
+	user_id = antx_auth(request)
+	notice_info = notice_db.find_one({'noticed_id': user_id})
+	notice = notice_info['notice_detail']
+	share_code = notice_info['share_code']
+	share_monitor
+	return msg(status='success', data=notice)
 
 @logger.catch(level='ERROR')
 @router.post('/share_buy')
