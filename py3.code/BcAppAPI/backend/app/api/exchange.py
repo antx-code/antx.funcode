@@ -134,6 +134,7 @@ async def buy_miner(request: Request, buy_info: BuyMiner):
 @router.post('/post_notice')
 async def post_notice(request: Request, post_info: PostNotice):
 	user_id = antx_auth(request)
+	nickname = user_db.find_one({'user_id': user_id})['nickname']
 	if not post_info.phone:
 		noticed_id = user_db.find_one({'email': post_info.email})['user_id']
 	else:
@@ -144,7 +145,7 @@ async def post_notice(request: Request, post_info: PostNotice):
 		'members': [user_id],  # 包括团长
 		'member_count': 1,
 		'team_buy_number': CONFIG['TeamBuyNumber'],
-		'miner_name': share_buy.miner_name
+		'miner_name': post_info.miner_name
 	}
 	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 	db_share_info = {
@@ -154,13 +155,13 @@ async def post_notice(request: Request, post_info: PostNotice):
 		'members': [],
 		'member_count': 0,
 		'team_buy_number': CONFIG['TeamBuyNumber'],
-		'miner_name': share_buy.miner_name,
+		'miner_name': post_info.miner_name,
 		'status': 'Created'
 	}
 	notice_info = {
 		'team_header': user_id,
 		'noticed_id': noticed_id,
-		'noticed_detail': f'Please click the share team buy url: {share_url} to pay money for the team miner!',
+		'noticed_detail': f'You have a new team buy query, the team leader was {nickname}. Please click the share team buy url: {share_url} to pay money for the team miner!',
 		'share_code': share_code,
 		'share_url': share_url,
 		'created_time': now_time,
@@ -178,57 +179,55 @@ async def get_notice(request: Request):
 	user_id = antx_auth(request)
 	notice_info = notice_db.find_one({'noticed_id': user_id})
 	notice = notice_info['notice_detail']
-	share_code = notice_info['share_code']
-	share_monitor
 	return msg(status='success', data=notice)
 
-@logger.catch(level='ERROR')
-@router.post('/share_buy')
-async def share_buy(request: Request, share_buy: ShareBuy):
-	user_id = antx_auth(request)
-	share_code, share_url = generate_share_code_url()
-	redis_share_info = {
-		'team_header': user_id,
-		'members': [user_id],  # 包括团长
-		'member_count': 1,
-		'team_buy_number': CONFIG['TeamBuyNumber'],
-		'miner_name': share_buy.miner_name
-	}
-	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-	db_share_info = {
-		'team_header': user_id,
-		'created_time': now_time,
-		'update_time': '',
-		'members': [],
-		'member_count': 0,
-		'team_buy_number': CONFIG['TeamBuyNumber'],
-		'miner_name': share_buy.miner_name,
-		'status': 'Created'
-	}
+# @logger.catch(level='ERROR')
+# @router.post('/share_buy')
+# async def share_buy(request: Request, share_buy: ShareBuy):
+# 	user_id = antx_auth(request)
+# 	share_code, share_url = generate_share_code_url()
+# 	redis_share_info = {
+# 		'team_header': user_id,
+# 		'members': [user_id],  # 包括团长
+# 		'member_count': 1,
+# 		'team_buy_number': CONFIG['TeamBuyNumber'],
+# 		'miner_name': share_buy.miner_name
+# 	}
+# 	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+# 	db_share_info = {
+# 		'team_header': user_id,
+# 		'created_time': now_time,
+# 		'update_time': '',
+# 		'members': [],
+# 		'member_count': 0,
+# 		'team_buy_number': CONFIG['TeamBuyNumber'],
+# 		'miner_name': share_buy.miner_name,
+# 		'status': 'Created'
+# 	}
+#
+# 	redis = redis_connection(redis_db=1)
+# 	redis.set_dep_key(key_name=share_code, key_value=json.dumps(redis_share_info, ensure_ascii=False), expire_secs=1800)
+# 	share_buy_db.insert_one_data({'share_code': share_code, 'share_info': db_share_info})
+# 	return msg(status='success', data={'share_code': share_code, 'share_url': share_url})
 
-	redis = redis_connection(redis_db=1)
-	redis.set_dep_key(key_name=share_code, key_value=json.dumps(redis_share_info, ensure_ascii=False), expire_secs=1800)
-	share_buy_db.insert_one_data({'share_code': share_code, 'share_info': db_share_info})
-	return msg(status='success', data={'share_code': share_code, 'share_url': share_url})
-
-@logger.catch(level='ERROR')
-@router.get('/get_share_code')
-async def get_share_code(request: Request):
-	user_id = antx_auth(request)
-	share_codes = []
-	results = []
-	redis = redis_connection(redis_db=1)
-	share_infos = share_buy_db.query_data({'share_info.team_header': user_id})
-	for share_info in share_infos:
-		share_codes.append(share_info['share_code'])
-	logger.info(share_codes)
-	for code in share_codes:
-		expires = redis.redis_client.ttl(name=code)
-		if expires == -2:
-			results.append({'share_code': code, 'status': 'Share buy url was expired!'})
-		else:
-			results.append({'share_code': code, 'status': 'Active'})
-	return msg(status='success', data=results)
+# @logger.catch(level='ERROR')
+# @router.get('/get_share_code')
+# async def get_share_code(request: Request):
+# 	user_id = antx_auth(request)
+# 	share_codes = []
+# 	results = []
+# 	redis = redis_connection(redis_db=1)
+# 	share_infos = share_buy_db.query_data({'share_info.team_header': user_id})
+# 	for share_info in share_infos:
+# 		share_codes.append(share_info['share_code'])
+# 	logger.info(share_codes)
+# 	for code in share_codes:
+# 		expires = redis.redis_client.ttl(name=code)
+# 		if expires == -2:
+# 			results.append({'share_code': code, 'status': 'Share buy url was expired!'})
+# 		else:
+# 			results.append({'share_code': code, 'status': 'Active'})
+# 	return msg(status='success', data=results)
 
 
 @logger.catch(level='ERROR')
@@ -252,6 +251,8 @@ async def share_buy_code(request: Request, share_code):
 	share_buy_count = redis_share_info['member_count']
 	if share_buy_count > CONFIG['TeamBuyNumber']:
 		return msg(status='error', data='Number of buyers exceeded!', code=211)
+	elif share_buy_count == CONFIG['TeamBuyNumber']:
+		return msg(status='success', data='Congratulations, team share buy number is full!')
 	redis_share_info['member_count'] += 1
 	redis.set_dep_key(key_name=share_code, key_value=json.dumps(redis_share_info, ensure_ascii=False), expire_secs=expires)
 	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -260,31 +261,32 @@ async def share_buy_code(request: Request, share_code):
 	db_share_info['member_count'] += 1
 	db_share_info['status'] = 'Active'
 	share_buy_db.update_one({'share_code': share_code}, {'share_info': db_share_info})
-	return msg(status='success', data='Click success')
+	return msg(status='success', data='Click success, please wating for more team share buy member!')
 
-@logger.catch(level='ERROR')
-@router.get('/share_monitor/{share_code}')
-async def share_monitor(request: Request, share_code):
-	redis = redis_connection(redis_db=1)
-	expires = redis.redis_client.ttl(name=share_code)
-	db_share_info = share_buy_db.find_one({'share_code': share_code})['share_info']
-	if expires == -2:
-		now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-		db_share_info['update_time'] = now_time
-		db_share_info['status'] = 'Cannel'
-		share_buy_db.update_one({'share_code': share_code}, {'share_info': db_share_info})
-		refund = miner_db.find_one({'miner_name': db_share_info['miner_name']})['miner_team_price']
-		refund_money(share_code, round((refund / CONFIG['TeamBuyNumber']), 2))
-		return msg(status='error', data='Share buy url was expired!', code=212)
-	redis_share_info = redis.get_key_expire_content(key_name=share_code)
-	redis_share_info = json.loads(redis_share_info)
-	share_buy_count = redis_share_info['member_count']
-	if share_buy_count > CONFIG['TeamBuyNumber']:
-		return msg(status='error', data='Number of buyers exceeded!', code=211)
-	elif share_buy_count ==CONFIG['TeamBuyNumber']:
-		return msg(status='success', data='Congratulations, team share buy number is full!')
-	else:
-		return msg(status='success', data='Wating for more team share buy member!')
+# @logger.catch(level='ERROR')
+# @router.get('/share_monitor/{share_code}')
+# async def share_monitor(request: Request, share_code):
+# def share_monitor(share_code):
+# 	redis = redis_connection(redis_db=1)
+# 	expires = redis.redis_client.ttl(name=share_code)
+# 	db_share_info = share_buy_db.find_one({'share_code': share_code})['share_info']
+# 	if expires == -2:
+# 		now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+# 		db_share_info['update_time'] = now_time
+# 		db_share_info['status'] = 'Cannel'
+# 		share_buy_db.update_one({'share_code': share_code}, {'share_info': db_share_info})
+# 		refund = miner_db.find_one({'miner_name': db_share_info['miner_name']})['miner_team_price']
+# 		refund_money(share_code, round((refund / CONFIG['TeamBuyNumber']), 2))
+# 		return msg(status='error', data='Share buy url was expired!', code=212)
+# 	redis_share_info = redis.get_key_expire_content(key_name=share_code)
+# 	redis_share_info = json.loads(redis_share_info)
+# 	share_buy_count = redis_share_info['member_count']
+# 	if share_buy_count > CONFIG['TeamBuyNumber']:
+# 		return msg(status='error', data='Number of buyers exceeded!', code=211)
+# 	elif share_buy_count == CONFIG['TeamBuyNumber']:
+# 		return msg(status='success', data='Congratulations, team share buy number is full!')
+# 	else:
+# 		return msg(status='success', data='Wating for more team share buy member!')
 
 def refund_money(share_buy_code, miner_per_price):
 	share_buy_info = share_buy_db.find_one({'share_code': share_buy_code})['share_info']
