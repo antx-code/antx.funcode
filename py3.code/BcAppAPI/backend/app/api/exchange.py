@@ -163,6 +163,7 @@ async def post_notice(request: Request, post_info: PostNotice):
 		'noticed_id': noticed_id,
 		'noticed_detail': f'You have a new team buy query, the team leader was {nickname}. Please click the share team buy url: {share_url} to pay money for the team miner!',
 		'share_code': share_code,
+		'miner_name': post_info.miner_name,
 		'share_url': share_url,
 		'created_time': now_time,
 	}
@@ -180,7 +181,8 @@ async def get_notice(request: Request):
 	notice_info = notice_db.find_one({'noticed_id': user_id})
 	notice = notice_info['noticed_detail']
 	share_code = notice_info['share_code']
-	return msg(status='success', data={'share_code': share_code, 'notice': notice})
+	miner_name = notice['miner_name']
+	return msg(status='success', data={'share_code': share_code, 'miner_name': miner_name, 'notice': notice})
 
 @logger.catch(level='ERROR')
 @router.post('/share_buy')
