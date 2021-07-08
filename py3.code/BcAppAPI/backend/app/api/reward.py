@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from utils.services.base.base_func import *
 from utils.services.redis_db_connect.connect import *
 from app.models.user_info_models import *
+from app.models.reward_models import *
 
 # logger.add(sink='logs/user_info_api.log',
 #            level='ERROR',
@@ -25,6 +26,7 @@ dnk_db = db_connection('bc-app', 'dnetworks')
 avatar_db = db_connection('bc-app', 'avatar')
 asset_db = db_connection('bc-app', 'assets')
 miner_reward_record_db = db_connection('bc-app', 'miner_reward_record')
+miner_db = db_connection('bc-app', 'miners')
 redis_service = redis_connection(redis_db=0)
 
 def time2seconds(st):
@@ -199,3 +201,36 @@ async def get_team_reward(request: Request):
 
 	reward_info = {'asset': asset_info['asset']['usdt']['all'], 'miner_reward': records}
 	return msg(status='success', data=reward_info)
+
+@logger.catch(level='ERROR')
+@router.post('/myminer_detail')
+async def get_myminer_detail(request: Request, get_info: MyMinerDetail):
+	user_id = antx_auth(request)
+	asset_info = asset_db.find_one({'user_id': user_id})['asset']
+	miner_info = miner_db.find_one({'miner_name': get_info.miner_name})
+	if get_info.type == 'personal':
+		miner_price = miner_info['miner_price']
+		for miner in asset_info['miner']:
+			if miner['miner_name'] == get_info.miner_name:
+				all = miner['all']
+				today_reward = miner['today_reward']
+				alive_time = miner['alive_time']
+	else:
+		miner_price = miner_info['miner_team_price']
+		for miner in asset_info['team_miner']:
+			if miner['miner_name'] == get_info.miner_name:
+				all = miner['all']
+				today_reward = miner['today_reward']
+				alive_time = miner['alive_time']
+	my_miner_detail = {
+		'miner_name': get_info.miner_name,
+		'miner_id': get_info.miner_id,
+		'miner_type': get_info.miner_type,
+		'all': all,
+		'today': today_reward,
+		'alive_time': alive_time,
+		'miner_price': miner_price,
+		'miner_power': miner_info['miner_power'],
+		'miner_management_fee': miner_info['miner_manage_price']    # 百分比
+	}
+	return msg(status='success', data=my_miner_detail)
