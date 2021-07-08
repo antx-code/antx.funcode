@@ -181,7 +181,7 @@ async def get_notice(request: Request):
 	notice_info = notice_db.find_one({'noticed_id': user_id})
 	notice = notice_info['noticed_detail']
 	share_code = notice_info['share_code']
-	miner_name = notice['miner_name']
+	miner_name = notice_info['miner_name']
 	return msg(status='success', data={'share_code': share_code, 'miner_name': miner_name, 'notice': notice})
 
 @logger.catch(level='ERROR')
