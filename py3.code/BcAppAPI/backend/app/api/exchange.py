@@ -161,7 +161,7 @@ async def post_notice(request: Request, post_info: PostNotice):
 	notice_info = {
 		'team_header': user_id,
 		'noticed_id': noticed_id,
-		'noticed_detail': f'You have a new team buy query, the team leader was {nickname}. Please click the share team buy code: {share_code} to pay money for the team miner!',
+		'noticed_detail': f'You have a new team buy query, the team leader was {nickname}. Please click the share team buy url: {share_url} to pay money for the team miner!',
 		'share_code': share_code,
 		'share_url': share_url,
 		'created_time': now_time,
@@ -178,7 +178,7 @@ async def post_notice(request: Request, post_info: PostNotice):
 async def get_notice(request: Request):
 	user_id = antx_auth(request)
 	notice_info = notice_db.find_one({'noticed_id': user_id})
-	notice = notice_info['notice_detail']
+	notice = notice_info['noticed_detail']
 	share_code = notice_info['share_code']
 	return msg(status='success', data={'share_code': share_code, 'notice': notice})
 
