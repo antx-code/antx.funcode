@@ -225,7 +225,7 @@ async def get_team_reward(request: Request):
 		# 		avatar = avatar_db.find_one({'user_id': 'default'})['img']
 		# 	record['members_img'].append(avatar)
 
-	reward_info = {'asset': asset_info['asset']['usdt']['all'], 'miner_reward': records}
+	reward_info = {'asset': round(asset_info['asset']['usdt']['all'], 4), 'miner_reward': records}
 	return msg(status='success', data=reward_info)
 
 @logger.catch(level='ERROR')
