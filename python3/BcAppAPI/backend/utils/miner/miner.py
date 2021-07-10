@@ -72,7 +72,8 @@ class MinerRewardRunner():
 			for asset in assets:
 				for miner in asset['asset']['miner']:
 					logger.info(miner['miner_id'])
-					self.miner_running(miner)
+					miner_today_reward, miner_all_reward = self.miner_running(miner)
+
 				# self.team_miner_running(asset)
 
 

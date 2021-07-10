@@ -161,7 +161,7 @@ async def post_notice(request: Request, post_info: PostNotice):
 	notice_info = {
 		'team_header': user_id,
 		'noticed_id': noticed_id,
-		'noticed_detail': f'You friend {nickname} invite you buy a miner, click here {share_url} to buy!',
+		'noticed_detail': f'You friend {nickname} invite you to buy a miner!',
 		'share_code': share_code,
 		'miner_name': post_info.miner_name,
 		'share_url': share_url,
@@ -178,7 +178,11 @@ async def post_notice(request: Request, post_info: PostNotice):
 @router.get('/get_notice')
 async def get_notice(request: Request):
 	user_id = antx_auth(request)
-	notice_info = notice_db.find_one({'noticed_id': user_id})
+	all_notice = []
+	notices = notice_db.collection.find({'noticed_id': user_id}, {'_id': 0}).sort('created_time', -1)
+	for notice in notices:
+		all_notice.append(notice)
+	notice_info = all_notice[0]
 	notice = notice_info['noticed_detail']
 	share_code = notice_info['share_code']
 	miner_name = notice_info['miner_name']
