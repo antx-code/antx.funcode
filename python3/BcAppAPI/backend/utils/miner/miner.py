@@ -70,7 +70,8 @@ class MinerRewardRunner():
 		else:
 			pages = (asset_count // 10) + 1
 		for i in range(pages):
-			assets = asset_db.collection.find({}, {'_id': 0}).skip(i).limit(10)
+			page = 10 * i
+			assets = asset_db.collection.find({}, {'_id': 0}).skip(page).limit(10)
 			for asset in assets:
 				user_id = asset['user_id']
 				m_reward = 0
@@ -91,7 +92,8 @@ class MinerRewardRunner():
 		else:
 			pages = (asset_count // 10) + 1
 		for i in range(pages):
-			assets = asset_db.collection.find({}, {'_id': 0}).skip(i).limit(10)
+			page = 10 * i
+			assets = asset_db.collection.find({}, {'_id': 0}).skip(page).limit(10)
 			for asset in assets:
 				share_reward = 0
 				user_id = asset['user_id']
@@ -141,8 +143,10 @@ class MinerRewardRunner():
 		else:
 			pages = (asset_count // 10) + 1
 		for i in range(pages):
-			assets = asset_db.collection.find({}, {'_id': 0}).skip(i).limit(10)
+			page = 10 * i
+			assets = asset_db.collection.find({}, {'_id': 0}).skip(page).limit(10)
 			for asset in assets:
+				logger.info(asset['user_id'])
 				for miner in asset['asset']['miner']:
 					miner_id = miner['miner_id']
 					miner_today_reward, miner_all_reward = self.miner_running(miner)
