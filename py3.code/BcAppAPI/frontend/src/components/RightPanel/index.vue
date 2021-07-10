@@ -2,6 +2,9 @@
   <div ref="rightPanel" :class="{show:show}" class="rightPanel-container">
     <div class="rightPanel-background" />
     <div class="rightPanel">
+      <div class="handle-button" :style="{'top':buttonTop+'px','background-color':theme}" @click="show=!show">
+        <i :class="show?'el-icon-close':'el-icon-setting'" />
+      </div>
       <div class="rightPanel-items">
         <slot />
       </div>
@@ -24,18 +27,12 @@ export default {
       type: Number
     }
   },
+  data() {
+    return {
+      show: false
+    }
+  },
   computed: {
-    show: {
-      get() {
-        return this.$store.state.settings.showSettings
-      },
-      set(val) {
-        this.$store.dispatch('settings/changeSetting', {
-          key: 'showSettings',
-          value: val
-        })
-      }
-    },
     theme() {
       return this.$store.state.settings.theme
     }
@@ -54,7 +51,6 @@ export default {
   },
   mounted() {
     this.insertToBody()
-    this.addEventClick()
   },
   beforeDestroy() {
     const elx = this.$refs.rightPanel

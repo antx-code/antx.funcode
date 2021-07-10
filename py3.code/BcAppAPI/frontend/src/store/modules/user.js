@@ -1,5 +1,4 @@
 import { login, logout, getInfo } from '@/api/user'
-import { getRoutes } from '@/api/role'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
@@ -34,26 +33,15 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      const params = new URLSearchParams()
-      params.append('username', username)
-      params.append('password', password)
-      login(params).then(response => {
+      // const params = new URLSearchParams()
+      // params.append('username', username)
+      // params.append('password', password)
+      login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
+
         commit('SET_TOKEN', data.token)
         setToken(data.token)
         resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  },
-
-  // get user info
-  getAuthMenu({ commit }, roles) {
-    return new Promise((resolve, reject) => {
-      getRoutes(roles).then(response => {
-        const { data } = response
-        resolve(data)
       }).catch(error => {
         reject(error)
       })
@@ -70,14 +58,15 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        const { roles, username, avatar, introduction } = data
+        const { roles, name, avatar, introduction } = data
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
           reject('getInfo: roles must be a non-null array!')
         }
+
         commit('SET_ROLES', roles)
-        commit('SET_NAME', username)
+        commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_INTRODUCTION', introduction)
         resolve(data)
@@ -118,28 +107,23 @@ const actions = {
   },
 
   // dynamically modify permissions
-  changeRoles({ commit, dispatch }, role) {
-    return new Promise(async resolve => {
-      const token = role + '-token'
+  async changeRoles({ commit, dispatch }, role) {
+    const token = role + '-token'
 
-      commit('SET_TOKEN', token)
-      setToken(token)
+    commit('SET_TOKEN', token)
+    setToken(token)
 
-      const { roles } = await dispatch('getInfo')
+    const { roles } = await dispatch('getInfo')
 
-      resetRouter()
+    resetRouter()
 
-      // generate accessible routes map based on roles
-      const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
+    // generate accessible routes map based on roles
+    const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
+    // dynamically add accessible routes
+    router.addRoutes(accessRoutes)
 
-      // dynamically add accessible routes
-      router.addRoutes(accessRoutes)
-
-      // reset visited views and cached views
-      dispatch('tagsView/delAllViews', null, { root: true })
-
-      resolve()
-    })
+    // reset visited views and cached views
+    dispatch('tagsView/delAllViews', null, { root: true })
   }
 }
 

@@ -1,7 +1,4 @@
-/* eslint-disable */
-import {asyncRoutes, constantRoutes} from '@/router'
-import store from '@/store'
-import Layout from '@/layout'
+import { asyncRoutes, constantRoutes } from '@/router'
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -17,36 +14,15 @@ function hasPermission(roles, route) {
 }
 
 /**
- * 后台查询的菜单数据拼装成路由格式的数据
- * @param routes
- */
-export function generate_menu(data) {
-  let routes = []
-  data.forEach(item => {
-    const menu = item
-    menu.component = item.component == '' ? Layout : loadView(item.component)
-    if (item.children) {
-      menu.children = item.children === undefined ? [] : generate_menu(item.children)
-    }
-    routes.push(menu)
-  })
-  return routes
-}
-
-// import预编译比require快，但是import不支持变量，只能用require的形式，否则还要前端配置路由表
-export const loadView = (view) => { // 路由懒加载
-  return (resolve) => require([`@/views${view}`], resolve)
-}
-
-/**
  * Filter asynchronous routing tables by recursion
  * @param routes asyncRoutes
  * @param roles
  */
 export function filterAsyncRoutes(routes, roles) {
   const res = []
+
   routes.forEach(route => {
-    const tmp = {...route}
+    const tmp = { ...route }
     if (hasPermission(roles, tmp)) {
       if (tmp.children) {
         tmp.children = filterAsyncRoutes(tmp.children, roles)
@@ -71,14 +47,16 @@ const mutations = {
 }
 
 const actions = {
-  generateRoutes({commit}, roles) {
+  generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
-      store.dispatch('user/getAuthMenu', roles).then((data) => {
-        let generateRoutes = [...generate_menu(data), ...asyncRoutes]
-        let accessedRoutes = filterAsyncRoutes(generateRoutes, roles)
-        commit('SET_ROUTES', accessedRoutes)
-        resolve(accessedRoutes)
-      })
+      let accessedRoutes
+      if (roles.includes('admin')) {
+        accessedRoutes = asyncRoutes || []
+      } else {
+        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+      }
+      commit('SET_ROUTES', accessedRoutes)
+      resolve(accessedRoutes)
     })
   }
 }

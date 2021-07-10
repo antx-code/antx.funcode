@@ -1,11 +1,11 @@
 module.exports = {
-  title: 'Vue Element Admin',
+  title: '后台管理系统',
 
   /**
    * @type {boolean} true | false
    * @description Whether show the settings right-panel
    */
-  showSettings: false,
+  showSettings: true,
 
   /**
    * @type {boolean} true | false
