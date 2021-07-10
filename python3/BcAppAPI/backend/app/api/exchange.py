@@ -161,7 +161,7 @@ async def post_notice(request: Request, post_info: PostNotice):
 	notice_info = {
 		'team_header': user_id,
 		'noticed_id': noticed_id,
-		'noticed_detail': f'You have a new team buy query, the team leader was {nickname}. Please click the share team buy url: {share_url} to pay money for the team miner!',
+		'noticed_detail': f'You friend {nickname} invite you buy a miner, click here {share_url} to buy!',
 		'share_code': share_code,
 		'miner_name': post_info.miner_name,
 		'share_url': share_url,
