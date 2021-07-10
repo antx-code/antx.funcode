@@ -67,27 +67,31 @@ async def get_home_reward(request: Request):
 	arh, arm, ars = seconds2time(running_time)
 
 	final_records = []
-	result = []
-	recent = get_recent7date()
-	records = miner_reward_record_db.query_data({
-		'$and': [{
-			'miner_reward_record': {'$gte': recent[-1], '$lt': recent[0]},
-			'user_id': user_id,
-			'miner_type': 'personal'
-		}]
-	})
-	for record in records:
-		result.append({'record_date': record['miner_reward_record'], 'miner_reward': record['miner_reward']})
-	for day in recent:
-		sum_reward = 0
-		for record in result:
-			if day == record['record_date']:
-				sum_reward += record['miner_reward']
-		record_info = {
-			'record_date': day,
-			'reward': sum_reward
-		}
-		final_records.append(record_info)
+	recents = get_recent7date()
+	for record_date in recents:
+		personal_records = miner_reward_record_db.collection.find({
+			'$and': [
+				{'record_time': {'$gte': f'{record_date} 00:00:00', '$lte': f'{record_date} 23:59:59'}},
+				{'user_id': user_id}, {'miner_type': 'personal'}
+			]
+		}, {'_id': 0}).sort('record_time', -1)
+		team_records = miner_reward_record_db.collection.find({
+			'$and': [
+				{'record_time': {'$gte': f'{record_date} 00:00:00', '$lte': f'{record_date} 23:59:59'}},
+				{'user_id': user_id}, {'miner_type': 'team'}
+			]
+		}, {'_id': 0}).sort('record_time', -1)
+		personal_results = [doc for doc in personal_records]
+		team_results = [doc for doc in team_records]
+		if len(personal_results) > 0:
+			personal_reward = personal_results[0]['miner_today_reward']
+		else:
+			personal_reward = 0
+		if len(team_results) > 0:
+			team_reward = team_results[0]['miner_today_reward']
+		else:
+			team_reward = 0
+		final_records.append({'record_date': record_date, 'reward': personal_reward + team_reward})
 
 	miner_list = []
 	try:
@@ -254,5 +258,17 @@ async def get_myminer_detail(request: Request, get_info: MyMinerDetail):
 
 @logger.catch(level='ERROR')
 @router.post('/record')
-async def get_miner_reward():
-	pass
+async def get_miner_reward(request: Request, record_info: MinerRewardRecord):
+	user_id = antx_auth(request)
+	final_records = []
+	records = miner_reward_record_db.collection.find({
+		'$and': [{
+			'record_time': {'$gte': f'{record_info.record_scope["start"]}-01 00:00:00', '$lt': f'{record_info.record_scope["end"]}-01 00:00:00'},
+			'user_id': user_id,
+			'miner_type': record_info.record_type
+		}]
+	}, {'_id': 0}).sort('record_time', -1)
+	for record in records:
+		del record['record_date']
+		final_records.append(record)
+	return final_records

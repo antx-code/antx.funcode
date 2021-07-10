@@ -2,6 +2,9 @@ import time
 from datetime import datetime
 from loguru import logger
 from utils.services.redis_db_connect.connect import *
+from utils.services.base.SnowFlake import IdWorker
+
+id_worker = IdWorker(0, 0)
 
 asset_db = db_connection('bc-app', 'assets')
 miner_reward_record_db = db_connection('bc-app', 'miner_reward_record')
@@ -115,6 +118,7 @@ class MinerRewardRunner():
 		now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 		record = {
 			'user_id': user_id,
+			'record_id': id_worker.get_id(),
 			'miner_type': miner_type,
 			'miner_id': miner_id,
 			'miner_name': miner_name,
