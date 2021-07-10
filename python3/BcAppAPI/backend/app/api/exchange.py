@@ -131,7 +131,7 @@ async def buy_miner(request: Request, buy_info: BuyMiner):
 	return msg(status='success', data=return_info)
 
 @logger.catch(level='ERROR')
-@router.post('/post_notice')
+@router.post('/post_notice')    # 发送团购邀请
 async def post_notice(request: Request, post_info: PostNotice):
 	user_id = antx_auth(request)
 	nickname = user_db.find_one({'user_id': user_id})['nickname']
@@ -175,7 +175,7 @@ async def post_notice(request: Request, post_info: PostNotice):
 	return msg(status='success', data='Invite request was send, please wait for it.')
 
 @logger.catch(level='ERROR')
-@router.get('/get_notice')
+@router.get('/get_notice')  # 获取团购邀请信息
 async def get_notice(request: Request):
 	user_id = antx_auth(request)
 	all_notice = []
@@ -189,36 +189,58 @@ async def get_notice(request: Request):
 	return msg(status='success', data={'share_code': share_code, 'miner_name': miner_name, 'notice': notice})
 
 @logger.catch(level='ERROR')
-@router.post('/share_buy')
+@router.post('/share_buy')  # 生成团购邀请码和邀请链接
 async def share_buy(request: Request, share_buy: ShareBuy):
 	user_id = antx_auth(request)
 	share_code, share_url = generate_share_code_url()
+	user_asset = asset_db.find_one({'user_id': user_id})['asset']
+	miner_id = generate_miner_id()
+	miner_price = miner_db.find_one({'miner_name': share_buy.miner_name})['miner_price']
 	redis_share_info = {
 		'team_header': user_id,
 		'members': [user_id],  # 包括团长
 		'member_count': 1,
 		'team_buy_number': CONFIG['TeamBuyNumber'],
-		'miner_name': share_buy.miner_name
+		'miner_name': share_buy.miner_name,
+		'miner_id': miner_id
 	}
 	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 	db_share_info = {
 		'team_header': user_id,
 		'created_time': now_time,
 		'update_time': '',
-		'members': [],
-		'member_count': 0,
+		'members': [user_id],
+		'member_count': 1,
 		'team_buy_number': CONFIG['TeamBuyNumber'],
 		'miner_name': share_buy.miner_name,
+		'miner_id': miner_id,
 		'status': 'Created'
+	}
+
+	asset_miner = {
+		'miner_id': miner_id,
+		'miner_name': share_buy.miner_name,
+		'created_time': now_time,
+		'update_time': '',
+		'alive_time': '00:00:00',
+		'members': [user_id],  # user_id 列表
+		'member_count': 1,
+		'share_code': share_code,
+		'all': 0,
+		'today_rewards': 0,  # 今日总收益
+		'today_reward': 0  # 今日个人收益 = 今日总收益 / 团队人数
 	}
 
 	redis = redis_connection(redis_db=1)
 	redis.set_dep_key(key_name=share_code, key_value=json.dumps(redis_share_info, ensure_ascii=False), expire_secs=1800)
 	share_buy_db.insert_one_data({'share_code': share_code, 'share_info': db_share_info})
+	asset_db.update_one({'user_id': user_id}, {'asset.usdt.all': user_asset['usdt']['all'] - miner_price})
+	asset_db.collection.update_one({'user_id': user_id}, {'$push': {'asset.team_miner': asset_miner}}, upsert=True)
+	record_db.insert_one_data(record_buy(user_id, share_buy.miner_name, miner_id, miner_price, buy_type='team'))
 	return msg(status='success', data={'share_code': share_code, 'share_url': share_url})
 
 @logger.catch(level='ERROR')
-@router.get('/get_share_code')
+@router.get('/get_share_code')  # 获取团购邀请码
 async def get_share_code(request: Request):
 	user_id = antx_auth(request)
 	share_codes = []
@@ -236,13 +258,13 @@ async def get_share_code(request: Request):
 			results.append({'share_code': code, 'status': 'Active'})
 	return msg(status='success', data=results)
 
-
 @logger.catch(level='ERROR')
-@router.get('/share/{share_code}')
+@router.get('/share/{share_code}')  # 记录加入团购的人
 async def share_buy_code(request: Request, share_code):
 	user_id = antx_auth(request)
 	redis = redis_connection(redis_db=1)
 	expires = redis.redis_client.ttl(name=share_code)
+	logger.info(expires)
 	db_share_info = share_buy_db.find_one({'share_code': share_code})['share_info']
 	if expires == -2:
 		now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -250,7 +272,8 @@ async def share_buy_code(request: Request, share_code):
 		db_share_info['status'] = 'Cannel'
 		share_buy_db.update_one({'share_code': share_code}, {'share_info': db_share_info})
 		refund = miner_db.find_one({'miner_name': db_share_info['miner_name']})['miner_team_price']
-		refund_money(share_code, round((refund/CONFIG['TeamBuyNumber']), 2))
+		miner_id = db_share_info['miner_id']
+		refund_money(share_code, round((refund/CONFIG['TeamBuyNumber']), 4), miner_id)
 		return msg(status='error', data='Share buy url was expired!', code=212)
 	redis_share_info = redis.get_key_expire_content(key_name=share_code)
 	redis_share_info = json.loads(redis_share_info)
@@ -271,7 +294,7 @@ async def share_buy_code(request: Request, share_code):
 	return msg(status='success', data='Click success, please wating for more team share buy member!')
 
 @logger.catch(level='ERROR')
-@router.get('/share_monitor/{share_code}')
+@router.get('/share_monitor/{share_code}')  # 监测团购码和团购链接的有效性
 async def share_monitor(request: Request, share_code):
 # def share_monitor(share_code):
 	redis = redis_connection(redis_db=1)
@@ -283,7 +306,8 @@ async def share_monitor(request: Request, share_code):
 		db_share_info['status'] = 'Cannel'
 		share_buy_db.update_one({'share_code': share_code}, {'share_info': db_share_info})
 		refund = miner_db.find_one({'miner_name': db_share_info['miner_name']})['miner_team_price']
-		refund_money(share_code, round((refund / CONFIG['TeamBuyNumber']), 2))
+		miner_id = db_share_info['miner_id']
+		refund_money(share_code, round((refund / CONFIG['TeamBuyNumber']), 4), miner_id)
 		return msg(status='error', data='Share buy url was expired!', code=212)
 	redis_share_info = redis.get_key_expire_content(key_name=share_code)
 	redis_share_info = json.loads(redis_share_info)
@@ -291,11 +315,11 @@ async def share_monitor(request: Request, share_code):
 	if share_buy_count > CONFIG['TeamBuyNumber']:
 		return msg(status='error', data='Number of buyers exceeded!', code=211)
 	elif share_buy_count == CONFIG['TeamBuyNumber']:
-		return msg(status='success', data='Congratulations, team share buy number is full!')
+		return msg(status='success', data='Congratulations, team share buy number is full, please pay money!')
 	else:
 		return msg(status='success', data='Wating for more team share buy member!')
 
-def refund_money(share_buy_code, miner_per_price):
+def refund_money(share_buy_code, miner_per_price, miner_id):    # 团购未成功，退回金额并删除资产中团购矿机记录
 	share_buy_info = share_buy_db.find_one({'share_code': share_buy_code})['share_info']
 	members = share_buy_info['members']
 	# member_count = share_buy_info['member_count']
@@ -303,12 +327,12 @@ def refund_money(share_buy_code, miner_per_price):
 		logger.info(member)
 		user_asset = asset_db.find_one({'user_id': member})['asset']
 		user_asset_all = user_asset['usdt']['all']
-		logger.info(user_asset_all)
-		logger.info(user_asset_all + miner_per_price)
-		asset_db.update_one({'user_id': member}, {'asset.usdt.all': user_asset_all + miner_per_price})
+		logger.info(f'refund {miner_per_price} usdt for {member}...')
+		asset_db.update_one({'user_id': member}, {'asset.usdt.all': round(user_asset_all + miner_per_price, 4)})
+		asset_db.collection.update({'user_id': member}, {'$pull': {'asset.team_miner': {'miner_id': miner_id}}})
 
 @logger.catch(level='ERROR')
-@router.post('/team_share_buy')
+@router.post('/team_share_buy') # 团购购买付款链接
 async def team_share_buy_miner(request: Request, buy_info: TeamBuyMiner):
 	user_id = antx_auth(request)
 	user_asset = asset_db.find_one({'user_id': user_id})['asset']
@@ -317,12 +341,11 @@ async def team_share_buy_miner(request: Request, buy_info: TeamBuyMiner):
 	share_buy_info = json.loads(share_buy_info)
 	members = share_buy_info['members']
 	member_count = share_buy_info['member_count']
+	miner_id = share_buy_info['miner_id']
 	if user_asset['usdt']['all'] < buy_info.miner_per_price:
 		return msg(status='error', data='Order created failed, your wallet balance is not enough to buy, please recharge!', code=209)
 
-	miner_id = generate_miner_id()
 	now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-	# per_pay_money = round((buy_info.miner_sum_price / CONFIG['TeamBuyNumber']), 2)
 	return_info = {
 		'miner_id': miner_id,
 		'miner_name': buy_info.miner_name,
@@ -336,7 +359,7 @@ async def team_share_buy_miner(request: Request, buy_info: TeamBuyMiner):
 		'created_time': now_time,
 		'update_time': '',
 		'alive_time': '00:00:00',
-		'members': members,  # nickname
+		'members': members,  # user_id 列表
 		'member_count': member_count,
 		'share_code': buy_info.share_buy_code,
 		'all': 0,
@@ -347,9 +370,9 @@ async def team_share_buy_miner(request: Request, buy_info: TeamBuyMiner):
 	asset_db.collection.update_one({'user_id': user_id}, {'$push': {'asset.team_miner': asset_miner}}, upsert=True)
 	record_db.insert_one_data(record_buy(user_id, buy_info.miner_name, miner_id, buy_info.miner_per_price, buy_type='team'))
 
-	miner_info = miner_db.find_one({'miner_name': buy_info.miner_name})
-	miner_numbers = miner_info['miner_numbers']
-	miner_db.update_one({'miner_name': buy_info.miner_name}, {'miner_numbers': miner_numbers - 1})
+	# miner_info = miner_db.find_one({'miner_name': buy_info.miner_name})
+	# miner_numbers = miner_info['miner_numbers']
+	# miner_db.update_one({'miner_name': buy_info.miner_name}, {'miner_numbers': miner_numbers - 1})
 	return msg(status='success', data=return_info)
 
 @logger.catch(level='ERROR')

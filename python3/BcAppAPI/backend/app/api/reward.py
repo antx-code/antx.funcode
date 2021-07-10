@@ -211,6 +211,11 @@ async def get_team_reward(request: Request):
 		del record['miner_name']
 		del record['today_rewards']
 		del record['member_count']
+		members = []
+		for member in record['members']:
+			member_nickname = user_db.find_one({'user_id': member})['nickname']
+			members.append(member_nickname)
+		record['members'] = members
 		# record['members_img'] = []
 		# for member in record['members']:
 		# 	try:

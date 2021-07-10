@@ -168,7 +168,7 @@ class MinerRewardRunner():
 					asset_db.update_one({'asset.team_miner.miner_id': miner_id},
 					                    {'asset.team_miner.$.all': round(miner_all_reward * self.level3, 4)})
 					asset_db.update_one({'asset.team_miner.miner_id': miner_id},
-					                    {'asset.team_miner.$.today_rewards': miner_today_rewards})
+					                    {'asset.team_miner.$.today_rewards': round(miner_today_rewards, 4)})
 		self.usdt_reward()
 		self.share_reward()
 
