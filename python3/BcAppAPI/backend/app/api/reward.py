@@ -229,27 +229,27 @@ async def get_myminer_detail(request: Request, get_info: MyMinerDetail):
 	user_id = antx_auth(request)
 	asset_info = asset_db.find_one({'user_id': user_id})['asset']
 	miner_info = miner_db.find_one({'miner_name': get_info.miner_name})
-	if get_info.type == 'personal':
+	if get_info.miner_type == 'personal':
 		miner_price = miner_info['miner_price']
 		for miner in asset_info['miner']:
 			if miner['miner_name'] == get_info.miner_name:
 				all = miner['all']
 				today_reward = miner['today_reward']
-				alive_time = miner['alive_time']
+				ctime = format2timestamp(miner['created_time'])
 	else:
 		miner_price = miner_info['miner_team_price']
 		for miner in asset_info['team_miner']:
 			if miner['miner_name'] == get_info.miner_name:
 				all = miner['all']
 				today_reward = miner['today_reward']
-				alive_time = miner['alive_time']
+				ctime = format2timestamp(miner['created_time'])
 	my_miner_detail = {
 		'miner_name': get_info.miner_name,
 		'miner_id': get_info.miner_id,
 		'miner_type': get_info.miner_type,
 		'all': all,
 		'today': today_reward,
-		'alive_time': alive_time,
+		'created_time': ctime,
 		'miner_price': miner_price,
 		'miner_power': miner_info['miner_power'],
 		'miner_management_fee': miner_info['miner_manage_price']    # 百分比
@@ -271,4 +271,4 @@ async def get_miner_reward(request: Request, record_info: MinerRewardRecord):
 	for record in records:
 		del record['record_date']
 		final_records.append(record)
-	return final_records
+	return msg(status='success', data=final_records)

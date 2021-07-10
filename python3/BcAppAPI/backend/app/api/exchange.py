@@ -385,5 +385,5 @@ async def get_record(request: Request, record_info: RecordInfo):
 	for record in records:
 		del record['_id']
 		final_records.append(record)
-	return final_records
+	return msg(status='success', data=final_records)
 
