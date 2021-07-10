@@ -1,2 +1,2 @@
-# antx.funcode
-All antx base code just for fun.
+# funcode
+All antx code just for fun.
