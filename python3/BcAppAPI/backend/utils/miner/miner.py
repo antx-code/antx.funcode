@@ -43,8 +43,8 @@ class MinerRewardRunner():
 		sum_timestamp = format2timestamp(created_time)
 		sum_diff = now_time - sum_timestamp
 		today_diff = now_time - today_timestamp
-		miner_today_reward = round(today_diff * second_reward * (1-self.manage_fee), 2)   # 此时未按三级分发，已扣除管理费
-		miner_all_reward = round(sum_diff * second_reward * (1-self.manage_fee), 2)   # 此时未按三级分发，已扣除管理费
+		miner_today_reward = round(today_diff * second_reward * (1-self.manage_fee), 4)   # 此时未按三级分发，已扣除管理费
+		miner_all_reward = round(sum_diff * second_reward * (1-self.manage_fee), 4)   # 此时未按三级分发，已扣除管理费
 		return miner_today_reward, miner_all_reward
 
 	@logger.catch(level='ERROR')
@@ -57,9 +57,9 @@ class MinerRewardRunner():
 		sum_timestamp = format2timestamp(created_time)
 		sum_diff = now_time - sum_timestamp
 		today_diff = now_time - today_timestamp
-		miner_today_rewards = round(today_diff * second_reward * (1 - self.manage_fee), 2)  # 此时未按三级分发，已扣除管理费,今日矿机总收益
-		miner_today_reward = round((today_diff * second_reward * (1 - self.manage_fee)) / self.team_number, 2)  # 此时未按三级分发，已扣除管理费，今日矿机总收益个人所得部分
-		miner_all_reward = round((sum_diff * second_reward * (1 - self.manage_fee)) / self.team_number, 2)  # 此时未按三级分发，已扣除管理费
+		miner_today_rewards = round(today_diff * second_reward * (1 - self.manage_fee), 4)  # 此时未按三级分发，已扣除管理费,今日矿机总收益
+		miner_today_reward = round((today_diff * second_reward * (1 - self.manage_fee)) / self.team_number, 4)  # 此时未按三级分发，已扣除管理费，今日矿机总收益个人所得部分
+		miner_all_reward = round((sum_diff * second_reward * (1 - self.manage_fee)) / self.team_number, 4)  # 此时未按三级分发，已扣除管理费
 		return miner_today_reward, miner_all_reward, miner_today_rewards
 
 	@logger.catch(level='ERROR')
@@ -82,7 +82,7 @@ class MinerRewardRunner():
 				for miner in asset['asset']['team_miner']:
 					m_today_reward += miner['today_reward']
 					m_reward += miner['all']
-				asset_db.update_one({'user_id': user_id}, {'asset.usdt.sum_reward': m_reward, 'asset.usdt.today_reward': m_today_reward})
+				asset_db.update_one({'user_id': user_id}, {'asset.usdt.sum_reward': round(m_reward, 4), 'asset.usdt.today_reward': round(m_today_reward, 4)})
 
 	@logger.catch(level='ERROR')
 	def share_reward(self):
@@ -102,14 +102,14 @@ class MinerRewardRunner():
 					for af1 in dnk_info['af1_code']:
 						af1_user_id = dnk_db.find_one({'own_code': af1})['user_id']
 						af1_sum_reward = asset_db.find_one({'user_id': af1_user_id})['asset']['usdt']['sum_reward']
-						share_level_reward = round((af1_sum_reward / self.level3) * self.level2, 2)
+						share_level_reward = round((af1_sum_reward / self.level4) * self.level2, 4)
 						share_reward += share_level_reward
 
 				if dnk_info is not None and len(dnk_info['af2_code']) > 0:
 					for af2 in dnk_info['af2_code']:
 						af2_user_id = dnk_db.find_one({'own_code': af2})['user_id']
 						af2_sum_reward = asset_db.find_one({'user_id': af2_user_id})['asset']['usdt']['sum_reward']
-						share_level_reward = round((af2_sum_reward / self.level3) * self.level1, 2)
+						share_level_reward = round((af2_sum_reward / self.level3) * self.level1, 4)
 						share_reward += share_level_reward
 
 				asset_db.update_one({'user_id': user_id},
@@ -153,9 +153,9 @@ class MinerRewardRunner():
 					self.miner_record(user_id=asset['user_id'], miner_name=miner['miner_name'], miner_id=miner_id, miner_type='personal', miner_all_reward=miner_all_reward, miner_today_reward=miner_today_reward)
 
 					asset_db.update_one({'asset.miner.miner_id': miner_id},
-					                    {'asset.miner.$.today_reward': round(miner_today_reward * self.level3, 2)})
+					                    {'asset.miner.$.today_reward': round(miner_today_reward * self.level3, 4)})
 					asset_db.update_one({'asset.miner.miner_id': miner_id},
-					                    {'asset.miner.$.all': round(miner_all_reward * self.level3, 2)})
+					                    {'asset.miner.$.all': round(miner_all_reward * self.level3, 4)})
 				for miner in asset['asset']['team_miner']:
 					miner_id = miner['miner_id']
 					miner_today_reward, miner_all_reward, miner_today_rewards = self.team_miner_running(miner)
@@ -164,9 +164,9 @@ class MinerRewardRunner():
 					                  miner_today_reward=miner_today_reward)
 
 					asset_db.update_one({'asset.team_miner.miner_id': miner_id},
-					                    {'asset.team_miner.$.today_reward': round(miner_today_reward * self.level3, 2)})
+					                    {'asset.team_miner.$.today_reward': round(miner_today_reward * self.level3, 4)})
 					asset_db.update_one({'asset.team_miner.miner_id': miner_id},
-					                    {'asset.team_miner.$.all': round(miner_all_reward * self.level3, 2)})
+					                    {'asset.team_miner.$.all': round(miner_all_reward * self.level3, 4)})
 					asset_db.update_one({'asset.team_miner.miner_id': miner_id},
 					                    {'asset.team_miner.$.today_rewards': miner_today_rewards})
 		self.usdt_reward()
