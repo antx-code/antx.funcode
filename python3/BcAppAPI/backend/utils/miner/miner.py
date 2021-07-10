@@ -1,10 +1,36 @@
+import time
 from loguru import logger
 from utils.services.redis_db_connect.connect import *
+
+asset_db = db_connection('bc-app', 'assets')
+miner_reward_record_db = db_connection('bc-app', 'miner_reward_record')
+dnk_db = db_connection('bc-app', 'dnetworks')
+redis_service = redis_connection(redis_db=0)
+
+# miner_reward -> 矿机预计预收益
+# miner_reward record
+# dnk -> 分级收益
+# asset 每个人的收益
+
+def format2timestamp(format_time: str):
+	timestamp = time.mktime(time.strptime(format_time, "%Y-%m-%d %H:%M:%S"))
+	return int(timestamp)
+
+def timediff(timediff: int):
+	m, s = divmod(timediff, 60)
+	h, m = divmod(m, 60)
+
+	return s
 
 class MinerRewardRunner():
 	@logger.catch(level='ERROR')
 	def __init__(self):
-		pass
+		config_info = redis_service.hget_redis('config', 'app')
+		self.miner_exceptd_reward = config_info['MinerReward']
+		self.level1 = config_info['Level1Reward']
+		self.level2 = config_info['Level2Reward']
+		self.level3 = config_info['Level3Reward']
+		self.manage_fee = config_info['MinerManageFee']
 
 	@logger.catch(level='ERROR')
 	def miner_running(self):
@@ -20,11 +46,12 @@ class MinerRewardRunner():
 
 	@logger.catch(level='ERROR')
 	def dia(self):
-		pass
+		now_time = int(time.time())
+
 
 	@logger.catch(level='ERROR')
 	def test(self):
-		pass
+		logger.info(self.level1)
 
 if __name__ == '__main__':
     miner_reward_runner = MinerRewardRunner()

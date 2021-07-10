@@ -29,22 +29,30 @@ miner_reward_record_db = db_connection('bc-app', 'miner_reward_record')
 miner_db = db_connection('bc-app', 'miners')
 redis_service = redis_connection(redis_db=0)
 
+@logger.catch(level='ERROR')
 def time2seconds(st):
 	h, m, s = st.strip().split(":")
 	time2sec = int(h) * 3600 + int(m) * 60 + int(s)
 	return time2sec
 
+@logger.catch(level='ERROR')
 def seconds2time(st):
 	m, s = divmod(st, 60)
 	h, m = divmod(m, 60)
 	return h, m, s
 
+@logger.catch(level='ERROR')
 def get_recent7date(n=7):
 	dates = []
 	today = datetime.datetime.now()
 	for i in range(n):
 		dates.append((today - datetime.timedelta(days=i)).strftime("%Y-%m-%d"))
 	return dates
+
+@logger.catch(level='ERROR')
+def format2timestamp(format_time: str):
+	timestamp = time.mktime(time.strptime(format_time, "%Y-%m-%d %H:%M:%S"))
+	return int(timestamp)
 
 @logger.catch(level='ERROR')
 @router.get('/home_reward')
@@ -87,7 +95,9 @@ async def get_home_reward(request: Request):
 		for miner in miners:
 			miner['miner_type'] = 'personal'
 			miner['status'] = 'running'
-			del miner['created_time']
+			ctime = format2timestamp(miner['created_time'])
+			miner['created_time'] = ctime
+			del miner['alive_time']
 			del miner['today_reward']
 		miner_list.extend(miners)
 	except Exception as e:
@@ -107,7 +117,7 @@ async def get_home_reward(request: Request):
 
 	final_result = {
 		'reward': {
-			'sum_reward': asset_info['usdt']['sum_reward'],
+			'sum_reward': asset_info['usdt'].get('sum_reward', 0),
 			'today_reward': asset_info['usdt']['today_reward'],
 			'running_time': f'{arh:02d}:{arm:02d}:{ars:02d}'
 		},

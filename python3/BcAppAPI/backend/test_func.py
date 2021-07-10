@@ -319,8 +319,15 @@ def test_math_sa():
 	pages = counts // size
 	print(pages)
 
+def timestamp2format():
+	timestamp = 1623524130
+	tl = time.localtime(timestamp)
+	format_time = time.strftime("%Y-%m-%d %H:%M:%S", tl)
+	print(format_time)
+
 if __name__ == '__main__':
 	test_math_sa()
+	timestamp2format()
 	# generate_init_miners()
 	# st = time2seconds('12:21:11')
 	# h, m, s = seconds2time(2090880)
