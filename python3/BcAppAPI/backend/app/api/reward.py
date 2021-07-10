@@ -251,3 +251,8 @@ async def get_myminer_detail(request: Request, get_info: MyMinerDetail):
 		'miner_management_fee': miner_info['miner_manage_price']    # 百分比
 	}
 	return msg(status='success', data=my_miner_detail)
+
+@logger.catch(level='ERROR')
+@router.post('/record')
+async def get_miner_reward():
+	pass

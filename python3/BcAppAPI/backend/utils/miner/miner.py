@@ -82,7 +82,48 @@ class MinerRewardRunner():
 
 	@logger.catch(level='ERROR')
 	def share_reward(self):
-		pass
+		asset_count = asset_db.collection.count_documents({})
+		if (asset_count // 10) == 0:
+			pages = (asset_count // 10)
+		else:
+			pages = (asset_count // 10) + 1
+		for i in range(pages):
+			assets = asset_db.collection.find({}, {'_id': 0}).skip(i).limit(10)
+			for asset in assets:
+				share_reward = 0
+				user_id = asset['user_id']
+				dnk_info = dnk_db.find_one({'user_id': user_id})
+				if dnk_info is not None and len(dnk_info['af1_code']) > 0:
+					for af1 in dnk_info['af1_code']:
+						af1_user_id = dnk_db.find_one({'own_code': af1})['user_id']
+						af1_sum_reward = asset_db.find_one({'user_id': af1_user_id})['asset']['usdt']['sum_reward']
+						share_level_reward = round((af1_sum_reward / self.level3) * self.level2, 2)
+						share_reward += share_level_reward
+
+				if dnk_info is not None and len(dnk_info['af2_code']) > 0:
+					for af2 in dnk_info['af2_code']:
+						af2_user_id = dnk_db.find_one({'own_code': af2})['user_id']
+						af2_sum_reward = asset_db.find_one({'user_id': af2_user_id})['asset']['usdt']['sum_reward']
+						share_level_reward = round((af2_sum_reward / self.level3) * self.level1, 2)
+						share_reward += share_level_reward
+
+				asset_db.update_one({'user_id': user_id},
+				                    {'asset.share': share_reward})
+
+	@logger.catch(level='ERROR')
+	def miner_record(self, user_id: int, miner_name: str, miner_id: str, miner_type: str, miner_all_reward: float, miner_today_reward: float):
+		now_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+		record = {
+			'user_id': user_id,
+			'miner_type': miner_type,
+			'miner_id': miner_id,
+			'miner_name': miner_name,
+			'record_time': now_time,
+			'record_date': now_time.split(' ')[0],
+			'miner_all_reward': miner_all_reward,
+			'miner_today_reward': miner_today_reward
+		}
+		miner_reward_record_db.insert_one_data(record)
 
 	@logger.catch(level='ERROR')
 	def miner_status_manager(self):
@@ -99,9 +140,9 @@ class MinerRewardRunner():
 			assets = asset_db.collection.find({}, {'_id': 0}).skip(i).limit(10)
 			for asset in assets:
 				for miner in asset['asset']['miner']:
-					logger.info(miner['miner_id'])
 					miner_id = miner['miner_id']
 					miner_today_reward, miner_all_reward = self.miner_running(miner)
+					self.miner_record(user_id=asset['user_id'], miner_name=miner['miner_name'], miner_id=miner_id, miner_type='personal', miner_all_reward=miner_all_reward, miner_today_reward=miner_today_reward)
 
 					asset_db.update_one({'asset.miner.miner_id': miner_id},
 					                    {'asset.miner.$.today_reward': round(miner_today_reward * self.level3, 2)})
@@ -110,6 +151,10 @@ class MinerRewardRunner():
 				for miner in asset['asset']['team_miner']:
 					miner_id = miner['miner_id']
 					miner_today_reward, miner_all_reward, miner_today_rewards = self.team_miner_running(miner)
+					self.miner_record(user_id=asset['user_id'], miner_name=miner['miner_name'], miner_id=miner_id,
+					                  miner_type='team', miner_all_reward=miner_all_reward,
+					                  miner_today_reward=miner_today_reward)
+
 					asset_db.update_one({'asset.team_miner.miner_id': miner_id},
 					                    {'asset.team_miner.$.today_reward': round(miner_today_reward * self.level3, 2)})
 					asset_db.update_one({'asset.team_miner.miner_id': miner_id},
@@ -122,9 +167,15 @@ class MinerRewardRunner():
 	@logger.catch(level='ERROR')
 	def test(self):
 		logger.info(self.manage_fee)
-		self.usdt_reward()
+		# self.usdt_reward()
+		self.share_reward()
 
 if __name__ == '__main__':
-    miner_reward_runner = MinerRewardRunner()
-    # miner_reward_runner.dia()
-    miner_reward_runner.test()
+	logger.info('************ start miner reward ************')
+	start = time.time()
+	miner_reward_runner = MinerRewardRunner()
+	miner_reward_runner.dia()
+	end = time.time()
+	logger.info(f'共用时: {end-start}s.')
+	logger.info('************ end miner reward ************')
+    # miner_reward_runner.test()
