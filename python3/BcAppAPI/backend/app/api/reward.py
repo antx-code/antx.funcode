@@ -109,6 +109,7 @@ async def get_home_reward(request: Request):
 			miner['status'] = 'running'
 			del miner['created_time']
 			del miner['today_reward']
+			del miner['today_rewards']
 			del miner['members']
 			del miner['miner_member_count']
 		miner_list.extend(team_miners)
@@ -184,6 +185,9 @@ async def get_miner_reward(request: Request):
 	asset_info = asset_db.find_one({'user_id': user_id})
 	records = asset_info['asset']['miner']
 	for record in records:
+		ctime = format2timestamp(record['created_time'])
+		record['created_time'] = ctime
+		del record['alive_time']
 		del record['today_reward']
 		del record['miner_name']
 	reward_info = {'asset': asset_info['asset']['usdt']['all'], 'miner_reward': records}
@@ -196,6 +200,9 @@ async def get_team_reward(request: Request):
 	asset_info = asset_db.find_one({'user_id': user_id})
 	records = asset_info['asset']['team_miner']
 	for record in records:
+		ctime = format2timestamp(record['created_time'])
+		record['created_time'] = ctime
+		del record['alive_time']
 		del record['today_reward']
 		del record['miner_name']
 		del record['today_rewards']

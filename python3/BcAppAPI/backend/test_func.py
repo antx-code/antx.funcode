@@ -325,9 +325,14 @@ def timestamp2format():
 	format_time = time.strftime("%Y-%m-%d %H:%M:%S", tl)
 	print(format_time)
 
+def test_today():
+	today = str(datetime.datetime.today()).split(' ')[0]
+	logger.info(today)
+
 if __name__ == '__main__':
 	test_math_sa()
 	timestamp2format()
+	test_today()
 	# generate_init_miners()
 	# st = time2seconds('12:21:11')
 	# h, m, s = seconds2time(2090880)
