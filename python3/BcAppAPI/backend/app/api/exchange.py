@@ -180,6 +180,8 @@ async def get_notice(request: Request):
 	user_id = antx_auth(request)
 	all_notice = []
 	notices = notice_db.collection.find({'noticed_id': user_id}, {'_id': 0}).sort('created_time', -1)
+	if not notices:
+		return msg(status='success', data={'share_code': '', 'miner_name': '', 'notice': ''})
 	for notice in notices:
 		all_notice.append(notice)
 	notice_info = all_notice[0]
@@ -306,8 +308,12 @@ async def share_monitor(request: Request, share_code):
 		db_share_info['status'] = 'Cannel'
 		share_buy_db.update_one({'share_code': share_code}, {'share_info': db_share_info})
 		refund = miner_db.find_one({'miner_name': db_share_info['miner_name']})['miner_team_price']
-		miner_id = db_share_info['miner_id']
-		refund_money(share_code, round((refund / CONFIG['TeamBuyNumber']), 4), miner_id)
+		try:
+			miner_id = db_share_info['miner_id']
+		except Exception as e:
+			miner_id = generate_miner_id()
+			share_buy_db.update_one({'share_code': share_code}, {'miner_id': miner_id})
+		# refund_money(share_code, round((refund / CONFIG['TeamBuyNumber']), 4), miner_id)
 		return msg(status='error', data='Share buy url was expired!', code=212)
 	redis_share_info = redis.get_key_expire_content(key_name=share_code)
 	redis_share_info = json.loads(redis_share_info)

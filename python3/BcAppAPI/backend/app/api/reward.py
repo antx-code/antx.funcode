@@ -145,9 +145,9 @@ async def get_abs_reward(request: Request):
 	for record in team_miner_records:
 		team_miner_reward += record['all']
 	reward_info = {
-		'sum_reward': asset_info['usdt']['sum_reward'],
-		'miner_reward': miner_reward,
-		'team_miner_reward': team_miner_reward
+		'sum_reward': round(asset_info['usdt']['sum_reward'], 4),
+		'miner_reward': round(miner_reward, 4),
+		'team_miner_reward': round(team_miner_reward, 4)
 	}
 	return msg(status='success', data=reward_info)
 
