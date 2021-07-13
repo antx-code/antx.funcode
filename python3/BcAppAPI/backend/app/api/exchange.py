@@ -180,8 +180,9 @@ async def post_notice(request: Request, post_info: PostNotice):
 async def get_notice(request: Request):
 	user_id = antx_auth(request)
 	all_notice = []
-	notices = notice_db.collection.find({'noticed_id': user_id}, {'_id': 0}).sort('created_time', -1)
-	if not notices:
+	try:
+		notices = notice_db.collection.find({'noticed_id': user_id}, {'_id': 0}).sort('created_time', -1)
+	except Exception as e:
 		return msg(status='success', data={'share_code': '', 'miner_name': '', 'notice': ''})
 	for notice in notices:
 		all_notice.append(notice)
