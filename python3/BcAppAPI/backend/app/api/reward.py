@@ -193,7 +193,8 @@ async def get_miner_reward(request: Request):
 		record['created_time'] = ctime
 		del record['alive_time']
 		del record['today_reward']
-		del record['miner_name']
+		record['type'] = 'personal'
+		# del record['miner_name']
 	reward_info = {'asset': asset_info['asset']['usdt']['all'], 'miner_reward': records}
 	return msg(status='success', data=reward_info)
 
@@ -208,9 +209,10 @@ async def get_team_reward(request: Request):
 		record['created_time'] = ctime
 		del record['alive_time']
 		del record['today_reward']
-		del record['miner_name']
+		# del record['miner_name']
 		del record['today_rewards']
 		del record['member_count']
+		record['type'] = 'team'
 		members = []
 		for member in record['members']:
 			member_nickname = user_db.find_one({'user_id': member})['nickname']
