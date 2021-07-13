@@ -31,6 +31,7 @@ record_db = db_connection('bc-app', 'records')
 share_buy_db = db_connection('bc-app', 'share_buy_code')
 redis_service = redis_connection(redis_db=0)
 notice_db = db_connection('bc-app', 'notices')
+address_db = db_connection('bc-app', 'address')
 
 CONFIG = redis_service.hget_redis(redis_key='config', content_key='app')
 
@@ -394,6 +395,10 @@ async def recharge(request: Request, recharge_info: RechargeInfo):
 @router.post('/withdraw')
 async def withdraw(request: Request, withdraw_info: WithdrawInfo):
 	user_id = antx_auth(request)
+	try:
+		address = address_db.find_one({'user_id': user_id})['address']
+	except Exception as e:
+		return msg(status='error', data='Unbinding address!', code=210)
 	asset = asset_db.find_one({'user_id': user_id})['asset']['usdt']['all']
 	asset_db.update_one({'user_id': user_id}, {'asset.usdt.all': asset - withdraw_info.withdraw_usdt})
 	record_db.insert_one_data(record_recharge_withdraw(user_id, 'withdraw', withdraw_info.withdraw_usdt))
