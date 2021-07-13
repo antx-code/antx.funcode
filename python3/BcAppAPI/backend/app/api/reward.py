@@ -204,6 +204,7 @@ async def get_team_reward(request: Request):
 	user_id = antx_auth(request)
 	asset_info = asset_db.find_one({'user_id': user_id})
 	records = asset_info['asset']['team_miner']
+	config = redis_service.hget_redis('config', 'app')
 	for record in records:
 		ctime = format2timestamp(record['created_time'])
 		record['created_time'] = ctime
@@ -211,13 +212,14 @@ async def get_team_reward(request: Request):
 		del record['today_reward']
 		# del record['miner_name']
 		del record['today_rewards']
-		del record['member_count']
+		# del record['member_count']
 		record['type'] = 'team'
 		members = []
 		for member in record['members']:
 			member_nickname = user_db.find_one({'user_id': member})['nickname']
 			members.append(member_nickname)
 		record['members'] = members
+		record['rem_count'] = config['TeamBuyNumber'] - record['member_count']
 		# record['members_img'] = []
 		# for member in record['members']:
 		# 	try:

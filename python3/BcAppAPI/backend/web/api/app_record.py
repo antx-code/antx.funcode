@@ -63,4 +63,12 @@ async def get_record(get_record: GetRecord):
 			records.append(record)
 	except Exception as e:
 		pass
-	return msg(status='success', data=records)
+	total_count = record_db.collection.find({'type': get_record.type, 'user_id': int(get_record.user_id)}, {'_id': 0}).count()
+	page_tmp = total_count % af
+	if page_tmp != 0:
+		all_pages = (total_count // af) + 1
+	else:
+		all_pages = total_count // af
+	rep_data = {'filter_count': len(records), 'record': records, 'total_count': total_count,
+	            'total_pages': all_pages}
+	return msg(status='success', data=rep_data)
