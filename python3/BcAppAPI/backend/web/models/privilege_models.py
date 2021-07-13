@@ -7,7 +7,7 @@ class PrivilegeList(BaseModel):
     type: str
 
 class SetPrivilege(BaseModel):
-    user_id: int
+    user_id: str
     privilege: str
     is_active: Optional[bool]
     is_superuser: Optional[bool]

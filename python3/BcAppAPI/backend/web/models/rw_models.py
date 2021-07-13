@@ -7,8 +7,8 @@ class GetAllRw(BaseModel):
     type: str
 
 class GetOneRw(BaseModel):
-    record_id: int
+    record_id: str
 
 class UpdateOneRw(BaseModel):
-    record_id: int
+    record_id: str
     status: str

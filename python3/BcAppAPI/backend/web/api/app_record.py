@@ -29,14 +29,37 @@ redis_service = redis_connection(redis_db=0)
 
 
 @logger.catch(level='ERROR')
+@router.post('/all')
+async def get_all_records(get_info: AllRecords):
+	final_data = []
+	pref = (get_info.page - 1) * get_info.size
+	af = get_info.size
+	all_records = record_db.collection.find({}, {'_id': 0}).skip(pref).limit(af)
+	for record in all_records:
+		record['user_id'] = str(record['user_id'])
+		record['record'] = str(record['record_id'])
+		final_data.append(record)
+	total_count = record_db.collection.find({}, {'_id': 0}).count()
+	page_tmp = total_count % af
+	if page_tmp != 0:
+		all_pages = (total_count // af) + 1
+	else:
+		all_pages = total_count // af
+	rep_data = {'filter_count': len(final_data), 'record': final_data, 'total_count': total_count,
+	            'total_pages': all_pages}
+	return msg(status='success', data=rep_data)
+
+@logger.catch(level='ERROR')
 @router.post('/get_record')
 async def get_record(get_record: GetRecord):
 	records = []
 	pref = (get_record.page - 1) * get_record.size
 	af = get_record.size
 	try:
-		record_info = record_db.collection.find({'type': get_record.type, 'user_id': get_record.user_id}, {"_id": 0}).skip(pref).limit(af)
+		record_info = record_db.collection.find({'type': get_record.type, 'user_id': int(get_record.user_id)}, {"_id": 0}).skip(pref).limit(af)
 		for record in record_info:
+			record['user_id'] = str(record['user_id'])
+			record['record_id'] = str(record['record_id'])
 			records.append(record)
 	except Exception as e:
 		pass

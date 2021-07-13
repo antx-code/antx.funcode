@@ -27,14 +27,18 @@ class DeleteAdminAcount(BaseModel):
 
 class BussinessConfig(BaseModel):
 	MinerReward: float = 1000
-	Level1Reward: float = 0.2
-	Level2Reward: float = 0.3
-	Level3Reward: float = 0.5
-	MinerManageFee: float = 200
+	Level1Reward: float = 0.02
+	Level2Reward: float = 0.03
+	Level3Reward: float = 0.95
+	MinerManageFee: float = 0.02
 	MinerLife: int = 10000
 	ShareReward: float = 100
 	TeamBuyNumber: int = 5
 	MinerSumCount: int = 10000
+
+class AllAdmin(BaseModel):
+	page: int
+	size: int
 
 class SystemSettings(BaseModel):
 	pass

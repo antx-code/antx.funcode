@@ -33,7 +33,7 @@ async def get_privilege_list(privilege_info: PrivilegeList):
 		users_info = user_db.collection.find({}, {'_id': 0}).skip(pref).limit(af)
 		for user in users_info:
 			user_info = {
-				'user_id': user['user_id'],
+				'user_id': str(user['user_id']),
 				'username': user['nickname'],
 				'privilege': user.get('privilege', 'user'),
 				'is_active': user['is_active'],
@@ -41,11 +41,12 @@ async def get_privilege_list(privilege_info: PrivilegeList):
 				'is_logged_in': user['is_logged_in']
 			}
 			privileges.append(user_info)
+		total_count = user_db.collection.find({}, {"_id": 0}).count()
 	else:
 		users_info = admin_db.collection.find({'privilege': privilege_info.type}, {'_id': 0}).skip(pref).limit(af)
 		for user in users_info:
 			user_info = {
-				'user_id': user['user_id'],
+				'user_id': str(user['user_id']),
 				'username': user['username'],
 				'privilege': user.get('privilege', 'gensuper'),
 				'is_active': user['is_active'],
@@ -53,7 +54,14 @@ async def get_privilege_list(privilege_info: PrivilegeList):
 				'is_logged_in': user['is_logged_in']
 			}
 			privileges.append(user_info)
-	return msg(status='success', data=privileges)
+		total_count = admin_db.collection.find({'privilege': privilege_info.type}, {"_id": 0}).count()
+		page_tmp = total_count % af
+		if page_tmp != 0:
+			all_pages = (total_count // af) + 1
+		else:
+			all_pages = total_count // af
+		rep_data = {'filter_count': len(privileges), 'record': privileges, 'total_count': total_count, 'total_pages': all_pages}
+	return msg(status='success', data=rep_data)
 
 @logger.catch(level='ERROR')
 @router.get('/{user_id}')
@@ -65,7 +73,7 @@ async def get_user_privilege(user_id):
 		tag = 'non-user'
 		user_info = admin_db.find_one({'user_id': user_id})
 	info = {
-		'user_id': user_info['user_id'],
+		'user_id': str(user_info['user_id']),
 		'privilege': user_info.get('privilege', 'user'),
 		'is_active': user_info['is_active'],
 		'is_superuser': user_info['is_superuser'],
@@ -87,7 +95,7 @@ async def set_privilege(set_info: SetPrivilege):
 		if v:
 			updates[k] = v
 	if set_info.privilege == 'user':
-		user_db.update_one({'user_id': set_info.user_id}, updates)
+		user_db.update_one({'user_id': int(set_info.user_id)}, updates)
 	else:
-		admin_db.update_one({'user_id': set_info.user_id}, updates)
+		admin_db.update_one({'user_id': int(set_info.user_id)}, updates)
 	return msg(status='success', data='Set user privilege successfully')

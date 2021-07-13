@@ -47,7 +47,7 @@ async def get_all_users(get_info: GetAllUsers):
 			invite_code = promo_invite_info['base_info']['share'].get('invite_code', '')
 			promo_code = promo_invite_info['base_info']['share'].get('promo_code', '')
 		user_info = {
-			'user_id': user['user_id'],
+			'user_id': str(user['user_id']),
 			'nickname': user['nickname'],
 			'phone': user['phone'],
 			'email': user['email'],
@@ -142,7 +142,7 @@ async def add_user(add_info: AddUser):
 @router.get('/{user_id}')
 async def get_user(user_id):
 	user_id = int(user_id)
-	if user_id not in user_db.dep_data('user_id'):
+	if int(user_id) not in user_db.dep_data('user_id') and str(user_id) not in user_db.dep_data('user_id'):
 		return msg(status='error', data='User was not exist!')
 	user_info = user_db.find_one({'user_id': user_id})
 	promo_invite_info = user_info_db.find_one({'user_id': user_id})
@@ -177,7 +177,7 @@ async def update_user(update_info: UpdateUser):
 		for inx, (k, v) in enumerate(dict(update_info.update_info).items()):
 			if v:
 				updates[k] = v
-	user_db.update_one({'user_id': update_info.user_id}, updates)
+	user_db.update_one({'user_id': int(update_info.user_id)}, updates)
 	return msg(status='success', data='Updated user info successfully')
 
 @logger.catch(level='ERROR')
@@ -185,5 +185,5 @@ async def update_user(update_info: UpdateUser):
 async def delete_user(delete_info: DeleteUser):
 	if delete_info.user_id not in user_db.dep_data('user_id'):
 		return msg(status='error', data='User not exist!')
-	user_db.delete_one({'user_id': delete_info.user_id})
+	user_db.delete_one({'user_id': int(delete_info.user_id)})
 	return msg(status='success', data='User deleted successfully')

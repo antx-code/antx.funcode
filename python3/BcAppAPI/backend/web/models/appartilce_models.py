@@ -12,12 +12,12 @@ class AddArticle(BaseModel):
 	type: str
 
 class GetOneArticle(BaseModel):
-	article_id: int
+	article_id: str
 
 class UpdateArticle(BaseModel):
-    article_id: int
+    article_id: str
     title: Optional[str]
     content: Optional[str]
 
 class DeleteArticle(BaseModel):
-    article_id: int
+    article_id: str

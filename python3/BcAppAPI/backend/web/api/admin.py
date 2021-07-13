@@ -24,6 +24,26 @@ admin_db = db_connection('bc-web', 'admin_users')
 redis_service = redis_connection(redis_db=0)
 
 @logger.catch(level='ERROR')
+@router.post('/all', summary='获取所有管理员账户信息')
+async def get_all_admin(request: Request, get_info: AllAdmin):
+	final_data = []
+	pref = (get_info.page - 1) * get_info.size
+	af = get_info.size
+	all_admins = admin_db.collection.find({}, {'_id': 0}).skip(pref).limit(af)
+	for admin in all_admins:
+		admin['user_id'] = str(admin['user_id'])
+		admin['created_by'] = str(admin['created_by'])
+		final_data.append(admin)
+	total_count = admin_db.collection.find({}, {'_id': 0}).count()
+	page_tmp = total_count % af
+	if page_tmp != 0:
+		all_pages = (total_count // af) + 1
+	else:
+		all_pages = total_count // af
+	rep_data = {'filter_count': len(final_data), 'record': final_data, 'total_count': total_count, 'total_pages': all_pages}
+	return msg(status='success', data=rep_data)
+
+@logger.catch(level='ERROR')
 @router.post('/login', summary='管理员登陆')
 async def login(request: Request, login_info: AdminLogin):
 	admin_username_infos = admin_db.dep_data('username')
@@ -151,6 +171,16 @@ async def init_admin():
 	}
 	admin_db.insert_one_data(new_info)
 	return msg(status='success', data='Add new admin user: admin')
+
+@logger.catch(level='ERROR')
+@router.post('/get_bussiness_config')
+async def get_bussiness_config(request: Request):
+	user_id = antx_auth(request)
+	user_info = admin_db.find_one({'user_id': user_id})
+	if not user_info['privilege'] or not user_info['is_superuser']:
+		return msg(status='error', data='Have not enough privilege to operate!')
+	app_config = redis_service.hget_redis(redis_key='config', content_key='app')
+	return msg(status='success', data=app_config)
 
 @logger.catch(level='ERROR')
 @router.post('/bussiness_config')

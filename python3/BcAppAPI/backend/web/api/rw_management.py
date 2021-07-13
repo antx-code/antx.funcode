@@ -37,6 +37,7 @@ async def get_record(get_info: GetAllRw):
 	try:
 		record_info = record_db.collection.find({'type': get_info.type, 'status': 'pending'}, {"_id": 0}).skip(pref).limit(af)
 		for record in record_info:
+			record['record_id'] = str(record['record_id'])
 			records.append(record)
 	except Exception as e:
 		pass
@@ -55,8 +56,9 @@ async def get_record(get_info: GetAllRw):
 async def get_one(get_info: GetOneRw):
 	records = []
 	try:
-		record_info = record_db.collection.find({'record_id': get_info.record_id}, {"_id": 0})
+		record_info = record_db.collection.find({'record_id': int(get_info.record_id)}, {"_id": 0})
 		for record in record_info:
+			record['record_id'] = int(record['record_id'])
 			records.append(record)
 	except Exception as e:
 		pass
@@ -65,11 +67,11 @@ async def get_one(get_info: GetOneRw):
 @logger.catch(level='ERROR')
 @router.post('/update_one')
 async def update_one(update_info: UpdateOneRw):
-	record_db.update_one({'record_id': update_info.record_id}, {'status': update_info.status})
+	record_db.update_one({'record_id': int(update_info.record_id)}, {'status': update_info.status})
 	return msg(status='success', data=f'Verify {update_info.record_id} successfully')
 
 @logger.catch(level='ERROR')
 @router.post('/delete_one')
 async def delete_one(delete_info: GetOneRw):
-	record_db.delete_one({'record_id': delete_info.record_id})
+	record_db.delete_one({'record_id': int(delete_info.record_id)})
 	return msg(status='success', data=f'Delete {delete_info.record_id} successfully')

@@ -19,6 +19,7 @@ class UpdateInfo(BaseModel):
 
 class UpdateMiner(BaseModel):
     miner_name: str
+    new_miner_name: Optional[str]
     miner_month_reward: Optional[float]
     miner_power: Optional[str]
     miner_price: Optional[float]

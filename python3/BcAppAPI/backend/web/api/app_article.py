@@ -96,7 +96,7 @@ async def add_article(request: Request, add_info: AddArticle):
 @logger.catch(level='ERROR')
 @router.post('/get_article')
 async def get_article(get_info: GetOneArticle):
-	article_info = article_db.find_one({'aid': get_info.article_id})
+	article_info = article_db.find_one({'aid': int(get_info.article_id)})
 	if not article_info:
 		return msg(status='error', data='Article are not exist!')
 	return msg(status='success', data=article_info)
@@ -110,20 +110,20 @@ async def update_article(update_info: UpdateArticle):
 	for inx, (k, v) in enumerate(infos.items()):
 		if v:
 			updates[k] = v
-	article_db.update_one({'aid': update_info.article_id}, updates)
-	ori = article_db.find_one({'aid': update_info.article_id})
+	article_db.update_one({'aid': int(update_info.article_id)}, updates)
+	ori = article_db.find_one({'aid': int(update_info.article_id)})
 	if ori['type'] == 'announcement':
 		del ori['type']
 		del ori['created_by']
-		announcement_db.update_one({'aid': update_info.article_id}, ori)
+		announcement_db.update_one({'aid': int(update_info.article_id)}, ori)
 	return msg(status='success', data='Update article successfully')
 
 @logger.catch(level='ERROR')
 @router.post('/delete_article')
 async def delete_article(delete_info: DeleteArticle):
-	article_info = article_db.find_one({'aid': delete_info.article_id})
+	article_info = article_db.find_one({'aid': int(delete_info.article_id)})
 	logger.info(article_info)
-	article_db.delete_one({'aid': delete_info.article_id})
+	article_db.delete_one({'aid': int(delete_info.article_id)})
 	if article_info['type'] == 'announcement':
-		announcement_db.delete_one({'aid': delete_info.article_id})
+		announcement_db.delete_one({'aid': int(delete_info.article_id)})
 	return msg(status='success', data='Article was deleted successfully')

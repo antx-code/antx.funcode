@@ -23,8 +23,8 @@ class UpdateInfo(BaseModel):
     level_status: Optional[str]
 
 class UpdateUser(BaseModel):
-    user_id: int
+    user_id: str
     update_info: UpdateInfo
 
 class DeleteUser(BaseModel):
-    user_id: int
+    user_id: str

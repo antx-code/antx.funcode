@@ -37,6 +37,7 @@ async def get_all_miners(get_info: GetAllMiners):
 	all_miners = miner_db.collection.find({}, {"_id": 0}).skip(pref).limit(af)
 	for miner in all_miners:
 		miner_sum_count = redis_service.hget_redis('config', 'app').get(miner['miner_name'], redis_service.hget_redis('config', 'app')['MinerSumCount'])
+		miner_numbers = miner.get('miner_numbers', miner_sum_count)
 		user_info = {
 			'miner_name': miner['miner_name'],
 			'miner_month_reward': miner['miner_month_reward'],
@@ -44,11 +45,13 @@ async def get_all_miners(get_info: GetAllMiners):
 			'miner_price': miner['miner_price'],
 			'miner_team_price': miner['miner_team_price'],
 			'miner_manage_price': miner['miner_manage_price'],
-			'miner_numbers': miner['miner_numbers'],
+			'miner_numbers': miner_numbers,
 			'miner_sum_count': miner_sum_count,
-			'miner_sale_count': miner_sum_count - miner['miner_numbers']
+			'miner_sale_count': miner_sum_count - miner_numbers
 		}
 		miners.append(user_info)
+		if 'miner_numbers' not in miner.keys():
+			miner_db.update_one({'miner_name': miner['miner_name']}, {'miner_numbers': miner_sum_count})
 	total_count = miner_db.collection.find({}, {"_id": 0}).count()
 	page_tmp = total_count % af
 	if page_tmp != 0:
@@ -66,7 +69,9 @@ async def get_one_miner(miner_name):
 	miner_info = miner_db.find_one({'miner_name': miner_name})
 	miner_pic = miner_pic_db.find_one({'user_id': miner_info['miner_name']})['img']
 	miner_info['miner_sum_count'] = miner_sum_count
-	miner_info['miner_sale_count'] = miner_sum_count - miner_info['miner_numbers']
+	if 'miner_numbers' not in miner_info.keys():
+		miner_info['miner_numbers'] = miner_sum_count
+	miner_info['miner_sale_count'] = miner_sum_count - miner_info.get('miner_numbers', miner_sum_count)
 	miner_info['img'] = miner_pic
 	return msg(status='success', data=miner_info)
 
@@ -98,9 +103,15 @@ async def update_miner(update_info: UpdateMiner):
 	miner_info = dict(update_info)
 	del miner_info['miner_name']
 	updates = {}
+	del miner_info['miner_name']
+	del miner_info['new_miner_name']
 	for inx, (k, v) in enumerate(miner_info.items()):
 		if v:
 			updates[k] = v
+	if update_info.new_miner_name is not None:
+		ori_miner_pics = miner_pic_db.find_one({'user_id': update_info.miner_name})['img']
+		miner_pic_db.save_img(user_id=update_info.new_miner_name, img=BytesIO(bytes(ori_miner_pics, encoding='utf-8')))
+		updates['miner_name'] = update_info.new_miner_name
 	miner_db.update_one({'miner_name': miner_name}, updates)
 	return msg(status='success', data='Update miner successfully')
 
