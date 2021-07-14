@@ -37,54 +37,6 @@ CONFIG = redis_service.hget_redis(redis_key='config', content_key='app')
 
 
 @logger.catch(level='ERROR')
-@router.get('/personal_miners')
-async def get_personal_miners():
-	miners = []
-	result = miner_db.query_data()
-	miner_pics = get_miner_pic()
-	for miner in result:
-		del miner['_id']
-		del miner['miner_team_price']
-		for miner_pic in miner_pics:
-			if miner['miner_name'] == miner_pic['user_id']:
-				miner['miner_pic'] = miner_pic['img']
-				miners.append(miner)
-	return msg(status='success', data=miners)
-
-@logger.catch(level='ERROR')
-@router.get('/team_miners')
-async def get_team_miners():
-	miners = []
-	result = miner_db.query_data()
-	miner_pics = get_miner_pic()
-	for miner in result:
-		del miner['_id']
-		del miner['miner_price']
-		for miner_pic in miner_pics:
-			if miner['miner_name'] == miner_pic['user_id']:
-				miner['miner_pic'] = miner_pic['img']
-				miners.append(miner)
-	return msg(status='success', data=miners)
-
-@logger.catch(level='ERROR')
-@router.get('/miner/{miner_name}')
-async def get_one_miner(miner_name):
-	miner_info = miner_db.find_one({'miner_name': miner_name})
-	miner_pic = get_miner_pic(miner_name)['img']
-	del miner_info['miner_team_price']
-	miner_info['miner_pic'] = miner_pic
-	return msg(status='success', data=miner_info)
-
-@logger.catch(level='ERROR')
-@router.get('/team_miner/{miner_name}')
-async def get_one_miner(miner_name):
-	miner_info = miner_db.find_one({'miner_name': miner_name})
-	miner_pic = get_miner_pic(miner_name)['img']
-	del miner_info['miner_price']
-	miner_info['miner_pic'] = miner_pic
-	return msg(status='success', data=miner_info)
-
-@logger.catch(level='ERROR')
 def get_miner_pic(miner_name=None):
 	if not miner_name:
 		all_pics = []
@@ -96,6 +48,68 @@ def get_miner_pic(miner_name=None):
 	else:
 		result = miner_pic_db.find_one({'user_id': miner_name})
 		return result
+
+@logger.catch(level='ERROR')
+@router.get('/personal_miners')
+async def get_personal_miners():
+	miners = []
+	result = miner_db.query_data()
+	# miner_pics = get_miner_pic()
+	for miner in result:
+		if miner['miner_price'] == 0:
+			continue
+		try:
+			miner_pic = miner_pic_db.find_one({'user_id': miner['miner_name']})
+		except Exception as e:
+			miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})
+		del miner['_id']
+		del miner['miner_team_price']
+		miner['miner_pic'] = miner_pic
+		miners.append(miner)
+	return msg(status='success', data=miners)
+
+@logger.catch(level='ERROR')
+@router.get('/team_miners')
+async def get_team_miners():
+	miners = []
+	result = miner_db.query_data()
+	# miner_pics = get_miner_pic()
+	for miner in result:
+		if miner['miner_team_price'] == 0:
+			continue
+		try:
+			miner_pic = miner_pic_db.find_one({'user_id': miner['miner_name']})
+		except Exception as e:
+			miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})
+		miner['miner_pic'] = miner_pic
+		del miner['_id']
+		del miner['miner_price']
+		miners.append(miner)
+	return msg(status='success', data=miners)
+
+@logger.catch(level='ERROR')
+@router.get('/miner/{miner_name}')
+async def get_one_miner(miner_name):
+	miner_info = miner_db.find_one({'miner_name': miner_name})
+	try:
+		miner_pic = miner_pic_db.find_one({'user_id': miner_name})
+	except Exception as e:
+		miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})
+	del miner_info['miner_team_price']
+	miner_info['miner_pic'] = miner_pic
+	return msg(status='success', data=miner_info)
+
+@logger.catch(level='ERROR')
+@router.get('/team_miner/{miner_name}')
+async def get_one_miner(miner_name):
+	miner_info = miner_db.find_one({'miner_name': miner_name})
+	try:
+		miner_pic = miner_pic_db.find_one({'user_id': miner_name})
+	except Exception as e:
+		miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})
+	del miner_info['miner_price']
+	miner_info['miner_pic'] = miner_pic
+	return msg(status='success', data=miner_info)
 
 @logger.catch(level='ERROR')
 @router.post('/buy_miner')
