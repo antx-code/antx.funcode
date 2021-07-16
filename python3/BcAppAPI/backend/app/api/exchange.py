@@ -59,9 +59,9 @@ async def get_personal_miners():
 		if miner['miner_price'] == 0:
 			continue
 		try:
-			miner_pic = miner_pic_db.find_one({'user_id': miner['miner_name']})
+			miner_pic = miner_pic_db.find_one({'user_id': miner['miner_name']})['img']
 		except Exception as e:
-			miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})
+			miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})['img']
 		del miner['_id']
 		del miner['miner_team_price']
 		miner['miner_pic'] = miner_pic
@@ -78,9 +78,9 @@ async def get_team_miners():
 		if miner['miner_team_price'] == 0:
 			continue
 		try:
-			miner_pic = miner_pic_db.find_one({'user_id': miner['miner_name']})
+			miner_pic = miner_pic_db.find_one({'user_id': miner['miner_name']})['img']
 		except Exception as e:
-			miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})
+			miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})['img']
 		miner['miner_pic'] = miner_pic
 		del miner['_id']
 		del miner['miner_price']
@@ -92,9 +92,9 @@ async def get_team_miners():
 async def get_one_miner(miner_name):
 	miner_info = miner_db.find_one({'miner_name': miner_name})
 	try:
-		miner_pic = miner_pic_db.find_one({'user_id': miner_name})
+		miner_pic = miner_pic_db.find_one({'user_id': miner_name})['img']
 	except Exception as e:
-		miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})
+		miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})['img']
 	del miner_info['miner_team_price']
 	miner_info['miner_pic'] = miner_pic
 	return msg(status='success', data=miner_info)
@@ -104,9 +104,9 @@ async def get_one_miner(miner_name):
 async def get_one_miner(miner_name):
 	miner_info = miner_db.find_one({'miner_name': miner_name})
 	try:
-		miner_pic = miner_pic_db.find_one({'user_id': miner_name})
+		miner_pic = miner_pic_db.find_one({'user_id': miner_name})['img']
 	except Exception as e:
-		miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})
+		miner_pic = miner_pic_db.find_one({'user_id': 'default_miner'})['img']
 	del miner_info['miner_price']
 	miner_info['miner_pic'] = miner_pic
 	return msg(status='success', data=miner_info)
